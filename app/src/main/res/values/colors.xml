@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background_gray_color">#fff5f5f5</color>
+    <color name="common_action_bar_splitter">#ffd2d2d2</color>
+    <color name="divider_grey">#ffefefef</color>
+    <color name="header_divider">#ff999999</color>
+    <color name="green">#00a650</color>
+    <color name="white">#ffffffff</color>
+    <color name="black">#ff000000</color>
+    <color name="camera_activity_picture_text_message_background">#99000000</color>
+    <color name="transparent">#000000</color>
+    <color name="black_sixty_opacity">#99000000</color>
+</resources>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="settings_section_header" parent="@android:attr/listSeparatorTextViewStyle">
+        <item name="android:textSize">20.0dip</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@color/green</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:paddingTop">4.0dip</item>
+        <item name="android:paddingBottom">4.0dip</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="TopPanel">
+        <item name="android:background">@color/green</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">48.0dip</item>
+        <item name="android:layout_alignParentTop">true</item>
+    </style>
+
+    <style name="settings_checkbox">
+        <item name="android:background">@drawable/settings_button_selector</item>
+        <item name="android:layout_width">@dimen/checkbox_size</item>
+        <item name="android:layout_height">@dimen/checkbox_size</item>
+        <item name="android:layout_marginRight">@dimen/default_gap_half</item>
+        <item name="android:checked">true</item>
+        <item name="android:button">@null</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_centerInParent">true</item>
+    </style>
+
+    <style name="listViewPrefs" parent="@android:style/Widget.ListView">
+        <item name="android:background">@drawable/aa_blank</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">?android:listPreferredItemHeight</item>
+        <item name="android:textSize">30.0sp</item>
+        <item name="android:layout_alignParentLeft">true</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:cacheColorHint">@color/white</item>
+        <item name="android:listSelector">@drawable/aa_blank</item>
+        <item name="android:divider">@color/divider_grey</item>
+        <item name="android:headerDividersEnabled">true</item>
+    </style>
+
+    <style name="ActionBar.Solid.Snapprefs" parent="@android:style/Widget.Holo.ActionBar.Solid">
+        <item name="android:background">@drawable/ab_solid_snapprefs</item>
+        <item name="android:backgroundStacked">@drawable/ab_stacked_solid_snapprefs</item>
+        <item name="android:backgroundSplit">@drawable/ab_bottom_solid_snapprefs</item>
+        <item name="android:progressBarStyle">@style/ProgressBar.Snapprefs</item>
+    </style>
+
+    <style name="ActionBar.Transparent.Snapprefs" parent="@android:style/Widget.Holo.ActionBar">
+        <item name="android:background">@drawable/ab_transparent_snapprefs</item>
+        <item name="android:progressBarStyle">@style/ProgressBar.Snapprefs</item>
+    </style>
+
+    <style name="PopupMenu.Snapprefs" parent="@android:style/Widget.Holo.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_snapprefs</item>
+    </style>
+
+    <style name="DropDownListView.Snapprefs" parent="@android:style/Widget.Holo.ListView.DropDown">
+        <item name="android:listSelector">@drawable/selectable_background_snapprefs</item>
+    </style>
+
+    <style name="ActionBarTabStyle.Snapprefs" parent="@android:style/Widget.Holo.ActionBar.TabView">
+        <item name="android:background">@drawable/tab_indicator_ab_snapprefs</item>
+    </style>
+
+    <style name="DropDownNav.Snapprefs" parent="@android:style/Widget.Holo.Spinner">
+        <item name="android:background">@drawable/spinner_background_ab_snapprefs</item>
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_snapprefs</item>
+        <item name="android:dropDownSelector">@drawable/selectable_background_snapprefs</item>
+    </style>
+
+    <style name="ProgressBar.Snapprefs" parent="@android:style/Widget.Holo.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_snapprefs</item>
+    </style>
+
+    <style name="ActionButton.CloseMode.Snapprefs" parent="@android:style/Widget.Holo.ActionButton.CloseMode">
+        <item name="android:background">@drawable/btn_cab_done_snapprefs</item>
+    </style>
+
+    <!-- this style is only referenced in a Light.DarkActionBar based theme -->
+    <style name="Theme.Snapprefs.Widget" parent="@android:style/Theme.Holo">
+        <item name="android:popupMenuStyle">@style/PopupMenu.Snapprefs</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Snapprefs</item>
+    </style>
+
+    <style name="CheckBoxAppTheme" parent="android:Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/btn_check_holo_light</item>
+    </style>
+</resources>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="App_Theme" parent="android:Theme.Holo.Light">
+        <item name="android:textColor">@color/black</item>
+        <item name="android:background">@drawable/aa_blank</item>
+        <item name="android:listViewStyle">@style/listViewPrefs</item>
+        <item name="android:listSeparatorTextViewStyle">@style/settings_section_header</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">#ff808080</item>
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:actionBarItemBackground">@drawable/selectable_background_snapprefs
+        </item>
+        <item name="android:popupMenuStyle">@style/PopupMenu.Snapprefs</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Snapprefs</item>
+        <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Snapprefs</item>
+        <item name="android:actionDropDownStyle">@style/DropDownNav.Snapprefs</item>
+        <item name="android:actionBarStyle">@style/ActionBar.Solid.Snapprefs</item>
+        <item name="android:actionModeBackground">@drawable/cab_background_top_snapprefs</item>
+        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_snapprefs
+        </item>
+        <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Snapprefs
+        </item>
+        <item name="android:checkboxStyle">@style/CheckBoxAppTheme</item>
+    </style>
+</resources> 

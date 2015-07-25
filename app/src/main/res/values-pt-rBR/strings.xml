@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SNAPPREFS</string>
+    <string name="pref_general_title">CONFIGURAÇÕES GERAIS</string>
+    <string name="pref_received_title">SNAPS RECEBIDOS</string>
+    <string name="pref_sent_title">SNAPS ENVIADOS</string>
+    <string name="pref_colour_title">CONFIGURAÇÕES DE COR</string>
+    <string name="pref_debug_title">INFORMAÇÕES</string>
+
+    <string name="pref_thanks_title">Agradecimentos para</string>
+    <string name="pref_thanks_summary">P1ngu1n, manvir, elesbb, chiralcode, Yoganandh, brunolafm</string>
+    <string name="pref_donate_title">Doar</string>
+    <string name="pref_donate_summary">Contribua me pagando uma cerveja. Doações são muito apreciadas.</string>
+
+    <string name="pref_support_title">Ajuda</string>
+    <string name="pref_support_summary">Abrir o tópico do modulo no XDA, por favor, procure antes de fazer sua pergunta.</string>
+
+    <string name="hidebf_text">Ocultar melhores amigos</string>
+    <string name="hidebf_summary">Ocultar seus melhores amigos</string>
+    <string name="hiderecent_text">Ocultar recentes</string>
+    <string name="hiderecent_summary">Ocultar pessoas que você enviou snaps recentemente</string>
+
+    <string name="screenshot_text">Detecção de Screenshot</string>
+    <string name="screenshot_text_summary">Bloquear o aviso de screenshot</string>
+
+    <string name="full_text">Texto ilimitado</string>
+    <string name="full_text_summary">Habilitar texto ilimitado para legenda</string>
+    <string name="select_text">Selecionar tudo</string>
+    <string name="select_text_summary">Adicionar opção de selecionar tudo para envio snaps</string>
+    <string name="selectstory_text">Incluir minha história</string>
+    <string name="selectstory_text_summary">Inclui minha história para a função de selecionar tudo</string>
+
+    <string name="rainbow_text">Texto em arco íris</string>
+    <string name="rainbow_text_summary">Faz cada letra ter uma cor diferente</string>
+    <string name="txtcolour_text">Personalização de cor do texto</string>
+    <string name="txtstyle_text">Estilos de texto personalizado</string>
+    <string name="txtstyle_text_summary">Habilitar negrito e itálico</string>
+    <string name="txtgravity_text">Gravidade do texto</string>
+    <string name="txtgravity_text_summary">Habilita mudanças no alinhamento do texto</string>
+    <string name="bgcolour_text">Habilita mudanças da cor do plano de fundo</string>
+    <string name="bg_transparency_text">Opacidade do plano de fundo personalizada</string>
+    <string name="size_text">Tamanho do texto personalizado</string>
+    <string name="transparency_text">Mudanças na opacidade da legenda</string>
+    <string name="debug_text">Modo de depuração</string>
+    <string name="pref_update_title">Para obter as últimas atualizações</string>
+    <string name="pref_update_summary">Adicionar \'snapprefs \' em Snapchat</string>
+    <string name="version_text">Versão</string>
+    <string name="general">Configurações gerais  </string>
+    <string name="saving">Configurações de salvamento</string>
+    <string name="sharing">Configurações de compartilhamento</string>
+
+    <string name="button_label">OK</string>
+    <string name="pref_name">Selecionados uma cor</string>
+    <string name="pref_summary">Preferência de diálogo com a seleção de cor</string>
+    <string name="dialog_default">Padrão</string>
+
+    <string name="dialog_txtcolor">Cor do texto</string>
+    <string name="dialog_bgcolor">Cor do plano de fundo</string>
+
+    <string name="caption_onboarding_message">Toque para adicionar uma legenda!</string>
+    <string name="swipe_filters_onboarding_message">Arraste para ver os filtros!</string>
+
+    <!-- Saving settings -->
+    <string name="pref_category_snapchats">Salvamento</string>
+    <string name="pref_save_snaps_images">Snaps de imagem</string>
+    <string name="pref_save_snaps_videos">Snaps de vídeo</string>
+    <string name="pref_save_stories_images">Imagens da história</string>
+    <string name="pref_save_stories_videos">Vídeos da história</string>
+    <string name="pref_save_sent_snaps_title">Snaps enviados</string>
+    <string name="pref_save_sent_snaps_summary_on">Snap enviados serão salvos</string>
+    <string name="pref_save_sent_snaps_summary_off">Snaps enviados não serão salvos</string>
+
+    <string-array name="pref_save_mode_entries">
+        <item>Salvar automaticamente</item>
+        <item>Arraste para salvar</item>
+        <item>Não salvar</item>
+    </string-array>
+
+
+    <!-- Viewing settings -->
+
+    <string name="pref_category_viewing">Visualizando</string>
+    <string name="pref_timer_minimum_title">Tempo mínimo de duração</string>
+    <string-array name="pref_timer_minimum_entries">
+        <item>Desabilitado</item>
+        <item>3 segundos</item>
+        <item>5 segundos</item>
+        <item>7 segundos</item>
+        <item>10 segundos</item>
+    </string-array>
+
+    <string name="pref_toasts_title">Mostrar mensagens de salvamento</string>
+    <string name="pref_toasts_summary_on">Aviso de salvamento habilitado</string>
+    <string name="pref_toasts_summary_off">Aviso de salvamento desabilitado</string>
+    <string name="pref_toasts_duration_title">Duração de aviso</string>
+    <string-array name="pref_toasts_duration_entries">
+        <item>Curto</item>
+        <item>Longo</item>
+    </string-array>
+    <!-- Folder settings -->
+
+
+    <string name="pref_category_folder">Pasta</string>
+    <string name="pref_hide_location_title">Esconder uma pasta</string>
+    <string name="pref_save_location_title">Local de salvamento</string>
+    <string name="pref_sort_files_mode_title">Organizar arquivos por categoria</string>
+    <string name="pref_sort_files_mode_summary_on">Snaps recebidos e histórias serão salvos em pastas diferentes</string>
+    <string name="pref_sort_files_mode_summary_off">Snaps recebidos e histórias serão salvos na mesma pasta</string>
+    <string name="pref_sort_files_username_title">Organizar arquivos por contato</string>
+    <string name="pref_sort_files_username_summary_on">Os arquivos serão salvos em uma subpasta para cada contato</string>
+    <string name="pref_sort_files_username_summary_off">Os arquivos serão salvos na mesma pasta do contato</string>
+
+    <!-- Toast messages -->
+
+    <string name="image_exists">Esta imagem já existe.</string>
+    <string name="video_exists">Este vídeo já existe.</string>
+    <string name="nomedia_exists">Esta pasta está oculta.</string>
+    <string name="image_saved">Esta imagem foi salva.</string>
+    <string name="video_saved">Este vídeo foi salvo.</string>
+    <string name="nomedia_saved">A pasta foi ocultada.</string>
+    <string name="image_not_saved">Ocorreu um erro ao salvar esta imagem.</string>
+    <string name="video_not_saved">Ocorreu um erro ao salva o vídeo.</string>
+    <string name="nomedia_error">Ocorreu um erro ao ocultar esta pasta.</string>
+    <string name="nomedia_storage">Impossível salvar nesta pasta.</string>
+
+    <!-- Dialogs -->
+    <string name="module_not_enabled">O Snapprefs não está habilitado. Por favor, habilite no Xposed Installer e reinicie seu dispositivo.</string>
+    <string name="size_error">"O vídeo que você compartilhou é muito grande (%1$s), ele provavelmente não será enviado. O Snapchat suporta arquivo de até %2$s."</string>
+    <string name="unable_open_xposed">Impossível abrir o Xposed Installer, ele está instalado?</string>
+
+    <string name="open_xposed_installer">Abrir Xposed Installer</string>
+    <string name="continue_anyway">Continuar mesmo assim</string>
+    <string name="go_back">Voltar</string>
+    <string name="close">Fechar</string>
+
+    <!-- Media settings -->
+    <string name="pref_media">Mídia</string>
+
+    <string name="pref_rotation_title">Modo de rotação</string>
+    <string-array name="pref_rotation_entries">
+        <item>Não girar</item>
+        <item>Sentido horário (90°)</item>
+        <item>Sentido anti horário (-90°)</item>
+    </string-array>
+    <string name="pref_adjustment_title">Modo de ajuste da imagem</string>
+    <string-array name="pref_adjustment_entries">
+        <item>Cortar</item>
+        <item>Escala</item>
+        <item>Nenhum</item>
+    </string-array>
+
+    <!-- Caption settings -->
+    <string name="pref_caption">Legendas</string>
+    <string name="pref_caption_explanation">Obs: Texto ilimitado funciona tanto para snaps compartilhados da galeria quanto para snaps tirados com a câmera do Snapchat.</string>
+
+    <string name="pref_caption_unlimited_vanilla_title">Legendas pequenas ilimitadas</string>
+    <string name="pref_caption_unlimited_vanilla_on">As legendas pequenas estão ilimitadas</string>
+    <string name="pref_caption_unlimited_vanilla_off">As legendas pequenas terão só uma linha</string>
+
+    <string name="pref_caption_unlimited_fat_title">Legendas grandes ilimitadas</string>
+    <string name="pref_caption_unlimited_fat_on">As legendas grandes estão ilimitadas</string>
+    <string name="pref_caption_unlimited_fat_off">As legendas grande terão no máximo 33  caracteres</string>
+
+    <!-- Other settings -->
+    <string name="pref_other">Outro</string>
+
+    <string name="pref_launcher_title">Ocultar app</string>
+    <string name="pref_launcher_on">App visível</string>
+    <string name="pref_launcher_off">App oculto</string>
+
+    <string name="pref_debug_on">As informações de depuração serão mostradas nos logs do Xposed</string>
+    <string name="pref_debug_off">As informações de depuração não serão mostradas nos logs do Xposed</string>
+
+
+</resources>

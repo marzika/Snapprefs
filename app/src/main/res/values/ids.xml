@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="picture_caption" type="id" />
+    <item name="bottom_panel" type="id" />
+    <item name="send_to_action_bar_search_bar" type="id" />
+    <item name="action_bar" type="id" />
+    <item name="clear_search_bar" type="id" />
+    <item name="send_to_action_bar_friend_button" type="id" />
+    <item name="send_to_action_bar_search_button" type="id" />
+    <item name="send_to_action_bar_title" type="id" />
+    <item name="send_to_activity_layout" type="id" />
+    <item name="send_to_back_arrow" type="id" />
+    <item name="send_to_back_button_area" type="id" />
+    <item name="send_to_list" type="id" />
+    <item name="snap_preview_relative_layout" type="id" />
+    <item name="snap_editor_view" type="id" />
+    <item name="caption_onboarding_view" type="id" />
+    <item name="color_picker_view" type="id" />
+    <item name="display_time" type="id" />
+    <item name="drawing_btn_selected" type="id" />
+    <item name="drawing_button_color_background" type="id" />
+    <item name="drawing_tools" type="id" />
+    <item name="mute_button" type="id" />
+    <item name="picture_view_menu" type="id" />
+    <item name="drawing_btn" type="id" />
+    <item name="picture_save_pic" type="id" />
+    <item name="picture_x" type="id" />
+    <item name="picture_send_pic" type="id" />
+    <item name="story_button" type="id" />
+    <item name="story_group_list" type="id" />
+    <item name="story_send_layout" type="id" />
+    <item name="swipe_filters_onboarding_view" type="id" />
+    <item name="time_picker_button" type="id" />
+    <item name="toggle_caption_btn" type="id" />
+    <item name="undo_btn" type="id" />
+    <item name="undo_button_color_background" type="id" />
+    <item name="ghost_btn" type="id" />
+</resources>

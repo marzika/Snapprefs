@@ -1,0 +1,30 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "com.marz.snapprefs"
+        minSdkVersion 11
+        targetSdkVersion 21
+        versionCode 12
+        versionName "1.4.3 beta 3"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    provided files('lib/XposedBridgeApi-54.jar')
+    compile 'net.rdrei.android.dirchooser:library:2.1@aar'
+    compile 'com.googlecode.mp4parser:isoparser:1.0.5.4'
+}

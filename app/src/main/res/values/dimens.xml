@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="checkbox_size">28.0dip</dimen>
+    <dimen name="default_gap">8.0dip</dimen>
+    <dimen name="default_gap_2x">16.0dip</dimen>
+    <dimen name="default_gap_3x">24.0dip</dimen>
+    <dimen name="default_gap_4x">32.0dip</dimen>
+    <dimen name="default_gap_5x">40.0dip</dimen>
+    <dimen name="default_gap_half">4.0dip</dimen>
+    <dimen name="default_gap_quarter">2.0dip</dimen>
+    <dimen name="image_preview_text_size">16.0sp</dimen>
+    <dimen name="text_size_default">18.0sp</dimen>
+    <dimen name="text_size_fine_print">12.0sp</dimen>
+    <dimen name="ui_element_unit">40.0dip</dimen>
+</resources>

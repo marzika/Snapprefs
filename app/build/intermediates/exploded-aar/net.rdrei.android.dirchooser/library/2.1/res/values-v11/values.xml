@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- From: file:/Users/phartig/Projects/java/Android-DirectoryChooser/library/src/main/res/values-v11/colors.xml -->
+    <eat-comment />
+
+    <color name="selection_background_color">#286E8A</color>
+
+</resources>

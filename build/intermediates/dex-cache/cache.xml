@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2">
+
+    <item
+        jar="G:\AndroidstudioProjects\SnapPref\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\libs\internal_impl-22.2.0.jar"
+        jumboMode="false" revision="21.1.2" sha1="57f2ab85c164ff1676ec64dee787981c046fab79">
+        <dex
+            dex="G:\AndroidstudioProjects\SnapPref\app\build\intermediates\pre-dexed\debug\internal_impl-22.2.0-98a52cfb681ef8d2369847b56172cc8a4aaf57a9.jar" />
+    </item>
+    <item
+        jar="C:\Users\Marcell\.gradle\caches\modules-2\files-2.1\org.aspectj\aspectjrt\1.8.2\7dede91c0c36b1265fc99c55283b90ed2be144c8\aspectjrt-1.8.2.jar"
+        jumboMode="false" revision="21.1.2" sha1="7dede91c0c36b1265fc99c55283b90ed2be144c8">
+        <dex
+            dex="G:\AndroidstudioProjects\SnapPref\app\build\intermediates\pre-dexed\debug\aspectjrt-1.8.2-38a3b490516ee03f5e1cc8b22085046e6e41295a.jar" />
+    </item>
+    <item
+        jar="F:\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\22.2.0\support-annotations-22.2.0.jar"
+        jumboMode="false" revision="21.1.2" sha1="66b42a1f3eb7676070b7ef7f14b603483aecbee1">
+        <dex
+            dex="G:\AndroidstudioProjects\SnapPref\app\build\intermediates\pre-dexed\debug\support-annotations-22.2.0-ef19fd8021d4fade96e8be49bb9ac46ae283f59a.jar" />
+    </item>
+    <item
+        jar="G:\AndroidstudioProjects\SnapPref\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\22.2.0\classes.jar"
+        jumboMode="false" revision="21.1.2" sha1="5b37cf49773f7f17aca9830efd3053b0cac56728">
+        <dex
+            dex="G:\AndroidstudioProjects\SnapPref\app\build\intermediates\pre-dexed\debug\classes-43d240cf6f0c0a9316921d8c3f40e6035dbd8956.jar" />
+    </item>
+    <item
+        jar="G:\AndroidstudioProjects\SnapPref\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.2.0\classes.jar"
+        jumboMode="false" revision="21.1.2" sha1="1ee588ff2c4daf7b97c1cbf922a6c7f027285c2f">
+        <dex
+            dex="G:\AndroidstudioProjects\SnapPref\app\build\intermediates\pre-dexed\debug\classes-0aa60c9ff0169044baa7b79e8af8d26312ebe72a.jar" />
+    </item>
+    <item
+        jar="C:\Users\Marcell\.gradle\caches\modules-2\files-2.1\com.googlecode.mp4parser\isoparser\1.0.5.4\232e5130b709e6cc2ac4c4e5c5212a89929ab592\isoparser-1.0.5.4.jar"
+        jumboMode="false" revision="21.1.2" sha1="232e5130b709e6cc2ac4c4e5c5212a89929ab592">
+        <dex
+            dex="G:\AndroidstudioProjects\SnapPref\app\build\intermediates\pre-dexed\debug\isoparser-1.0.5.4-d7493031b89c5b59d910a1962be4e23b79c561ad.jar" />
+    </item>
+    <item
+        jar="G:\AndroidstudioProjects\SnapPref\app\build\intermediates\exploded-aar\net.rdrei.android.dirchooser\library\2.1\classes.jar"
+        jumboMode="false" revision="21.1.2" sha1="80f7977c9545ad0472210159da0878eda4ecb283">
+        <dex
+            dex="G:\AndroidstudioProjects\SnapPref\app\build\intermediates\pre-dexed\debug\classes-3816da35437f5bf2f53a480fc305c3cc1dd0f04d.jar" />
+    </item>
+
+</items>
