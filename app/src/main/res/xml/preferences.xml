@@ -56,6 +56,21 @@
                 android:summary="@string/selectstory_text_summary"
                 android:title="@string/selectstory_text" />
         </PreferenceCategory>
+        <PreferenceCategory
+            android:key="pref_key_filter"
+            android:title="@string/pref_filter_title">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_custom_filter_checkbox"
+                android:summaryOff="@string/pref_custom_filter_cb_summary_off"
+                android:summaryOn="@string/pref_custom_filter_cb_summary_on"
+                android:title="@string/pref_custom_filter_cb_title" />
+            <Preference
+                android:defaultValue="-1"
+                android:key="pref_key_filter_location"
+                android:persistent="true"
+                android:title="@string/pref_custom_filter_title" />
+        </PreferenceCategory>
     </PreferenceScreen>
     <PreferenceScreen
         android:key="button_text_settings"

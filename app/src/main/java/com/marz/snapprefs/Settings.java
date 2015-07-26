@@ -23,9 +23,11 @@ import java.io.FileOutputStream;
 public class Settings extends PreferenceFragment {
     public static final String PREF_KEY_SAVE_LOCATION = "pref_key_save_location";
     public static final String PREF_KEY_HIDE_LOCATION = "pref_key_hide_location";
+    public static final String PREF_KEY_FILTER_LOCATION = "pref_key_filter_location";
     public static final String PREF_KEY_MOCK_LOCATION = "pref_key_mock_location";
     private static final int REQUEST_CHOOSE_DIR = 0x0B00B135;
     private static final int REQUEST_HIDE_DIR = 0x2B00B135;
+    private static final int REQUEST_FILTER_DIR = 0x3B00B135;
     private static XModuleResources mResources;
     private final Preference.OnPreferenceChangeListener launcherChangeListener = new Preference.OnPreferenceChangeListener() {
 
@@ -138,6 +140,19 @@ public class Settings extends PreferenceFragment {
             }
         });
         */
+        Preference filterChooser = findPreference(PREF_KEY_FILTER_LOCATION);
+        filterChooser.setSummary(sharedPreferences.getString(PREF_KEY_FILTER_LOCATION, ""));
+        filterChooser.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                // Open a new activity asking the user to select a folder
+                final Intent chooserIntent = new Intent(getActivity(), DirectoryChooserActivity.class);
+                chooserIntent.putExtra(DirectoryChooserActivity.EXTRA_NEW_DIR_NAME, "Snapprefs");
+                startActivityForResult(chooserIntent, REQUEST_FILTER_DIR);
+                return true;
+            }
+        });
+
         // Set onClickListener for choosing the Save Location
         Preference locationChooser = findPreference(PREF_KEY_SAVE_LOCATION);
         locationChooser.setSummary(sharedPreferences.getString(PREF_KEY_SAVE_LOCATION, ""));
@@ -194,6 +209,19 @@ public class Settings extends PreferenceFragment {
                 writeNoMediaFile(newHiddenLocation);
                 Preference pref = findPreference(PREF_KEY_HIDE_LOCATION);
                 pref.setSummary("Last hidden:" + newHiddenLocation);
+            }
+        }
+        if (requestCode == REQUEST_FILTER_DIR) {
+            if (resultCode == DirectoryChooserActivity.RESULT_CODE_DIR_SELECTED) {
+                String newFilterLocation = data.getStringExtra(DirectoryChooserActivity.RESULT_SELECTED_DIR);
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(PREF_KEY_FILTER_LOCATION, newFilterLocation);
+                editor.apply();
+
+                writeNoMediaFile(newFilterLocation);
+                Preference pref = findPreference(PREF_KEY_FILTER_LOCATION);
+                pref.setSummary(newFilterLocation);
             }
         }
     }

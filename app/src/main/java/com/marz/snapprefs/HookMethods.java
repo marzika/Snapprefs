@@ -5,9 +5,6 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
-import android.content.res.XResources;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +14,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.marz.snapprefs.Util.XposedUtils;
@@ -41,6 +39,7 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
 import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
 
@@ -64,11 +63,13 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static int mModeStoryImage = SAVE_AUTO;
     public static int mModeStoryVideo = SAVE_AUTO;
     public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
+    public static boolean mCustomFilterBoolean = false;
     public static boolean mTimerUnlimited = true;
     public static boolean mHideTimer = false;
     public static boolean mToastEnabled = true;
     public static int mToastLength = TOAST_LENGTH_LONG;
     public static String mSavePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
+    public static String mCustomFilterLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/Filters";
     public static boolean mSaveSentSnaps = false;
     public static boolean mSortByCategory = true;
     public static boolean mSortByUsername = true;
@@ -127,6 +128,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         bg_transparency = prefs.getBoolean("pref_key_bg_transparency", false);
         txtstyle = prefs.getBoolean("pref_key_txtstyle", false);
         txtgravity = prefs.getBoolean("pref_key_txtgravity", false);
+        mCustomFilterBoolean = prefs.getBoolean("pref_key_custom_filter_checkbox", mCustomFilterBoolean);
+        mCustomFilterLocation = prefs.getString("pref_key_filter_location", mCustomFilterLocation);
         debug = prefs.getBoolean("pref_key_debug", false);
 
         //SAVING
@@ -182,24 +185,14 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             return;
 
         refreshPreferences();
-        try {
-            Logger.log("We are trying to get modres", true);
             modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
-            Logger.log("Got modRes, trying to replace camera_batteryfilter_full", true);
-            resparam.res.setReplacement(resparam.packageName, "drawable", "camera_batteryfilter_full", new XResources.DrawableLoader() {
+            /*resparam.res.setReplacement(resparam.packageName, "drawable", "custom_filter_1", new XResources.DrawableLoader() {
                 public Drawable newDrawable(XResources p1, int p2) throws Throwable {
-                    /*Drawable e = Drawable.createFromPath("/sdcard/Snapprefs/Filters/custom_filter.png");
-                    return e;*/
-                    return new ColorDrawable(Color.WHITE);
+                    //Drawable e = Drawable.createFromPath("/sdcard/Snapprefs/Filters/custom_filter.png");
+                    Drawable e = mResources.getDrawable(R.drawable.custom_filter_1);
+                    return e;
                 }
-
-                ;
-            });
-            Logger.log("Replaced filter", true);
-        } catch (Throwable t) {
-            Logger.log("Error while replacing filter", true);
-            Logger.log(t.toString(), true);
-        }
+            });*/
         if (colours == true) {
             addGhost(resparam);
         }
@@ -346,9 +339,49 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         }
 		});
 		}*/
+        if (mCustomFilterBoolean == true) {
+            addFilter(lpparam);
+        }
         if (selectAll == true) {
             HookSendList.initSelectAll(lpparam);
         }
+    }
+
+    private void addFilter(LoadPackageParam lpparam) {
+        //Replaces the batteryfilter with our custom one
+        findAndHookMethod(ImageView.class, "setImageResource", int.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                try {
+                    XModuleResources modRes = XModuleResources.createInstance(MODULE_PATH, null);
+                    ImageView iv = (ImageView) param.thisObject;
+                    int resId = (Integer) param.args[0];
+                    if (iv != null)
+                        if (iv.getContext().getPackageName().equals("com.snapchat.android"))
+                            if (resId == iv.getContext().getResources().getIdentifier("camera_batteryfilter_full", "drawable", "com.snapchat.android"))
+                                if (mCustomFilterLocation == null) {
+                                    iv.setImageDrawable(modRes.getDrawable(R.drawable.custom_filter_1));
+                                    Logger.log("Replaced batteryfilter from R.drawable", true);
+                                } else {
+                                    iv.setImageDrawable(Drawable.createFromPath(mCustomFilterLocation + "/custom_filter.png"));
+                                    Logger.log("Replaced batteryfilter from " + mCustomFilterLocation, true);
+                                }
+                    //else if (resId == iv.getContext().getResources().getIdentifier("camera_batteryfilter_empty", "drawable", "com.snapchat.android"))
+                    //    iv.setImageDrawable(modRes.getDrawable(R.drawable.custom_filter_1)); quick switch to a 2nd filter?
+                } catch (Throwable t) {
+                    XposedBridge.log(t);
+                }
+            }
+        });
+        //Used to emulate the battery status as being FULL -> above 90%
+        final Class<?> batteryInfoProviderEnum = findClass("com.snapchat.android.location.geofilter.BatteryInfoProvider$BatteryLevel", lpparam.classLoader);
+        findAndHookMethod("com.snapchat.android.location.geofilter.BatteryInfoProvider", lpparam.classLoader, "a", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                Object battery = getStaticObjectField(batteryInfoProviderEnum, "FULL_BATTERY");
+                param.setResult(battery);
+            }
+        });
     }
 
     private void printSettings() {
@@ -370,6 +403,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("Background Transparency: " + bg_transparency);
         logging("TextStyle: " + txtstyle);
         logging("TextGravity: " + txtgravity);
+        logging("CustomFilters: " + mCustomFilterBoolean);
+        logging("CustomFiltersLocation: " + mCustomFilterLocation);
         logging("*****Debugging: " + debug + " *****");
         logging("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         Logger.setDebuggingEnabled(mDebugging);
