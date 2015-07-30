@@ -70,6 +70,10 @@
                 android:key="pref_key_filter_location"
                 android:persistent="true"
                 android:title="@string/pref_custom_filter_title" />
+            <Preference
+                android:key="pref_filter_readme"
+                android:summary="@string/pref_filter_readme_summary"
+                android:title="@string/pref_filter_readme_title" />
         </PreferenceCategory>
     </PreferenceScreen>
     <PreferenceScreen
@@ -245,6 +249,64 @@
                 android:title="@string/pref_adjustment_title" />
         </PreferenceCategory>
     </PreferenceScreen>
+    <PreferenceScreen
+        android:key="button_spoofing_settings"
+        android:persistent="false"
+        android:title="@string/spoofing">
+        <PreferenceCategory android:title="@string/pref_speed_title">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_speed"
+                android:summaryOff="@string/pref_speed_summary_off"
+                android:summaryOn="@string/pref_speed_summary_on"
+                android:title="@string/pref_speed_title" />
+            <Preference
+                android:key="pref_speed_readme"
+                android:summary="@string/pref_speed_readme_summary"
+                android:title="@string/pref_speed_readme_title" />
+        </PreferenceCategory>
+        <PreferenceCategory android:title="@string/pref_location_title">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_location"
+                android:summaryOff="@string/pref_location_summary_off"
+                android:summaryOn="@string/pref_location_summary_on"
+                android:title="@string/pref_location_title" />
+            <EditTextPreference
+                android:dialogTitle="@string/pref_location_latitude_dialog"
+                android:inputType="number|numberDecimal|numberSigned"
+                android:key="pref_key_location_latitude"
+                android:summary="@string/pref_location_latitude_summary"
+                android:title="@string/pref_location_latitude_title" />
+            <EditTextPreference
+                android:dialogTitle="@string/pref_location_longitude_dialog"
+                android:inputType="number|numberDecimal|numberSigned"
+                android:key="pref_key_location_longitude"
+                android:summary="@string/pref_location_longitude_summary"
+                android:title="@string/pref_location_longitude_title" />
+            <Preference
+                android:key="pref_location_readme"
+                android:summary="@string/pref_location_readme_summary"
+                android:title="@string/pref_location_readme_title" />
+        </PreferenceCategory>
+    </PreferenceScreen>
+    <PreferenceScreen
+        android:key="button_datasaving_settings"
+        android:persistent="false"
+        android:title="@string/datasaving">
+        <PreferenceCategory android:title="@string/datasaving">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_discover"
+                android:summaryOff="@string/pref_discover_summary_off"
+                android:summaryOn="@string/pref_discover_summary_on"
+                android:title="@string/pref_discover_title" />
+            <Preference
+                android:key="pref_discover_readme"
+                android:summary="@string/pref_discover_readme_summary"
+                android:title="@string/pref_discover_readme_title" />
+        </PreferenceCategory>
+    </PreferenceScreen>
     <!--
     <PreferenceScreen
         android:key="button_mock_settings"
@@ -288,13 +350,30 @@
                 android:defaultValue="false"
                 android:key="pref_key_debug"
                 android:title="@string/debug_text" />
+            <Preference
+                android:defaultValue="false"
+                android:enabled="false"
+                android:key="pref_key_version"
+                android:summary="@string/version_summary"
+                android:title="@string/version_text" />
         </PreferenceScreen>
-        <Preference
-            android:defaultValue="false"
-            android:enabled="false"
-            android:key="pref_key_version"
-            android:summary="@string/version_summary"
-            android:title="@string/version_text" />
+        <PreferenceScreen
+            android:key="button_latest"
+            android:title="@string/pref_update_title">
+            <Preference
+                android:enabled="false"
+                android:key="pref_add_sc"
+                android:summary="@string/pref_snapchat_summary"
+                android:title="@string/pref_snapchat" />
+            <Preference
+                android:key="pref_add_ig"
+                android:summary="@string/pref_instagram_summary"
+                android:title="@string/pref_instagram">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="https://instagram.com/meszarosmarci" />
+            </Preference>
+        </PreferenceScreen>
         <Preference
             android:key="pref_donate"
             android:summary="@string/pref_donate_summary"
@@ -303,11 +382,7 @@
                 android:action="android.intent.action.VIEW"
                 android:data="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=SL45E99ZBUUCQ" />
         </Preference>
-        <Preference
-            android:enabled="false"
-            android:key="pref_add"
-            android:summary="@string/pref_update_summary"
-            android:title="@string/pref_update_title" />
+
         <Preference
             android:enabled="false"
             android:key="pref_thanks"

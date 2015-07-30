@@ -6,7 +6,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.InputFilter;
@@ -20,8 +19,6 @@ import android.widget.RelativeLayout;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 
 import de.robv.android.xposed.IXposedHookInitPackageResources;
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -74,6 +71,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static boolean mSortByCategory = true;
     public static boolean mSortByUsername = true;
     public static boolean mDebugging = true;
+    public static boolean mSpeed = false;
+    public static boolean mDiscover = false;
     static XSharedPreferences prefs;
     static boolean selectStory;
     static boolean txtcolours;
@@ -88,7 +87,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     static EditText editText;
     static XModuleResources modRes;
     static Context SnapContext;
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
     private static XModuleResources mResources;
     private static int snapchatVersion;
     private static String MODULE_PATH = null;
@@ -96,13 +94,13 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     private static boolean selectAll;
     private static boolean hideBf;
     private static boolean hideRecent;
-    private static boolean colours;
+    private static boolean shouldAddGhost;
+    private static boolean mColours;
+    private static float mSpeedValue;
+    private static String mLatitude;
+    private static String mLongitude;
+    private static boolean mLocation;
     Class CaptionEditText;
-    //SNAPSHARE
-    private Uri initializedUri;
-    private XSharedPreferences sharedPreferences;
-    private GestureModel gestureModel;
-    private int screenHeight;
 
     public static int px(float f) {
         return Math.round((f * SnapContext.getResources().getDisplayMetrics().density));
@@ -130,6 +128,12 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         txtgravity = prefs.getBoolean("pref_key_txtgravity", false);
         mCustomFilterBoolean = prefs.getBoolean("pref_key_custom_filter_checkbox", mCustomFilterBoolean);
         mCustomFilterLocation = prefs.getString("pref_key_filter_location", mCustomFilterLocation);
+        mSpeed = prefs.getBoolean("pref_key_speed", false);
+        mSpeedValue = prefs.getFloat("pref_key_speed_value", 0F);
+        mLatitude = prefs.getString("pref_key_location_latitude", null);
+        mLongitude = prefs.getString("pref_key_location_longitude", null);
+        mLocation = prefs.getBoolean("pref_key_location", false);
+        mDiscover = prefs.getBoolean("pref_key_discover", false);
         debug = prefs.getBoolean("pref_key_debug", false);
 
         //SAVING
@@ -161,15 +165,28 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         Common.TIMBER = prefs.getBoolean("pref_timber", Common.TIMBER);
 
         if (txtcolours == true || bgcolours == true || size == true || rainbow == true || bg_transparency == true || txtstyle == true || txtgravity == true) {
-            colours = true;
+            mColours = true;
         } else {
-            colours = false;
+            mColours = false;
+        }
+
+        if (mSpeed || mColours) {
+            shouldAddGhost = true;
+        } else {
+            shouldAddGhost = false;
         }
     }
 
     static void logging(String message) {
         if (debug == true)
             XposedBridge.log(message);
+    }
+
+    public static void printStackTraces() {
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        for (StackTraceElement element : stackTraceElements) {
+            Logger.log("Class name :: " + element.getClassName() + "  || method name :: " + element.getMethodName());
+        }
     }
 
     @Override
@@ -193,7 +210,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                     return e;
                 }
             });*/
-        if (colours == true) {
+        if (shouldAddGhost == true) {
             addGhost(resparam);
         }
     }
@@ -219,7 +236,15 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         prefs.reload();
         refreshPreferences();
         printSettings();
-        getEditText(lpparam);/*
+        getEditText(lpparam);
+
+       /* findAndHookMethod("com.squareup.otto.Bus", lpparam.classLoader, "a", Object.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                printStackTraces();
+            }
+        });/*
+        /*
         final Class<?> receivedSnapClass = findClass("akc", lpparam.classLoader);
 		try{
 			XposedHelpers.setStaticIntField(receivedSnapClass, "SECOND_MAX_VIDEO_DURATION", 20);
@@ -236,9 +261,18 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 SnapContext = (Activity) methodHookParam.thisObject;
                 //SNAPPREFS
                 Saving.initSaving(lpparam, mResources, SnapContext);
+                if (mDiscover == true) {
                 DataSaving.initMethod(lpparam, mResources, SnapContext);
+                }
+                if (mSpeed == true) {
+                    Spoofing.initSpeed(lpparam, SnapContext);
+                }
+                if (mLocation == true) {
+                    Spoofing.initLocation(lpparam, SnapContext, mLatitude, mLongitude);
+                }
             }
         });
+
         // VanillaCaptionEditText was moved from an inner-class to a separate class in 8.1.0
         String vanillaCaptionEditTextClassName = "com.snapchat.android.ui.caption.VanillaCaptionEditText";
         hookAllConstructors(findClass(vanillaCaptionEditTextClassName, lpparam.classLoader), new XC_MethodHook() {
@@ -394,7 +428,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("SelectStory: " + selectStory);
         logging("HideBF: " + hideBf);
         logging("HideRecent: " + hideRecent);
-        logging("Colours: " + colours);
+        logging("ShouldAddGhost: " + shouldAddGhost);
         logging("TxtColours: " + txtcolours);
         logging("BgColours: " + bgcolours);
         logging("Size: " + size);
@@ -405,6 +439,13 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("TextGravity: " + txtgravity);
         logging("CustomFilters: " + mCustomFilterBoolean);
         logging("CustomFiltersLocation: " + mCustomFilterLocation);
+        logging("mSpeed: " + mSpeed);
+        logging("mSpeedValue: " + mSpeedValue);
+        logging("mLocation: " + mLocation);
+        logging("mLatitude: " + mLatitude);
+        logging("mLongitude: " + mLongitude);
+        logging("mDiscover: " + mDiscover);
+        logging("mColours: " + mColours);
         logging("*****Debugging: " + debug + " *****");
         logging("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         Logger.setDebuggingEnabled(mDebugging);
@@ -458,7 +499,24 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         logging("SnapPrefs: Displaying MainDialog");
                     }
                 });
-                relativeLayout.addView(ghost, layoutParams);
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
+                params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
+                params.topMargin = px(3.0f);
+                params.leftMargin = px(110.0f);
+                ImageButton speed = new ImageButton(SnapContext);
+                speed.setBackgroundColor(0);
+                speed.setImageDrawable(mResources.getDrawable(R.drawable.speed));
+                speed.setScaleX((float) 0.4);
+                speed.setScaleY((float) 0.4);
+                speed.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Dialogs.SpeedDialog(SnapContext);
+                        logging("SnapPrefs: Displaying SpeedDialog");
+                    }
+                });
+                if (mColours == true) relativeLayout.addView(speed, params);
+                if (mSpeed == true) relativeLayout.addView(ghost, layoutParams);
             }
         });
     }

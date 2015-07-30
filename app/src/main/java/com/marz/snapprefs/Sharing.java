@@ -13,10 +13,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.InputFilter;
-import android.view.inputmethod.EditorInfo;
 import android.webkit.URLUtil;
-import android.widget.EditText;
 
 import com.marz.snapprefs.Util.CommonUtils;
 import com.marz.snapprefs.Util.ImageUtils;
@@ -28,13 +25,11 @@ import java.io.File;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.newInstance;
-import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
 public class Sharing {
 
@@ -59,7 +54,8 @@ public class Sharing {
             return;
         }
 
-        final Class snapCapturedEventClass = findClass("com.snapchat.android.util.eventbus.SnapCapturedEvent", lpparam.classLoader);
+        final Class snapCapturedEventClass = findClass("bel", lpparam.classLoader); //from LandingPageActivity$6
+        final Class SnapCaptureContext = findClass("com.snapchat.android.util.eventbus.SnapCaptureContext", lpparam.classLoader);
         final Media media = new Media(); // a place to store the image
 
         // This is where the media is loaded and transformed. Hooks after the onCreate() call of the main Activity.
@@ -214,76 +210,25 @@ public class Sharing {
 
                 // Since 4.1.10 a new Class called Snapbryo stores all the data for snaps
                 // SnapCapturedEvent(Snapbryo(Builder(Media)))
-                if (snapchatVersion >= Obfuscator_share.FOUR_ONE_TEN) {
                     Object builder = newInstance(findClass("com.snapchat.android.model.Snapbryo.Builder", lpparam.classLoader));
                     builder = callMethod(builder, Obfuscator_share.BUILDER_CONSTRUCTOR.getValue(snapchatVersion), media.getContent());
                     Object snapbryo = callMethod(builder, Obfuscator_share.CREATE_SNAPBRYO.getValue(snapchatVersion));
-                    snapCaptureEvent = newInstance(snapCapturedEventClass, snapbryo);
-                } else {
-                    snapCaptureEvent = newInstance(snapCapturedEventClass, media.getContent());
-                }
+                snapCaptureEvent = newInstance(snapCapturedEventClass, snapbryo, SnapCaptureContext.getEnumConstants()[2]); //SNAPCAPTURECONTEXT
 
                 // Call the eventbus to post our SnapCapturedEvent, this will take us to the SnapPreviewFragment
-                Object busProvider = callStaticMethod(findClass("com.snapchat.android.util.eventbus.BusProvider", lpparam.classLoader), Obfuscator_share.GET_BUS.getValue(snapchatVersion));
-                callMethod(busProvider, Obfuscator_share.BUS_POST.getValue(snapchatVersion), snapCaptureEvent);
+                Object busProvider = callStaticMethod(findClass("bbq", lpparam.classLoader), "a");//upd. below
+                callMethod(busProvider, "a", snapCaptureEvent);
                 // Clean up after ourselves, otherwise snapchat will crash
                 initializedUri = null;
             }
         };
 
-        // In 5.0.2 CameraPreviewFragment was renamed to CameraFragment
-        String cameraFragment = "com.snapchat.android.camera." + (snapchatVersion < Obfuscator_share.FIVE_ZERO_TWO ? "CameraPreviewFragment" : "CameraFragment");
+        // In 5.0.2 CameraPreviewFragment was renamed to CameraFragment fully updated below
+        String cameraFragment = "com.snapchat.android.camera.CameraFragment";
         // In 5.0.36.0 (beta) refreshFlashButton was removed, we use onCameraStateEvent instead
-        if (snapchatVersion >= Obfuscator_share.FIVE_ZERO_THIRTYSIX) {
-            Class<?> cameraStateEventClass = findClass("com.snapchat.android.util.eventbus.CameraStateEvent", lpparam.classLoader);
-            findAndHookMethod(cameraFragment, lpparam.classLoader, Obfuscator_share.CAMERA_STATE_EVENT, cameraStateEventClass, cameraLoadedHook);
-            XposedUtils.log("Hooked onCameraStateEvent");
-        } else {
-            findAndHookMethod(cameraFragment, lpparam.classLoader, Obfuscator_share.CAMERA_LOAD.getValue(snapchatVersion), cameraLoadedHook);
-            XposedUtils.log("Hooked refreshFlashButton");
-        }
-
-        // VanillaCaptionEditText was moved from an inner-class to a separate class in 8.1.0
-        String vanillaCaptionEditTextClassName = "com.snapchat.android.ui." + (snapchatVersion < Obfuscator_share.EIGHT_ONE_ZERO ? "VanillaCaptionView$VanillaCaptionEditText" : "caption.VanillaCaptionEditText");
-        hookAllConstructors(findClass(vanillaCaptionEditTextClassName, lpparam.classLoader), new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                if (Common.CAPTION_UNLIMITED_VANILLA) {
-                    XposedUtils.log("Unlimited vanilla captions");
-                    EditText vanillaCaptionEditText = (EditText) param.thisObject;
-                    // Set single lines mode to false
-                    vanillaCaptionEditText.setSingleLine(false);
-
-                    // Remove actionDone IME option, by only setting flagNoExtractUi
-                    vanillaCaptionEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
-                    // Remove listener hiding keyboard when enter is pressed by setting the listener to null
-                    vanillaCaptionEditText.setOnEditorActionListener(null);
-                    // Remove listener for cutting of text when the first line is full by setting the text change listeners list to null
-                    setObjectField(vanillaCaptionEditText, "mListeners", null);
-                }
-            }
-        });
-
-        // FatCaptionEditText was moved from an inner-class to a separate class in 8.1.0
-        String fatCaptionEditTextClassName = "com.snapchat.android.ui." + (snapchatVersion < Obfuscator_share.EIGHT_ONE_ZERO ? "FatCaptionView$FatCaptionEditText" : "caption.FatCaptionEditText");
-        hookAllConstructors(findClass(fatCaptionEditTextClassName, lpparam.classLoader), new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                if (Common.CAPTION_UNLIMITED_FAT) {
-                    XposedUtils.log("Unlimited fat captions");
-                    EditText fatCaptionEditText = (EditText) param.thisObject;
-                    // Remove InputFilter with character limit
-                    fatCaptionEditText.setFilters(new InputFilter[0]);
-
-                    // Remove actionDone IME option, by only setting flagNoExtractUi
-                    fatCaptionEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
-                    // Remove listener hiding keyboard when enter is pressed by setting the listener to null
-                    fatCaptionEditText.setOnEditorActionListener(null);
-                    // Remove listener for removing new lines by setting the text change listeners list to null
-                    setObjectField(fatCaptionEditText, "mListeners", null);
-                }
-            }
-        });
+        Class<?> cameraStateEventClass = findClass("bbs", lpparam.classLoader);
+        findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "onCameraStateEvent", cameraStateEventClass, cameraLoadedHook);
+        XposedUtils.log("Hooked onCameraStateEvent");
     }
 
     //SNAPSHARE

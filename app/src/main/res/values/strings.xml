@@ -49,6 +49,38 @@
     <string name="general">General settings</string>
     <string name="saving">Saving settings</string>
     <string name="sharing">Sharing settings -- NOT WORKING YET</string>
+    <string name="spoofing">Spoofing settings</string>
+    <string name="pref_speed_title">Speed spoofing</string>
+    <string name="pref_speed_value_title">Current set speed:</string>
+    <string name="pref_speed_summary_on">Enabled speed spoofing</string>
+    <string name="pref_speed_summary_off">Disabled speed spoofing</string>
+    <string name="pref_speed_readme_summary">After setting the speed, you need to kill the app, then restart it for the changes to take effect.</string>
+    <string name="pref_speed_readme_title">HOW TO USE</string>
+    <string name="pref_filter_readme_title">HOW TO USE</string>
+    <string name="pref_filter_readme_summary">Your custom filter has to be named as "custom_filter.png" in the folder which is by default /sdcard/Snapprefs/Filters. If you changed the filter image, you have to restart Snapchat for the changes to take effect.</string>
+    <string name="pref_discover_readme_title">HOW TO USE</string>
+    <string name="pref_location_summary_off">Location will NOT be spoofed</string>
+    <string name="pref_location_summary_on">Location will be spoofed</string>
+    <string name="pref_location_readme_summary">Location spoofing is experimental, it should work, but also it give it time to load. Go to google and get the coordinates, then paste them into the corresponding fields.</string>
+    <string name="pref_location_readme_title">HOW TO USE</string>
+    <string name="pref_location_title">Location spoofing</string>
+    <string name="pref_location_latitude_dialog">Enter latitude</string>
+    <string name="pref_location_latitude_summary">Click here to enter latitude</string>
+    <string name="pref_location_latitude_title">Latitude</string>
+    <string name="pref_location_longitude_dialog">Enter longitude</string>
+    <string name="pref_location_longitude_summary">Click here to enter longitude</string>
+    <string name="pref_location_longitude_title">Longitude</string>
+    <string name="pref_discover_summary_off">Discover will load and download</string>
+    <string name="pref_discover_summary_on">Discover will NOT load NOR download</string>
+    <string name="pref_discover_title">Disable Discover</string>
+    <string name="datasaving">Datasaving settings</string>
+    <string name="pref_discover_readme_summary">The Discover page and Discover section on the Stories will be there, however they will not be downloaded to your device. Previously downloaded/cached Discovers before enabling this feature will load.</string>
+
+
+    <string name="pref_instagram_summary">\@meszarosmarci</string>
+    <string name="pref_instagram">Add me on Instagram</string>
+    <string name="pref_snapchat">Add me on Snapchat</string>
+    <string name="pref_snapchat_summary">snapprefs -- It is full</string>
 
     <string name="button_label">OK</string>
     <string name="pref_name">Pick a color</string>

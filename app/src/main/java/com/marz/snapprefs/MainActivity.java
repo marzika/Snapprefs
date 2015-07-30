@@ -20,5 +20,6 @@ public class MainActivity extends Activity {
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new Settings()).commit();
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
     }
 }
