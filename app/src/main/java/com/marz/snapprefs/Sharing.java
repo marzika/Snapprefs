@@ -54,7 +54,7 @@ public class Sharing {
             return;
         }
 
-        final Class snapCapturedEventClass = findClass("bel", lpparam.classLoader); //from LandingPageActivity$6
+        final Class snapCapturedEventClass = findClass("bfy", lpparam.classLoader); //from LandingPageActivity$6
         final Class SnapCaptureContext = findClass("com.snapchat.android.util.eventbus.SnapCaptureContext", lpparam.classLoader);
         final Media media = new Media(); // a place to store the image
 
@@ -216,17 +216,15 @@ public class Sharing {
                 snapCaptureEvent = newInstance(snapCapturedEventClass, snapbryo, SnapCaptureContext.getEnumConstants()[2]); //SNAPCAPTURECONTEXT
 
                 // Call the eventbus to post our SnapCapturedEvent, this will take us to the SnapPreviewFragment
-                Object busProvider = callStaticMethod(findClass("bbq", lpparam.classLoader), "a");//upd. below
+                Object busProvider = callStaticMethod(findClass("bdb", lpparam.classLoader), "a");//upd. below
                 callMethod(busProvider, "a", snapCaptureEvent);
                 // Clean up after ourselves, otherwise snapchat will crash
                 initializedUri = null;
             }
         };
 
-        // In 5.0.2 CameraPreviewFragment was renamed to CameraFragment fully updated below
-        String cameraFragment = "com.snapchat.android.camera.CameraFragment";
         // In 5.0.36.0 (beta) refreshFlashButton was removed, we use onCameraStateEvent instead
-        Class<?> cameraStateEventClass = findClass("bbs", lpparam.classLoader);
+        Class<?> cameraStateEventClass = findClass("bdd", lpparam.classLoader);
         findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "onCameraStateEvent", cameraStateEventClass, cameraLoadedHook);
         XposedUtils.log("Hooked onCameraStateEvent");
     }

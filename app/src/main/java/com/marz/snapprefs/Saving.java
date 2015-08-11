@@ -133,7 +133,7 @@ public class Saving {
              * used to determine if we are viewing the actual Snap or not.
              */
 
-            findAndHookMethod(Obfuscator.save.SNAPVIEW_CLASS, lpparam.classLoader, Obfuscator.save.SNAPVIEW_SHOW, findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader), findClass(Obfuscator.save.CHRONOLOGICALSNAPPROVIDER_CLASS, lpparam.classLoader), boolean.class, new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.SNAPVIEW_CLASS, lpparam.classLoader, Obfuscator.save.SNAPVIEW_SHOW, findClass(Obfuscator.save.SNAPVIEW_SHOW_FIRST, lpparam.classLoader), findClass(Obfuscator.save.SNAPVIEW_SHOW_SECOND, lpparam.classLoader), findClass(Obfuscator.save.SNAPVIEW_SHOW_THIRD, lpparam.classLoader), new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     viewingSnap = true;
@@ -308,7 +308,7 @@ public class Saving {
             /**
              * We hook SnapView.c once again to get the receivedSnap argument, then store it along with the classLoader.
              */
-            findAndHookMethod(Obfuscator.save.SNAPVIEW_CLASS, lpparam.classLoader, Obfuscator.save.SNAPVIEW_SHOW, findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader), findClass(Obfuscator.save.CHRONOLOGICALSNAPPROVIDER_CLASS, lpparam.classLoader), boolean.class, new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.SNAPVIEW_CLASS, lpparam.classLoader, Obfuscator.save.SNAPVIEW_SHOW, findClass(Obfuscator.save.SNAPVIEW_SHOW_FIRST, lpparam.classLoader), findClass(Obfuscator.save.SNAPVIEW_SHOW_SECOND, lpparam.classLoader), findClass(Obfuscator.save.SNAPVIEW_SHOW_THIRD, lpparam.classLoader), new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Logger.log("Starting to view a snap");

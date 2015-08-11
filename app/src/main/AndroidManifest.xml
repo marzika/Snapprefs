@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.marz.snapprefs"
-    android:versionCode="11"
-    android:versionName="1.4.3 beta 2">
+    android:versionCode="13"
+    android:versionName="1.4.3 beta 4">
 
     <uses-sdk
         android:minSdkVersion="13"

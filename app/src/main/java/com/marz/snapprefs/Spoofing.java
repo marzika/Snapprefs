@@ -32,7 +32,7 @@ public class Spoofing {
     }
 
     static void initLocation(final LoadPackageParam lpparam, Context context, final String latitude, final String longitude) {
-        findAndHookMethod("ajj", lpparam.classLoader, "d", new XC_MethodHook() {
+        findAndHookMethod("akt", lpparam.classLoader, "d", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 float mLatitude = Float.valueOf(latitude);

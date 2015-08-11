@@ -210,7 +210,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                     return e;
                 }
             });*/
-        if (shouldAddGhost == true) {
+        if (shouldAddGhost) {
             addGhost(resparam);
         }
     }
@@ -515,8 +515,12 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         logging("SnapPrefs: Displaying SpeedDialog");
                     }
                 });
-                if (mColours == true) relativeLayout.addView(speed, params);
-                if (mSpeed == true) relativeLayout.addView(ghost, layoutParams);
+                if (mColours == true) {
+                    relativeLayout.addView(speed, params);
+                }
+                if (mSpeed == true) {
+                    relativeLayout.addView(ghost, layoutParams);
+                }
             }
         });
     }

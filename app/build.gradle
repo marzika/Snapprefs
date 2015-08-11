@@ -8,8 +8,8 @@ android {
         applicationId "com.marz.snapprefs"
         minSdkVersion 11
         targetSdkVersion 21
-        versionCode 12
-        versionName "1.4.3 beta 3"
+        versionCode 13
+        versionName "1.4.3 beta 4"
     }
 
     buildTypes {
