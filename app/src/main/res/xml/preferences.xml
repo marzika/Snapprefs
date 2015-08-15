@@ -65,6 +65,12 @@
                 android:summaryOff="@string/pref_custom_filter_cb_summary_off"
                 android:summaryOn="@string/pref_custom_filter_cb_summary_on"
                 android:title="@string/pref_custom_filter_cb_title" />
+            <com.marz.snapprefs.BetterListPreference
+                android:defaultValue="@string/pref_filter_default_value"
+                android:entries="@array/pref_filter_entries"
+                android:entryValues="@array/pref_filter_values"
+                android:key="pref_key_filter_type"
+                android:title="@string/pref_filter_type_title" />
             <Preference
                 android:defaultValue="-1"
                 android:key="pref_key_filter_location"
@@ -284,6 +290,10 @@
                 android:key="pref_key_location_longitude"
                 android:summary="@string/pref_location_longitude_summary"
                 android:title="@string/pref_location_longitude_title" />
+            <Preference
+                android:key="pref_key_location_picker"
+                android:summary="@string/pref_location_location_picker_summary"
+                android:title="@string/pref_location_location_picker_title" />
             <Preference
                 android:key="pref_location_readme"
                 android:summary="@string/pref_location_readme_summary"

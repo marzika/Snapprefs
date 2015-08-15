@@ -13,8 +13,6 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
-import com.marz.snapprefs.Util.MockLocationProvider;
-
 import net.rdrei.android.dirchooser.DirectoryChooserActivity;
 
 import java.io.File;
@@ -24,7 +22,7 @@ public class Settings extends PreferenceFragment {
     public static final String PREF_KEY_SAVE_LOCATION = "pref_key_save_location";
     public static final String PREF_KEY_HIDE_LOCATION = "pref_key_hide_location";
     public static final String PREF_KEY_FILTER_LOCATION = "pref_key_filter_location";
-    public static final String PREF_KEY_MOCK_LOCATION = "pref_key_mock_location";
+    public static final String PREF_KEY_LOCATION_PICKER = "pref_key_location_picker";
     private static final int REQUEST_CHOOSE_DIR = 0x0B00B135;
     private static final int REQUEST_HIDE_DIR = 0x2B00B135;
     private static final int REQUEST_FILTER_DIR = 0x3B00B135;
@@ -41,7 +39,6 @@ public class Settings extends PreferenceFragment {
             return true;
         }
     };
-    MockLocationProvider mock;
     private SharedPreferences sharedPreferences;
 
     @SuppressWarnings("deprecation")
@@ -69,77 +66,18 @@ public class Settings extends PreferenceFragment {
             editor.putString(PREF_KEY_SAVE_LOCATION, defaultLocation);
             editor.apply();
         }
-        mock = new MockLocationProvider(LocationManager.NETWORK_PROVIDER, ctx);
-        final Preference mockChooser = findPreference(PREF_KEY_MOCK_LOCATION);
-        mockChooser.setSummary("Currently not mocking any location");
-        mockChooser.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener(){
+        */
+
+        Preference spoofingChooser = findPreference(PREF_KEY_LOCATION_PICKER);
+        spoofingChooser.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
-                alert.setTitle("Input Coordinates");
-                LinearLayout layout = new LinearLayout(ctx);
-                layout.setOrientation(LinearLayout.VERTICAL);
-                final TextView latitude = new TextView(ctx);
-                latitude.setText("Latitude:");
-                final EditText inputlat = new EditText(ctx);
-                inputlat.setTextColor((Color.parseColor("#000000")));
-                final TextView longitude = new TextView(ctx);
-                longitude.setText("Latitude:");
-                final EditText inputlong = new EditText(ctx);
-                inputlong.setTextColor((Color.parseColor("#000000")));
-                inputlong.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
-                inputlat.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL|InputType.TYPE_NUMBER_FLAG_SIGNED);
-                inputlong.setSingleLine(true);
-                inputlat.setSingleLine(true);
-                layout.addView(latitude);
-                layout.addView(inputlat);
-                layout.addView(longitude);
-                layout.addView(inputlong);
-                alert.setPositiveButton("Set", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        Double latitude = Double.valueOf(String.valueOf(inputlat.getText()));
-                        Double longitude = Double.valueOf(String.valueOf(inputlong.getText()));
-/*
-                        mock.pushLocation(latitude, longitude);
-
-                        LocationManager locMgr = (LocationManager) ctx.getSystemService(ctx.LOCATION_SERVICE);
-                        LocationListener lis = new LocationListener() {
-                            public void onLocationChanged(Location location) {
-                                //You will get the mock location
-                            }
-
-                            @Override
-                            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                            }
-
-                            @Override
-                            public void onProviderEnabled(String provider) {
-
-                            }
-
-                            @Override
-                            public void onProviderDisabled(String provider) {
-
-                            }
-                            //...
-                        };
-
-                        locMgr.requestLocationUpdates(
-                                LocationManager.NETWORK_PROVIDER, 1000, 1, lis);
-                        mockChooser.setSummary("Mocking: " + latitude + ", " + longitude);
-                    }
-                });
-                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                    }
-                });
-                alert.setView(layout);
-                alert.show();
+                final Intent mapIntent = new Intent(getActivity(), MapsActivity.class);
+                startActivity(mapIntent);
                 return true;
             }
         });
-        */
+
         Preference filterChooser = findPreference(PREF_KEY_FILTER_LOCATION);
         filterChooser.setSummary(sharedPreferences.getString(PREF_KEY_FILTER_LOCATION, ""));
         filterChooser.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {

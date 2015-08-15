@@ -14,6 +14,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.marz.snapprefs.Util.XposedUtils;
@@ -61,6 +62,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static int mModeStoryVideo = SAVE_AUTO;
     public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
     public static boolean mCustomFilterBoolean = false;
+    public static int mCustomFilterType;
     public static boolean mTimerUnlimited = true;
     public static boolean mHideTimer = false;
     public static boolean mToastEnabled = true;
@@ -128,6 +130,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         txtgravity = prefs.getBoolean("pref_key_txtgravity", false);
         mCustomFilterBoolean = prefs.getBoolean("pref_key_custom_filter_checkbox", mCustomFilterBoolean);
         mCustomFilterLocation = prefs.getString("pref_key_filter_location", mCustomFilterLocation);
+        mCustomFilterType = prefs.getInt("pref_key_filter_type", 0);
         mSpeed = prefs.getBoolean("pref_key_speed", false);
         mSpeedValue = prefs.getFloat("pref_key_speed_value", 0F);
         mLatitude = prefs.getString("pref_key_location_latitude", null);
@@ -213,6 +216,10 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         if (shouldAddGhost) {
             addGhost(resparam);
         }
+        if (mCustomFilterType == 0) {
+            fullScreenFilter(resparam);
+        }
+        //addSaveBtn(resparam);
     }
 
     @Override
@@ -255,10 +262,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 		} For viewing longer videos?*/
         findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
             protected void afterHookedMethod(MethodHookParam methodHookParam) throws Throwable {
+                if (SnapContext == null) SnapContext = (Activity) methodHookParam.thisObject;
                 prefs.reload();
                 refreshPreferences();
-                if (SnapContext == null) SnapContext = (Activity) methodHookParam.thisObject;
-                SnapContext = (Activity) methodHookParam.thisObject;
                 //SNAPPREFS
                 Saving.initSaving(lpparam, mResources, SnapContext);
                 if (mDiscover == true) {
@@ -397,8 +403,12 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                                     iv.setImageDrawable(modRes.getDrawable(R.drawable.custom_filter_1));
                                     Logger.log("Replaced batteryfilter from R.drawable", true);
                                 } else {
-                                    iv.setImageDrawable(Drawable.createFromPath(mCustomFilterLocation + "/custom_filter.png"));
-                                    Logger.log("Replaced batteryfilter from " + mCustomFilterLocation, true);
+                                    if (mCustomFilterType == 0) {
+                                        iv.setImageDrawable(Drawable.createFromPath(mCustomFilterLocation + "/fullscreen_filter.png"));
+                                    } else if (mCustomFilterType == 1) {
+                                        iv.setImageDrawable(Drawable.createFromPath(mCustomFilterLocation + "/banner_filter.png"));
+                                    }
+                                    Logger.log("Replaced batteryfilter from " + mCustomFilterLocation + " Type: " + mCustomFilterType, true);
                                 }
                     //else if (resId == iv.getContext().getResources().getIdentifier("camera_batteryfilter_empty", "drawable", "com.snapchat.android"))
                     //    iv.setImageDrawable(modRes.getDrawable(R.drawable.custom_filter_1)); quick switch to a 2nd filter?
@@ -439,6 +449,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("TextGravity: " + txtgravity);
         logging("CustomFilters: " + mCustomFilterBoolean);
         logging("CustomFiltersLocation: " + mCustomFilterLocation);
+        logging("CustomFilterType: " + mCustomFilterType);
         logging("mSpeed: " + mSpeed);
         logging("mSpeedValue: " + mSpeedValue);
         logging("mLocation: " + mLocation);
@@ -479,6 +490,50 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         });
     }
 
+    public void addSaveBtn(InitPackageResourcesParam resparam) {
+        if (SnapContext != null) {
+            Logger.log("We are in addsave and Snapcontext isnt null", true);
+                    /*resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated() {
+            @Override
+            public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
+                FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP));
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
+                ImageButton savebtn = new ImageButton(SnapContext);
+                layoutParams.topMargin = px(3.0f);
+                layoutParams.leftMargin = px(55.0f);
+                savebtn.setBackgroundColor(0);
+                savebtn.setImageDrawable(mResources.getDrawable(R.drawable.savebutton));
+                //savebtn.setScaleX(0);
+                //savebtn.setScaleY(0);
+                savebtn.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View v) {
+                        Toast toast = Toast.makeText(SnapContext, "Savebtn click", Toast.LENGTH_SHORT);
+                        logging("SnapPrefs: Displaying Savebutton");
+                    }
+                });
+                frameLayout.addView(savebtn, layoutParams);
+            }
+        });*/
+        } else {
+            Logger.log("We are in addsave and Snapcontext IS null", true);
+        }
+    }
+
+    public void fullScreenFilter(InitPackageResourcesParam resparam) {
+        resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "battery_view", new XC_LayoutInflated() {
+            LinearLayout.LayoutParams batteryLayoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+
+            @Override
+            public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
+                View battery = (View) liparam.view.findViewById(liparam.res.getIdentifier("battery_icon", "id", "com.snapchat.android"));
+                battery.setLayoutParams(batteryLayoutParams);
+                battery.setPadding(0, 0, 0, 0);
+                Logger.log("fullScreenFilter", true);
+            }
+        });
+    }
     public void addGhost(InitPackageResourcesParam resparam) {
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "snap_preview", new XC_LayoutInflated() {
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {

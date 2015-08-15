@@ -45,7 +45,7 @@
     <string name="pref_update_title">To get the latest updates</string>
     <string name="pref_update_summary">Add \'snapprefs\' on Snapchat</string>
     <string name="version_text">Version</string>
-    <string name="version_summary" translatable="false">Current version is: v1.4.3 beta 3</string>
+    <string name="version_summary" translatable="false">Current version is: v1.4.3 beta 4</string>
     <string name="general">General settings</string>
     <string name="saving">Saving settings</string>
     <string name="sharing">Sharing settings -- NOT WORKING YET</string>
@@ -57,7 +57,7 @@
     <string name="pref_speed_readme_summary">After setting the speed, you need to kill the app, then restart it for the changes to take effect.</string>
     <string name="pref_speed_readme_title">HOW TO USE</string>
     <string name="pref_filter_readme_title">HOW TO USE</string>
-    <string name="pref_filter_readme_summary">Your custom filter has to be named as "custom_filter.png" in the folder which is by default /sdcard/Snapprefs/Filters. If you changed the filter image, you have to restart Snapchat for the changes to take effect.</string>
+    <string name="pref_filter_readme_summary">Your custom filter has to be named as "custom_filter.png" in the folder which is by default /sdcard/Snapprefs/Filters. If you changed the filter image, you have to restart Snapchat for the changes to take effect.\nResolution for Fullscreen Filters: 1080x1920\nResolution for Banner Filters: 821x323</string>
     <string name="pref_discover_readme_title">HOW TO USE</string>
     <string name="pref_location_summary_off">Location will NOT be spoofed</string>
     <string name="pref_location_summary_on">Location will be spoofed</string>
@@ -70,6 +70,8 @@
     <string name="pref_location_longitude_dialog">Enter longitude</string>
     <string name="pref_location_longitude_summary">Click here to enter longitude</string>
     <string name="pref_location_longitude_title">Longitude</string>
+    <string name="pref_location_location_picker_title">Open Map</string>
+    <string name="pref_location_location_picker_summary">Click here to open the map and select with a LONGCLICK the desired location.</string>
     <string name="pref_discover_summary_off">Discover will load and download</string>
     <string name="pref_discover_summary_on">Discover will NOT load NOR download</string>
     <string name="pref_discover_title">Disable Discover</string>
@@ -148,6 +150,18 @@
     <string name="pref_custom_filter_cb_summary_off">Custom filters are disabled</string>
     <string name="pref_custom_filter_title">Choose custom filter</string>
     <string name="pref_filter_title">Custom filter</string>
+    <string name="pref_filter_type_title">Choose filter type</string>
+    <string name="pref_filter_default_value" translatable="false">0</string>
+    <string-array name="pref_filter_entries">
+        <item>Full screen</item>
+        <item>Banner</item>
+    </string-array>
+
+
+    <string-array name="pref_filter_values" translatable="false">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
 
     <string name="pref_toasts_title">Show toast messages</string>
     <string name="pref_toasts_summary_on">Toast messages are enabled</string>
@@ -253,7 +267,8 @@
     <string name="pref_support_faq" translatable="false">FAQ</string>
     <string name="support" translatable="false">Support</string>
     <string name="pref_support_faq_summary" translatable="false">Opens the XDA post containing the Frequently Asked Questions with answers.</string>
-    <string name="mock" translatable="false">Geofilter settings</string>
-    <string name="pref_mock_location_title" translatable="false">Mock location</string>
-    <string name="mock_text" translatable="false">Enable Location-Mocking</string>
+    <string name="title_activity_maps">Choose location to spoof</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyD-XNCHffArxbrgQ_-CS1nDXZRTfcEIlO4
+    </string>
 </resources>
