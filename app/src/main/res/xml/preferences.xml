@@ -80,6 +80,14 @@
                 android:key="pref_filter_readme"
                 android:summary="@string/pref_filter_readme_summary"
                 android:title="@string/pref_filter_readme_title" />
+            <Preference
+                android:key="pref_filter_group"
+                android:summary="@string/pref_filter_group_summary"
+                android:title="@string/pref_filter_group_title">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="https://plus.google.com/communities/111884042638955665569" />
+            </Preference>
         </PreferenceCategory>
     </PreferenceScreen>
     <PreferenceScreen
@@ -294,10 +302,6 @@
                 android:key="pref_key_location_picker"
                 android:summary="@string/pref_location_location_picker_summary"
                 android:title="@string/pref_location_location_picker_title" />
-            <Preference
-                android:key="pref_location_readme"
-                android:summary="@string/pref_location_readme_summary"
-                android:title="@string/pref_location_readme_title" />
         </PreferenceCategory>
     </PreferenceScreen>
     <PreferenceScreen
@@ -317,22 +321,6 @@
                 android:title="@string/pref_discover_readme_title" />
         </PreferenceCategory>
     </PreferenceScreen>
-    <!--
-    <PreferenceScreen
-        android:key="button_mock_settings"
-        android:title="@string/mock"
-        android:persistent="false">
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="pref_key_mock"
-            android:title="@string/mock_text"
-            />
-        <Preference
-            android:defaultValue="-1"
-            android:key="pref_key_mock_location"
-            android:persistent="true"
-            android:title="@string/pref_mock_location_title"/>
-    </PreferenceScreen> -->
     <PreferenceCategory
         android:key="pref_key_debug"
         android:title="@string/pref_debug_title">

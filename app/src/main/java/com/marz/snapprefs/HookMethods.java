@@ -213,6 +213,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                     return e;
                 }
             });*/
+
         if (shouldAddGhost) {
             addGhost(resparam);
         }
@@ -240,10 +241,45 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             XposedUtils.log("Exception while trying to get version info", e);
             return;
         }
+
         prefs.reload();
         refreshPreferences();
         printSettings();
         getEditText(lpparam);
+
+       /* findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "open", String.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Logger.log("Open asset: " + param.args[0], true);
+                String str = (String) param.args[0];
+                String url = Environment.getExternalStorageDirectory()+"/Snapprefs/Stickers/"+str;
+                Logger.log("Sdcard path: " + url, true);
+                File file = new File(url);
+                InputStream is = null;
+                is = new BufferedInputStream(new FileInputStream(file));
+                param.setResult(is);
+                Logger.log("setResult for AssetManagar", true);
+            }
+        });
+        findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "openFd", String.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Logger.log("OpenFd asset: " + param.args[0], true);
+            }
+        });*/
+        /*
+        findAndHookMethod("atp", lpparam.classLoader, "a", String.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Logger.log("Opened PNG: "+ param.args[0], true);
+            }
+        });*/
+        /*findAndHookMethod("atp", lpparam.classLoader, "b", String.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Logger.log("Opened SVG: "+ param.args[0], true);
+            }
+        });*/
 
        /* findAndHookMethod("com.squareup.otto.Bus", lpparam.classLoader, "a", Object.class, new XC_MethodHook() {
             @Override
@@ -323,7 +359,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 
 
         //SNAPSHARE
-        //Sharing.initSharing(lpparam, mResources);
+        Sharing.initSharing(lpparam, mResources);
         //KEEPCHAT
         //Saving.initSaving(lpparam, mResources);
         //SNAPPREFS
@@ -540,8 +576,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 RelativeLayout relativeLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("snap_preview_decor_relative_layout", "id", Common.PACKAGE_SNAP));
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
-                layoutParams.topMargin = px(3.0f);
-                layoutParams.leftMargin = px(55.0f);
+                layoutParams.topMargin = px(45.0f);
+                layoutParams.leftMargin = px(10.0f);
                 ImageButton ghost = new ImageButton(SnapContext);
                 ghost.setBackgroundColor(0);
                 ghost.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
@@ -556,8 +592,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 });
                 RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
                 params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
-                params.topMargin = px(3.0f);
-                params.leftMargin = px(110.0f);
+                params.topMargin = px(90.0f);
+                params.leftMargin = px(10.0f);
                 ImageButton speed = new ImageButton(SnapContext);
                 speed.setBackgroundColor(0);
                 speed.setImageDrawable(mResources.getDrawable(R.drawable.speed));
@@ -571,10 +607,10 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                     }
                 });
                 if (mColours == true) {
-                    relativeLayout.addView(speed, params);
+                    relativeLayout.addView(ghost, layoutParams);
                 }
                 if (mSpeed == true) {
-                    relativeLayout.addView(ghost, layoutParams);
+                    relativeLayout.addView(speed, params);
                 }
             }
         });

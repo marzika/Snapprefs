@@ -48,7 +48,7 @@
     <string name="version_summary" translatable="false">Current version is: v1.4.3 beta 4</string>
     <string name="general">General settings</string>
     <string name="saving">Saving settings</string>
-    <string name="sharing">Sharing settings -- NOT WORKING YET</string>
+    <string name="sharing">Sharing settings</string>
     <string name="spoofing">Spoofing settings</string>
     <string name="pref_speed_title">Speed spoofing</string>
     <string name="pref_speed_value_title">Current set speed:</string>
@@ -57,11 +57,10 @@
     <string name="pref_speed_readme_summary">After setting the speed, you need to kill the app, then restart it for the changes to take effect.</string>
     <string name="pref_speed_readme_title">HOW TO USE</string>
     <string name="pref_filter_readme_title">HOW TO USE</string>
-    <string name="pref_filter_readme_summary">Your custom filter has to be named as "custom_filter.png" in the folder which is by default /sdcard/Snapprefs/Filters. If you changed the filter image, you have to restart Snapchat for the changes to take effect.\nResolution for Fullscreen Filters: 1080x1920\nResolution for Banner Filters: 821x323</string>
+    <string name="pref_filter_readme_summary">Your custom filter has to be named as "banner_filter.png"/"fullscreen_filter.png" in the folder which is by default /sdcard/Snapprefs/Filters. If you changed the filter image, you have to restart Snapchat for the changes to take effect.\nResolution for Fullscreen Filters: 1080x1920\nResolution for Banner Filters: 821x323</string>
     <string name="pref_discover_readme_title">HOW TO USE</string>
     <string name="pref_location_summary_off">Location will NOT be spoofed</string>
     <string name="pref_location_summary_on">Location will be spoofed</string>
-    <string name="pref_location_readme_summary">Location spoofing is experimental, it should work, but also it give it time to load. Go to google and get the coordinates, then paste them into the corresponding fields.</string>
     <string name="pref_location_readme_title">HOW TO USE</string>
     <string name="pref_location_title">Location spoofing</string>
     <string name="pref_location_latitude_dialog">Enter latitude</string>
@@ -149,6 +148,8 @@
     <string name="pref_custom_filter_cb_summary_on">Select a custom filter below</string>
     <string name="pref_custom_filter_cb_summary_off">Custom filters are disabled</string>
     <string name="pref_custom_filter_title">Choose custom filter</string>
+    <string name="pref_filter_group_summary">Here you can download custom filters to have</string>
+    <string name="pref_filter_group_title">Open the Google+ group for filters</string>
     <string name="pref_filter_title">Custom filter</string>
     <string name="pref_filter_type_title">Choose filter type</string>
     <string name="pref_filter_default_value" translatable="false">0</string>
@@ -256,6 +257,7 @@
 
     <!-- Other settings -->
     <string name="pref_other">Other</string>
+    <string name="dialog_main">- When sharing an IMAGE you have to DISMISS the first share, THEN take an image with the Snapchat camera.\n\n- When sharing a VIDEO you have to RECORD a video with the Snapchat camera AFTER sharing it.\n\n!!! IF YOU WANT TO USE SNAPCHAT NORMALLY AFTER SHARING, KILL THE APP, THEN RESTART IT !!!</string>
 
     <string name="pref_launcher_title">Show launcher icon</string>
     <string name="pref_launcher_on">Access settings through my launcher</string>

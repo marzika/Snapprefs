@@ -19,8 +19,8 @@
 package com.marz.snapprefs;
 
 public class Obfuscator {
-    // Snapprefs supports v9.13.0.0 and up
-    private static final int SUPPORTED_VERSION_CODE = 709;
+    // Snapprefs supports v9.14.1.0 and up
+    private static final int SUPPORTED_VERSION_CODE = 711;
 
     /**
      * Check if Snapprefs is compatible with this Snapchat version.
@@ -116,5 +116,16 @@ public class Obfuscator {
         public static final String FRIEND_CLASS = "com.snapchat.android.model.Friend";
         //PostToStory class
         public static final String POSTTOSTORY_CLASS = "ame"; //prev. aku
+    }
+
+    public class sharing {
+        //snapCapturedEvent class
+        public static final String SNAPCAPTUREDEVENT_CLASS = "bhv"; //prev. bfy ->from LandingPageActivity$8
+        //snapCaptureContext class
+        public static final String SNAPCAPTURECONTEXT_CLASS = "com.snapchat.android.util.eventbus.SnapCaptureContext";
+        //BusProvider class
+        public static final String BUSPROVIDER_CLASS = "bey";
+        //BussProvider.returnBus()
+        public static final String BUSPROVIDER_RETURNBUS = "a";
     }
 }

@@ -29,7 +29,6 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
-import static de.robv.android.xposed.XposedHelpers.newInstance;
 
 public class Sharing {
 
@@ -54,9 +53,10 @@ public class Sharing {
             return;
         }
 
-        final Class snapCapturedEventClass = findClass("bfy", lpparam.classLoader); //from LandingPageActivity$6
-        final Class SnapCaptureContext = findClass("com.snapchat.android.util.eventbus.SnapCaptureContext", lpparam.classLoader);
-        final Media media = new Media(); // a place to store the image
+        final Class snapCapturedEventClass = findClass(Obfuscator.sharing.SNAPCAPTUREDEVENT_CLASS, lpparam.classLoader);
+        final Class SnapCaptureContext = findClass(Obfuscator.sharing.SNAPCAPTURECONTEXT_CLASS, lpparam.classLoader);
+        final Media mediaImg = new Media(); // a place to store the image
+        final Media mediaVid = new Media(); // a place to store the video
 
         // This is where the media is loaded and transformed. Hooks after the onCreate() call of the main Activity.
         findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
@@ -129,7 +129,7 @@ public class Sharing {
                             }
 
                             // Make Snapchat show the image
-                            media.setContent(bitmap);
+                            mediaImg.setContent(bitmap);
                         } catch (Exception e) {
                             XposedUtils.log(e);
                             return;
@@ -177,13 +177,14 @@ public class Sharing {
                             // Inform the user with a dialog
                             //createSizeDialog(activity, readableFileSize, readableMaxSize).show();
                         }
-                        media.setContent(videoUri);
+                        mediaVid.setContent(videoUri);
                     }
 
                     /**
                      * Mark image as initialized
                      * @see initializedUri
                      */
+                    createDialog(activity).show();
                     initializedUri = mediaUri;
                 } else {
                     XposedUtils.log("Regular call of Snapchat.");
@@ -197,6 +198,7 @@ public class Sharing {
          * We want to send our media once the camera is ready, that's why we hook the refreshFlashButton/onCameraStateEvent method.
          * The media is injected by calling the eventbus to send a snapcapture event with our own media.
          */
+
         XC_MethodHook cameraLoadedHook = new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -207,24 +209,47 @@ public class Sharing {
 
                 XposedUtils.log("Doing it's magic!");
                 Object snapCaptureEvent;
+                findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Bitmap.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        param.args[0] = mediaImg.getContent();
+                        Logger.log("Set media in camerafragment", true);
+                    }
+                });
+
+                findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Bitmap.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        param.args[0] = mediaImg.getContent();
+                        Logger.log("Set IMAGE media in camerafragment", true);
+                    }
+                });
+                findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Uri.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        param.args[0] = mediaVid.getContent();
+                        Logger.log("Set Video media in camerafragment", true);
+                    }
+                });
 
                 // Since 4.1.10 a new Class called Snapbryo stores all the data for snaps
                 // SnapCapturedEvent(Snapbryo(Builder(Media)))
-                    Object builder = newInstance(findClass("com.snapchat.android.model.Snapbryo.Builder", lpparam.classLoader));
-                    builder = callMethod(builder, Obfuscator_share.BUILDER_CONSTRUCTOR.getValue(snapchatVersion), media.getContent());
-                    Object snapbryo = callMethod(builder, Obfuscator_share.CREATE_SNAPBRYO.getValue(snapchatVersion));
-                snapCaptureEvent = newInstance(snapCapturedEventClass, snapbryo, SnapCaptureContext.getEnumConstants()[2]); //SNAPCAPTURECONTEXT
+                //    Object builder = newInstance(findClass("com.snapchat.android.model.Snapbryo.Builder", lpparam.classLoader));
+                //   builder = callMethod(builder, Obfuscator_share.BUILDER_CONSTRUCTOR.getValue(snapchatVersion), media.getContent());
+                //  Object snapbryo = callMethod(builder, Obfuscator_share.CREATE_SNAPBRYO.getValue(snapchatVersion));
+                //Object snapbryo = media.getContent();
+                //snapCaptureEvent = newInstance(snapCapturedEventClass, snapbryo, SnapCaptureContext.getEnumConstants()[0]); //SNAPCAPTURECONTEXT
 
                 // Call the eventbus to post our SnapCapturedEvent, this will take us to the SnapPreviewFragment
-                Object busProvider = callStaticMethod(findClass("bdb", lpparam.classLoader), "a");//upd. below
-                callMethod(busProvider, "a", snapCaptureEvent);
+                //Object busProvider = callStaticMethod(findClass(Obfuscator.sharing.BUSPROVIDER_CLASS, lpparam.classLoader), Obfuscator.sharing.BUSPROVIDER_RETURNBUS);//upd. below
+                //callMethod(busProvider, "a", snapCaptureEvent);
                 // Clean up after ourselves, otherwise snapchat will crash
                 initializedUri = null;
             }
         };
 
         // In 5.0.36.0 (beta) refreshFlashButton was removed, we use onCameraStateEvent instead
-        Class<?> cameraStateEventClass = findClass("bdd", lpparam.classLoader);
+        Class<?> cameraStateEventClass = findClass("bfa", lpparam.classLoader);
         findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "onCameraStateEvent", cameraStateEventClass, cameraLoadedHook);
         XposedUtils.log("Hooked onCameraStateEvent");
     }
@@ -235,14 +260,12 @@ public class Sharing {
      * Creates a dialog saying the image is too large. Two options are given: continue or quit.
      *
      * @param activity         The activity to be used to create the dialog
-     * @param readableFileSize The human-readable current file size
-     * @param readableMaxSize  The human-readable maximum file size
      * @return The dialog to show
      */
-    private static AlertDialog createSizeDialog(final Activity activity, String readableFileSize, String readableMaxSize) {
+    private static AlertDialog createDialog(final Activity activity) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(activity);
         dialogBuilder.setTitle(mResources.getString(R.string.app_name));
-        dialogBuilder.setMessage(mResources.getString(R.string.size_error, readableFileSize, readableMaxSize));
+        dialogBuilder.setMessage(mResources.getString(R.string.dialog_main));
         dialogBuilder.setPositiveButton(mResources.getString(R.string.continue_anyway), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 dialog.cancel();
