@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<shape android:shape="rectangle"
-  xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/divider_grey" />
-</shape><!-- From: file:/G:/AndroidstudioProjects/SnapPref/app/src/main/res/drawable/list_divider.xml -->

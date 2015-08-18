@@ -1,8 +1,0 @@
-<!-- From: file:/Users/phartig/Projects/java/Android-DirectoryChooser/library/src/main/AndroidManifest.xml -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="net.rdrei.android.dirchooser">
-
-    <uses-sdk
-        android:minSdkVersion="11"
-        android:targetSdkVersion="19" />
-</manifest>
