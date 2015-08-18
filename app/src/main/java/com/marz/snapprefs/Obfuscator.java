@@ -78,6 +78,14 @@ public class Obfuscator {
         //.model.chat.StatefulChatFeedItem
         //StatefulChatFeedItem.getSender()
         public static final String STATEFULCHATFEEDITEM_GETSENDER = "j";
+        //ScreenshotDetector class
+        public static final String SCREENSHOTDETECTOR_CLASS = "ara";
+        //ScreenshotDetector.run(List)
+        public static final String SCREENSHOTDETECTOR_RUN = "a";
+        //SnapStateMessage class
+        public static final String SNAPSTATEMESSAGE_CLASS = "boa";
+        //SnapStateMessage.setScreenshotCount(Long)
+        public static final String SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT = "b";
     }
     //Sharing
 

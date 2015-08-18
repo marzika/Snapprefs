@@ -231,8 +231,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             PackageInfo piSnapChat = context.getPackageManager().getPackageInfo(lpparam.packageName, 0);
             XposedUtils.log("SnapChat Version: " + piSnapChat.versionName + " (" + piSnapChat.versionCode + ")", false);
             XposedUtils.log("SnapPrefs Version: " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")", false);
-
-            snapchatVersion = Obfuscator_share.getVersion(piSnapChat.versionCode);
         } catch (Exception e) {
             XposedUtils.log("Exception while trying to get version info", e);
             return;
@@ -242,7 +240,14 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         refreshPreferences();
         printSettings();
         getEditText(lpparam);
-        findAndHookMethod("ara", lpparam.classLoader, "a", List.class, XC_MethodReplacement.DO_NOTHING);
+        findAndHookMethod(Obfuscator.save.SCREENSHOTDETECTOR_CLASS, lpparam.classLoader, Obfuscator.save.SCREENSHOTDETECTOR_RUN, List.class, XC_MethodReplacement.DO_NOTHING);
+        findAndHookMethod(Obfuscator.save.SNAPSTATEMESSAGE_CLASS, lpparam.classLoader, Obfuscator.save.SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT, Long.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                param.args[0] = 0L;
+                Logger.log("StateBuilder.setScreenshotCount set to 0L", true);
+            }
+        });
         Class<?> legacyCanvasView = findClass("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader);
         /*XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, legacyCanvasView, int.class, float.class, new XC_MethodHook() {
             @Override
