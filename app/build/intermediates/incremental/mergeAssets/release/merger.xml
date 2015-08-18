@@ -1,2 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="2.1"><source path="G:\AndroidstudioProjects\SnapPref\app\build\intermediates\exploded-aar\net.rdrei.android.dirchooser\library\2.1\assets"/></dataSet><dataSet config="main"><source path="G:\AndroidstudioProjects\SnapPref\app\src\main\assets"><file name="xposed_init" path="G:\AndroidstudioProjects\SnapPref\app\src\main\assets\xposed_init"/></source></dataSet><dataSet config="release"><source path="G:\AndroidstudioProjects\SnapPref\app\src\release\assets"/></dataSet></merger>
