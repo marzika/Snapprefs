@@ -22,11 +22,13 @@ import android.widget.RelativeLayout;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import java.io.File;
+import java.util.List;
 
 import de.robv.android.xposed.IXposedHookInitPackageResources;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
@@ -240,6 +242,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         refreshPreferences();
         printSettings();
         getEditText(lpparam);
+        findAndHookMethod("ara", lpparam.classLoader, "a", List.class, XC_MethodReplacement.DO_NOTHING);
         Class<?> legacyCanvasView = findClass("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader);
         /*XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, legacyCanvasView, int.class, float.class, new XC_MethodHook() {
             @Override
