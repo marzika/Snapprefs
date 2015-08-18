@@ -46,8 +46,6 @@ public class Sharing {
             PackageInfo piSnapChat = context.getPackageManager().getPackageInfo(lpparam.packageName, 0);
             XposedUtils.log("SnapChat Version: " + piSnapChat.versionName + " (" + piSnapChat.versionCode + ")", false);
             XposedUtils.log("SnapPrefs Version: " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")", false);
-
-            snapchatVersion = Obfuscator_share.getVersion(piSnapChat.versionCode);
         } catch (Exception e) {
             XposedUtils.log("Exception while trying to get version info", e);
             return;
