@@ -1,7 +1,9 @@
 package com.marz.snapprefs;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
@@ -173,7 +175,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             mColours = false;
         }
 
-        if (mSpeed || mColours) {
+        if (mSpeed || mColours || mLocation) {
             shouldAddGhost = true;
         } else {
             shouldAddGhost = false;
@@ -206,14 +208,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 
         refreshPreferences();
             modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
-            /*resparam.res.setReplacement(resparam.packageName, "drawable", "custom_filter_1", new XResources.DrawableLoader() {
-                public Drawable newDrawable(XResources p1, int p2) throws Throwable {
-                    //Drawable e = Drawable.createFromPath("/sdcard/Snapprefs/Filters/custom_filter.png");
-                    Drawable e = mResources.getDrawable(R.drawable.custom_filter_1);
-                    return e;
-                }
-            });*/
-
         if (shouldAddGhost) {
             addGhost(resparam);
         }
@@ -246,7 +240,21 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         refreshPreferences();
         printSettings();
         getEditText(lpparam);
-
+        Class<?> legacyCanvasView = findClass("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader);
+        /*XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, legacyCanvasView, int.class, float.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Logger.log("CanvasView - ORIGINAL, setColor: " + param.args[1] + " setStrokeWidth: " + param.args[2], true);
+                //float width = 10.0F;
+                //int color =  Color.argb(123, 247, 87, 247);
+                Random rnd = new Random();
+                int color = Color.argb(rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+                float width = rnd.nextFloat() * 20.0F;
+                param.args[1] = color;
+                param.args[2] = width;
+                Logger.log("CanvasView - NEW setColor: " + color + " setStrokeWidth: " + width, true);
+            }
+        });*/
        /* findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "open", String.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -304,13 +312,13 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 //SNAPPREFS
                 Saving.initSaving(lpparam, mResources, SnapContext);
                 if (mDiscover == true) {
-                DataSaving.initMethod(lpparam, mResources, SnapContext);
+                    DataSaving.initMethod(lpparam, mResources, SnapContext);
                 }
                 if (mSpeed == true) {
                     Spoofing.initSpeed(lpparam, SnapContext);
                 }
                 if (mLocation == true) {
-                    Spoofing.initLocation(lpparam, SnapContext, mLatitude, mLongitude);
+                    Spoofing.initLocation(lpparam, SnapContext);
                 }
             }
         });
@@ -360,8 +368,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 
         //SNAPSHARE
         Sharing.initSharing(lpparam, mResources);
-        //KEEPCHAT
-        //Saving.initSaving(lpparam, mResources);
         //SNAPPREFS
 
 		/*findAndHookMethod(Common.Class_ScreenshotDetector, lpparam.classLoader, Common.Method_DetectionSession, List.class, long.class, XC_MethodReplacement.returnConstant(null));
@@ -422,7 +428,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             HookSendList.initSelectAll(lpparam);
         }
     }
-
     private void addFilter(LoadPackageParam lpparam) {
         //Replaces the batteryfilter with our custom one
         findAndHookMethod(ImageView.class, "setImageResource", int.class, new XC_MethodHook() {
@@ -590,10 +595,10 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         logging("SnapPrefs: Displaying MainDialog");
                     }
                 });
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
-                params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
-                params.topMargin = px(90.0f);
-                params.leftMargin = px(10.0f);
+                RelativeLayout.LayoutParams paramsSpeed = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
+                paramsSpeed.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
+                paramsSpeed.topMargin = px(90.0f);
+                paramsSpeed.leftMargin = px(10.0f);
                 ImageButton speed = new ImageButton(SnapContext);
                 speed.setBackgroundColor(0);
                 speed.setImageDrawable(mResources.getDrawable(R.drawable.speed));
@@ -606,11 +611,32 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         logging("SnapPrefs: Displaying SpeedDialog");
                     }
                 });
+                RelativeLayout.LayoutParams paramsLocation = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
+                paramsLocation.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
+                paramsLocation.topMargin = px(135.0f);
+                paramsLocation.leftMargin = px(10.0f);
+                ImageButton location = new ImageButton(SnapContext);
+                location.setBackgroundColor(0);
+                location.setImageDrawable(mResources.getDrawable(R.drawable.location));
+                location.setScaleX((float) 0.4);
+                location.setScaleY((float) 0.4);
+                location.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent();
+                        intent.setComponent(new ComponentName("com.marz.snapprefs", "com.marz.snapprefs.MapsActivity"));
+                        SnapContext.startActivity(intent);
+                        logging("SnapPrefs: Displaying Map");
+                    }
+                });
                 if (mColours == true) {
                     relativeLayout.addView(ghost, layoutParams);
                 }
                 if (mSpeed == true) {
-                    relativeLayout.addView(speed, params);
+                    relativeLayout.addView(speed, paramsSpeed);
+                }
+                if (mLocation == true) {
+                    relativeLayout.addView(location, paramsLocation);
                 }
             }
         });

@@ -6,8 +6,9 @@ import android.location.LocationManager;
 
 import com.marz.snapprefs.Util.FileUtils;
 
+import java.util.Random;
+
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
@@ -15,32 +16,33 @@ import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 public class Spoofing {
 
     private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
-    static XSharedPreferences prefs;
-    private static float mSpeedValue;
 
     static void initSpeed(final LoadPackageParam lpparam, Context context) {
         Logger.log("Setting speed");
-        String speed = FileUtils.readFromFile(context);
-        final float mSpeedValue = Float.parseFloat(speed);
         findAndHookMethod(Obfuscator.spoofing.SPEEDOMETERVIEW_CLASS, lpparam.classLoader, Obfuscator.spoofing.SPEEDOMETERVIEW_SETSPEED, float.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                String speed = FileUtils.readFromSDFile("speed");
+                float mSpeedValue = Float.parseFloat(speed);
                 param.args[0] = mSpeedValue;
                 Logger.log("Set speed to " + mSpeedValue, true);
             }
         });
     }
 
-    static void initLocation(final LoadPackageParam lpparam, Context context, final String latitude, final String longitude) {
+    static void initLocation(final LoadPackageParam lpparam, final Context context) {
         findAndHookMethod("akt", lpparam.classLoader, "d", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                float mLatitude = Float.valueOf(latitude);
-                float mLongitude = Float.valueOf(longitude);
+                String rawlatitude = FileUtils.readFromSDFile("latitude");
+                String rawlongitude = FileUtils.readFromSDFile("longitude");
+                float mLatitude = Float.valueOf(rawlatitude);
+                float mLongitude = Float.valueOf(rawlongitude);
                 Location fakedLocation = new Location(LocationManager.GPS_PROVIDER);
-                //fakedLocation.setAccuracy();
-                fakedLocation.setAccuracy((float) 0.001);
-                fakedLocation.setAltitude(0.001);
+                Random acc = new Random();
+                Random alt = new Random();
+                fakedLocation.setAccuracy(acc.nextFloat() * 50);
+                fakedLocation.setAltitude(alt.nextDouble() * 500);
                 fakedLocation.setLatitude(mLatitude);
                 fakedLocation.setLongitude(mLongitude);
                 float accuracy = fakedLocation.getAccuracy();

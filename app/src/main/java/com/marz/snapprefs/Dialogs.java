@@ -52,7 +52,7 @@ public class Dialogs {
                 double editDouble = Double.parseDouble(eText.getText().toString());
                 CharSequence text = editDouble * 3.6 + " KPH\n" + editDouble * 2.2369 + " MPH";
                 String speed = String.valueOf(editDouble);
-                FileUtils.writeToFile(speed, context);
+                FileUtils.writeToSDFile(speed, "speed");
                 int duration = Toast.LENGTH_SHORT;
                 Toast toast = Toast.makeText(SnapContext, text, duration);
                 toast.show();
