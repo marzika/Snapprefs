@@ -103,8 +103,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     private static boolean shouldAddGhost;
     private static boolean mColours;
     private static float mSpeedValue;
-    private static String mLatitude;
-    private static String mLongitude;
     private static boolean mLocation;
     Class CaptionEditText;
 
@@ -137,8 +135,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mCustomFilterType = prefs.getInt("pref_key_filter_type", 0);
         mSpeed = prefs.getBoolean("pref_key_speed", false);
         mSpeedValue = prefs.getFloat("pref_key_speed_value", 0F);
-        mLatitude = prefs.getString("pref_key_location_latitude", null);
-        mLongitude = prefs.getString("pref_key_location_longitude", null);
         mLocation = prefs.getBoolean("pref_key_location", false);
         mDiscover = prefs.getBoolean("pref_key_discover", false);
         debug = prefs.getBoolean("pref_key_debug", false);
@@ -248,21 +244,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 Logger.log("StateBuilder.setScreenshotCount set to 0L", true);
             }
         });
-        Class<?> legacyCanvasView = findClass("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader);
-        /*XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, legacyCanvasView, int.class, float.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Logger.log("CanvasView - ORIGINAL, setColor: " + param.args[1] + " setStrokeWidth: " + param.args[2], true);
-                //float width = 10.0F;
-                //int color =  Color.argb(123, 247, 87, 247);
-                Random rnd = new Random();
-                int color = Color.argb(rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
-                float width = rnd.nextFloat() * 20.0F;
-                param.args[1] = color;
-                param.args[2] = width;
-                Logger.log("CanvasView - NEW setColor: " + color + " setStrokeWidth: " + width, true);
-            }
-        });*/
        /* findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "open", String.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -328,6 +309,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 if (mLocation == true) {
                     Spoofing.initLocation(lpparam, SnapContext);
                 }
+                PaintTools.initPaint(lpparam, mResources, SnapContext);
             }
         });
 
@@ -502,8 +484,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("mSpeed: " + mSpeed);
         logging("mSpeedValue: " + mSpeedValue);
         logging("mLocation: " + mLocation);
-        logging("mLatitude: " + mLatitude);
-        logging("mLongitude: " + mLongitude);
         logging("mDiscover: " + mDiscover);
         logging("mColours: " + mColours);
         logging("*****Debugging: " + debug + " *****");
