@@ -9,8 +9,10 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
@@ -44,7 +46,7 @@ public class PaintTools {
         });
         XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.ColorPickerView", lpparam.classLoader, Context.class, AttributeSet.class, new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+            protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
                 View colorpickerview = (View) getObjectField(param.thisObject, "h");
                 if (colorpickerview == null) {
                     Logger.log("colorPickerView-launched -- colorpickerview = null", true);
@@ -85,11 +87,21 @@ public class PaintTools {
                     @Override
                     public void onClick(View v) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        LinearLayout linearLayout = new LinearLayout(context);
+                        linearLayout.setOrientation(LinearLayout.VERTICAL);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+                        final TextView tv = new TextView(context);
+                        tv.setText("Currently selected width: " + width);
                         final SeekBar seekBar2 = new SeekBar(context);
-                        seekBar2.setMax(50);
+                        seekBar2.setMax(30);
                         seekBar2.setProgress(width);
                         seekBar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                             public void onProgressChanged(SeekBar seekBar2, int n, boolean bl) {
+                                if (n == 0) {
+                                    n = n + 1;
+                                }
+                                tv.setText("Currently selected width: " + n);
                             }
 
                             @Override
@@ -115,9 +127,16 @@ public class PaintTools {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 width = seekBar2.getProgress();
+                                if (width == 0) {
+                                    width = width + 1;
+                                }
                             }
                         });
-                        builder.setView((View) seekBar2);
+                        linearLayout.addView(tv, params);
+                        linearLayout.addView(seekBar2, params);
+                        builder.setView((View) linearLayout);
+                        //builder.setView((View) tv);
+                        //builder.setView((View) seekBar2);
                         builder.show();
                     }
                 });
