@@ -270,6 +270,8 @@
     <string name="support" translatable="false">Support</string>
     <string name="pref_support_faq_summary" translatable="false">Opens the XDA post containing the Frequently Asked Questions with answers.</string>
     <string name="title_activity_maps">Choose location to spoof</string>
+    <string name="str_btn_find">Search</string>
+    <string name="hnt_et_location">Type here a location to find</string>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
         AIzaSyD-XNCHffArxbrgQ_-CS1nDXZRTfcEIlO4
     </string>
