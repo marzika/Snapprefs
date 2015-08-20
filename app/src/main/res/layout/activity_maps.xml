@@ -23,7 +23,9 @@
             android:layout_height="wrap_content"
             android:layout_toLeftOf="@id/btn_find"
             android:hint="@string/hnt_et_location"
-            android:inputType="text" />
+            android:inputType="text"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black_sixty_opacity" />
 
     </RelativeLayout>
     <fragment

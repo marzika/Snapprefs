@@ -5,7 +5,7 @@
     android:versionName="1.4.3 beta 4">
 
     <uses-sdk
-        android:minSdkVersion="13"
+        android:minSdkVersion="15"
         android:targetSdkVersion="21" />
 
     <uses-permission android:name="com.google.android.apps.photos.permission.GOOGLE_PHOTOS" />

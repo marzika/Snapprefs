@@ -1,13 +1,16 @@
 package com.marz.snapprefs;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.XModuleResources;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
+import android.widget.SeekBar;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
@@ -18,8 +21,27 @@ import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
 
 public class PaintTools {
+    static int color = Color.RED;
+    static int width = 2;
     public static void initPaint(XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context context) {
-        final Class<?> colorPickerView = findClass("com.snapchat.android.ui.ColorPickerView", lpparam.classLoader);
+        Class<?> legacyCanvasView = findClass("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader);
+        XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, legacyCanvasView, int.class, float.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Logger.log("CanvasView - ORIGINAL, setColor: " + param.args[1] + " setStrokeWidth: " + param.args[2], true);
+                //param.args[2] = width;
+                //Logger.log("CanvasView - NEW setColor: " + color + " setStrokeWidth: " + width, true);
+                param.args[1] = color;
+                param.args[2] = width;
+            }
+        });
+        findAndHookMethod("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, "setColor", int.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Logger.log("Called setColor: " + param.args[0], true);
+                color = (Integer) param.args[0];
+            }
+        });
         XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.ColorPickerView", lpparam.classLoader, Context.class, AttributeSet.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -37,7 +59,16 @@ public class PaintTools {
                 colorpicker.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(context, "ColorPicker, yeah!", Toast.LENGTH_SHORT).show();
+                        ColorPickerDialog colorPickerDialog = new ColorPickerDialog(context, color, new ColorPickerDialog.OnColorSelectedListener() {
+
+                            @Override
+                            public void onColorSelected(int n) {
+                                // TODO Auto-generated method stub
+                                color = n;
+                            }
+                        });
+                        colorPickerDialog.setTitle("Select stroke color");
+                        colorPickerDialog.show();
                     }
                 });
                 RelativeLayout.LayoutParams paramsPicker = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -53,7 +84,41 @@ public class PaintTools {
                 widthpicker.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Toast.makeText(context, "WidthPicker, yeah!", Toast.LENGTH_SHORT).show();
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        final SeekBar seekBar2 = new SeekBar(context);
+                        seekBar2.setMax(50);
+                        seekBar2.setProgress(width);
+                        seekBar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                            public void onProgressChanged(SeekBar seekBar2, int n, boolean bl) {
+                            }
+
+                            @Override
+                            public void onStartTrackingTouch(SeekBar arg0) {
+                                // TODO Auto-generated method stub
+
+                            }
+
+                            @Override
+                            public void onStopTrackingTouch(SeekBar arg0) {
+                                // TODO Auto-generated method stub
+
+                            }
+
+                        });
+                        builder.setNeutralButton(Common.dialog_default, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                width = 2;
+                            }
+                        });
+                        builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                width = seekBar2.getProgress();
+                            }
+                        });
+                        builder.setView((View) seekBar2);
+                        builder.show();
                     }
                 });
                 RelativeLayout.LayoutParams paramsWidth = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -63,24 +128,6 @@ public class PaintTools {
 
                 ((RelativeLayout) colorpickerview.getParent().getParent()).addView(colorpicker, paramsPicker);
                 ((RelativeLayout) colorpickerview.getParent().getParent()).addView(widthpicker, paramsWidth);
-            }
-        });
-    }
-
-    public static void setPaint(XC_LoadPackage.LoadPackageParam lpparam, Context context, final Integer color, final Integer alpha, final Float width) {
-        Class<?> legacyCanvasView = findClass("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader);
-        XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, legacyCanvasView, int.class, float.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Logger.log("CanvasView - ORIGINAL, setColor: " + param.args[1] + " setStrokeWidth: " + param.args[2], true);
-                param.args[2] = width;
-                Logger.log("CanvasView - NEW setColor: " + color + " setStrokeWidth: " + width, true);
-            }
-        });
-        findAndHookMethod("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, "setColor", int.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                param.args[0] = color;
             }
         });
     }
