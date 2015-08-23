@@ -71,6 +71,8 @@ public class Saving {
     public static boolean mDebugging = true;
     public static boolean viewingSnap;
     public static Object receivedSnap;
+    public static Object oldreceivedSnap;
+    public static boolean usedOldReceivedSnap = false;
     public static Resources mSCResources;
     public static FileInputStream mVideo;
     public static Bitmap mImage;
@@ -99,7 +101,7 @@ public class Saving {
                     try {
                         mVideo = new FileInputStream(param.args[0].toString());
                         Logger.log(param.args[0].toString(), true);
-                        Logger.log("It is a Video", true);
+                        //Logger.log("It is a Video", true);
                         saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
                         //mVideo = null;
                     } catch (FileNotFoundException e) {
@@ -120,7 +122,7 @@ public class Saving {
 
                         if (((BitmapDrawable) param.args[0]).getBitmap() == null) return;
                         mImage = ((BitmapDrawable) param.args[0]).getBitmap();
-                        Logger.log("It is a Bitmap", true);
+                        //Logger.log("It is a Bitmap", true);
                         saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
                     } catch (NullPointerException | Resources.NotFoundException ignore) {
                         //Sometimes getResourceName is going to return null that's okay
@@ -313,6 +315,7 @@ public class Saving {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Logger.log("Starting to view a snap");
                     receivedSnap = param.args[0];
+                    oldreceivedSnap = receivedSnap;
                     //Call for savereceivedsnap
                     snapCL = lpparam.classLoader;
                 }
@@ -347,34 +350,40 @@ public class Saving {
     private static void saveReceivedSnap(Context context, Object receivedSnap, MediaType mediaType) {
         Logger.log("----------------------- SNAPPREFS ------------------------", false);
         String sender = null;
+        if (receivedSnap == null) {
+            receivedSnap = oldreceivedSnap;
+            usedOldReceivedSnap = true;
+        } else {
+            usedOldReceivedSnap = false;
+        }
         try {
             sender = (String) getObjectField(receivedSnap, "mSender");
+            ;
         } catch (NullPointerException ignore) {
         }
-
         if (sender == null) { //This means its a story
             Class<?> storySnap = findClass(Obfuscator.save.STORYSNAP_CLASS, snapCL);
-            sender = (String) getObjectField(storySnap.cast(receivedSnap), "mUsername");
+            try {
+                sender = (String) getObjectField(storySnap.cast(receivedSnap), "mUsername");
+            } catch (Exception e) {
+                Logger.log(e.toString(), true);
+            }
             setAdditionalInstanceField(receivedSnap, "snap_type", SnapType.STORY);
         } else {
             setAdditionalInstanceField(receivedSnap, "snap_type", SnapType.SNAP);
         }
-
         Date timestamp = new Date((Long) callMethod(receivedSnap, Obfuscator.save.SNAP_GETTIMESTAMP)); //Gettimestamp-Snap
         String filename = sender + "_" + dateFormat.format(timestamp);
+        Logger.log("usedOldReceivedSnap = " + usedOldReceivedSnap, true);
+        if (usedOldReceivedSnap) {
+            filename = filename + "_1";
+        }
         try {
             image = mImage;
             video = mVideo;
         } catch (NullPointerException ignore) {
-
         }
-
         SnapType snapType = (SnapType) removeAdditionalInstanceField(receivedSnap, "snap_type");
-        if (image == null || video == null) {
-            Logger.log("IMAGE OR URI IS NULL", true);
-        } else {
-            Logger.log("THEY ARENT NULL", true);
-        }
         switch (mediaType) {
             case VIDEO: {
                 setAdditionalInstanceField(receivedSnap, "snap_media_type", MediaType.VIDEO);

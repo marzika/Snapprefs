@@ -300,6 +300,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 refreshPreferences();
                 //SNAPPREFS
                 Saving.initSaving(lpparam, mResources, SnapContext);
+                //Test.initSaving(lpparam, mResources, SnapContext);
                 if (mDiscover == true) {
                     DataSaving.initMethod(lpparam, mResources, SnapContext);
                 }

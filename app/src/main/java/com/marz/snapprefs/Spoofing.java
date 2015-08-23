@@ -18,14 +18,13 @@ public class Spoofing {
     private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
 
     static void initSpeed(final LoadPackageParam lpparam, Context context) {
-        Logger.log("Setting speed");
         findAndHookMethod(Obfuscator.spoofing.SPEEDOMETERVIEW_CLASS, lpparam.classLoader, Obfuscator.spoofing.SPEEDOMETERVIEW_SETSPEED, float.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 String speed = FileUtils.readFromSDFile("speed");
                 float mSpeedValue = Float.parseFloat(speed);
                 param.args[0] = mSpeedValue;
-                Logger.log("Set speed to " + mSpeedValue, true);
+                //Logger.log("Set speed to " + mSpeedValue, true);
             }
         });
     }
@@ -50,7 +49,7 @@ public class Spoofing {
                 double longitude = fakedLocation.getLongitude();
                 double latitude = fakedLocation.getLatitude();
                 String provider = fakedLocation.getProvider();
-                Logger.log("Acc: " + accuracy + "\nAltitude: " + altitude + "\nLongitude: " + longitude + "\nLatitude: " + latitude + "\nProvider: " + provider);
+                //Logger.log("Acc: " + accuracy + "\nAltitude: " + altitude + "\nLongitude: " + longitude + "\nLatitude: " + latitude + "\nProvider: " + provider);
                 param.setResult(fakedLocation);
             }
         });
