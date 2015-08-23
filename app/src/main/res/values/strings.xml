@@ -107,13 +107,13 @@
 
     <string-array name="pref_save_mode_entries">
         <item>Save automatically</item>
-        <!--<item>Sweep to save</item> -->
+        <item>Sweep to save --REMOVED - SWITCH TO AUTOSAVE</item>
         <item>Don\'t save</item>
     </string-array>
 
     <string-array name="pref_save_mode_values" translatable="false">
         <item>0</item>
-        <!-- <item>1</item>-->
+        <item>1</item>
         <item>2</item>
     </string-array>
 
@@ -273,6 +273,6 @@
     <string name="str_btn_find">Search</string>
     <string name="hnt_et_location">Type here a location to find</string>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
-        AIzaSyD-XNCHffArxbrgQ_-CS1nDXZRTfcEIlO4
+        AIzaSyDrN_SeVUZ1R7Qz-BggYYeyKuVdKU-NUmg
     </string>
 </resources>
