@@ -32,6 +32,7 @@ import static de.robv.android.xposed.XposedHelpers.getObjectField;
 public class PaintTools {
     static int color = Color.RED;
     static int width = 2;
+    static int alpha = 255;
     static Paint paint = null;
     static boolean easterEgg = false;
     static boolean shouldErase = false;
@@ -60,6 +61,7 @@ public class PaintTools {
                         paint.setAlpha(0x00);
                     } else {
                         paint.setXfermode(null);
+                        paint.setAlpha(alpha);
                     }
                     if (easterEgg) {
                         int[] rainbow = getRainbowColors();
@@ -199,6 +201,68 @@ public class PaintTools {
                 paramsWidth.rightMargin = HookMethods.px(55.0f);
                 paramsWidth.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
+                ImageButton alphabutton = new ImageButton(context);
+                alphabutton.setBackgroundColor(0);
+                alphabutton.setImageDrawable(modRes.getDrawable(R.drawable.alpha));
+                alphabutton.getDrawable().setDither(true);
+                alphabutton.setScaleX((float) 0.4);
+                alphabutton.setScaleY((float) 0.4);
+                alphabutton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        LinearLayout linearLayout = new LinearLayout(context);
+                        linearLayout.setOrientation(LinearLayout.VERTICAL);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+                        final TextView tv = new TextView(context);
+                        tv.setText("Currently selected transparency: " + alpha);
+                        final SeekBar seekBar2 = new SeekBar(context);
+                        seekBar2.setMax(255);
+                        seekBar2.setProgress(alpha);
+                        seekBar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                            public void onProgressChanged(SeekBar seekBar2, int n, boolean bl) {
+                                int m = n + 1;
+                                tv.setText("Currently selected width: " + m);
+                            }
+
+                            @Override
+                            public void onStartTrackingTouch(SeekBar arg0) {
+                                // TODO Auto-generated method stub
+
+                            }
+
+                            @Override
+                            public void onStopTrackingTouch(SeekBar arg0) {
+                                // TODO Auto-generated method stub
+
+                            }
+
+                        });
+                        builder.setNeutralButton(Common.dialog_default, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                alpha = 255;
+                            }
+                        });
+                        builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                alpha = seekBar2.getProgress();
+                            }
+                        });
+                        linearLayout.addView(tv, params);
+                        linearLayout.addView(seekBar2, params);
+                        builder.setView((View) linearLayout);
+                        builder.show();
+                    }
+                });
+                RelativeLayout.LayoutParams paramsAlpha = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                paramsAlpha.topMargin = HookMethods.px(5.0f);
+                paramsAlpha.rightMargin = HookMethods.px(55.0f);
+                paramsAlpha.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+
+                ((RelativeLayout) colorpickerview.getParent().getParent()).addView(alphabutton, paramsAlpha);
                 ((RelativeLayout) colorpickerview.getParent().getParent()).addView(eraserbutton, paramsErase);
                 ((RelativeLayout) colorpickerview.getParent().getParent()).addView(colorpicker, paramsPicker);
                 ((RelativeLayout) colorpickerview.getParent().getParent()).addView(widthpicker, paramsWidth);
