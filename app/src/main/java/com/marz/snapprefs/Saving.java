@@ -389,6 +389,9 @@ public class Saving {
                 setAdditionalInstanceField(receivedSnap, "snap_media_type", MediaType.VIDEO);
                 Logger.log("Video " + snapType.name + " opened");
                 int saveMode = (snapType == SnapType.SNAP ? mModeSnapVideo : mModeStoryVideo);
+                if (saveMode == SAVE_S2S) {
+                    saveMode = SAVE_AUTO;
+                }
                 if (saveMode == DO_NOT_SAVE) {
                     Logger.log("Mode: don't save");
                 } else if (saveMode == SAVE_S2S) {
@@ -405,6 +408,9 @@ public class Saving {
                 setAdditionalInstanceField(receivedSnap, "snap_media_type", MediaType.IMAGE);
                 Logger.log("Image " + snapType.name + " opened");
                 int saveMode = (snapType == SnapType.SNAP ? mModeSnapImage : mModeStoryImage);
+                if (saveMode == SAVE_S2S) {
+                    saveMode = SAVE_AUTO;
+                }
                 if (saveMode == DO_NOT_SAVE) {
                     Logger.log("Mode: don't save");
                 } else if (saveMode == SAVE_S2S) {

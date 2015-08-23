@@ -12,11 +12,11 @@
                 android:key="pref_key_hidebf"
                 android:summary="@string/hidebf_summary"
                 android:title="@string/hidebf_text" />
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:key="pref_key_hiderecent"
-                android:summary="@string/hiderecent_summary"
-                android:title="@string/hiderecent_text" />
+            <!--    <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:key="pref_key_hiderecent"
+                    android:summary="@string/hiderecent_summary"
+                    android:title="@string/hiderecent_text" />-->
         </PreferenceCategory>
         <PreferenceCategory
             android:key="pref_key_timer"
@@ -189,12 +189,12 @@
                 android:entryValues="@array/pref_save_mode_values"
                 android:key="pref_key_stories_videos"
                 android:title="@string/pref_save_stories_videos" />
-            <CheckBoxPreference
+            <!--<CheckBoxPreference
                 android:defaultValue="false"
                 android:key="pref_key_save_sent_snaps"
                 android:summaryOff="@string/pref_save_sent_snaps_summary_off"
                 android:summaryOn="@string/pref_save_sent_snaps_summary_on"
-                android:title="@string/pref_save_sent_snaps_title" />
+                android:title="@string/pref_save_sent_snaps_title" /> -->
         </PreferenceCategory>
 
         <PreferenceCategory android:title="@string/pref_category_viewing">
