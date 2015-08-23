@@ -360,50 +360,19 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         //SNAPSHARE
         Sharing.initSharing(lpparam, mResources);
         //SNAPPREFS
-
-		/*findAndHookMethod(Common.Class_ScreenshotDetector, lpparam.classLoader, Common.Method_DetectionSession, List.class, long.class, XC_MethodReplacement.returnConstant(null));
-        logging("Snap Prefs: Not reporting screenshots. DetectionSession");
-
-		Constructor<?> ss;
-		ss = findConstructorExact(Common.Class_Screenshot1, lpparam.classLoader);
-		XposedBridge.hookMethod(ss, new XC_MethodReplacement() {
-			@Override
-			protected Object replaceHookedMethod(MethodHookParam param)
-					throws Throwable {
-				logging("Snap Prefs: Not reporting screenshots. SC1");
-				return false;
-			}
-		});
-		findAndHookMethod(Common.Class_Screenshot2, lpparam.classLoader, Common.Method_Screenshot2, new XC_MethodReplacement() {
-			@Override
-			protected Object replaceHookedMethod(MethodHookParam param)
-					throws Throwable {
-				logging("Snap Prefs: Not reporting screenshots. SC2");
-				return false;
-			}
-		});
-		findAndHookMethod(Common.Class_Screenshot2, lpparam.classLoader, Common.Method_Screenshot3, boolean.class , new XC_MethodReplacement(){
-			@Override
-			protected Object replaceHookedMethod(MethodHookParam param)
-					throws Throwable {
-				logging("Snap Prefs: Not reporting screenshots. SC3");
-				return false;
-			}
-		});
-
 		if (hideBf == true){
-			findAndHookMethod(Common.Class_Friend, lpparam.classLoader, Common.Method_BestFriend, new XC_MethodReplacement(){
-		@Override
-		protected Object replaceHookedMethod(MethodHookParam param)
-				throws Throwable {
-			logging("Snap Prefs: Removing Best-friends");
-			return false;
+            findAndHookMethod("com.snapchat.android.model.Friend", lpparam.classLoader, "i", new XC_MethodReplacement() {
+                @Override
+                protected Object replaceHookedMethod(MethodHookParam param)
+                        throws Throwable {
+                    logging("Snap Prefs: Removing Best-friends");
+                    return false;
+                }
+            });
         }
-		});
-		}
 
-		if (hideRecent == true){
-		findAndHookMethod(Common.Class_Friend, lpparam.classLoader, Common.Method_Recent, new XC_MethodReplacement(){
+		/*if (hideRecent == true){
+        findAndHookMethod(Common.Class_Friend, lpparam.classLoader, Common.Method_Recent, new XC_MethodReplacement(){
 		@Override
 		protected Object replaceHookedMethod(MethodHookParam param)
 				throws Throwable {
