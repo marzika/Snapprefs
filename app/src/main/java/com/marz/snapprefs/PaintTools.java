@@ -223,7 +223,7 @@ public class PaintTools {
                         seekBar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                             public void onProgressChanged(SeekBar seekBar2, int n, boolean bl) {
                                 int m = n + 1;
-                                tv.setText("Currently selected width: " + m);
+                                tv.setText("Currently selected transparency: " + m);
                             }
 
                             @Override
