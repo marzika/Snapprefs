@@ -300,7 +300,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 refreshPreferences();
                 //SNAPPREFS
                 Saving.initSaving(lpparam, mResources, SnapContext);
-                //Test.initSaving(lpparam, mResources, SnapContext);
                 if (mDiscover == true) {
                     DataSaving.initMethod(lpparam, mResources, SnapContext);
                 }
@@ -310,7 +309,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 if (mLocation == true) {
                     Spoofing.initLocation(lpparam, SnapContext);
                 }
-                PaintTools.initPaint(lpparam, mResources, SnapContext);
+                PaintTools.initPaint(lpparam, mResources);
             }
         });
 

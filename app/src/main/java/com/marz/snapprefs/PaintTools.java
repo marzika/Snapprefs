@@ -37,7 +37,19 @@ public class PaintTools {
     static boolean easterEgg = false;
     static boolean shouldErase = false;
     static ImageButton eraserbutton;
-    public static void initPaint(XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context context) {
+    static Context context;
+
+    public static void initPaint(XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes) {
+        XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, Context.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                if (param.args[0] != null) {
+                    context = (Context) param.args[0];
+                } else {
+                    Logger.log("Got the Context to use, but it's null :(", true);
+                }
+            }
+        });
         Class<?> legacyCanvasView = findClass("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader);
         XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, legacyCanvasView, int.class, float.class, new XC_MethodHook() {
             @Override
