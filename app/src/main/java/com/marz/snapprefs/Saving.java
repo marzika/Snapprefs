@@ -560,7 +560,7 @@ public class Saving {
     private static boolean saveImage(Bitmap image, File fileToSave) {
         try {
             FileOutputStream out = new FileOutputStream(fileToSave);
-            image.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            image.compress(Bitmap.CompressFormat.PNG, 100, out);
             out.flush();
             out.close();
             Logger.log("SAVEIMAGE DONE", true);
@@ -668,10 +668,10 @@ public class Saving {
     }
 
     public enum MediaType {
-        IMAGE(".jpg"),
-        IMAGE_OVERLAY(".jpg"),
+        IMAGE(".png"),
+        IMAGE_OVERLAY(".png"),
         VIDEO(".mp4"),
-        GESTUREDIMAGE(".jpg"),
+        GESTUREDIMAGE(".png"),
         GESTUREDVIDEO(".mp4");
 
         private final String fileExtension;
