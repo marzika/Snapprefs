@@ -293,9 +293,12 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 			Logger.log("SECOND_MAX_VIDEO_DURATION set over 10 failed :(",true);
 			Logger.log(t.toString());
 		} For viewing longer videos?*/
-        findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
-            protected void afterHookedMethod(MethodHookParam methodHookParam) throws Throwable {
-                if (SnapContext == null) SnapContext = (Activity) methodHookParam.thisObject;
+
+        XC_MethodHook initHook = new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                /*if (SnapContext == null)*/
+                SnapContext = (Activity) param.thisObject;
                 prefs.reload();
                 refreshPreferences();
                 //SNAPPREFS
@@ -311,7 +314,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 }
                 PaintTools.initPaint(lpparam, mResources);
             }
-        });
+        };
+        findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, initHook);
+        findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onResume", initHook);
 
         // VanillaCaptionEditText was moved from an inner-class to a separate class in 8.1.0
         String vanillaCaptionEditTextClassName = "com.snapchat.android.ui.caption.VanillaCaptionEditText";
