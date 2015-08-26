@@ -1,12 +1,14 @@
 package com.marz.snapprefs;
 
 import android.app.Activity;
+import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -15,18 +17,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.marz.snapprefs.Util.FileUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MapsActivity extends Activity {
-    static final LatLng orlando = new LatLng(28.377144, -81.570611);
     MarkerOptions markerOptions;
-    LatLng latLng;
+    //LatLng latLng;
     private GoogleMap map;
 
     @Override
@@ -35,16 +34,13 @@ public class MapsActivity extends Activity {
         setContentView(R.layout.activity_maps);
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
                 .getMap();
-        final List<Marker> markerList = new ArrayList<>();
-        Marker orlandodisney = map.addMarker(new MarkerOptions().position(orlando)
-                .title("Disneyland - Orlando"));
         map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
 
             @Override
-            public void onMapLongClick(LatLng latLng) {
-                FileUtils.writeToSDFile(String.valueOf(latLng.latitude), "latitude");
-                FileUtils.writeToSDFile(String.valueOf(latLng.longitude), "longitude");
-                Toast.makeText(MapsActivity.this, "Spoofing location for " + latLng.toString(), Toast.LENGTH_SHORT).show();
+            public void onMapLongClick(LatLng location) {
+                FileUtils.writeToSDFile(String.valueOf(location.latitude), "latitude");
+                FileUtils.writeToSDFile(String.valueOf(location.longitude), "longitude");
+                Toast.makeText(MapsActivity.this, "Spoofing location for " + location.toString(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -55,6 +51,8 @@ public class MapsActivity extends Activity {
         OnClickListener findClickListener = new OnClickListener() {
             @Override
             public void onClick(View v) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
                 // Getting reference to EditText to get the user input location
                 EditText etLocation = (EditText) findViewById(R.id.et_location);
 
@@ -99,7 +97,7 @@ public class MapsActivity extends Activity {
             Address address = (Address) addresses.get(0);
 
             // Creating an instance of GeoPoint, to display in Google Map
-            latLng = new LatLng(address.getLatitude(), address.getLongitude());
+            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
 
             String addressText = String.format("%s, %s",
                     address.getMaxAddressLineIndex() > 0 ? address.getAddressLine(0) : "",
