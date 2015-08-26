@@ -14,17 +14,15 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 
 public class Spoofing {
-
-    private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
+    static float speed;
 
     static void initSpeed(final LoadPackageParam lpparam, Context context) {
         findAndHookMethod(Obfuscator.spoofing.SPEEDOMETERVIEW_CLASS, lpparam.classLoader, Obfuscator.spoofing.SPEEDOMETERVIEW_SETSPEED, float.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                String speed = FileUtils.readFromSDFile("speed");
-                float mSpeedValue = Float.parseFloat(speed);
-                param.args[0] = mSpeedValue;
-                //Logger.log("Set speed to " + mSpeedValue, true);
+                if (speed != 0) {
+                    param.args[0] = speed;
+                }
             }
         });
     }
