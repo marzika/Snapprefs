@@ -18,8 +18,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.marz.snapprefs.Util.FileUtils;
-
 import java.util.Random;
 
 import de.robv.android.xposed.XSharedPreferences;
@@ -49,13 +47,15 @@ public class Dialogs {
         builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                double editDouble = Double.parseDouble(eText.getText().toString());
-                CharSequence text = editDouble * 3.6 + " KPH\n" + editDouble * 2.2369 + " MPH";
-                String speed = String.valueOf(editDouble);
-                FileUtils.writeToSDFile(speed, "speed");
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(SnapContext, text, duration);
-                toast.show();
+                if (eText.getText().toString().trim().length() > 0) {
+                    double editDouble = Double.parseDouble(eText.getText().toString());
+                    CharSequence text = editDouble * 3.6 + " KPH\n" + editDouble * 2.2369 + " MPH";
+                    Spoofing.speed = (float) editDouble;
+                    Toast.makeText(SnapContext, text, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(SnapContext, "You must enter a valid number", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
         builder.setNegativeButton(Common.dialog_cancel, new DialogInterface.OnClickListener() {
