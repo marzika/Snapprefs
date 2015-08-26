@@ -128,6 +128,24 @@ public class Saving {
                         //Sometimes getResourceName is going to return null that's okay
                     }
                 }
+            });            /**
+             * We hook this method to get the BitmapDrawable currently displayed.
+             */
+            findAndHookMethod(ImageView.class, "updateDrawable", Drawable.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    try {
+                        if (!mSCResources.getResourceName(((View) param.thisObject).getId()).equals(Common.basename + ":id/snap_video_image_overlay"))
+                            return;
+
+                        if (((BitmapDrawable) param.args[0]).getBitmap() == null) return;
+                        mImage = ((BitmapDrawable) param.args[0]).getBitmap();
+                        //Logger.log("It is a Bitmap", true);
+                        saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE_OVERLAY);
+                    } catch (NullPointerException | Resources.NotFoundException ignore) {
+                        //Sometimes getResourceName is going to return null that's okay
+                    }
+                }
             });
 
             /**
@@ -423,6 +441,20 @@ public class Saving {
                 }
                 break;
             }
+            case IMAGE_OVERLAY: {
+                int saveMode = (snapType == SnapType.SNAP ? mModeSnapVideo : mModeStoryVideo);
+                if (saveMode == SAVE_S2S) {
+                    saveMode = SAVE_AUTO;
+                }
+                if (saveMode == DO_NOT_SAVE) {
+                } else if (saveMode == SAVE_S2S) {
+                    gestureModel = new GestureModel(receivedSnap, screenHeight, MediaType.GESTUREDVIDEO);
+                } else {
+                    gestureModel = null;
+                    saveSnap(snapType, MediaType.IMAGE_OVERLAY, context, image, video, filename, sender);
+                }
+                break;
+            }
             case GESTUREDIMAGE: {
                 Logger.log("GESTUREDIMAGE is coming", true);
                 saveSnap(snapType, MediaType.IMAGE, context, image, video, filename, sender);
@@ -449,6 +481,7 @@ public class Saving {
         }
 
         File imageFile = new File(directory, filename + MediaType.IMAGE.fileExtension);
+        File overlayFile = new File(directory, filename + "_overlay" + MediaType.IMAGE.fileExtension);
         File videoFile = new File(directory, filename + MediaType.VIDEO.fileExtension);
 
         if (mediaType == MediaType.IMAGE) {
@@ -467,6 +500,21 @@ public class Saving {
                 Logger.log("Saving image", true);
             } else {
                 showToast(context, mResources.getString(R.string.image_not_saved));
+            }
+        } else if (mediaType == MediaType.IMAGE_OVERLAY) {
+            if (overlayFile.exists()) {
+                Logger.log("VideoOverlay already exists");
+                showToast(context, mResources.getString(R.string.video_exists));
+                return;
+            }
+
+            if (saveImage(image, overlayFile)) {
+                //showToast(context, "This overlay ");
+                Logger.log("VideoOverlay " + snapType.name + " has been saved");
+                Logger.log("Path: " + overlayFile.toString());
+                runMediaScanner(context, overlayFile.getAbsolutePath());
+            } else {
+                showToast(context, "An error occured while saving this overlay.");
             }
         } else if (mediaType == MediaType.VIDEO) {
             if (videoFile.exists()) {
@@ -621,6 +669,7 @@ public class Saving {
 
     public enum MediaType {
         IMAGE(".jpg"),
+        IMAGE_OVERLAY(".jpg"),
         VIDEO(".mp4"),
         GESTUREDIMAGE(".jpg"),
         GESTUREDVIDEO(".mp4");
