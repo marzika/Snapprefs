@@ -286,18 +286,6 @@
                 android:summaryOff="@string/pref_location_summary_off"
                 android:summaryOn="@string/pref_location_summary_on"
                 android:title="@string/pref_location_title" />
-            <EditTextPreference
-                android:dialogTitle="@string/pref_location_latitude_dialog"
-                android:inputType="number|numberDecimal|numberSigned"
-                android:key="pref_key_location_latitude"
-                android:summary="@string/pref_location_latitude_summary"
-                android:title="@string/pref_location_latitude_title" />
-            <EditTextPreference
-                android:dialogTitle="@string/pref_location_longitude_dialog"
-                android:inputType="number|numberDecimal|numberSigned"
-                android:key="pref_key_location_longitude"
-                android:summary="@string/pref_location_longitude_summary"
-                android:title="@string/pref_location_longitude_title" />
             <Preference
                 android:key="pref_key_location_picker"
                 android:summary="@string/pref_location_location_picker_summary"
