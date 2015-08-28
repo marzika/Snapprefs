@@ -73,9 +73,12 @@
     <string name="pref_location_location_picker_summary">Upon opening the map from SC, LONG click on the desired location, preferrably to the middle of the city to set the spoofed location.</string>
     <string name="pref_discover_summary_off">Discover will load and download</string>
     <string name="pref_discover_summary_on">Discover will NOT load NOR download</string>
-    <string name="pref_discover_title">Disable Discover</string>
+    <string name="pref_discover_title">Block Discover snaps</string>
+    <string name="pref_discover_ui_summary_off">Discover will show in the UI</string>
+    <string name="pref_discover_ui_summary_on">Discover will NOT show in the UI</string>
+    <string name="pref_discover_ui_title">Block Discover from the UI</string>
     <string name="datasaving">Datasaving settings</string>
-    <string name="pref_discover_readme_summary">The Discover page and Discover section on the Stories will be there, however they will not be downloaded to your device. Previously downloaded/cached Discovers before enabling this feature will load.</string>
+    <string name="pref_discover_readme_summary">Previously downloaded/cached Discovers before enabling this feature will load. Also, the second option saves like 5kB more data, since it block brand logos from downloading.</string>
 
 
     <string name="pref_instagram_summary">\@meszarosmarci</string>

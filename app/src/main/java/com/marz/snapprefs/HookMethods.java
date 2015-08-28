@@ -78,7 +78,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static boolean mSortByUsername = true;
     public static boolean mDebugging = true;
     public static boolean mSpeed = false;
-    public static boolean mDiscover = false;
+    public static boolean mDiscoverSnap = false;
+    public static boolean mDiscoverUI = false;
     static XSharedPreferences prefs;
     static boolean selectStory;
     static boolean txtcolours;
@@ -136,7 +137,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mSpeed = prefs.getBoolean("pref_key_speed", false);
         mSpeedValue = prefs.getFloat("pref_key_speed_value", 0F);
         mLocation = prefs.getBoolean("pref_key_location", false);
-        mDiscover = prefs.getBoolean("pref_key_discover", false);
+        mDiscoverSnap = prefs.getBoolean("pref_key_discover", false);
+        mDiscoverUI = prefs.getBoolean("pref_key_discover_ui", false);
         debug = prefs.getBoolean("pref_key_debug", false);
 
         //SAVING
@@ -303,8 +305,11 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 refreshPreferences();
                 //SNAPPREFS
                 Saving.initSaving(lpparam, mResources, SnapContext);
-                if (mDiscover == true) {
-                    DataSaving.initMethod(lpparam, mResources, SnapContext);
+                if (mDiscoverSnap == true) {
+                    DataSaving.blockDsnap(lpparam);
+                }
+                if (mDiscoverUI == true) {
+                    DataSaving.blockFromUi(lpparam);
                 }
                 if (mSpeed == true) {
                     Spoofing.initSpeed(lpparam, SnapContext);
@@ -458,7 +463,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("mSpeed: " + mSpeed);
         logging("mSpeedValue: " + mSpeedValue);
         logging("mLocation: " + mLocation);
-        logging("mDiscover: " + mDiscover);
+        logging("mDiscoverSnap: " + mDiscoverSnap);
+        logging("mDiscoverUI: " + mDiscoverUI);
         logging("mColours: " + mColours);
         logging("*****Debugging: " + debug + " *****");
         logging("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
