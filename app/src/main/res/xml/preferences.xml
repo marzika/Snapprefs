@@ -274,10 +274,6 @@
                 android:summaryOff="@string/pref_speed_summary_off"
                 android:summaryOn="@string/pref_speed_summary_on"
                 android:title="@string/pref_speed_title" />
-            <Preference
-                android:key="pref_speed_readme"
-                android:summary="@string/pref_speed_readme_summary"
-                android:title="@string/pref_speed_readme_title" />
         </PreferenceCategory>
         <PreferenceCategory android:title="@string/pref_location_title">
             <CheckBoxPreference
