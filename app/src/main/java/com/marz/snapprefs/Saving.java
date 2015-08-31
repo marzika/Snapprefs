@@ -178,6 +178,7 @@ public class Saving {
             /**
              * We hook this method to get the BitmapDrawable currently displayed.
              */
+            if (mOverlays == true) {
             findAndHookMethod(ImageView.class, "updateDrawable", Drawable.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -207,6 +208,7 @@ public class Saving {
                     }
                 }
             });
+            }
 
             /**
              * When the SnapView.a method gets called to show the actual snap, therefore it can be
@@ -595,7 +597,7 @@ public class Saving {
                 return;
             }
 
-            if (saveImage(image, imageFile)) {
+            if (saveImageJPG(image, imageFile)) {
                 showToast(context, mResources.getString(R.string.image_saved));
                 Logger.log("Image " + snapType.name + " has been saved");
                 Logger.log("Path: " + imageFile.toString());
@@ -606,14 +608,13 @@ public class Saving {
                 showToast(context, mResources.getString(R.string.image_not_saved));
             }
         } else if (mediaType == MediaType.IMAGE_OVERLAY) {
-            if (mOverlays == true) {
                 if (overlayFile.exists()) {
                     Logger.log("VideoOverlay already exists");
                     showToast(context, mResources.getString(R.string.video_exists));
                     return;
                 }
 
-                if (saveImage(image, overlayFile)) {
+            if (saveImagePNG(image, overlayFile)) {
                     //showToast(context, "This overlay ");
                     Logger.log("VideoOverlay " + snapType.name + " has been saved");
                     Logger.log("Path: " + overlayFile.toString());
@@ -621,7 +622,6 @@ public class Saving {
                 } else {
                     showToast(context, "An error occured while saving this overlay.");
                 }
-            }
         } else if (mediaType == MediaType.VIDEO) {
             if (videoFile.exists()) {
                 Logger.log("Video already exists");
@@ -663,13 +663,27 @@ public class Saving {
     }
 
     // function to saveimage
-    public static boolean saveImage(Bitmap image, File fileToSave) {
+    public static boolean saveImageJPG(Bitmap image, File fileToSave) {
+        try {
+            FileOutputStream out = new FileOutputStream(fileToSave);
+            image.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+            Logger.log("SAVEIMAGE-JPG DONE", true);
+            return true;
+        } catch (Exception e) {
+            Logger.log("Exception while saving an image", e);
+            return false;
+        }
+    }
+
+    public static boolean saveImagePNG(Bitmap image, File fileToSave) {
         try {
             FileOutputStream out = new FileOutputStream(fileToSave);
             image.compress(Bitmap.CompressFormat.PNG, 100, out);
             out.flush();
             out.close();
-            Logger.log("SAVEIMAGE DONE", true);
+            Logger.log("SAVEIMAGE-PNG DONE", true);
             return true;
         } catch (Exception e) {
             Logger.log("Exception while saving an image", e);
@@ -775,10 +789,10 @@ public class Saving {
     }
 
     public enum MediaType {
-        IMAGE(".png"),
+        IMAGE(".jpg"),
         IMAGE_OVERLAY(".png"),
         VIDEO(".mp4"),
-        GESTUREDIMAGE(".png"),
+        GESTUREDIMAGE(".jpg"),
         GESTUREDVIDEO(".mp4");
 
         private final String fileExtension;
