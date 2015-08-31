@@ -77,6 +77,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static boolean mSortByCategory = true;
     public static boolean mSortByUsername = true;
     public static boolean mDebugging = true;
+    public static boolean mOverlays = false;
     public static boolean mSpeed = false;
     public static boolean mDiscoverSnap = false;
     public static boolean mDiscoverUI = false;
@@ -94,6 +95,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     static EditText editText;
     static XModuleResources modRes;
     static Context SnapContext;
+    static int counter = 0;
     private static XModuleResources mResources;
     private static int snapchatVersion;
     private static String MODULE_PATH = null;
@@ -155,6 +157,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mSortByCategory = prefs.getBoolean("pref_key_sort_files_mode", mSortByCategory);
         mSortByUsername = prefs.getBoolean("pref_key_sort_files_username", mSortByUsername);
         mDebugging = prefs.getBoolean("pref_key_debug_mode", mDebugging);
+        mOverlays = prefs.getBoolean("pref_key_overlay", mOverlays);
         mTimerUnlimited = prefs.getBoolean("pref_key_timer_unlimited", mTimerUnlimited);
         mHideTimer = prefs.getBoolean("pref_key_timer_hide", mHideTimer);
 
@@ -305,6 +308,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 refreshPreferences();
                 //SNAPPREFS
                 Saving.initSaving(lpparam, mResources, SnapContext);
+                //Test.initTest(lpparam, SnapContext);
                 if (mDiscoverSnap == true) {
                     DataSaving.blockDsnap(lpparam);
                 }
@@ -364,8 +368,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 }
             }
         });
-
-
         //SNAPSHARE
         Sharing.initSharing(lpparam, mResources);
         //SNAPPREFS
@@ -477,6 +479,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("~ mModeSnapVideo: " + saveModes[mModeSnapVideo]);
         logging("~ mModeStoryImage: " + saveModes[mModeStoryImage]);
         logging("~ mModeStoryVideo: " + saveModes[mModeStoryVideo]);
+        logging("~ mOverlays: " + mOverlays);
         logging("~ mTimerMinimum: " + mTimerMinimum);
         logging("~ mToastEnabled: " + mToastEnabled);
         logging("~ mToastLength: " + mToastLength);

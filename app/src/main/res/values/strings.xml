@@ -77,6 +77,9 @@
     <string name="pref_discover_ui_title">Block Discover from the UI</string>
     <string name="datasaving">Datasaving settings</string>
     <string name="pref_discover_readme_summary">Previously downloaded/cached Discovers before enabling this feature will load. Also, the second option saves like 5kB more data, since it block brand logos from downloading.</string>
+    <string name="pref_overlay_summary_off">Video overlays will NOT be saved</string>
+    <string name="pref_overlay_summary_on">Video overlays will be saved</string>
+    <string name="pref_overlay_title">Save video overlays</string>
 
 
     <string name="pref_instagram_summary">\@meszarosmarci</string>
