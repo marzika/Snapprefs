@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "com.marz.snapprefs"
-        minSdkVersion 11
+        minSdkVersion 12
         targetSdkVersion 21
-        versionCode 14
-        versionName "1.4.6"
+        versionCode 15
+        versionName "1.4.7"
     }
 
     buildTypes {

@@ -69,21 +69,28 @@ public class Saving {
     public static boolean mSortByCategory = true;
     public static boolean mSortByUsername = true;
     public static boolean mDebugging = true;
+    public static boolean mOverlays = false;
     public static boolean viewingSnap;
     public static Object receivedSnap;
     public static Object oldreceivedSnap;
     public static boolean usedOldReceivedSnap = false;
     public static Resources mSCResources;
     public static FileInputStream mVideo;
+    public static String mVideoUri;
     public static Bitmap mImage;
     public static ClassLoader snapCL;
     public static Bitmap image;
     public static FileInputStream video;
     static XSharedPreferences prefs;
+    static int counter = 0;
+    static SnapType lastSnapType;
+    static String lastSender;
+    static Date lastTimestamp;
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.getDefault());
     private static XModuleResources mResources;
     private static GestureModel gestureModel;
     private static int screenHeight;
+    ;
 
     static void initSaving(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
         mResources = modRes;
@@ -96,13 +103,38 @@ public class Saving {
              */
             findAndHookMethod(VideoView.class, "setVideoURI", Uri.class, Map.class, new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     //We have to store the file data before snapchat deletes it
                     try {
-                        mVideo = new FileInputStream(param.args[0].toString());
+                        counter++;
+                        if (mVideoUri != null) {
+                            String lastVideoUri = param.args[0].toString();
+                            if (mVideoUri.equals(lastVideoUri)) {
+                                //Toast.makeText(snapContext,"The both URIs are the same: ", Toast.LENGTH_SHORT).show();
+                                Logger.log("The URIs are the same.", true);
+                                return;
+                            } else {
+                                mVideoUri = lastVideoUri;
+                                mVideo = new FileInputStream(param.args[0].toString());
+                                //Toast.makeText(snapContext,"The both URIs are NOT the same: ", Toast.LENGTH_SHORT).show();
+                                Logger.log("The URIs are NOT the same.", true);
+                                saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
+                            }
+
+                        } else {
+                            mVideoUri = param.args[0].toString();
+                            mVideo = new FileInputStream(param.args[0].toString());
+                            Logger.log(param.args[0].toString(), true);
+                            Logger.log("mVideoUri is null", true);
+                            saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
+                        }
+                        //mVideoUri = param.args[0].toString();
+                        //mVideo = new FileInputStream(param.args[0].toString());
                         Logger.log(param.args[0].toString(), true);
+                        //Logger.log("mVideoUri is null", true);
+                        //saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
                         //Logger.log("It is a Video", true);
-                        saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
+                        //Toast.makeText(snapContext,"Video, counter: "+counter, Toast.LENGTH_SHORT).show();
                         //mVideo = null;
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
@@ -121,32 +153,62 @@ public class Saving {
                             return;
 
                         if (((BitmapDrawable) param.args[0]).getBitmap() == null) return;
-                        mImage = ((BitmapDrawable) param.args[0]).getBitmap();
+                        Bitmap lastImage = ((BitmapDrawable) param.args[0]).getBitmap();
+                        if (mImage != null) {
+                            if (mImage.sameAs(lastImage)) {
+                                //Toast.makeText(snapContext,"The both bitmap are the same: ", Toast.LENGTH_SHORT).show();
+                                return;
+                            } else {
+                                mImage = lastImage;
+                                //Toast.makeText(snapContext,"The both bitmap are NOT the same: ", Toast.LENGTH_SHORT).show();
+                                saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
+                            }
+                        } else {
+                            mImage = lastImage;
+                            //Toast.makeText(snapContext,"First was null, now we are saving, number: "+counter, Toast.LENGTH_SHORT).show();
+                            saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
+                        }
                         //Logger.log("It is a Bitmap", true);
-                        saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
+                        //Toast.makeText(snapContext,"Bitmap, counter: "+counter, Toast.LENGTH_SHORT).show();
                     } catch (NullPointerException | Resources.NotFoundException ignore) {
                         //Sometimes getResourceName is going to return null that's okay
                     }
                 }
-            });            /**
+            });
+            /**
              * We hook this method to get the BitmapDrawable currently displayed.
              */
+            if (mOverlays == true) {
             findAndHookMethod(ImageView.class, "updateDrawable", Drawable.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     try {
                         if (!mSCResources.getResourceName(((View) param.thisObject).getId()).equals(Common.basename + ":id/snap_video_image_overlay"))
                             return;
-
                         if (((BitmapDrawable) param.args[0]).getBitmap() == null) return;
-                        mImage = ((BitmapDrawable) param.args[0]).getBitmap();
+                        Bitmap lastImage = ((BitmapDrawable) param.args[0]).getBitmap();
+                        if (mImage != null) {
+                            if (mImage.sameAs(lastImage)) {
+                                //Toast.makeText(snapContext,"The both bitmap are the same: ", Toast.LENGTH_SHORT).show();
+                                return;
+                            } else {
+                                mImage = lastImage;
+                                //Toast.makeText(snapContext,"The both bitmap are NOT the same: ", Toast.LENGTH_SHORT).show();
+                                saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE_OVERLAY);
+                            }
+                        } else {
+                            mImage = lastImage;
+                            //Toast.makeText(snapContext,"First was null, now we are saving, number: "+counter, Toast.LENGTH_SHORT).show();
+                            saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE_OVERLAY);
+                        }
                         //Logger.log("It is a Bitmap", true);
-                        saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE_OVERLAY);
+                        //Toast.makeText(snapContext,"Bitmap, counter: "+counter, Toast.LENGTH_SHORT).show();
                     } catch (NullPointerException | Resources.NotFoundException ignore) {
                         //Sometimes getResourceName is going to return null that's okay
                     }
                 }
             });
+            }
 
             /**
              * When the SnapView.a method gets called to show the actual snap, therefore it can be
@@ -346,6 +408,9 @@ public class Saving {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     //Logger.log("Stopped viewing the Snap", true);
                     viewingSnap = false;
+                    mImage = null;
+                    mVideo = null;
+                    mVideoUri = null;
                 }
             });
             /**
@@ -368,29 +433,71 @@ public class Saving {
     private static void saveReceivedSnap(Context context, Object receivedSnap, MediaType mediaType) {
         Logger.log("----------------------- SNAPPREFS ------------------------", false);
         String sender = null;
-        if (receivedSnap == null) {
-            receivedSnap = oldreceivedSnap;
-            usedOldReceivedSnap = true;
-        } else {
+        SnapType snapType = null;
+        Date timestamp;
+        //Logger.log("saveReceivedSnap - 1 -" + mediaType.toString(), true);
+        if (mediaType == MediaType.IMAGE || mediaType == MediaType.GESTUREDIMAGE) {
+            if (receivedSnap == null) {
+                receivedSnap = oldreceivedSnap;
+                usedOldReceivedSnap = true;
+                //Logger.log("saveReceivedSnap - 1 - IMAGE, NULL", true);
+            } else {
+                usedOldReceivedSnap = false;
+                //Logger.log("saveReceivedSnap - 1 - IMAGE, NOT NULL", true);
+            }
+        } else if (mediaType == MediaType.VIDEO || mediaType == MediaType.GESTUREDVIDEO) {
+            if (receivedSnap == null) {
+                //receivedSnap = oldreceivedSnap;
+                //Logger.log("saveReceivedSnap - 2 - VIDEO NULL", true);
+                usedOldReceivedSnap = true;
+                //return;
+            }
             usedOldReceivedSnap = false;
+            //Logger.log("saveReceivedSnap - 2 - VIDEO NOT NULL", true);
+        } else if (mediaType == mediaType.IMAGE_OVERLAY) {
+            if (receivedSnap == null) {
+                receivedSnap = oldreceivedSnap;
+                usedOldReceivedSnap = true;
+                //Logger.log("saveReceivedSnap - 2 - OVERLAY, NULL", true);
+            } else {
+                usedOldReceivedSnap = false;
+                //Logger.log("saveReceivedSnap - 2 - OVERLAY, NOT NULL", true);
+            }
         }
+        //Logger.log("saveReceivedSnap - 3 - " + mediaType.toString(), true);
         try {
             sender = (String) getObjectField(receivedSnap, "mSender");
-            ;
+            //Logger.log("saveReceivedSnap - 3 - mSender- " + mediaType.toString(), true);
         } catch (NullPointerException ignore) {
+            //Logger.log("saveReceivedSnap - 3 - mSender NULL- " + mediaType.toString(), true);
         }
-        if (sender == null) { //This means its a story
-            Class<?> storySnap = findClass(Obfuscator.save.STORYSNAP_CLASS, snapCL);
-            try {
-                sender = (String) getObjectField(storySnap.cast(receivedSnap), "mUsername");
-            } catch (Exception e) {
-                Logger.log(e.toString(), true);
+        //Logger.log("saveReceivedSnap - 4- " + mediaType.toString(), true);
+        if (receivedSnap != null) {
+            if (sender == null) { //This means its a story
+                Class<?> storySnap = findClass(Obfuscator.save.STORYSNAP_CLASS, snapCL);
+                try {
+                    sender = (String) getObjectField(storySnap.cast(receivedSnap), "mUsername");
+                } catch (Exception e) {
+                    Logger.log(e.toString(), true);
+                }
+                setAdditionalInstanceField(receivedSnap, "snap_type", SnapType.STORY);
+                lastSnapType = SnapType.STORY;
+            } else {
+                setAdditionalInstanceField(receivedSnap, "snap_type", SnapType.SNAP);
+                lastSnapType = SnapType.SNAP;
             }
-            setAdditionalInstanceField(receivedSnap, "snap_type", SnapType.STORY);
+            snapType = (SnapType) removeAdditionalInstanceField(receivedSnap, "snap_type");
+            timestamp = new Date((Long) callMethod(receivedSnap, Obfuscator.save.SNAP_GETTIMESTAMP)); //Gettimestamp-Snap
+            lastSender = sender;
+            lastTimestamp = timestamp;
+            usedOldReceivedSnap = false;
         } else {
-            setAdditionalInstanceField(receivedSnap, "snap_type", SnapType.SNAP);
+            sender = lastSender;
+            timestamp = lastTimestamp;
+            snapType = lastSnapType;
+            usedOldReceivedSnap = true;
         }
-        Date timestamp = new Date((Long) callMethod(receivedSnap, Obfuscator.save.SNAP_GETTIMESTAMP)); //Gettimestamp-Snap
+
         String filename = sender + "_" + dateFormat.format(timestamp);
         Logger.log("usedOldReceivedSnap = " + usedOldReceivedSnap, true);
         if (usedOldReceivedSnap) {
@@ -401,10 +508,9 @@ public class Saving {
             video = mVideo;
         } catch (NullPointerException ignore) {
         }
-        SnapType snapType = (SnapType) removeAdditionalInstanceField(receivedSnap, "snap_type");
         switch (mediaType) {
             case VIDEO: {
-                setAdditionalInstanceField(receivedSnap, "snap_media_type", MediaType.VIDEO);
+                //setAdditionalInstanceField(receivedSnap, "snap_media_type", MediaType.VIDEO);
                 Logger.log("Video " + snapType.name + " opened");
                 int saveMode = (snapType == SnapType.SNAP ? mModeSnapVideo : mModeStoryVideo);
                 if (saveMode == SAVE_S2S) {
@@ -418,12 +524,12 @@ public class Saving {
                 } else {
                     Logger.log("Mode: auto save");
                     gestureModel = null;
-                    saveSnap(snapType, MediaType.VIDEO, context, image, video, filename, sender);
+                    saveSnap(snapType, MediaType.VIDEO, context, null, video, filename, sender);
                 }
                 break;
             }
             case IMAGE: {
-                setAdditionalInstanceField(receivedSnap, "snap_media_type", MediaType.IMAGE);
+                //setAdditionalInstanceField(receivedSnap, "snap_media_type", MediaType.IMAGE);
                 Logger.log("Image " + snapType.name + " opened");
                 int saveMode = (snapType == SnapType.SNAP ? mModeSnapImage : mModeStoryImage);
                 if (saveMode == SAVE_S2S) {
@@ -437,7 +543,7 @@ public class Saving {
                 } else {
                     Logger.log("Mode: auto save");
                     gestureModel = null;
-                    saveSnap(snapType, MediaType.IMAGE, context, image, video, filename, sender);
+                    saveSnap(snapType, MediaType.IMAGE, context, image, null, filename, sender);
                 }
                 break;
             }
@@ -451,18 +557,18 @@ public class Saving {
                     gestureModel = new GestureModel(receivedSnap, screenHeight, MediaType.GESTUREDVIDEO);
                 } else {
                     gestureModel = null;
-                    saveSnap(snapType, MediaType.IMAGE_OVERLAY, context, image, video, filename, sender);
+                    saveSnap(snapType, MediaType.IMAGE_OVERLAY, context, image, null, filename, sender);
                 }
                 break;
             }
             case GESTUREDIMAGE: {
                 Logger.log("GESTUREDIMAGE is coming", true);
-                saveSnap(snapType, MediaType.IMAGE, context, image, video, filename, sender);
+                saveSnap(snapType, MediaType.IMAGE, context, image, null, filename, sender);
                 break;
             }
             case GESTUREDVIDEO: {
                 Logger.log("GESTUREDVIDEO is coming", true);
-                saveSnap(snapType, MediaType.VIDEO, context, image, video, filename, sender);
+                saveSnap(snapType, MediaType.VIDEO, context, null, video, filename, sender);
                 break;
             }
             default: {
@@ -471,7 +577,7 @@ public class Saving {
         }
     }
 
-    private static void saveSnap(SnapType snapType, MediaType mediaType, Context context, Bitmap image, FileInputStream video, String filename, String sender) {
+    public static void saveSnap(SnapType snapType, MediaType mediaType, Context context, Bitmap image, FileInputStream video, String filename, String sender) {
         File directory;
         try {
             directory = createFileDir(snapType.subdir, sender);
@@ -481,7 +587,7 @@ public class Saving {
         }
 
         File imageFile = new File(directory, filename + MediaType.IMAGE.fileExtension);
-        File overlayFile = new File(directory, filename + "_overlay" + MediaType.IMAGE.fileExtension);
+        File overlayFile = new File(directory, filename + "_overlay" + counter + MediaType.IMAGE.fileExtension);
         File videoFile = new File(directory, filename + MediaType.VIDEO.fileExtension);
 
         if (mediaType == MediaType.IMAGE) {
@@ -491,7 +597,7 @@ public class Saving {
                 return;
             }
 
-            if (saveImage(image, imageFile)) {
+            if (saveImageJPG(image, imageFile)) {
                 showToast(context, mResources.getString(R.string.image_saved));
                 Logger.log("Image " + snapType.name + " has been saved");
                 Logger.log("Path: " + imageFile.toString());
@@ -502,20 +608,20 @@ public class Saving {
                 showToast(context, mResources.getString(R.string.image_not_saved));
             }
         } else if (mediaType == MediaType.IMAGE_OVERLAY) {
-            if (overlayFile.exists()) {
-                Logger.log("VideoOverlay already exists");
-                showToast(context, mResources.getString(R.string.video_exists));
-                return;
-            }
+                if (overlayFile.exists()) {
+                    Logger.log("VideoOverlay already exists");
+                    showToast(context, mResources.getString(R.string.video_exists));
+                    return;
+                }
 
-            if (saveImage(image, overlayFile)) {
-                //showToast(context, "This overlay ");
-                Logger.log("VideoOverlay " + snapType.name + " has been saved");
-                Logger.log("Path: " + overlayFile.toString());
-                runMediaScanner(context, overlayFile.getAbsolutePath());
-            } else {
-                showToast(context, "An error occured while saving this overlay.");
-            }
+            if (saveImagePNG(image, overlayFile)) {
+                    //showToast(context, "This overlay ");
+                    Logger.log("VideoOverlay " + snapType.name + " has been saved");
+                    Logger.log("Path: " + overlayFile.toString());
+                    runMediaScanner(context, overlayFile.getAbsolutePath());
+                } else {
+                    showToast(context, "An error occured while saving this overlay.");
+                }
         } else if (mediaType == MediaType.VIDEO) {
             if (videoFile.exists()) {
                 Logger.log("Video already exists");
@@ -538,7 +644,7 @@ public class Saving {
         viewingSnap = false;
     }
 
-    private static File createFileDir(String category, String sender) throws IOException {
+    public static File createFileDir(String category, String sender) throws IOException {
         File directory = new File(mSavePath);
 
         if (mSortByCategory || (mSortByUsername && sender == null)) {
@@ -557,13 +663,27 @@ public class Saving {
     }
 
     // function to saveimage
-    private static boolean saveImage(Bitmap image, File fileToSave) {
+    public static boolean saveImageJPG(Bitmap image, File fileToSave) {
+        try {
+            FileOutputStream out = new FileOutputStream(fileToSave);
+            image.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+            Logger.log("SAVEIMAGE-JPG DONE", true);
+            return true;
+        } catch (Exception e) {
+            Logger.log("Exception while saving an image", e);
+            return false;
+        }
+    }
+
+    public static boolean saveImagePNG(Bitmap image, File fileToSave) {
         try {
             FileOutputStream out = new FileOutputStream(fileToSave);
             image.compress(Bitmap.CompressFormat.PNG, 100, out);
             out.flush();
             out.close();
-            Logger.log("SAVEIMAGE DONE", true);
+            Logger.log("SAVEIMAGE-PNG DONE", true);
             return true;
         } catch (Exception e) {
             Logger.log("Exception while saving an image", e);
@@ -603,7 +723,7 @@ public class Saving {
      * @param context Current context
      * @param filePath File to be scanned by the media scanner
      */
-    private static void runMediaScanner(Context context, String... mediaPath) {
+    public static void runMediaScanner(Context context, String... mediaPath) {
         try {
             Logger.log("MediaScanner started");
             MediaScannerConnection.scanFile(context, mediaPath, null,
@@ -617,7 +737,7 @@ public class Saving {
         }
     }
 
-    private static void showToast(Context context, String toastMessage) {
+    public static void showToast(Context context, String toastMessage) {
         if (mToastEnabled) {
             if (mToastLength == TOAST_LENGTH_SHORT) {
                 Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show();
@@ -647,6 +767,7 @@ public class Saving {
         mSortByCategory = prefs.getBoolean("pref_key_sort_files_mode", mSortByCategory);
         mSortByUsername = prefs.getBoolean("pref_key_sort_files_username", mSortByUsername);
         mDebugging = prefs.getBoolean("pref_key_debug_mode", mDebugging);
+        mOverlays = prefs.getBoolean("pref_key_overlay", mOverlays);
         mTimerUnlimited = prefs.getBoolean("pref_key_timer_unlimited", mTimerUnlimited);
         mHideTimer = prefs.getBoolean("pref_key_timer_hide", mHideTimer);
 
@@ -668,10 +789,10 @@ public class Saving {
     }
 
     public enum MediaType {
-        IMAGE(".png"),
+        IMAGE(".jpg"),
         IMAGE_OVERLAY(".png"),
         VIDEO(".mp4"),
-        GESTUREDIMAGE(".png"),
+        GESTUREDIMAGE(".jpg"),
         GESTUREDVIDEO(".mp4");
 
         private final String fileExtension;

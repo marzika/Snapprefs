@@ -45,7 +45,7 @@
     <string name="pref_update_title">To get the latest updates</string>
     <string name="pref_update_summary">Add \'snapprefs\' on Snapchat</string>
     <string name="version_text">Version</string>
-    <string name="version_summary" translatable="false">Current version is: v1.4.6</string>
+    <string name="version_summary" translatable="false">Current version is: v1.4.7</string>
     <string name="general">General settings</string>
     <string name="saving">Saving settings</string>
     <string name="sharing">Sharing settings</string>
@@ -77,6 +77,9 @@
     <string name="pref_discover_ui_title">Block Discover from the UI</string>
     <string name="datasaving">Datasaving settings</string>
     <string name="pref_discover_readme_summary">Previously downloaded/cached Discovers before enabling this feature will load. Also, the second option saves like 5kB more data, since it block brand logos from downloading.</string>
+    <string name="pref_overlay_summary_off">Video overlays will NOT be saved</string>
+    <string name="pref_overlay_summary_on">Video overlays will be saved</string>
+    <string name="pref_overlay_title">Save video overlays</string>
 
 
     <string name="pref_instagram_summary">\@meszarosmarci</string>
