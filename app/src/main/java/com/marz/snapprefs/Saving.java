@@ -587,7 +587,7 @@ public class Saving {
         }
 
         File imageFile = new File(directory, filename + MediaType.IMAGE.fileExtension);
-        File overlayFile = new File(directory, filename + "_overlay" + counter + MediaType.IMAGE.fileExtension);
+        File overlayFile = new File(directory, filename + "_overlay" + counter + MediaType.IMAGE_OVERLAY.fileExtension);
         File videoFile = new File(directory, filename + MediaType.VIDEO.fileExtension);
 
         if (mediaType == MediaType.IMAGE) {
