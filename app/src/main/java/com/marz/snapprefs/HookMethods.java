@@ -21,7 +21,10 @@ import android.widget.RelativeLayout;
 
 import com.marz.snapprefs.Util.XposedUtils;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.List;
 
 import de.robv.android.xposed.IXposedHookInitPackageResources;
@@ -81,6 +84,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static boolean mSpeed = false;
     public static boolean mDiscoverSnap = false;
     public static boolean mDiscoverUI = false;
+    public static boolean mCustomSticker = false;
     static XSharedPreferences prefs;
     static boolean selectStory;
     static boolean txtcolours;
@@ -141,6 +145,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mLocation = prefs.getBoolean("pref_key_location", false);
         mDiscoverSnap = prefs.getBoolean("pref_key_discover", false);
         mDiscoverUI = prefs.getBoolean("pref_key_discover_ui", false);
+        mCustomSticker = prefs.getBoolean("pref_key_sticker", false);
         debug = prefs.getBoolean("pref_key_debug", false);
 
         //SAVING
@@ -249,7 +254,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 Logger.log("StateBuilder.setScreenshotCount set to 0L", true);
             }
         });
-       /* findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "open", String.class, new XC_MethodHook() {
+        if (mCustomSticker == true) {
+            findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "open", String.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 Logger.log("Open asset: " + param.args[0], true);
@@ -260,9 +266,11 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 InputStream is = null;
                 is = new BufferedInputStream(new FileInputStream(file));
                 param.setResult(is);
-                Logger.log("setResult for AssetManagar", true);
+                Logger.log("setResult for AssetManager", true);
             }
         });
+        }
+        /*
         findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "openFd", String.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -467,6 +475,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("mLocation: " + mLocation);
         logging("mDiscoverSnap: " + mDiscoverSnap);
         logging("mDiscoverUI: " + mDiscoverUI);
+        logging("mCustomSticker: " + mCustomSticker);
         logging("mColours: " + mColours);
         logging("*****Debugging: " + debug + " *****");
         logging("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
