@@ -18,6 +18,8 @@ import net.rdrei.android.dirchooser.DirectoryChooserActivity;
 import java.io.File;
 import java.io.FileOutputStream;
 
+import de.cketti.library.changelog.ChangeLog;
+
 public class Settings extends PreferenceFragment {
     public static final String PREF_KEY_SAVE_LOCATION = "pref_key_save_location";
     public static final String PREF_KEY_HIDE_LOCATION = "pref_key_hide_location";
@@ -48,6 +50,10 @@ public class Settings extends PreferenceFragment {
         addPreferencesFromResource(R.xml.preferences);
         final Context ctx = getActivity();
 
+        ChangeLog cl = new ChangeLog(ctx);
+        if (cl.isFirstRun()) {
+            cl.getLogDialog().show();
+        }
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 

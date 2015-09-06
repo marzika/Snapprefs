@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<changelog>
+    <release
+        version="1.4.7"
+        versioncode="15">
+        <change>Fixed the duplicate saving</change>
+        <change>Added option to enable/disable overlay saving (should improve performance)</change>
+        <change>Snaps are JPGs, overlays are .PNG</change>
+        <change>Added Color History</change>
+        <change>Added Hex color input</change>
+        <change>The lag should be reduced when opening a Snap</change>
+        <change>NOTE: The overlays are getting saved more than once, it isn't a bug.</change>
+    </release>
+    <release
+        version="1.4.6"
+        versioncode="14">
+        <change>Updated for 9.14.2.0</change>
+        <change>Bug fixes and improvements, it is most likely bug-free</change>
+        <change>Added ability to hide Discover from UI</change>
+        <change>Saves images as PNGs as well as Overlays</change>
+    </release>
+    <release
+        version="1.4.5 beta"
+        versioncode="13">
+        <change>Updated for SC 9.14.1.0</change>
+        <change>Sharing from Gallery has been readded both for videos and images</change>
+        <change>Introducing Paint Tools - you can change your drawing's transparency, width, color
+            and you can erase finely too
+        </change>
+        <change>Fixed the issue when the saving skipped some images</change>
+        <change>Added custom Fullscreen Filters</change>
+        <change>Added 2 more additional screenshot bypasses, you can now screenshot Chats and you
+            don't have to worry about the random notifications
+        </change>
+        <change>Location spoofing from now on has a map and can be launched within the app, no
+            restarts needed to set the location
+        </change>
+        <change>Speed spoofing has been improved, no restart needed to set the value</change>
+
+        <change>NOTE: Sweep-to-save and Recents-Hiding has been removed, more info GitHub</change>
+    </release>
+    <release
+        version="1.4.3 beta 3"
+        versioncode="12">
+        <change>Updated for 9.13.0.0</change>
+        <change>Added Location Spoofing</change>
+        <change>Added Speed Spoofing</change>
+        <change>Added Unlimited Viewing Time</change>
+        <change>Added ability to hide Timer</change>
+        <change>Added ability to block Discover so you can save data from your dataplan</change>
+        <change>Added Custom Filters</change>
+
+        <change>Bugs: If you open multiple snaps at once the last won't save, sent snaps won't be
+            saved, sharing is partially updated.
+        </change>
+    </release>
+    <release
+        version="1.4.3 beta 2"
+        versioncode="11">
+        <change>Updated saving to work with 9.12.0.1</change>
+        <change>Readded Select-All and Unlimited Captions</change>
+        <change>Fixed the Screenshot detection bug</change>
+        <change>Fixed the issue where the Snap gets saved after closing it</change>
+    </release>
+    <release
+        version="1.4.3 beta 1"
+        versioncode="10">
+        <change>Updated for 9.11.0.0</change>
+        <change>Not working features are: Unlimited captions, sharing from gallery, select all
+        </change>
+    </release>
+    <release
+        version="1.4.2"
+        versioncode="9">
+        <change>Updated for SC 9.3.1.0</change>
+        <change>The select-all checkbox now has the same style as the UI</change>
+    </release>
+    <release
+        version="1.4.1"
+        versioncode="8">
+        <change>Removed conflicting preference</change>
+        <change>Updated graphics</change>
+    </release>
+    <release
+        version="1.4.0"
+        versioncode="7">
+        <change>Updated to work with SC 9.2.0.0</change>
+        <change>Added Directory Choosing</change>
+        <change>Added Folder Hiding</change>
+        <change>Cleaned up the code, removed useless files</change>
+    </release>
+    <release
+        version="1.3.1"
+        versioncode="6">
+        <change>Fixed VERSION_NAME and VERSION_CODE bug</change>
+    </release>
+    <release
+        version="1.3.0"
+        versioncode="5">
+        <change>Added every feature of Keepchat and Snapshare</change>
+        <change>Lollipop support</change>
+        <change>Support for SC 9.1.2.0</change>
+    </release>
+    <release
+        version="1.2"
+        versioncode="4">
+        <change>Added a button to launch the customization</change>
+        <change>Updated every feature to work for the latest Snapchat versions (8.1.2)</change>
+        <change>Fixed the bug when changing to the bold caption style you could no longer customize
+            the text
+        </change>
+    </release>
+    <release
+        version="1.1.0"
+        versioncode="3">
+        <change>Added Select-All feature</change>
+        <change>Disabled Text-suggestions in the Caption</change>
+        <change>Now supports Android 2.3+</change>
+    </release>
+    <release
+        version="1.0.1"
+        versioncode="2">
+        <change>Fixed theme for Touchwiz ROMs</change>
+        <change>Added Information section with debugging option and version display</change>
+        <change>Fixed logic when dialog got displayed without items</change>
+    </release>
+    <release
+        version="1.0"
+        versioncode="1">
+        <change>Initial release</change>
+    </release>
+</changelog>
