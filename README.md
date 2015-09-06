@@ -48,8 +48,9 @@ chiralcode for his [ColorPicker](https://github.com/chiralcode/Android-Color-Pic
 
 [Yoganandh for his color collection](https://gist.github.com/VenomVendor/6857539)
 
-cketti for his [ckChangelog libraray](https://github.com/cketti/ckChangeLog)
+cketti for his [ckChangelog library](https://github.com/cketti/ckChangeLog)
 
+ddmanfire for implementing array saving [#1](https://github.com/ddmanfire/Snapprefs/commit/dc2e199c74a3729f0c50365597577a37fb312b2e) [#2](https://github.com/ddmanfire/Snapprefs/commit/03fa8783cd3d21dabdfebbd572eb7481fccbe48b)
 
 Installation
 ------------------
