@@ -48,6 +48,8 @@ chiralcode for his [ColorPicker](https://github.com/chiralcode/Android-Color-Pic
 
 [Yoganandh for his color collection](https://gist.github.com/VenomVendor/6857539)
 
+cketti for his [ckChangelog libraray](https://github.com/cketti/ckChangeLog)
+
 
 Installation
 ------------------
