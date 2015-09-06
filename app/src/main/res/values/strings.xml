@@ -8,7 +8,7 @@
     <string name="pref_debug_title">INFORMATIONS</string>
 
     <string name="pref_thanks_title">Thanks to</string>
-    <string name="pref_thanks_summary">P1ngu1n, manvir, elesbb, chiralcode, Yoganandh, bnalls33</string>
+    <string name="pref_thanks_summary">P1ngu1n, manvir, elesbb, chiralcode, Yoganandh, bnalls33, cketti, ddmanfire</string>
     <string name="pref_donate_title">Donate</string>
     <string name="pref_donate_summary">Support me by buying some coffee using PayPal. Donations are highly appreciated.</string>
 
@@ -54,6 +54,13 @@
     <string name="pref_speed_value_title">Current set speed:</string>
     <string name="pref_speed_summary_on">Enabled speed spoofing</string>
     <string name="pref_speed_summary_off">Disabled speed spoofing</string>
+    <string name="pref_sticker">Custom sticker</string>
+    <string name="pref_sticker_title">Enable custom stickers</string>
+    <string name="pref_sticker_summary_on">Custom sticker will be loaded</string>
+    <string name="pref_sticker_summary_off">Custom sticker will NOT be loaded</string>
+    <string name="pref_sticker_readme_title">HOW TO USE</string>
+    <string name="pref_sticker_readme_summary">To replace stickers, you have to first get SC\'s Emoji zips (can be found in their app/assets folder), the PNG folder stores the previews of the stickers, the SVG folder contains the actual stickers. Each filename represents the unicode code of the Emoji, which they represent. To change the sticker, you have to replace the desired PNG and SVG in their zip, then place the zips in the /SDCARD/Snapprefs/Stickers/ folder (you have to create the folder). Click here for details on SVGs.</string>
+    <string name="pref_sticker_readme_summary2">Example SVGs/PNGs can be found at https://github.com/Ranks/emojione</string>
     <string name="pref_filter_readme_title">HOW TO USE</string>
     <string name="pref_filter_readme_summary">Your custom filter has to be named as "banner_filter.png"/"fullscreen_filter.png" in the folder which is by default /sdcard/Snapprefs/Filters. If you changed the filter image, you have to restart Snapchat for the changes to take effect.\nResolution for Fullscreen Filters: 1080x1920\nResolution for Banner Filters: 821x323</string>
     <string name="pref_discover_readme_title">HOW TO USE</string>
@@ -68,7 +75,7 @@
     <string name="pref_location_longitude_summary">Click here to enter longitude</string>
     <string name="pref_location_longitude_title">Longitude</string>
     <string name="pref_location_location_picker_title">HOW TO USE</string>
-    <string name="pref_location_location_picker_summary">Upon opening the map from SC, LONG click on the desired location, preferrably to the middle of the city to set the spoofed location.</string>
+    <string name="pref_location_location_picker_summary">Upon opening the map from SC, LONG click on the desired location, preferably to the middle of the city to set the spoofed location.</string>
     <string name="pref_discover_summary_off">Discover will load and download</string>
     <string name="pref_discover_summary_on">Discover will NOT load NOR download</string>
     <string name="pref_discover_title">Block Discover snaps</string>
@@ -111,7 +118,7 @@
 
     <string-array name="pref_save_mode_entries">
         <item>Save automatically</item>
-        <item>Sweep to save --REMOVED - SWITCH TO AUTOSAVE</item>
+        <item>Sweep to save</item>
         <item>Don\'t save</item>
     </string-array>
 
