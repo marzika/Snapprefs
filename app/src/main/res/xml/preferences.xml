@@ -57,6 +57,31 @@
                 android:title="@string/selectstory_text" />
         </PreferenceCategory>
         <PreferenceCategory
+            android:key="pref_sticker"
+            android:title="@string/pref_sticker">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_sticker"
+                android:summaryOff="@string/pref_sticker_summary_off"
+                android:summaryOn="@string/pref_sticker_summary_on"
+                android:title="@string/pref_sticker_title" />
+            <Preference
+                android:key="pref_sticker_readme"
+                android:summary="@string/pref_sticker_readme_summary"
+                android:title="@string/pref_sticker_readme_title">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="https://github.com/marzika/Snapprefs/blob/development/app/src/main/res/stickers.txt" />
+            </Preference>
+            <Preference
+                android:key="pref_key_sticker_readme_2"
+                android:summary="@string/pref_sticker_readme_summary2">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="https://github.com/Ranks/emojione" />
+            </Preference>
+        </PreferenceCategory>
+        <PreferenceCategory
             android:key="pref_key_filter"
             android:title="@string/pref_filter_title">
             <CheckBoxPreference
