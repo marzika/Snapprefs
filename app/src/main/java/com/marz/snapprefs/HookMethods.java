@@ -20,8 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.marz.snapprefs.Util.XposedUtils;
-import com.startapp.android.publish.StartAppSDK;
-import com.startapp.android.publish.banner.Banner;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -338,7 +336,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 /*if (SnapContext == null)*/
                 SnapContext = (Activity) param.thisObject;
-                StartAppSDK.init(SnapContext, "108991393", "208831076", true);
+
                 prefs.reload();
                 refreshPreferences();
                 //SNAPPREFS
@@ -588,33 +586,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "snap_preview", new XC_LayoutInflated() {
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
                 RelativeLayout mainLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("snap_preview_header", "id", Common.PACKAGE_SNAP)).getParent();
-                final Banner startAppBanner = new Banner(SnapContext);
 
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
-                layoutParams.topMargin = px(3.0f);
-                layoutParams.leftMargin = px(55.0f);
-                ImageButton ghost = new ImageButton(SnapContext);
-                ghost.setBackgroundColor(0);
-                ghost.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
-                ghost.setScaleX((float) 0.75);
-                ghost.setScaleY((float) 0.75);
-                ghost.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startAppBanner.hideBanner();
-                    }
-                });
-                // Define StartApp Banner
-                RelativeLayout.LayoutParams bannerParameters =
-                        new RelativeLayout.LayoutParams(
-                                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                                RelativeLayout.LayoutParams.WRAP_CONTENT);
-                bannerParameters.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                bannerParameters.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                // Add to main Layout
-                mainLayout.addView(startAppBanner, bannerParameters);
-                mainLayout.addView(ghost, layoutParams);
             }
         });
     }
