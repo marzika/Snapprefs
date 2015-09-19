@@ -28,7 +28,7 @@ public class Spoofing {
     }
 
     static void initLocation(final LoadPackageParam lpparam, final Context context) {
-        findAndHookMethod("akt", lpparam.classLoader, "d", new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.spoofing.LOCATION_CLASS, lpparam.classLoader, Obfuscator.spoofing.LOCATION_GETLOCATION, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 String rawlatitude = FileUtils.readFromSDFile("latitude");

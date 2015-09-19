@@ -207,13 +207,13 @@ public class Sharing {
 
                 XposedUtils.log("Doing it's magic!");
                 Object snapCaptureEvent;
-                findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Bitmap.class, new XC_MethodHook() {
+                /*findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Bitmap.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         param.args[0] = mediaImg.getContent();
                         Logger.log("Set media in camerafragment", true);
                     }
-                });
+                });*/
 
                 findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Bitmap.class, new XC_MethodHook() {
                     @Override
@@ -247,7 +247,7 @@ public class Sharing {
         };
 
         // In 5.0.36.0 (beta) refreshFlashButton was removed, we use onCameraStateEvent instead
-        Class<?> cameraStateEventClass = findClass("bfa", lpparam.classLoader);
+        Class<?> cameraStateEventClass = findClass(Obfuscator.sharing.CAMERASTATEEVENT_CLASS, lpparam.classLoader);
         findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "onCameraStateEvent", cameraStateEventClass, cameraLoadedHook);
         XposedUtils.log("Hooked onCameraStateEvent");
     }

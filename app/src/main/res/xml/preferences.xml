@@ -71,7 +71,7 @@
                 android:title="@string/pref_sticker_readme_title">
                 <intent
                     android:action="android.intent.action.VIEW"
-                    android:data="https://github.com/marzika/Snapprefs/blob/development/app/src/main/res/stickers.txt" />
+                    android:data="http://forum.xda-developers.com/showpost.php?p=62707280&amp;postcount=4411" />
             </Preference>
             <Preference
                 android:key="pref_key_sticker_readme_2"
