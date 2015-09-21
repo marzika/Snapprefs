@@ -64,6 +64,9 @@
     <string name="pref_filter_readme_title">HOW TO USE</string>
     <string name="pref_filter_readme_summary">Your custom filter has to be named as "banner_filter.png"/"fullscreen_filter.png" in the folder which is by default /sdcard/Snapprefs/Filters. If you changed the filter image, you have to restart Snapchat for the changes to take effect.\nResolution for Fullscreen Filters: 1080x1920\nResolution for Banner Filters: 821x323</string>
     <string name="pref_discover_readme_title">HOW TO USE</string>
+    <string name="pref_weather_summary_off">Weather will NOT be spoofed</string>
+    <string name="pref_weather_summary_on">Weather will be spoofed</string>
+    <string name="pref_weather_title">Weather spoofing</string>
     <string name="pref_location_summary_off">Location will NOT be spoofed</string>
     <string name="pref_location_summary_on">Location will be spoofed</string>
     <string name="pref_location_readme_title">HOW TO USE</string>
@@ -287,4 +290,8 @@
         AIzaSyDrN_SeVUZ1R7Qz-BggYYeyKuVdKU-NUmg
         <!--AIzaSyD-XNCHffArxbrgQ_-CS1nDXZRTfcEIlO4 DEBUG-->
     </string>
+    <string name="title_activity_reedem">Reedem</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 </resources>

@@ -82,6 +82,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static boolean mDebugging = true;
     public static boolean mOverlays = false;
     public static boolean mSpeed = false;
+    public static boolean mWeather = false;
     public static boolean mDiscoverSnap = false;
     public static boolean mDiscoverUI = false;
     public static boolean mCustomSticker = false;
@@ -109,8 +110,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     private static boolean hideRecent;
     private static boolean shouldAddGhost;
     private static boolean mColours;
-    private static float mSpeedValue;
     private static boolean mLocation;
+    private static InitPackageResourcesParam resParam;
     Class CaptionEditText;
 
     public static int px(float f) {
@@ -145,7 +146,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mCustomFilterLocation = prefs.getString("pref_key_filter_location", mCustomFilterLocation);
         mCustomFilterType = prefs.getInt("pref_key_filter_type", 0);
         mSpeed = prefs.getBoolean("pref_key_speed", false);
-        mSpeedValue = prefs.getFloat("pref_key_speed_value", 0F);
+        mWeather = prefs.getBoolean("pref_key_weather", false);
         mLocation = prefs.getBoolean("pref_key_location", false);
         mDiscoverSnap = prefs.getBoolean("pref_key_discover", false);
         mDiscoverUI = prefs.getBoolean("pref_key_discover_ui", false);
@@ -187,7 +188,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             mColours = false;
         }
 
-        if (mSpeed || mColours || mLocation) {
+        if (mSpeed || mColours || mLocation || mWeather) {
             shouldAddGhost = true;
         } else {
             shouldAddGhost = false;
@@ -219,6 +220,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             return;
 
         refreshPreferences();
+        resParam = resparam;
             modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
         if (shouldAddGhost) {
             addGhost(resparam);
@@ -226,7 +228,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         if (mCustomFilterType == 0) {
             fullScreenFilter(resparam);
         }
-        addSaveBtn(resparam);
+        //addSaveBtn(resparam);
         addAd(resparam);
     }
 
@@ -353,6 +355,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 }
                 if (mLocation == true) {
                     Spoofing.initLocation(lpparam, SnapContext);
+                }
+                if (mWeather == true) {
+                    Spoofing.initWeather(lpparam, SnapContext);
                 }
                 PaintTools.initPaint(lpparam, mResources);
             }
@@ -496,7 +501,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("CustomFiltersLocation: " + mCustomFilterLocation);
         logging("CustomFilterType: " + mCustomFilterType);
         logging("mSpeed: " + mSpeed);
-        logging("mSpeedValue: " + mSpeedValue);
+        logging("mWeather: " + mWeather);
         logging("mLocation: " + mLocation);
         logging("mDiscoverSnap: " + mDiscoverSnap);
         logging("mDiscoverUI: " + mDiscoverUI);
@@ -534,37 +539,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 editText = (EditText) param.thisObject;
             }
         });
-    }
-
-    public void addSaveBtn(InitPackageResourcesParam resparam) {
-        if (SnapContext != null) {
-            Logger.log("We are in addsave and Snapcontext isnt null", true);
-                    /*resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated() {
-            @Override
-            public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
-                FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP));
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
-                ImageButton savebtn = new ImageButton(SnapContext);
-                layoutParams.topMargin = px(3.0f);
-                layoutParams.leftMargin = px(55.0f);
-                savebtn.setBackgroundColor(0);
-                savebtn.setImageDrawable(mResources.getDrawable(R.drawable.savebutton));
-                //savebtn.setScaleX(0);
-                //savebtn.setScaleY(0);
-                savebtn.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View v) {
-                        Toast toast = Toast.makeText(SnapContext, "Savebtn click", Toast.LENGTH_SHORT);
-                        logging("SnapPrefs: Displaying Savebutton");
-                    }
-                });
-                frameLayout.addView(savebtn, layoutParams);
-            }
-        });*/
-        } else {
-            Logger.log("We are in addsave and Snapcontext IS null", true);
-        }
     }
 
     public void fullScreenFilter(InitPackageResourcesParam resparam) {
@@ -626,6 +600,22 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         logging("SnapPrefs: Displaying SpeedDialog");
                     }
                 });
+                RelativeLayout.LayoutParams paramsWeather = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
+                paramsWeather.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
+                paramsWeather.topMargin = px(180.0f);
+                paramsWeather.leftMargin = px(10.0f);
+                ImageButton weather = new ImageButton(SnapContext);
+                weather.setBackgroundColor(0);
+                weather.setImageDrawable(mResources.getDrawable(R.drawable.weather));
+                weather.setScaleX((float) 0.4);
+                weather.setScaleY((float) 0.4);
+                weather.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Dialogs.WeatherDialog(SnapContext);
+                        logging("SnapPrefs: Displaying WeatherDialog");
+                    }
+                });
                 RelativeLayout.LayoutParams paramsLocation = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
                 paramsLocation.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
                 paramsLocation.topMargin = px(135.0f);
@@ -652,6 +642,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 }
                 if (mLocation == true) {
                     relativeLayout.addView(location, paramsLocation);
+                }
+                if (mWeather == true) {
+                    relativeLayout.addView(weather, paramsWeather);
                 }
             }
         });

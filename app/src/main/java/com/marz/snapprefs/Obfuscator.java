@@ -20,7 +20,8 @@ package com.marz.snapprefs;
 
 public class Obfuscator {
     // Snapprefs supports v9.15.1.0 and up
-    private static final int SUPPORTED_VERSION_CODE = 720;
+    public static final int SUPPORTED_VERSION_CODE = 720;
+    public static final String SUPPORTED_VERSION_CODENAME = "9.15.2.0";
 
     /**
      * Check if Snapprefs is compatible with this Snapchat version.

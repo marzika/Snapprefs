@@ -318,6 +318,14 @@
                 android:summary="@string/pref_location_location_picker_summary"
                 android:title="@string/pref_location_location_picker_title" />
         </PreferenceCategory>
+        <PreferenceCategory android:title="@string/pref_weather_title">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_weather"
+                android:summaryOff="@string/pref_weather_summary_off"
+                android:summaryOn="@string/pref_weather_summary_on"
+                android:title="@string/pref_weather_title" />
+        </PreferenceCategory>
     </PreferenceScreen>
     <PreferenceScreen
         android:key="button_datasaving_settings"

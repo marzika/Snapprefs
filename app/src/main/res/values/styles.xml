@@ -42,7 +42,7 @@
     </style>
 
     <style name="listViewPrefs" parent="@android:style/Widget.ListView">
-        <item name="android:background">@drawable/aa_blank</item>
+        <item name="android:background">@color/white</item>
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">?android:listPreferredItemHeight</item>
         <item name="android:textSize">30.0sp</item>

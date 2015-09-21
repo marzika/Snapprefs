@@ -21,8 +21,8 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
     <!--
  <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
@@ -35,12 +35,10 @@
         <activity
             android:name="com.startapp.android.publish.list3d.List3DActivity"
             android:theme="@android:style/Theme" />
-
         <activity
             android:name="com.startapp.android.publish.OverlayActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@android:style/Theme.Translucent" />
-
         <activity
             android:name="com.startapp.android.publish.FullScreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -96,7 +94,10 @@
         <activity
             android:name=".MapsActivity"
             android:exported="true"
-            android:label="@string/title_activity_maps"></activity>
+            android:label="@string/title_activity_maps" />
+        <activity
+            android:name=".Reedem"
+            android:label="@string/title_activity_reedem"></activity>
     </application>
 
 </manifest>

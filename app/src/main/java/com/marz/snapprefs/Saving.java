@@ -90,7 +90,6 @@ public class Saving {
     private static GestureModel gestureModel;
     private static int screenHeight;
 
-
     static void newSaveMethod(FileInputStream mVideo, Bitmap mImage, boolean isOverlay) {
         if (mVideo == null && mImage == null) {
             Logger.log("Skipping null");
@@ -118,7 +117,6 @@ public class Saving {
         }
         Logger.log("Saving Done!");
     }
-
     static void initSaving(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
         mResources = modRes;
         if (mSCResources == null) mSCResources = snapContext.getResources();
@@ -201,6 +199,7 @@ public class Saving {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     viewingSnap = true;
                     currentViewingSnap++;
+                    //currentViewingSnap++;
                     Logger.log("Starting to view a snap, plus viewingSnap: " + viewingSnap, true);
                 }
             });
@@ -234,7 +233,19 @@ public class Saving {
                                 if ((currentDistance < (gestureModel.getDistance() * 0.3)) && (gestureModel.getDistance() > (gestureModel.getDisplayHeight() * 0.2))) {
                                     gestureModel.setSaved();
                                     //TODO add new saving method (also added image overlay saving to S2S)
-                                    newSaveMethod2(snapContext);
+                                    //newSaveMethod2(snapContext);
+                                    Snap toSave = snapsMap.get(currentViewingSnap);
+                                    if (toSave.getMediaType() == MediaType.IMAGE) {
+                                        mImage = toSave.getImage();
+                                        saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDIMAGE);
+                                    } else if (toSave.getMediaType() == MediaType.VIDEO) {
+                                        mVideo = toSave.getVideo();
+                                        saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDVIDEO);
+                                    } else if (toSave.getMediaType() == MediaType.IMAGE_OVERLAY) {
+                                        mImage = toSave.getImage();
+                                        saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDOVERLAY);
+                                    }
+                                    Logger.log("Saving Done!");
                                     //saveReceivedSnap(snapContext, gestureModel.getReceivedSnap(), gestureModel.mediaType);
                                 }
                             }
@@ -356,21 +367,11 @@ public class Saving {
             if (mTimerUnlimited == true || mHideTimer == true) {
                 findAndHookMethod("com.snapchat.android.ui.SnapTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
-           /* Class<?> snapView = findClass(Obfuscator.save.SNAPVIEW_CLASS, lpparam.classLoader);
-            hookAllConstructors(snapView, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Logger.log("We have hooked the constructor", true);
-                    View snapTimerView = (View) getObjectField(param.thisObject, "j");
-                    Logger.log("We have j as snapTimerView", true);
-                    snapTimerView.setVisibility(View.INVISIBLE);
-                    Logger.log("We have set j as Invisible", true);
-                }
-            }); */
             /**
              * We hook this method to handle our gestures made in the SC app itself.
              */
             findAndHookMethod(Obfuscator.save.LANDINGPAGEACTIVITY_CLASS, lpparam.classLoader, "dispatchTouchEvent", MotionEvent.class, gestureMethodHook);
+            //findAndHookMethod(Obfuscator.save.SNAPVIEW_CLASS, lpparam.classLoader, "a", boolean.class, MotionEvent.class, gestureMethodHook);
             /**
              * We hook SnapView.c once again to get the receivedSnap argument, then store it along with the classLoader.
              */

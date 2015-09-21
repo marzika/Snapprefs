@@ -2,10 +2,21 @@ package com.marz.snapprefs;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
+
+import de.cketti.library.changelog.ChangeLog;
 
 
 public class MainActivity extends Activity {
@@ -17,9 +28,71 @@ public class MainActivity extends Activity {
         getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getActionBar().setCustomView(R.layout.abs);
         getActionBar().setBackgroundDrawable(colorDrawable);
-        getFragmentManager().beginTransaction()
-                .replace(android.R.id.content, new Settings()).commit();
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        final Context context = this;
+        ChangeLog cl = new ChangeLog(context);
+        if (cl.isFirstRun()) {
+            cl.getLogDialog().show();
+        }
+        //getFragmentManager().beginTransaction().replace(android.R.id.content, new Settings()).commit();
+        //PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        setContentView(R.layout.activity_main);
+        Button settings = (Button) findViewById(R.id.settings);
+        Button reedem = (Button) findViewById(R.id.reedem);
+        Button donate = (Button) findViewById(R.id.donate);
+        Button about = (Button) findViewById(R.id.about);
+        settings.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                getFragmentManager().beginTransaction().replace(android.R.id.content, new Settings()).commit();
+                PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.preferences, false);
+            }
+        });
+        reedem.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), Reedem.class);
+                startActivity(intent);
+            }
+        });
+        about.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                new AlertDialog.Builder(context)
+                        .setTitle("About")
+                        .setMessage("Thanks to: \n" + getResources().getString(R.string.pref_thanks_summary) + "\n\nVersion: " + BuildConfig.VERSION_NAME + "\n\nSupported version: " + Obfuscator.SUPPORTED_VERSION_CODENAME)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                return;
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
+        donate.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                new AlertDialog.Builder(context)
+                        .setTitle("Donate")
+                        .setMessage("Donations are highly appreciated and it helps to keep the motivation going! If you feel like I deserve some coffee/beer, you can donate on PayPal by clicking the 'Donate' button below.\n\nNOTE: Donations will not unlock paid features, for them check the Remove Ads page")
+                        .setPositiveButton("Donate", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                try {
+                                    Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SL45E99ZBUUCQ"));
+                                    startActivity(myIntent);
+                                } catch (ActivityNotFoundException e) {
+                                    Toast.makeText(getApplicationContext(), "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
+                                    e.printStackTrace();
+                                }
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                return;
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
+
+
 
     }
 }
