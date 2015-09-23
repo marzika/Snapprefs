@@ -18,6 +18,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Util.FileUtils;
+
 import java.util.Random;
 
 import de.robv.android.xposed.XSharedPreferences;
@@ -88,7 +90,8 @@ public class Dialogs {
                 if (eText.getText().toString().trim().length() > 0) {
                     double editDouble = Double.parseDouble(eText.getText().toString());
                     CharSequence text = "Temperature set to " + editDouble;
-                    Spoofing.temp = (float) editDouble;
+                    //Spoofing.temp = (float) editDouble;
+                    FileUtils.writeToFile(String.valueOf(editDouble), SnapContext, "weather");
                     Toast.makeText(SnapContext, text, Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(SnapContext, "You must enter a valid number", Toast.LENGTH_SHORT).show();

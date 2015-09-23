@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
     <release
+        version="1.4.9 beta"
+        versioncode="16">
+        <change>Updated for 9.15.2.0</change>
+        <change>Readded Sweep-to-save (thanks to ddmanfire)</change>
+        <change>Added weather spoofing</change>
+        <change>Added Custom Stickers</change>
+        <change>New app layout</change>
+        <change>Added changelog dialog</change>
+        <change>Added Premium/Deluxe IAP reedeming</change>
+        <change>NOTE: Please wait until the additional features are declared before buying these
+            IAPs.
+        </change>
+    </release>
+    <release
         version="1.4.7"
         versioncode="15">
         <change>Fixed the duplicate saving</change>

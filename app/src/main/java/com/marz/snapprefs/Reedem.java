@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -79,7 +80,7 @@ public class Reedem extends Activity {
             buynow.setText("Click here to buy a license");
             buynow.setOnClickListener(new Button.OnClickListener() {
                 public void onClick(View v) {
-                    new AlertDialog.Builder(context)
+                    new AlertDialog.Builder(Reedem.this)
                             .setTitle("Buy a license")
                             .setMessage("Premium: AdFree (more will come)\n\nDeluxe: Premium + GodMode (noone can save your Snaps -- not added yet)")
                             .setPositiveButton("Premium (2.99$)", new DialogInterface.OnClickListener() {
@@ -105,7 +106,7 @@ public class Reedem extends Activity {
             buynow.setVisibility(View.VISIBLE);
             buynow.setOnClickListener(new Button.OnClickListener() {
                 public void onClick(View v) {
-                    new AlertDialog.Builder(context)
+                    new AlertDialog.Builder(Reedem.this)
                             .setTitle("Upgrade your license")
                             .setMessage("Premium: AdFree (more will come)\n\nDeluxe: Premium + GodMode (noone can save your Snaps -- not added yet)")
                             .setNeutralButton("Deluxe (9.99$)", new DialogInterface.OnClickListener() {
@@ -138,7 +139,7 @@ public class Reedem extends Activity {
     public void postData(final String confirmationID, final String deviceID) {
         // Create a new HttpClient and Post Header
         HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://snapprefs.site40.net/checkuser.php");
+        HttpPost httppost = new HttpPost("http://snapprefs.com/checkuser.php");
         saveStringPreference("device_id", deviceID);
         saveStringPreference("confirmation_id", confirmationID);
 
@@ -185,7 +186,7 @@ public class Reedem extends Activity {
                             buynow.setText("Click here to buy a license");
                             buynow.setOnClickListener(new Button.OnClickListener() {
                                 public void onClick(View v) {
-                                    new AlertDialog.Builder(getApplicationContext())
+                                    new AlertDialog.Builder(Reedem.this)
                                             .setTitle("Buy a license")
                                             .setMessage("Premium: AdFree (more will come)\n\nDeluxe: Premium + GodMode (noone can save your Snaps -- not added yet)")
                                             .setPositiveButton("Premium (2.99$)", new DialogInterface.OnClickListener() {
@@ -213,7 +214,7 @@ public class Reedem extends Activity {
                             buynow.setText("Click here to upgrade your license");
                             buynow.setOnClickListener(new Button.OnClickListener() {
                                 public void onClick(View v) {
-                                    new AlertDialog.Builder(getApplicationContext())
+                                    new AlertDialog.Builder(Reedem.this)
                                             .setTitle("Upgrade your license")
                                             .setMessage("Premium: AdFree (more will come)\n\nDeluxe: Premium + GodMode (noone can save your Snaps -- not added yet)")
                                             .setNeutralButton("Deluxe (9.99$)", new DialogInterface.OnClickListener() {
@@ -246,9 +247,12 @@ public class Reedem extends Activity {
             });
         } catch (ClientProtocolException e) {
             // TODO Auto-generated catch block
+            Toast.makeText(Reedem.this, "ClientProtocolException" + e.toString(), Toast.LENGTH_SHORT).show();
             saveIntPreference("license_status", 0);
+
         } catch (IOException e) {
             // TODO Auto-generated catch block
+            Toast.makeText(Reedem.this, "IOException" + e.toString(), Toast.LENGTH_SHORT).show();
             saveIntPreference("license_status", 0);
         }
     }

@@ -384,36 +384,5 @@
                 android:summary="@string/version_summary"
                 android:title="@string/version_text" />
         </PreferenceScreen>
-        <PreferenceScreen
-            android:key="button_latest"
-            android:title="@string/pref_update_title">
-            <Preference
-                android:enabled="false"
-                android:key="pref_add_sc"
-                android:summary="@string/pref_snapchat_summary"
-                android:title="@string/pref_snapchat" />
-            <Preference
-                android:key="pref_add_ig"
-                android:summary="@string/pref_instagram_summary"
-                android:title="@string/pref_instagram">
-                <intent
-                    android:action="android.intent.action.VIEW"
-                    android:data="https://instagram.com/meszarosmarci" />
-            </Preference>
-        </PreferenceScreen>
-        <Preference
-            android:key="pref_donate"
-            android:summary="@string/pref_donate_summary"
-            android:title="@string/pref_donate_title">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=SL45E99ZBUUCQ" />
-        </Preference>
-
-        <Preference
-            android:enabled="false"
-            android:key="pref_thanks"
-            android:summary="@string/pref_thanks_summary"
-            android:title="@string/pref_thanks_title" />
     </PreferenceCategory>
 </PreferenceScreen>
