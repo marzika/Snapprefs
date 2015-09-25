@@ -18,7 +18,7 @@ import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
 public class Spoofing {
     static float speed;
-    static float temp;
+    //static float temp;
 
     static void initSpeed(final LoadPackageParam lpparam, Context context) {
         findAndHookMethod(Obfuscator.spoofing.SPEEDOMETERVIEW_CLASS, lpparam.classLoader, Obfuscator.spoofing.SPEEDOMETERVIEW_SETSPEED, float.class, new XC_MethodHook() {
@@ -62,6 +62,7 @@ public class Spoofing {
         findAndHookConstructor("aue", lpparam.classLoader, avl, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                String temp = FileUtils.readFromFile(context, "weather");
                 setObjectField(param.thisObject, "mTempC", String.valueOf(temp));
                 setObjectField(param.thisObject, "mTempF", String.valueOf(temp));
                 Logger.log("set the temperatures", true);

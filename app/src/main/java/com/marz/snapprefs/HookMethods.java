@@ -8,9 +8,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.InputFilter;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -18,13 +20,26 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.marz.snapprefs.Util.XposedUtils;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.ByteArrayBuffer;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import de.robv.android.xposed.IXposedHookInitPackageResources;
@@ -54,26 +69,26 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static final String SNAPCHAT_PACKAGE_NAME = "com.snapchat.android";
     // Modes for saving Snapchats
     public static final int SAVE_AUTO = 0;
-    public static final int SAVE_S2S = 1;
-    public static final int DO_NOT_SAVE = 2;
-    // Length of toasts
-    public static final int TOAST_LENGTH_SHORT = 0;
-    public static final int TOAST_LENGTH_LONG = 1;
-    // Minimum timer duration disabled
-    public static final int TIMER_MINIMUM_DISABLED = 0;
-    private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
     // Preferences and their default values
     public static int mModeSnapImage = SAVE_AUTO;
     public static int mModeSnapVideo = SAVE_AUTO;
     public static int mModeStoryImage = SAVE_AUTO;
     public static int mModeStoryVideo = SAVE_AUTO;
+    public static final int SAVE_S2S = 1;
+    public static final int DO_NOT_SAVE = 2;
+    // Length of toasts
+    public static final int TOAST_LENGTH_SHORT = 0;
+    public static final int TOAST_LENGTH_LONG = 1;
+    public static int mToastLength = TOAST_LENGTH_LONG;
+    // Minimum timer duration disabled
+    public static final int TIMER_MINIMUM_DISABLED = 0;
     public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
+    private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
     public static boolean mCustomFilterBoolean = false;
     public static int mCustomFilterType;
     public static boolean mTimerUnlimited = true;
     public static boolean mHideTimer = false;
     public static boolean mToastEnabled = true;
-    public static int mToastLength = TOAST_LENGTH_LONG;
     public static String mSavePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
     public static String mCustomFilterLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/Filters";
     public static boolean mSaveSentSnaps = false;
@@ -113,6 +128,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     private static boolean mLocation;
     private static InitPackageResourcesParam resParam;
     Class CaptionEditText;
+    boolean latest = false;
 
     public static int px(float f) {
         return Math.round((f * SnapContext.getResources().getDisplayMetrics().density));
@@ -207,6 +223,62 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         }
     }
 
+    public boolean postData() {
+
+        // Create a new HttpClient and Post Header
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost("http://snapprefs.com/checkversion.php");
+
+
+        try {
+            // Add your data
+            List nameValuePairs = new ArrayList(2);
+            nameValuePairs.add(new BasicNameValuePair("version", "1.4.9b"));
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+            // Execute HTTP Post Request
+            HttpResponse response = httpclient.execute(httppost);
+
+            InputStream is = response.getEntity().getContent();
+            BufferedInputStream bis = new BufferedInputStream(is);
+            final ByteArrayBuffer baf = new ByteArrayBuffer(20);
+
+            int current = 0;
+
+            while ((current = bis.read()) != -1) {
+                baf.append((byte) current);
+            }
+            String text = new String(baf.toByteArray());
+            String status = null;
+            String error_msg = null;
+            try {
+
+                JSONObject obj = new JSONObject(text);
+                status = obj.getString("status");
+                error_msg = obj.getString("error_msg");
+                if (status.equals("0") && !error_msg.isEmpty()) {
+                    latest = true;
+                }
+                if (status.equals("1") && error_msg.isEmpty()) {
+                    //Toast.makeText(SnapContext, "New version available, update NOW from the Xposed repo.", Toast.LENGTH_SHORT).show();
+                    latest = false;
+                }
+            } catch (Throwable t) {
+                Log.e("Snapprefs", "Could not parse malformed JSON: \"" + text + "\"");
+                latest = false;
+            }
+        } catch (ClientProtocolException e) {
+            // TODO Auto-generated catch block
+            //saveIntPreference("license_status", 0);
+            latest = false;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            //saveIntPreference("license_status", 0);
+            latest = false;
+        }
+        return latest;
+    }
+
     @Override
     public void initZygote(StartupParam startupParam) throws Throwable {
         MODULE_PATH = startupParam.modulePath;
@@ -221,7 +293,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 
         refreshPreferences();
         resParam = resparam;
-            modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
+        modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
         if (shouldAddGhost) {
             addGhost(resparam);
         }
@@ -248,35 +320,11 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             XposedUtils.log("Exception while trying to get version info", e);
             return;
         }
-
+        new Connection().execute();
         prefs.reload();
         refreshPreferences();
         printSettings();
-        getEditText(lpparam);
-        findAndHookMethod(Obfuscator.save.SCREENSHOTDETECTOR_CLASS, lpparam.classLoader, Obfuscator.save.SCREENSHOTDETECTOR_RUN, List.class, XC_MethodReplacement.DO_NOTHING);
-        findAndHookMethod(Obfuscator.save.SNAPSTATEMESSAGE_CLASS, lpparam.classLoader, Obfuscator.save.SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT, Long.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                param.args[0] = 0L;
-                Logger.log("StateBuilder.setScreenshotCount set to 0L", true);
-            }
-        });
-        if (mCustomSticker == true) {
-            findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "open", String.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Logger.log("Open asset: " + param.args[0], true);
-                String str = (String) param.args[0];
-                String url = Environment.getExternalStorageDirectory()+"/Snapprefs/Stickers/"+str;
-                Logger.log("Sdcard path: " + url, true);
-                File file = new File(url);
-                InputStream is = null;
-                is = new BufferedInputStream(new FileInputStream(file));
-                param.setResult(is);
-                Logger.log("setResult for AssetManager", true);
-            }
-        });
-        }
+
         Class<?> Bus = findClass("com.squareup.otto.Bus", lpparam.classLoader);
         Class<?> ave = findClass("ave", lpparam.classLoader);
         Class<?> SnapViewEventAnalytics = findClass("com.snapchat.android.analytics.SnapViewEventAnalytics", lpparam.classLoader);
@@ -339,6 +387,12 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 /*if (SnapContext == null)*/
                 SnapContext = (Activity) param.thisObject;
 
+                if (latest == false) {
+                    Toast.makeText(SnapContext, "Snapprefs is NOT the latest or an error has occured, please update from the repo", Toast.LENGTH_SHORT).show();
+                    return;
+                } else if (latest == true) {
+                    //Toast.makeText(SnapContext, "Snapprefs is the latest", Toast.LENGTH_SHORT).show();
+                }
                 prefs.reload();
                 refreshPreferences();
                 //SNAPPREFS
@@ -360,6 +414,32 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                     Spoofing.initWeather(lpparam, SnapContext);
                 }
                 PaintTools.initPaint(lpparam, mResources);
+
+                getEditText(lpparam);
+                findAndHookMethod(Obfuscator.save.SCREENSHOTDETECTOR_CLASS, lpparam.classLoader, Obfuscator.save.SCREENSHOTDETECTOR_RUN, List.class, XC_MethodReplacement.DO_NOTHING);
+                findAndHookMethod(Obfuscator.save.SNAPSTATEMESSAGE_CLASS, lpparam.classLoader, Obfuscator.save.SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT, Long.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        param.args[0] = 0L;
+                        Logger.log("StateBuilder.setScreenshotCount set to 0L", true);
+                    }
+                });
+                if (mCustomSticker == true) {
+                    findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "open", String.class, new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            Logger.log("Open asset: " + param.args[0], true);
+                            String str = (String) param.args[0];
+                            String url = Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/" + str;
+                            Logger.log("Sdcard path: " + url, true);
+                            File file = new File(url);
+                            InputStream is = null;
+                            is = new BufferedInputStream(new FileInputStream(file));
+                            param.setResult(is);
+                            Logger.log("setResult for AssetManager", true);
+                        }
+                    });
+                }
             }
         };
         findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, initHook);
@@ -409,7 +489,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         //SNAPSHARE
         Sharing.initSharing(lpparam, mResources);
         //SNAPPREFS
-		if (hideBf == true){
+        if (hideBf == true) {
             findAndHookMethod("com.snapchat.android.model.Friend", lpparam.classLoader, "i", new XC_MethodReplacement() {
                 @Override
                 protected Object replaceHookedMethod(MethodHookParam param)
@@ -437,6 +517,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             HookSendList.initSelectAll(lpparam);
         }
     }
+
     private void addFilter(LoadPackageParam lpparam) {
         //Replaces the batteryfilter with our custom one
         findAndHookMethod(ImageView.class, "setImageResource", int.class, new XC_MethodHook() {
@@ -564,6 +645,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             }
         });
     }
+
     public void addGhost(InitPackageResourcesParam resparam) {
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "snap_preview", new XC_LayoutInflated() {
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
@@ -648,5 +730,15 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 }
             }
         });
+    }
+
+    private class Connection extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+            postData();
+            return null;
+        }
+
     }
 }
