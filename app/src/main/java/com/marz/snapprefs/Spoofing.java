@@ -18,7 +18,6 @@ import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
 public class Spoofing {
     static float speed;
-    //static float temp;
 
     static void initSpeed(final LoadPackageParam lpparam, Context context) {
         findAndHookMethod(Obfuscator.spoofing.SPEEDOMETERVIEW_CLASS, lpparam.classLoader, Obfuscator.spoofing.SPEEDOMETERVIEW_SETSPEED, float.class, new XC_MethodHook() {

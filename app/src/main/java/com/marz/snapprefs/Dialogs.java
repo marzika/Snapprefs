@@ -88,7 +88,7 @@ public class Dialogs {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (eText.getText().toString().trim().length() > 0) {
-                    double editDouble = Double.parseDouble(eText.getText().toString());
+                    int editDouble = Integer.parseInt(eText.getText().toString());
                     CharSequence text = "Temperature set to " + editDouble;
                     //Spoofing.temp = (float) editDouble;
                     FileUtils.writeToFile(String.valueOf(editDouble), SnapContext, "weather");
