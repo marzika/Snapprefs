@@ -82,14 +82,14 @@ public class Reedem extends Activity {
                 public void onClick(View v) {
                     new AlertDialog.Builder(Reedem.this)
                             .setTitle("Buy a license")
-                            .setMessage("Premium: AdFree (more will come)\n\nDeluxe: Premium + GodMode (noone can save your Snaps -- not added yet)")
-                            .setPositiveButton("Premium (2.99$)", new DialogInterface.OnClickListener() {
+                            .setMessage(Html.fromHtml(getString(R.string.buy_text)))
+                            .setPositiveButton(R.string.buy_premium, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2AS727Q2CL7AS"));//Premium
                                     startActivity(myIntent);
                                 }
                             })
-                            .setNeutralButton("Deluxe (9.99$)", new DialogInterface.OnClickListener() {
+                            .setNeutralButton(R.string.buy_deluxe, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=H523TP8ZJH9XY"));//Deluxe
                                     startActivity(myIntent);
@@ -108,7 +108,7 @@ public class Reedem extends Activity {
                 public void onClick(View v) {
                     new AlertDialog.Builder(Reedem.this)
                             .setTitle("Upgrade your license")
-                            .setMessage("Premium: AdFree (more will come)\n\nDeluxe: Premium + GodMode (noone can save your Snaps -- not added yet)")
+                            .setMessage(Html.fromHtml(getString(R.string.buy_text)))
                             .setNeutralButton("Deluxe (9.99$)", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=H523TP8ZJH9XY"));//Deluxe
@@ -188,14 +188,14 @@ public class Reedem extends Activity {
                                 public void onClick(View v) {
                                     new AlertDialog.Builder(Reedem.this)
                                             .setTitle("Buy a license")
-                                            .setMessage("Premium: AdFree (more will come)\n\nDeluxe: Premium + GodMode (noone can save your Snaps -- not added yet)")
-                                            .setPositiveButton("Premium (2.99$)", new DialogInterface.OnClickListener() {
+                                            .setMessage(Html.fromHtml(getString(R.string.buy_text)))
+                                            .setPositiveButton(R.string.buy_premium, new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2AS727Q2CL7AS"));//Premium
                                                     startActivity(myIntent);
                                                 }
                                             })
-                                            .setNeutralButton("Deluxe (9.99$)", new DialogInterface.OnClickListener() {
+                                            .setNeutralButton(R.string.buy_deluxe, new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=H523TP8ZJH9XY"));//Deluxe
                                                     startActivity(myIntent);
@@ -216,8 +216,8 @@ public class Reedem extends Activity {
                                 public void onClick(View v) {
                                     new AlertDialog.Builder(Reedem.this)
                                             .setTitle("Upgrade your license")
-                                            .setMessage("Premium: AdFree (more will come)\n\nDeluxe: Premium + GodMode (noone can save your Snaps -- not added yet)")
-                                            .setNeutralButton("Deluxe (9.99$)", new DialogInterface.OnClickListener() {
+                                            .setMessage(Html.fromHtml(getString(R.string.buy_text)))
+                                            .setNeutralButton(R.string.buy_deluxe, new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int which) {
                                                     Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=H523TP8ZJH9XY"));//Deluxe
                                                     startActivity(myIntent);
