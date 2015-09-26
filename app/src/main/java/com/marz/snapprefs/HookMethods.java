@@ -69,21 +69,21 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static final String SNAPCHAT_PACKAGE_NAME = "com.snapchat.android";
     // Modes for saving Snapchats
     public static final int SAVE_AUTO = 0;
-    // Preferences and their default values
-    public static int mModeSnapImage = SAVE_AUTO;
-    public static int mModeSnapVideo = SAVE_AUTO;
-    public static int mModeStoryImage = SAVE_AUTO;
-    public static int mModeStoryVideo = SAVE_AUTO;
     public static final int SAVE_S2S = 1;
     public static final int DO_NOT_SAVE = 2;
     // Length of toasts
     public static final int TOAST_LENGTH_SHORT = 0;
     public static final int TOAST_LENGTH_LONG = 1;
-    public static int mToastLength = TOAST_LENGTH_LONG;
     // Minimum timer duration disabled
     public static final int TIMER_MINIMUM_DISABLED = 0;
-    public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
     private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
+    // Preferences and their default values
+    public static int mModeSnapImage = SAVE_AUTO;
+    public static int mModeSnapVideo = SAVE_AUTO;
+    public static int mModeStoryImage = SAVE_AUTO;
+    public static int mModeStoryVideo = SAVE_AUTO;
+    public static int mToastLength = TOAST_LENGTH_LONG;
+    public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
     public static boolean mCustomFilterBoolean = false;
     public static int mCustomFilterType;
     public static boolean mTimerUnlimited = true;
@@ -324,62 +324,22 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         prefs.reload();
         refreshPreferences();
         printSettings();
-
-        Class<?> Bus = findClass("com.squareup.otto.Bus", lpparam.classLoader);
-        Class<?> ave = findClass("ave", lpparam.classLoader);
-        Class<?> SnapViewEventAnalytics = findClass("com.snapchat.android.analytics.SnapViewEventAnalytics", lpparam.classLoader);
-        Class<?> ow = findClass("ow", lpparam.classLoader);
-        Class<?> arq = findClass("arq", lpparam.classLoader);
-        Class<?> aqo = findClass("aqo", lpparam.classLoader);
-        Class<?> SnapViewA = findClass("com.snapchat.android.ui.SnapView$a", lpparam.classLoader);
-        Class<?> abx = findClass("abx", lpparam.classLoader);
-        Class<?> aoe = findClass("aoe", lpparam.classLoader);
-        Class<?> arw = findClass("arw", lpparam.classLoader);
-        Class<?> azp = findClass("azp", lpparam.classLoader);
-        Class<?> abq = findClass("abq", lpparam.classLoader);
-        Class<?> aog = findClass("aog", lpparam.classLoader);
-        /*findAndHookConstructor("com.snapchat.android.ui.SnapView", lpparam.classLoader, Context.class, AttributeSet.class, Bus, ave, SnapViewEventAnalytics, ow, arq, aqo, SnapViewA, abx, aoe, arw, azp, Set.class, abq, aog, new XC_MethodHook() {
+        Premium.initPremium(lpparam, modRes, SnapContext);
+        findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-            ViewGroup snap_container = (ViewGroup)getObjectField(param.thisObject, "i");
-            final Context snap_container_context = (Context) param.args[0];
-            if(snap_container==null){
-                Logger.log("snap_container null", true);
-            } else {
-                Logger.log("snap_container NOT null");
-                ImageButton savebutton = new ImageButton(snap_container_context);
-                savebutton.setBackgroundColor(0);
-                savebutton.setImageDrawable(modRes.getDrawable(R.drawable.colorpicker));
-                savebutton.setScaleX((float) 0.4);
-                savebutton.setScaleY((float) 0.4);
-                savebutton.setOnClickListener(new View.OnClickListener()
-
-                {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(snap_container_context, "savebutton clicked", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                );
-
-                RelativeLayout.LayoutParams paramsSave = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                paramsSave.topMargin = HookMethods.pxC(50.0f, snap_container_context);
-                paramsSave.rightMargin = HookMethods.pxC(5.0f, snap_container_context);
-                paramsSave.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                snap_container.addView(savebutton, paramsSave);
-                savebutton.bringToFront();
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                param.args[0] = 120000;
             }
-            }
-        });*/
-        /*
-        final Class<?> receivedSnapClass = findClass("akc", lpparam.classLoader);
-		try{
-			XposedHelpers.setStaticIntField(receivedSnapClass, "SECOND_MAX_VIDEO_DURATION", 20);
-			Logger.log("SECOND_MAX_VIDEO_DURATION set over 10", true);
+        });
+
+        final Class<?> receivedSnapClass = findClass("ate", lpparam.classLoader);
+        try{
+            XposedHelpers.setStaticIntField(receivedSnapClass, "SECOND_MAX_VIDEO_DURATION", 99999);
+            Logger.log("SECOND_MAX_VIDEO_DURATION set over 10", true);
 		} catch (Throwable t){
 			Logger.log("SECOND_MAX_VIDEO_DURATION set over 10 failed :(",true);
 			Logger.log(t.toString());
-		} For viewing longer videos?*/
+        } /*For viewing longer videos?*/
 
         XC_MethodHook initHook = new XC_MethodHook() {
             @Override
@@ -430,13 +390,15 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                             Logger.log("Open asset: " + param.args[0], true);
                             String str = (String) param.args[0];
-                            String url = Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/" + str;
-                            Logger.log("Sdcard path: " + url, true);
-                            File file = new File(url);
-                            InputStream is = null;
-                            is = new BufferedInputStream(new FileInputStream(file));
-                            param.setResult(is);
-                            Logger.log("setResult for AssetManager", true);
+                            if (str.contains("twitter_emojis_")) {
+                                String url = Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/" + str;
+                                Logger.log("Sdcard path: " + url, true);
+                                File file = new File(url);
+                                InputStream is = null;
+                                is = new BufferedInputStream(new FileInputStream(file));
+                                param.setResult(is);
+                                Logger.log("setResult for AssetManager", true);
+                            }
                         }
                     });
                 }
@@ -517,6 +479,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             HookSendList.initSelectAll(lpparam);
         }
     }
+
 
     private void addFilter(LoadPackageParam lpparam) {
         //Replaces the batteryfilter with our custom one
