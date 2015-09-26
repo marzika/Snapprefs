@@ -36,10 +36,10 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
+import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
-import static de.robv.android.xposed.XposedHelpers.removeAdditionalInstanceField;
 import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
 
 public class Saving {
@@ -82,11 +82,19 @@ public class Saving {
     public static Resources mSCResources;
     public static FileInputStream mVideo;
     public static Bitmap mImage;
+    public static Bitmap sentImage;
+    public static Bitmap lastSavedBitmap;
+    public static Uri videoUri;
+    public static Uri lastSavedUri;
     public static ClassLoader snapCL;
     public static Bitmap image;
     public static FileInputStream video;
     static XSharedPreferences prefs;
+    static SnapType lastSnapType;
+    static String lastSender;
+    static Date lastTimestamp;
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.getDefault());
+    private static SimpleDateFormat dateFormatSent = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
     private static XModuleResources mResources;
     private static GestureModel gestureModel;
     private static int screenHeight;
@@ -138,7 +146,7 @@ public class Saving {
                         newSaveMethod(mVideo, null, false);
 
                         //Logger.log("It is a Video", true);
-                        saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
+                        //saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
                         //mVideo = null;
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
@@ -162,7 +170,7 @@ public class Saving {
                         newSaveMethod(null, mImage, false);
 
                         //Logger.log("It is a Bitmap", true);
-                        saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
+                        //saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
                     } catch (NullPointerException | Resources.NotFoundException ignore) {
                         //Sometimes getResourceName is going to return null that's okay
                     }
@@ -183,7 +191,7 @@ public class Saving {
                         newSaveMethod(null, mImage, true);
 
                         //Logger.log("It is a Bitmap", true);
-                        saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE_OVERLAY);
+                        //saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE_OVERLAY);
                     } catch (NullPointerException | Resources.NotFoundException ignore) {
                         //Sometimes getResourceName is going to return null that's okay
                     }
@@ -255,9 +263,35 @@ public class Saving {
                 }
             };
 
-            final Class<?> snapImagebryo = findClass("akh", lpparam.classLoader);
+            final Class<?> snapImagebryo = findClass("atn", lpparam.classLoader);
             final Class<?> mediabryoClass = findClass("com.snapchat.android.model.Mediabryo", lpparam.classLoader);
-
+            findAndHookMethod("ash", lpparam.classLoader, "a", Bitmap.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    sentImage = (Bitmap) param.args[0];
+                }
+            });
+            /*findAndHookMethod("com.snapchat.android.model.Mediabryo", lpparam.classLoader, "c", mediabryoClass, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    Uri videoUri = (Uri) param.getResult();
+                    Logger.log("We have the URI " + videoUri.toString(), true);
+                    video = new FileInputStream(videoUri.toString());
+                    //Logger.log("Saving sent VIDEO SNAP", true);
+                    //saveSnap(SnapType.SENT, MediaType.VIDEO, snapContext, null, video, fileName, null);
+                }
+            });*/
+            Class<?> mediabryoA = findClass("com.snapchat.android.model.Mediabryo$a", lpparam.classLoader);
+            findAndHookConstructor("com.snapchat.android.model.Mediabryo", lpparam.classLoader, mediabryoA, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    videoUri = (Uri) getObjectField(param.thisObject, "mVideoUri");
+                    //String vidString = videoUri.toString();
+                    //sentVideo = new FileInputStream(videoUri.toString());
+                    Logger.log("We have the URI " + videoUri.toString(), true);
+                    //sentVideo = new FileInputStream(videoUri.toString());
+                }
+            });
             /**
              * Method which gets called to prepare an image for sending (before selecting contacts).
              * We check whether it's an image or a video and save it.
@@ -276,25 +310,30 @@ public class Saving {
                     try {
                         final Context context = (Context) callMethod(param.thisObject, "getActivity");
                         Logger.log("We have the Context", true);
-                        Object mediabryo = getObjectField(param.thisObject, "a"); //ajk is AnnotatedMediabryo, in SnapPreviewFragment
+                        Object mediabryo = getObjectField(param.thisObject, "a"); //ash is AnnotatedMediabryo, in SnapPreviewFragment
                         Logger.log("We have the MediaBryo", true);
-                        final String fileName = dateFormat.format(new Date());
+                        final String fileName = dateFormatSent.format(new Date());
                         Logger.log("We have the filename " + fileName, true);
 
                         // Check if instance of SnapImageBryo and thus an image or a video
                         if (snapImagebryo.isInstance(mediabryo)) {
                             Logger.log("The sent snap is an Image", true);
-                            findAndHookMethod("ajk", lpparam.classLoader, "a", Bitmap.class, new XC_MethodHook() {
-                                @Override
-                                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                                    image = (Bitmap) param.args[0];
-                                    Logger.log("Saving sent IMAGE SNAP", true);
-                                    saveSnap(SnapType.SENT, MediaType.IMAGE, context, image, null, fileName, null);
-                                }
-                            });
+                            //Bitmap sentimg = (Bitmap) callMethod(mediabryo, "e", mediabryo);
+                            if (lastSavedBitmap == sentImage && lastSavedBitmap != null) {
+                                return;
+                            }
+                            saveSnap(SnapType.SENT, MediaType.IMAGE, snapContext, sentImage, null, fileName, null);
+                            lastSavedBitmap = sentImage;
                         } else {
                             Logger.log("The sent snap is a Video", true);
-                            findAndHookMethod("com.snapchat.android.model.Mediabryo", lpparam.classLoader, "c", mediabryoClass, new XC_MethodHook() {
+                            if (lastSavedUri == videoUri && lastSavedUri != null) {
+                                return;
+                            }
+                            FileInputStream sentVid = new FileInputStream(videoUri.getPath());
+                            Logger.log("Saving sent VIDEO SNAP", true);
+                            saveSnap(SnapType.SENT, MediaType.VIDEO, context, null, sentVid, fileName, null);
+                            lastSavedUri = videoUri;
+                            /*findAndHookMethod("com.snapchat.android.model.Mediabryo", lpparam.classLoader, "c", mediabryoClass, new XC_MethodHook() {
                                 @Override
                                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                                     Uri videoUri = (Uri) param.getResult();
@@ -303,7 +342,7 @@ public class Saving {
                                     Logger.log("Saving sent VIDEO SNAP", true);
                                     saveSnap(SnapType.SENT, MediaType.VIDEO, context, null, video, fileName, null);
                                 }
-                            });
+                            });*/
                         }
                     } catch (Throwable t) {
                         Logger.log("Saving sent snaps failed", true);
@@ -405,6 +444,22 @@ public class Saving {
              * Sets the Snap as Screenshotted, so we constantly return false to it.
              */
             findAndHookMethod(Obfuscator.save.SNAP_CLASS, lpparam.classLoader, Obfuscator.save.SNAP_ISSCREENSHOTTED, XC_MethodReplacement.returnConstant(false));
+            findAndHookMethod("ayc", lpparam.classLoader, "a", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    Snap toSave = snapsMap.get(currentViewingSnap);
+                    mImage = toSave.getImage();
+                    saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
+                }
+            });
+            findAndHookMethod("ayf", lpparam.classLoader, "a", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    Snap toSave = snapsMap.get(currentViewingSnap);
+                    mVideo = toSave.getVideo();
+                    saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
+                }
+            });
 
 
         } catch (Exception e) {
@@ -421,11 +476,13 @@ public class Saving {
     private static void saveReceivedSnap(Context context, Object receivedSnap, MediaType mediaType) {
         Logger.log("----------------------- SNAPPREFS ------------------------", false);
         String sender = null;
+        SnapType snapType;
         if (receivedSnap == null) {
-            receivedSnap = oldreceivedSnap;
-            usedOldReceivedSnap = true;
+            //receivedSnap = oldreceivedSnap;
+            //usedOldReceivedSnap = true;
+            return;
         } else {
-            usedOldReceivedSnap = false;
+            //usedOldReceivedSnap = false;
         }
         try {
             sender = (String) getObjectField(receivedSnap, "mSender");
@@ -438,9 +495,11 @@ public class Saving {
             } catch (Exception e) {
                 Logger.log(e.toString(), true);
             }
-            setAdditionalInstanceField(receivedSnap, "snap_type", SnapType.STORY);
+            snapType = SnapType.STORY;
+            lastSnapType = SnapType.STORY;
         } else {
-            setAdditionalInstanceField(receivedSnap, "snap_type", SnapType.SNAP);
+            snapType = SnapType.SNAP;
+            lastSnapType = SnapType.SNAP;
         }
         Date timestamp = new Date((Long) callMethod(receivedSnap, Obfuscator.save.SNAP_GETTIMESTAMP)); //Gettimestamp-Snap
         String filename = sender + "_" + dateFormat.format(timestamp);
@@ -453,7 +512,6 @@ public class Saving {
             video = mVideo;
         } catch (NullPointerException ignore) {
         }
-        SnapType snapType = (SnapType) removeAdditionalInstanceField(receivedSnap, "snap_type");
         switch (mediaType) {
             case VIDEO: {
                 setAdditionalInstanceField(receivedSnap, "snap_media_type", MediaType.VIDEO);
@@ -559,11 +617,13 @@ public class Saving {
                 showToast(context, mResources.getString(R.string.image_not_saved));
             }
         } else if (mediaType == MediaType.IMAGE_OVERLAY) {
-            if (overlayFile.exists()) {
-                Logger.log("VideoOverlay already exists");
-                showToast(context, mResources.getString(R.string.video_exists));
-                return;
-            }
+            if (mOverlays == true) {
+                if (overlayFile.exists()) {
+                    Logger.log("VideoOverlay already exists");
+                    showToast(context, mResources.getString(R.string.video_exists));
+                    return;
+                }
+
 
             if (saveImagePNG(image, overlayFile)) {
                 //showToast(context, "This overlay ");
@@ -572,6 +632,7 @@ public class Saving {
                 runMediaScanner(context, overlayFile.getAbsolutePath());
             } else {
                 showToast(context, "An error occured while saving this overlay.");
+            }
             }
         } else if (mediaType == MediaType.VIDEO) {
             if (videoFile.exists()) {
@@ -592,7 +653,7 @@ public class Saving {
         image = null;
         video = null;
         receivedSnap = null;
-        viewingSnap = false;
+        //viewingSnap = false;
     }
 
     private static File createFileDir(String category, String sender) throws IOException {
