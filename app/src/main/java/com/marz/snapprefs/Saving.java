@@ -74,6 +74,7 @@ public class Saving {
     public static boolean mSortByCategory = true;
     public static boolean mSortByUsername = true;
     public static boolean mDebugging = true;
+    public static boolean mOverlays = true;
     public static boolean viewingSnap;
     public static Object receivedSnap;
     public static Object oldreceivedSnap;
@@ -547,7 +548,7 @@ public class Saving {
                 return;
             }
 
-            if (saveImage(image, imageFile)) {
+            if (saveImageJPG(image, imageFile)) {
                 showToast(context, mResources.getString(R.string.image_saved));
                 Logger.log("Image " + snapType.name + " has been saved");
                 Logger.log("Path: " + imageFile.toString());
@@ -564,7 +565,7 @@ public class Saving {
                 return;
             }
 
-            if (saveImage(image, overlayFile)) {
+            if (saveImagePNG(image, overlayFile)) {
                 //showToast(context, "This overlay ");
                 Logger.log("VideoOverlay " + snapType.name + " has been saved");
                 Logger.log("Path: " + overlayFile.toString());
@@ -613,13 +614,27 @@ public class Saving {
     }
 
     // function to saveimage
-    private static boolean saveImage(Bitmap image, File fileToSave) {
+    private static boolean saveImagePNG(Bitmap image, File fileToSave) {
         try {
             FileOutputStream out = new FileOutputStream(fileToSave);
             image.compress(Bitmap.CompressFormat.PNG, 100, out);
             out.flush();
             out.close();
             Logger.log("SAVEIMAGE DONE", true);
+            return true;
+        } catch (Exception e) {
+            Logger.log("Exception while saving an image", e);
+            return false;
+        }
+    }
+
+    public static boolean saveImageJPG(Bitmap image, File fileToSave) {
+        try {
+            FileOutputStream out = new FileOutputStream(fileToSave);
+            image.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+            Logger.log("SAVEIMAGE-JPG DONE", true);
             return true;
         } catch (Exception e) {
             Logger.log("Exception while saving an image", e);
@@ -702,6 +717,7 @@ public class Saving {
         mSaveSentSnaps = prefs.getBoolean("pref_key_save_sent_snaps", mSaveSentSnaps);
         mSortByCategory = prefs.getBoolean("pref_key_sort_files_mode", mSortByCategory);
         mSortByUsername = prefs.getBoolean("pref_key_sort_files_username", mSortByUsername);
+        mOverlays = prefs.getBoolean("pref_key_overlay", mOverlays);
         mDebugging = prefs.getBoolean("pref_key_debug_mode", mDebugging);
         mTimerUnlimited = prefs.getBoolean("pref_key_timer_unlimited", mTimerUnlimited);
         mHideTimer = prefs.getBoolean("pref_key_timer_hide", mHideTimer);
@@ -724,10 +740,10 @@ public class Saving {
     }
 
     public enum MediaType {
-        IMAGE(".png"),
+        IMAGE(".jpg"),
         IMAGE_OVERLAY(".png"),
         VIDEO(".mp4"),
-        GESTUREDIMAGE(".png"),
+        GESTUREDIMAGE(".jpg"),
         GESTUREDVIDEO(".mp4"),
         GESTUREDOVERLAY(".png");
 

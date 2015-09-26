@@ -15,7 +15,7 @@
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="PayPal Transaction ID:"
+        android:text="Reedem ID:"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <EditText
@@ -25,7 +25,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/default_gap"
         android:gravity="center_vertical|center_horizontal"
-        android:hint="Type here your PayPal Transaction ID"
+        android:hint="Type here your reedem ID"
         android:inputType="textNoSuggestions|textVisiblePassword"
         android:maxLength="20"
         android:textColor="@color/black" />
