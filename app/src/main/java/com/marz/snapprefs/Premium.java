@@ -21,5 +21,7 @@ public class Premium {
         //findAndHookMethod("ate", lpparam.classLoader, "A", XC_MethodReplacement.DO_NOTHING);
         //findAndHookConstructor("uu", lpparam.classLoader, XC_MethodReplacement.DO_NOTHING);
         //findAndHookMethod("yy", lpparam.classLoader, "execute", XC_MethodReplacement.DO_NOTHING);
+        findAndHookMethod("com.snapchat.android.model.chat.ChatConversation", lpparam.classLoader, "e", boolean.class, XC_MethodReplacement.DO_NOTHING);
+        findAndHookMethod("com.snapchat.android.model.chat.ChatConversation", lpparam.classLoader, "b", boolean.class, XC_MethodReplacement.DO_NOTHING);
     }
 }
