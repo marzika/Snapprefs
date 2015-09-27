@@ -220,12 +220,12 @@
                 android:summaryOff="@string/pref_overlay_summary_off"
                 android:summaryOn="@string/pref_overlay_summary_on"
                 android:title="@string/pref_overlay_title" />
-            <!--<CheckBoxPreference
+            <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="pref_key_save_sent_snaps"
                 android:summaryOff="@string/pref_save_sent_snaps_summary_off"
                 android:summaryOn="@string/pref_save_sent_snaps_summary_on"
-                android:title="@string/pref_save_sent_snaps_title" /> -->
+                android:title="@string/pref_save_sent_snaps_title" />
         </PreferenceCategory>
 
         <PreferenceCategory android:title="@string/pref_category_viewing">
