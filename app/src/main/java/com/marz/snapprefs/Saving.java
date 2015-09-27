@@ -288,7 +288,9 @@ public class Saving {
                     videoUri = (Uri) getObjectField(param.thisObject, "mVideoUri");
                     //String vidString = videoUri.toString();
                     //sentVideo = new FileInputStream(videoUri.toString());
+                    if (videoUri != null) {
                     Logger.log("We have the URI " + videoUri.toString(), true);
+                    }
                     //sentVideo = new FileInputStream(videoUri.toString());
                 }
             });
