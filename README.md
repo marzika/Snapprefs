@@ -48,6 +48,9 @@ chiralcode for his [ColorPicker](https://github.com/chiralcode/Android-Color-Pic
 
 [Yoganandh for his color collection](https://gist.github.com/VenomVendor/6857539)
 
+cketti for his [ckChangelog library](https://github.com/cketti/ckChangeLog) (Apache License 2.0)
+
+ddmanfire for implementing array saving [#1](https://github.com/ddmanfire/Snapprefs/commit/dc2e199c74a3729f0c50365597577a37fb312b2e) [#2](https://github.com/ddmanfire/Snapprefs/commit/03fa8783cd3d21dabdfebbd572eb7481fccbe48b)
 
 Installation
 ------------------
@@ -63,6 +66,9 @@ Installation
 
 License
 -------
-It is licensed on the GPL V2 which you have already received a million times.
+The whole project is licensed under the GNU GPLv3, which can be found in the LICENSE file.
+The license is also included to the app in the /assets/ folder.
 
 *Copyright (C) 2014 Marcell Mészáros*
+
+Snapprefs is in no way affiliated with, authorized, maintained, sponsored or endorsed by the Snapchat Inc. or any of its affiliates or subsidiaries. This is an independent application.

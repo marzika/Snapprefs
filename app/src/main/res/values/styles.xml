@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:textColorPrimary">@color/primary_text</item>
+        <item name="android:windowTitleStyle">@style/TitleDialogTextStyle</item>
+    </style>
+
+    <style name="TitleDialogTextStyle" parent="Base.DialogWindowTitle.AppCompat">
+        <item name="android:textColor">@color/primary_dark</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Title</item>
+    </style>
     <style name="settings_section_header" parent="@android:attr/listSeparatorTextViewStyle">
         <item name="android:textSize">20.0dip</item>
         <item name="android:textStyle">bold</item>
@@ -32,7 +42,7 @@
     </style>
 
     <style name="listViewPrefs" parent="@android:style/Widget.ListView">
-        <item name="android:background">@drawable/aa_blank</item>
+        <item name="android:background">@color/white</item>
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">?android:listPreferredItemHeight</item>
         <item name="android:textSize">30.0sp</item>

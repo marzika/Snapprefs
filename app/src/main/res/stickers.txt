@@ -1,0 +1,22 @@
+Custom Stickers -- MrYawnie
+
+For Custom stickers, you need to have a 72x72 PNG (preview image) and a 47.5 x 47.5 SVG vector graphic.
+
+SVG instructions:
+
+1. Trace an image into vector by using any vector editor (results vary depending on the tracing options). 
+2. Save the vector in any size, and open the SVG with notepad++.
+3. On the top of the code, you'll see something like this:
+	"<svg version="1.2" baseProfile="tiny" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+	 x="0px" y="0px" width="48px" height="48px" viewBox="0 0 48 48" xml:space="preserve">"
+
+	Delete the x, y, width and heigth attributes and replace them with 
+
+	viewBox="0 0 47.5 47.5" style="enable-background:new 0 0 47.5 47.5;"
+
+	so the endresult looks like this:
+
+	"<svg version="1.2" baseProfile="tiny" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 viewBox="0 0 47.5 47.5" style="enable-background:new 0 0 47.5 47.5;" xml:space="preserve">"
+
+4. Save the changed code. You are now done with creating and editing the SVG to work with Snapprefs custom stickers. 

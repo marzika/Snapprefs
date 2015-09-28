@@ -11,7 +11,10 @@ import java.util.Random;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
+import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
 public class Spoofing {
     static float speed;
@@ -28,7 +31,7 @@ public class Spoofing {
     }
 
     static void initLocation(final LoadPackageParam lpparam, final Context context) {
-        findAndHookMethod("akt", lpparam.classLoader, "d", new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.spoofing.LOCATION_CLASS, lpparam.classLoader, Obfuscator.spoofing.LOCATION_GETLOCATION, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 String rawlatitude = FileUtils.readFromSDFile("latitude");
@@ -49,6 +52,19 @@ public class Spoofing {
                 String provider = fakedLocation.getProvider();
                 //Logger.log("Acc: " + accuracy + "\nAltitude: " + altitude + "\nLongitude: " + longitude + "\nLatitude: " + latitude + "\nProvider: " + provider);
                 param.setResult(fakedLocation);
+            }
+        });
+    }
+
+    static void initWeather(final LoadPackageParam lpparam, final Context context) {
+        Class<?> avl = findClass("avl", lpparam.classLoader);
+        findAndHookConstructor("aue", lpparam.classLoader, avl, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                String temp = FileUtils.readFromFile(context, "weather");
+                setObjectField(param.thisObject, "mTempC", String.valueOf(temp));
+                setObjectField(param.thisObject, "mTempF", String.valueOf(temp));
+                Logger.log("set the temperatures", true);
             }
         });
     }

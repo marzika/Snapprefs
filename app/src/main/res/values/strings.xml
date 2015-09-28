@@ -8,7 +8,7 @@
     <string name="pref_debug_title">INFORMATIONS</string>
 
     <string name="pref_thanks_title">Thanks to</string>
-    <string name="pref_thanks_summary">P1ngu1n, manvir, elesbb, chiralcode, Yoganandh, bnalls33</string>
+    <string name="pref_thanks_summary">P1ngu1n, manvir, elesbb, chiralcode, Yoganandh, bnalls33, cketti, ddmanfire</string>
     <string name="pref_donate_title">Donate</string>
     <string name="pref_donate_summary">Support me by buying some coffee using PayPal. Donations are highly appreciated.</string>
 
@@ -45,7 +45,7 @@
     <string name="pref_update_title">To get the latest updates</string>
     <string name="pref_update_summary">Add \'snapprefs\' on Snapchat</string>
     <string name="version_text">Version</string>
-    <string name="version_summary" translatable="false">Current version is: v1.4.7</string>
+    <string name="version_summary" translatable="false">Current version is: v1.5.0</string>
     <string name="general">General settings</string>
     <string name="saving">Saving settings</string>
     <string name="sharing">Sharing settings</string>
@@ -54,9 +54,19 @@
     <string name="pref_speed_value_title">Current set speed:</string>
     <string name="pref_speed_summary_on">Enabled speed spoofing</string>
     <string name="pref_speed_summary_off">Disabled speed spoofing</string>
+    <string name="pref_sticker">Custom sticker</string>
+    <string name="pref_sticker_title">Enable custom stickers</string>
+    <string name="pref_sticker_summary_on">Custom sticker will be loaded</string>
+    <string name="pref_sticker_summary_off">Custom sticker will NOT be loaded</string>
+    <string name="pref_sticker_readme_title">HOW TO USE</string>
+    <string name="pref_sticker_readme_summary">To replace stickers, you have to first get SC\'s Emoji zips (can be found in their apk\'s assets folder), the PNG folder stores the previews of the stickers, the SVG folder contains the actual stickers. Each filename represents the unicode code of the Emoji, which they represent. To change the sticker, you have to replace the desired PNG and SVG in their zip, then place the zips in the /SDCARD/Snapprefs/Stickers/ folder (create them). Click here for a tutorial.</string>
+    <string name="pref_sticker_readme_summary2">Example SVGs/PNGs can be found at https://github.com/Ranks/emojione</string>
     <string name="pref_filter_readme_title">HOW TO USE</string>
     <string name="pref_filter_readme_summary">Your custom filter has to be named as "banner_filter.png"/"fullscreen_filter.png" in the folder which is by default /sdcard/Snapprefs/Filters. If you changed the filter image, you have to restart Snapchat for the changes to take effect.\nResolution for Fullscreen Filters: 1080x1920\nResolution for Banner Filters: 821x323</string>
     <string name="pref_discover_readme_title">HOW TO USE</string>
+    <string name="pref_weather_summary_off">Weather will NOT be spoofed</string>
+    <string name="pref_weather_summary_on">Weather will be spoofed</string>
+    <string name="pref_weather_title">Weather spoofing</string>
     <string name="pref_location_summary_off">Location will NOT be spoofed</string>
     <string name="pref_location_summary_on">Location will be spoofed</string>
     <string name="pref_location_readme_title">HOW TO USE</string>
@@ -68,7 +78,7 @@
     <string name="pref_location_longitude_summary">Click here to enter longitude</string>
     <string name="pref_location_longitude_title">Longitude</string>
     <string name="pref_location_location_picker_title">HOW TO USE</string>
-    <string name="pref_location_location_picker_summary">Upon opening the map from SC, LONG click on the desired location, preferrably to the middle of the city to set the spoofed location.</string>
+    <string name="pref_location_location_picker_summary">Upon opening the map from SC, LONG click on the desired location, preferably to the middle of the city to set the spoofed location.</string>
     <string name="pref_discover_summary_off">Discover will load and download</string>
     <string name="pref_discover_summary_on">Discover will NOT load NOR download</string>
     <string name="pref_discover_title">Block Discover snaps</string>
@@ -111,7 +121,7 @@
 
     <string-array name="pref_save_mode_entries">
         <item>Save automatically</item>
-        <item>Sweep to save --REMOVED - SWITCH TO AUTOSAVE</item>
+        <item>Sweep to save</item>
         <item>Don\'t save</item>
     </string-array>
 
@@ -280,4 +290,22 @@
         AIzaSyDrN_SeVUZ1R7Qz-BggYYeyKuVdKU-NUmg
         <!--AIzaSyD-XNCHffArxbrgQ_-CS1nDXZRTfcEIlO4 DEBUG-->
     </string>
+    <string name="title_activity_reedem">Reedem</string>
+    <string name="buy_text"><![CDATA[<b>Premium:</b><br><small>AdFree, Unlimited Replays, Typing alert bypass, Chat presence bypass</small><br><br><b>Deluxe:</b><br><small>Every Premium feature, Stealth viewing (stories and snaps), GodMode (noone can save your Snaps -- not added yet)</small><br><br><b>NOTE:<br><small>You will receive an email with your Reedem ID from support@snapprefs.com.<br><br>With payment issues send me an email to the above mentioned email.</small>]]></string>
+    <string name="buy_deluxe">Deluxe (9.99$)</string>
+    <string name="buy_premium">Premium (2.99$)</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="banner_ad_unit_id">ca-app-pub-6910530129073042/7440988016</string>
+    <string name="premdeluxe">Premium &amp; Deluxe settings</string>
+    <string name="pref_replay_summary_off">You will NOT be able to replay unlimited times</string>
+    <string name="pref_replay_summary_on">You will be able to replay unlimited times</string>
+    <string name="pref_replay_title">Unlimited Replays</string>
+    <string name="pref_typing_title">Block typing and presence alert in chat</string>
+    <string name="pref_typing_summary_on">They will be blocked</string>
+    <string name="pref_typing_summary_off">They will NOT be blocked</string>
+    <string name="pref_viewed_summary_off">Stealth viewing will NOT be executed</string>
+    <string name="pref_viewed_summary_on">Stealth viewing will be executed</string>
+    <string name="pref_viewed_title">Stealth Viewing</string>
+    <string name="pref_viewed_readme_summary">After the snaps are loaded, enable Airplane mode, view the desired snap, then KILL SNAPCHAT from the Recent Apps page. You can disable Airplane mode now.</string>
 </resources>

@@ -28,7 +28,7 @@ public class DataSaving {
         try {
             Class<?> ChannelPage = findClass("com.snapchat.android.discover.model.ChannelPage", lpparam.classLoader);
             //findAndHookMethod("afh", lpparam.classLoader, "a", ChannelPage, boolean.class, XC_MethodReplacement.returnConstant(false));
-            findAndHookMethod("agn", lpparam.classLoader, "b", Cursor.class, XC_MethodReplacement.returnConstant(null));
+            findAndHookMethod(Obfuscator.datasaving.CHANNELDOWNLOADER_CLASS, lpparam.classLoader, Obfuscator.datasaving.CHANNELDOWNLOADER_START, Cursor.class, XC_MethodReplacement.returnConstant(null));
         } catch (Throwable t) {
             Logger.log("Error while blocking Channel Intro Download", true);
             Logger.log(t.toString());

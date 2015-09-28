@@ -57,6 +57,31 @@
                 android:title="@string/selectstory_text" />
         </PreferenceCategory>
         <PreferenceCategory
+            android:key="pref_sticker"
+            android:title="@string/pref_sticker">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_sticker"
+                android:summaryOff="@string/pref_sticker_summary_off"
+                android:summaryOn="@string/pref_sticker_summary_on"
+                android:title="@string/pref_sticker_title" />
+            <Preference
+                android:key="pref_sticker_readme"
+                android:summary="@string/pref_sticker_readme_summary"
+                android:title="@string/pref_sticker_readme_title">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="http://forum.xda-developers.com/showpost.php?p=56915736&amp;postcount=4" />
+            </Preference>
+            <Preference
+                android:key="pref_key_sticker_readme_2"
+                android:summary="@string/pref_sticker_readme_summary2">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="https://github.com/Ranks/emojione" />
+            </Preference>
+        </PreferenceCategory>
+        <PreferenceCategory
             android:key="pref_key_filter"
             android:title="@string/pref_filter_title">
             <CheckBoxPreference
@@ -195,12 +220,12 @@
                 android:summaryOff="@string/pref_overlay_summary_off"
                 android:summaryOn="@string/pref_overlay_summary_on"
                 android:title="@string/pref_overlay_title" />
-            <!--<CheckBoxPreference
+            <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="pref_key_save_sent_snaps"
                 android:summaryOff="@string/pref_save_sent_snaps_summary_off"
                 android:summaryOn="@string/pref_save_sent_snaps_summary_on"
-                android:title="@string/pref_save_sent_snaps_title" /> -->
+                android:title="@string/pref_save_sent_snaps_title" />
         </PreferenceCategory>
 
         <PreferenceCategory android:title="@string/pref_category_viewing">
@@ -293,6 +318,14 @@
                 android:summary="@string/pref_location_location_picker_summary"
                 android:title="@string/pref_location_location_picker_title" />
         </PreferenceCategory>
+        <PreferenceCategory android:title="@string/pref_weather_title">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_weather"
+                android:summaryOff="@string/pref_weather_summary_off"
+                android:summaryOn="@string/pref_weather_summary_on"
+                android:title="@string/pref_weather_title" />
+        </PreferenceCategory>
     </PreferenceScreen>
     <PreferenceScreen
         android:key="button_datasaving_settings"
@@ -314,6 +347,35 @@
             <Preference
                 android:key="pref_discover_readme"
                 android:summary="@string/pref_discover_readme_summary"
+                android:title="@string/pref_discover_readme_title" />
+        </PreferenceCategory>
+    </PreferenceScreen>
+    <PreferenceScreen
+        android:key="button_premium_settings"
+        android:persistent="false"
+        android:title="@string/premdeluxe">
+        <PreferenceCategory android:title="@string/premdeluxe">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_replay"
+                android:summaryOff="@string/pref_replay_summary_off"
+                android:summaryOn="@string/pref_replay_summary_on"
+                android:title="@string/pref_replay_title" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_typing"
+                android:summaryOff="@string/pref_typing_summary_off"
+                android:summaryOn="@string/pref_typing_summary_on"
+                android:title="@string/pref_typing_title" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_viewed"
+                android:summaryOff="@string/pref_viewed_summary_off"
+                android:summaryOn="@string/pref_viewed_summary_on"
+                android:title="@string/pref_viewed_title" />
+            <Preference
+                android:key="pref_viewed_readme"
+                android:summary="@string/pref_viewed_readme_summary"
                 android:title="@string/pref_discover_readme_title" />
         </PreferenceCategory>
     </PreferenceScreen>
@@ -351,36 +413,5 @@
                 android:summary="@string/version_summary"
                 android:title="@string/version_text" />
         </PreferenceScreen>
-        <PreferenceScreen
-            android:key="button_latest"
-            android:title="@string/pref_update_title">
-            <Preference
-                android:enabled="false"
-                android:key="pref_add_sc"
-                android:summary="@string/pref_snapchat_summary"
-                android:title="@string/pref_snapchat" />
-            <Preference
-                android:key="pref_add_ig"
-                android:summary="@string/pref_instagram_summary"
-                android:title="@string/pref_instagram">
-                <intent
-                    android:action="android.intent.action.VIEW"
-                    android:data="https://instagram.com/meszarosmarci" />
-            </Preference>
-        </PreferenceScreen>
-        <Preference
-            android:key="pref_donate"
-            android:summary="@string/pref_donate_summary"
-            android:title="@string/pref_donate_title">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=SL45E99ZBUUCQ" />
-        </Preference>
-
-        <Preference
-            android:enabled="false"
-            android:key="pref_thanks"
-            android:summary="@string/pref_thanks_summary"
-            android:title="@string/pref_thanks_title" />
     </PreferenceCategory>
 </PreferenceScreen>

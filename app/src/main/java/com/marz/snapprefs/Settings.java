@@ -48,7 +48,6 @@ public class Settings extends PreferenceFragment {
         addPreferencesFromResource(R.xml.preferences);
         final Context ctx = getActivity();
 
-
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         // Add listener to the Launcher preference

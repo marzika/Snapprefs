@@ -19,8 +19,9 @@
 package com.marz.snapprefs;
 
 public class Obfuscator {
-    // Snapprefs supports v9.14.1.0 and up
-    private static final int SUPPORTED_VERSION_CODE = 711;
+    // Snapprefs supports v9.15.1.0 and up
+    public static final int SUPPORTED_VERSION_CODE = 720;
+    public static final String SUPPORTED_VERSION_CODENAME = "9.15.1.0";
 
     /**
      * Check if Snapprefs is compatible with this Snapchat version.
@@ -36,21 +37,21 @@ public class Obfuscator {
     public class save {
 
         //ReceivedSnap class
-        public static final String RECEIVEDSNAP_CLASS = "amj"; //prev. akv, akb
+        public static final String RECEIVEDSNAP_CLASS = "ate"; //prev. amj, akv, akb
         // ReceivedSnap.getCanonicalDisplayTime()
-        public static final String RECEIVEDSNAP_DISPLAYTIME = "D"; //prev. G
+        public static final String RECEIVEDSNAP_DISPLAYTIME = "G"; //prev. D, G
         //StorySnap class
-        public static final String STORYSNAP_CLASS = "amw"; // prev. ali, akm
+        public static final String STORYSNAP_CLASS = "atu"; // prev. amw, ali, akm
         //SnapView class
         public static final String SNAPVIEW_CLASS = "com.snapchat.android.ui.SnapView";
         //SnapView.show(ReceivedSnap, ChronologicalSnapProvider, Booleans(?))
         public static final String SNAPVIEW_SHOW = "a"; // prev. c
-        //First param of SnapView.show -> avf
-        public static final String SNAPVIEW_SHOW_FIRST = "avf";
-        //Second param of SnapView.show -> alr
-        public static final String SNAPVIEW_SHOW_SECOND = "alr";
-        //Third param of SnapView.show -> abp
-        public static final String SNAPVIEW_SHOW_THIRD = "abp";
+        //First param of SnapView.show -> bdl, avf
+        public static final String SNAPVIEW_SHOW_FIRST = "bdl";
+        //Second param of SnapView.show -> asz, alr
+        public static final String SNAPVIEW_SHOW_SECOND = "asz";
+        //Third param of SnapView.show -> agd, abp
+        public static final String SNAPVIEW_SHOW_THIRD = "agd";
         //SnapView.hide(SnapViewEventAnalytics.EndReason)
         public static final String SNAPVIEW_HIDE = "a";
         //SnapPreviewFragment class
@@ -58,58 +59,60 @@ public class Obfuscator {
         //ImageResourceView class
         public static final String IMAGERESOURCEVIEW_CLASS = "com.snapchat.android.ui.ImageResourceView";
         //imageResource instance variable name in ui.ImageResourceView
-        public static final String IMAGERESOURCEVIEW_VAR_IMAGERESOURCE = "a"; // asj -> prev. aqz, apz
+        public static final String IMAGERESOURCEVIEW_VAR_IMAGERESOURCE = "b"; // bai -> prev. asj, aqz, apz
         //LandingPageActivity class
         public static final String LANDINGPAGEACTIVITY_CLASS = "com.snapchat.android.LandingPageActivity";
         //Snap class
         public static final String SNAP_CLASS = "com.snapchat.android.model.Snap";
         //Snap.isScreenshotted()
-        public static final String SNAP_ISSCREENSHOTTED = "ap"; //prev. ao
+        public static final String SNAP_ISSCREENSHOTTED = "ar"; //prev. ap, ao
         //Snap.getTimestamp()
-        public static final String SNAP_GETTIMESTAMP = "T"; //prev R, U
+        public static final String SNAP_GETTIMESTAMP = "W"; //prev T, R, U
         //EndReason class
         public static final String ENDREASON_CLASS = "com.snapchat.android.analytics.SnapViewEventAnalytics.EndReason";
         //ImageResource -> aqz prev. apz
         //ChatMedia instance variable name in ImageResource
-        public static final String IMAGERESOURCE_VAR_CHATMEDIA = "f";
+        public static final String IMAGERESOURCE_VAR_CHATMEDIA = "b"; //prev. f
         //.model.chat.Chat -> anh, prev. alt, akx
         //Chat.getTimeStamp()
-        public static final String CHAT_GETTIMESTAMP = "T"; //prev. U
+        public static final String CHAT_GETTIMESTAMP = "W"; //prev. T, U
         //.model.chat.StatefulChatFeedItem
         //StatefulChatFeedItem.getSender()
         public static final String STATEFULCHATFEEDITEM_GETSENDER = "j";
-        //ScreenshotDetector class
-        public static final String SCREENSHOTDETECTOR_CLASS = "ara";
+        //ScreenshotDetector class -> onLoaderReset
+        public static final String SCREENSHOTDETECTOR_CLASS = "ayn"; //prev. ara
         //ScreenshotDetector.run(List)
         public static final String SCREENSHOTDETECTOR_RUN = "a";
         //SnapStateMessage class
-        public static final String SNAPSTATEMESSAGE_CLASS = "boa";
+        public static final String SNAPSTATEMESSAGE_CLASS = "bxn"; //prev. boa
         //SnapStateMessage.setScreenshotCount(Long)
         public static final String SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT = "b";
     }
-    //Sharing
-
     //Data-saving
     public class datasaving {
-        public static final String DSNAPDOWNLOADER_CLASS = "afq"; //prev. aekparamaoh, bjz parambjz, vy paramvy
+        public static final String DSNAPDOWNLOADER_CLASS = "akn"; //prev. afq
         public static final String DSNAPDOWNLOADER_DOWNLOADSNAP = "a";
-        public static final String DOWNLOADREQUEST_CLASS = "aoh"; //prev. amv
-        public static final String DYNAMICBYTEBUFFER_CLASS = "bjz"; //prev. bic
-        public static final String NETWORKRESULT_CLASS = "vy"; //prev. vb
+        public static final String DOWNLOADREQUEST_CLASS = "avt"; //prev. aoh, amv
+        public static final String DYNAMICBYTEBUFFER_CLASS = "bsz"; //prev. bjz, bic
+        public static final String NETWORKRESULT_CLASS = "zl"; //prev. vy, vb
+        public static final String CHANNELDOWNLOADER_CLASS = "alm"; //prev. agn
+        public static final String CHANNELDOWNLOADER_START = "a"; //prev. b
     }
     //Spoofing
     public class spoofing {
         //SpeedometerView class
-        public static final String SPEEDOMETERVIEW_CLASS = "aus"; //prev. asz
-        //SpeedometerView.setSpeed
+        public static final String SPEEDOMETERVIEW_CLASS = "bcx"; //prev. aus, asz
+        //SpeedometerView.setSpeed(Float)
         public static final String SPEEDOMETERVIEW_SETSPEED = "a";
+        public static final String LOCATION_CLASS = "arh";
+        public static final String LOCATION_GETLOCATION = "d";
     }
     //Select-All
     public class select {
         //SendToFragment class
         public static final String SENDTOFRAGMENT_CLASS = "com.snapchat.android.fragments.sendto.SendToFragment";
         //SendToFragment.AddToList()
-        public static final String SENDTOFRAGMENT_ADDTOLIST = "i";
+        public static final String SENDTOFRAGMENT_ADDTOLIST = "c"; //prev. i
         //TopView instance variable in SendToFragment
         public static final String SENDTOFRAGMENT_VAR_TOPVIEW = "d";
         //FriendHashSet instance variable in SendToFragment
@@ -117,18 +120,20 @@ public class Obfuscator {
         //ArrayList instance variable in SendToFragment
         public static final String SENDTOFRAGMENT_VAR_ARRAYLIST = "m";
         //SendToAdapter class
-        public static final String SENDTOADAPTER_CLASS = "ajj"; //prev. ahz, ahe
+        public static final String SENDTOADAPTER_CLASS = "apf"; //prev. ajj, ahz, ahe
         //List instance variable in SendToAdapter
         public static final String SENDTOADAPTER_VAR_LIST = "e";
         //Friend class
         public static final String FRIEND_CLASS = "com.snapchat.android.model.Friend";
         //PostToStory class
-        public static final String POSTTOSTORY_CLASS = "ame"; //prev. aku
+        public static final String POSTTOSTORY_CLASS = "asx"; //prev. aku
     }
 
     public class sharing {
+        //cameraStateEvent class
+        public static final String CAMERASTATEEVENT_CLASS = "bnm";
         //snapCapturedEvent class
-        public static final String SNAPCAPTUREDEVENT_CLASS = "bhv"; //prev. bfy ->from LandingPageActivity$8
+        public static final String SNAPCAPTUREDEVENT_CLASS = "bhv"; //prev. bhv, bfy ->from LandingPageActivity$8
         //snapCaptureContext class
         public static final String SNAPCAPTURECONTEXT_CLASS = "com.snapchat.android.util.eventbus.SnapCaptureContext";
         //BusProvider class
