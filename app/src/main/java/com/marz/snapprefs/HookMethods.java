@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -23,6 +24,9 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Util.XposedUtils;
+import com.startapp.android.publish.StartAppAd;
+import com.startapp.android.publish.StartAppSDK;
+import com.startapp.android.publish.banner.Banner;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -101,6 +105,10 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static boolean mDiscoverSnap = false;
     public static boolean mDiscoverUI = false;
     public static boolean mCustomSticker = false;
+    public static boolean mReplay = false;
+    public static boolean mStealth = false;
+    public static boolean mTyping = false;
+    public static int mLicense = 0;
     static XSharedPreferences prefs;
     static boolean selectStory;
     static boolean txtcolours;
@@ -115,6 +123,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     static EditText editText;
     static XModuleResources modRes;
     static Context SnapContext;
+    static Context context;
     static int counter = 0;
     private static XModuleResources mResources;
     private static int snapchatVersion;
@@ -167,6 +176,10 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mDiscoverSnap = prefs.getBoolean("pref_key_discover", false);
         mDiscoverUI = prefs.getBoolean("pref_key_discover_ui", false);
         mCustomSticker = prefs.getBoolean("pref_key_sticker", false);
+        mReplay = prefs.getBoolean("pref_key_replay", false);
+        mStealth = prefs.getBoolean("pref_key_viewed", false);
+        mTyping = prefs.getBoolean("pref_key_typing", false);
+        mLicense = prefs.getInt("license_status", mLicense);
         debug = prefs.getBoolean("pref_key_debug", false);
 
         //SAVING
@@ -212,7 +225,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     }
 
     static void logging(String message) {
-        if (debug == true)
+        if (mDebugging == true)
             XposedBridge.log(message);
     }
 
@@ -311,9 +324,10 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         try {
             XposedUtils.log("----------------- SNAPPREFS HOOKED -----------------", false);
             Object activityThread = callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
-            Context context = (Context) callMethod(activityThread, "getSystemContext");
+            context = (Context) callMethod(activityThread, "getSystemContext");
 
             PackageInfo piSnapChat = context.getPackageManager().getPackageInfo(lpparam.packageName, 0);
+            StartAppAd startAppAd = new StartAppAd(context);
             XposedUtils.log("SnapChat Version: " + piSnapChat.versionName + " (" + piSnapChat.versionCode + ")", false);
             XposedUtils.log("SnapPrefs Version: " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")", false);
         } catch (Exception e) {
@@ -324,7 +338,18 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         prefs.reload();
         refreshPreferences();
         printSettings();
-        Premium.initPremium(lpparam, modRes, SnapContext);
+        //findAndHookMethod("com.google.android.gms.common.GooglePlayServicesUtil", lpparam.classLoader, "isGooglePlayServicesAvailable", Context.class, XC_MethodReplacement.returnConstant(0));
+        if (mLicense == 1 || mLicense == 2) {
+            if (mReplay == true) {
+                Premium.initReplay(lpparam, modRes, SnapContext);
+            }
+            if (mTyping == true) {
+                Premium.initTyping(lpparam, modRes, SnapContext);
+            }
+            if (mStealth == true) {
+                Premium.initViewed(lpparam, modRes, SnapContext);
+            }
+        }
         findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -405,6 +430,13 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             }
         };
         findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, initHook);
+        findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Context ctx = (Activity) param.thisObject;
+                StartAppSDK.init(ctx, "108991393", "208402174", true);
+            }
+        });
         findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onResume", initHook);
 
         // VanillaCaptionEditText was moved from an inner-class to a separate class in 8.1.0
@@ -452,7 +484,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         Sharing.initSharing(lpparam, mResources);
         //SNAPPREFS
         if (hideBf == true) {
-            findAndHookMethod("com.snapchat.android.model.Friend", lpparam.classLoader, "i", new XC_MethodReplacement() {
+            findAndHookMethod("com.snapchat.android.model.Friend", lpparam.classLoader, "k", new XC_MethodReplacement() {
                 @Override
                 protected Object replaceHookedMethod(MethodHookParam param)
                         throws Throwable {
@@ -550,8 +582,12 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("mDiscoverSnap: " + mDiscoverSnap);
         logging("mDiscoverUI: " + mDiscoverUI);
         logging("mCustomSticker: " + mCustomSticker);
+        logging("mReplay: " + mReplay);
+        logging("mStealth: " + mStealth);
+        logging("mTyping: " + mTyping);
         logging("mColours: " + mColours);
         logging("*****Debugging: " + debug + " *****");
+        logging("mLicense: " + mLicense);
         logging("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
         Logger.setDebuggingEnabled(mDebugging);
 
@@ -600,11 +636,39 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     }
 
     public void addAd(InitPackageResourcesParam resparam) {
-        //resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "snap_preview", new XC_LayoutInflated() {
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "snap_preview", new XC_LayoutInflated() {
+            //resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "home_pager", new XC_LayoutInflated() {
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
                 RelativeLayout mainLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("snap_preview_header", "id", Common.PACKAGE_SNAP)).getParent();
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.CENTER_HORIZONTAL);
+                final Banner startAppBanner = new Banner(SnapContext);
+                final ImageButton closebutton = new ImageButton(SnapContext);
+                closebutton.setBackgroundColor(0);
+                closebutton.setImageDrawable(mResources.getDrawable(R.drawable.close));
+                closebutton.setScaleX((float) 0.3);
+                closebutton.setScaleY((float) 0.3);
+                closebutton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startAppBanner.hideBanner();
+                        closebutton.setVisibility(View.GONE);
+                    }
+                });
+                layoutParams2.addRule(RelativeLayout.RIGHT_OF, closebutton.getId());
+                layoutParams2.addRule(RelativeLayout.ALIGN_TOP, closebutton.getId());
+                layoutParams.bottomMargin = px(70);
 
+                if (mLicense == 1 || mLicense == 2) {
+                    startAppBanner.hideBanner();
+                    closebutton.setVisibility(View.GONE);
+                } else {
+                }
+                if (mLicense == 0) {
+                    mainLayout.addView(startAppBanner, layoutParams);
+                    mainLayout.addView(closebutton, layoutParams2);
+                }
             }
         });
     }

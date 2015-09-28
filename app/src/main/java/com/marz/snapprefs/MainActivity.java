@@ -7,6 +7,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.ColorDrawable;
@@ -19,6 +20,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import de.cketti.library.changelog.ChangeLog;
 
 
@@ -26,7 +30,6 @@ public class MainActivity extends Activity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#00a650"));
         getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getActionBar().setCustomView(R.layout.abs);
@@ -48,7 +51,7 @@ public class MainActivity extends Activity {
         SC_text.setPaintFlags(SC_text.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         settings.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                getFragmentManager().beginTransaction().replace(android.R.id.content, new Settings()).commit();
+                getFragmentManager().beginTransaction().replace(R.id.frame_layout, new Settings()).commit();
                 PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.preferences, false);
             }
         });
@@ -133,8 +136,22 @@ public class MainActivity extends Activity {
                         .show();
             }
         });
+        AdView mAdView = (AdView) findViewById(R.id.adView);
+        if (readIntPreference("license_status") == 1 || readIntPreference("license_status") == 2) {
+            mAdView.destroy();
+            mAdView.setVisibility(View.GONE);
+        } else {
+            AdRequest adRequest = new AdRequest.Builder()
+                    .addTestDevice("753D126B83124EE69FA573A9D07FEF54")
+                    .build();
+            mAdView.loadAd(adRequest);
+            mAdView.setVisibility(View.VISIBLE);
+        }
+    }
 
-
-
+    public int readIntPreference(String key) {
+        SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
+        int returned = prefs.getInt(key, 0);
+        return returned;
     }
 }

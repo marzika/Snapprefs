@@ -71,7 +71,7 @@
                 android:title="@string/pref_sticker_readme_title">
                 <intent
                     android:action="android.intent.action.VIEW"
-                    android:data="http://forum.xda-developers.com/showpost.php?p=62707280&amp;postcount=4411" />
+                    android:data="http://forum.xda-developers.com/showpost.php?p=56915736&amp;postcount=4" />
             </Preference>
             <Preference
                 android:key="pref_key_sticker_readme_2"
@@ -347,6 +347,35 @@
             <Preference
                 android:key="pref_discover_readme"
                 android:summary="@string/pref_discover_readme_summary"
+                android:title="@string/pref_discover_readme_title" />
+        </PreferenceCategory>
+    </PreferenceScreen>
+    <PreferenceScreen
+        android:key="button_premium_settings"
+        android:persistent="false"
+        android:title="@string/premdeluxe">
+        <PreferenceCategory android:title="@string/premdeluxe">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_replay"
+                android:summaryOff="@string/pref_replay_summary_off"
+                android:summaryOn="@string/pref_replay_summary_on"
+                android:title="@string/pref_replay_title" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_typing"
+                android:summaryOff="@string/pref_typing_summary_off"
+                android:summaryOn="@string/pref_typing_summary_on"
+                android:title="@string/pref_typing_title" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_viewed"
+                android:summaryOff="@string/pref_viewed_summary_off"
+                android:summaryOn="@string/pref_viewed_summary_on"
+                android:title="@string/pref_viewed_title" />
+            <Preference
+                android:key="pref_viewed_readme"
+                android:summary="@string/pref_viewed_readme_summary"
                 android:title="@string/pref_discover_readme_title" />
         </PreferenceCategory>
     </PreferenceScreen>

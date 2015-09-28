@@ -21,6 +21,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -134,6 +137,17 @@ public class Reedem extends Activity {
                 new Connection().execute(cID.getText().toString(), deviceID);
             }
         });
+        AdView mAdView = (AdView) findViewById(R.id.adView2);
+        if (readIntPreference("license_status") == 1 || readIntPreference("license_status") == 2) {
+            mAdView.destroy();
+            mAdView.setVisibility(View.GONE);
+        } else {
+            AdRequest adRequest = new AdRequest.Builder()
+                    .addTestDevice("753D126B83124EE69FA573A9D07FEF54")
+                    .build();
+            mAdView.loadAd(adRequest);
+            mAdView.setVisibility(View.VISIBLE);
+        }
     }
 
     public void postData(final String confirmationID, final String deviceID) {
@@ -258,25 +272,25 @@ public class Reedem extends Activity {
     }
 
     public void saveStringPreference(String key, String value) {
-        SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE).edit();
         editor.putString(key, value);
         editor.apply();
     }
 
     public void saveIntPreference(String key, int value) {
-        SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE).edit();
         editor.putInt(key, value);
         editor.apply();
     }
 
     public String readStringPreference(String key) {
-        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
         String returned = prefs.getString(key, null);
         return returned;
     }
 
     public int readIntPreference(String key) {
-        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+        SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
         int returned = prefs.getInt(key, 0);
         return returned;
     }

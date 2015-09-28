@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 21
+    compileSdkVersion 22
     buildToolsVersion "21.1.2"
 
     defaultConfig {
         applicationId "com.marz.snapprefs"
         minSdkVersion 12
         targetSdkVersion 21
-        versionCode 16
-        versionName "1.4.9 beta"
+        versionCode 17
+        versionName "1.5.0"
     }
 
     buildTypes {
@@ -25,9 +25,11 @@ repositories {
 
 dependencies {
     provided files('lib/XposedBridgeApi-54.jar')
-    compile 'com.google.android.gms:play-services-maps:7.8.0'
+    compile 'com.android.support:appcompat-v7:22.2.0'
+    //compile 'com.google.android.gms:play-services-maps:8.1.0'
     compile 'net.rdrei.android.dirchooser:library:2.1@aar'
     compile 'com.googlecode.mp4parser:isoparser:1.0.5.4'
-    compile 'com.android.support:appcompat-v7:22.2.1'
     compile 'de.cketti.library.changelog:ckchangelog:1.2.2'
+    compile 'com.google.android.gms:play-services:7.0.0'
+    compile files('libs/StartAppInApp-2.4.11.jar')
 }

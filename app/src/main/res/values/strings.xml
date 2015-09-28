@@ -45,7 +45,7 @@
     <string name="pref_update_title">To get the latest updates</string>
     <string name="pref_update_summary">Add \'snapprefs\' on Snapchat</string>
     <string name="version_text">Version</string>
-    <string name="version_summary" translatable="false">Current version is: v1.4.9 beta</string>
+    <string name="version_summary" translatable="false">Current version is: v1.5.0</string>
     <string name="general">General settings</string>
     <string name="saving">Saving settings</string>
     <string name="sharing">Sharing settings</string>
@@ -291,9 +291,21 @@
         <!--AIzaSyD-XNCHffArxbrgQ_-CS1nDXZRTfcEIlO4 DEBUG-->
     </string>
     <string name="title_activity_reedem">Reedem</string>
-    <string name="buy_text"><![CDATA[<b>Premium:</b><br><small>AdFree (more will come)</small><br><br><b>Deluxe:</b><br><small>Premium + GodMode (noone can save your Snaps -- not added yet)</small><br><br><b>NOTE:<br><small>You will receive an email with your Reedem ID from support@snapprefs.com.<br><br>With payment issues send me an email to the above mentioned email.</small>]]></string>
+    <string name="buy_text"><![CDATA[<b>Premium:</b><br><small>AdFree, Unlimited Replays, Typing alert bypass, Chat presence bypass</small><br><br><b>Deluxe:</b><br><small>Every Premium feature, Stealth viewing (stories and snaps), GodMode (noone can save your Snaps -- not added yet)</small><br><br><b>NOTE:<br><small>You will receive an email with your Reedem ID from support@snapprefs.com.<br><br>With payment issues send me an email to the above mentioned email.</small>]]></string>
     <string name="buy_deluxe">Deluxe (9.99$)</string>
     <string name="buy_premium">Premium (2.99$)</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="banner_ad_unit_id">ca-app-pub-6910530129073042/7440988016</string>
+    <string name="premdeluxe">Premium &amp; Deluxe settings</string>
+    <string name="pref_replay_summary_off">You will NOT be able to replay unlimited times</string>
+    <string name="pref_replay_summary_on">You will be able to replay unlimited times</string>
+    <string name="pref_replay_title">Unlimited Replays</string>
+    <string name="pref_typing_title">Block typing and presence alert in chat</string>
+    <string name="pref_typing_summary_on">They will be blocked</string>
+    <string name="pref_typing_summary_off">They will NOT be blocked</string>
+    <string name="pref_viewed_summary_off">Stealth viewing will NOT be executed</string>
+    <string name="pref_viewed_summary_on">Stealth viewing will be executed</string>
+    <string name="pref_viewed_title">Stealth Viewing</string>
+    <string name="pref_viewed_readme_summary">After the snaps are loaded, enable Airplane mode, view the desired snap, then KILL SNAPCHAT from the Recent Apps page. You can disable Airplane mode now.</string>
 </resources>
