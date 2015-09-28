@@ -246,7 +246,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         try {
             // Add your data
             List nameValuePairs = new ArrayList(2);
-            nameValuePairs.add(new BasicNameValuePair("version", "1.4.9b"));
+            nameValuePairs.add(new BasicNameValuePair("version", "1.5.0"));
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
             // Execute HTTP Post Request
@@ -346,7 +346,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             if (mTyping == true) {
                 Premium.initTyping(lpparam, modRes, SnapContext);
             }
-            if (mStealth == true) {
+            if (mStealth == true && mLicense == 2) {
                 Premium.initViewed(lpparam, modRes, SnapContext);
             }
         }

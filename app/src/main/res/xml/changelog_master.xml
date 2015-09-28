@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
     <release
+        version="1.5.0"
+        versioncode="17">
+        <change>Added Premium and Deluxe features (unlimited replays, stealth viewing, typing and
+            presence alert bypass)
+        </change>
+        <change>Added saving Sent Snaps</change>
+        <change>Major bugs fixes</change>
+        <change>NOTE: The last snap will not get saved, unless you reopen it. God mode is not added
+            yet.
+        </change>
+    </release>
+    <release
         version="1.4.9 beta"
         versioncode="16">
         <change>Updated for 9.15.2.0</change>
