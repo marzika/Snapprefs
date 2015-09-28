@@ -70,3 +70,5 @@ The whole project is licensed under the GNU GPLv3, which can be found in the LIC
 The license is also included to the app in the /assets/ folder.
 
 *Copyright (C) 2014 Marcell Mészáros*
+
+Snapprefs is in no way affiliated with, authorized, maintained, sponsored or endorsed by the Snapchat Inc. or any of its affiliates or subsidiaries. This is an independent application.
