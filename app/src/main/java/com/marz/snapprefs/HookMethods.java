@@ -8,13 +8,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,9 +22,6 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Util.XposedUtils;
-import com.startapp.android.publish.StartAppAd;
-import com.startapp.android.publish.StartAppSDK;
-import com.startapp.android.publish.banner.Banner;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -313,8 +308,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         if (mCustomFilterType == 0) {
             fullScreenFilter(resparam);
         }
-        //addSaveBtn(resparam);
-        addAd(resparam);
     }
 
     @Override
@@ -327,14 +320,12 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             context = (Context) callMethod(activityThread, "getSystemContext");
 
             PackageInfo piSnapChat = context.getPackageManager().getPackageInfo(lpparam.packageName, 0);
-            StartAppAd startAppAd = new StartAppAd(context);
             XposedUtils.log("SnapChat Version: " + piSnapChat.versionName + " (" + piSnapChat.versionCode + ")", false);
             XposedUtils.log("SnapPrefs Version: " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")", false);
         } catch (Exception e) {
             XposedUtils.log("Exception while trying to get version info", e);
             return;
         }
-        new Connection().execute();
         prefs.reload();
         refreshPreferences();
         printSettings();
@@ -430,13 +421,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             }
         };
         findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, initHook);
-        findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Context ctx = (Activity) param.thisObject;
-                StartAppSDK.init(ctx, "108991393", "208402174", true);
-            }
-        });
         findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onResume", initHook);
 
         // VanillaCaptionEditText was moved from an inner-class to a separate class in 8.1.0
@@ -634,45 +618,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             }
         });
     }
-
-    public void addAd(InitPackageResourcesParam resparam) {
-        resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "snap_preview", new XC_LayoutInflated() {
-            //resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "home_pager", new XC_LayoutInflated() {
-            public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
-                RelativeLayout mainLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("snap_preview_header", "id", Common.PACKAGE_SNAP)).getParent();
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.CENTER_HORIZONTAL);
-                final Banner startAppBanner = new Banner(SnapContext);
-                final ImageButton closebutton = new ImageButton(SnapContext);
-                closebutton.setBackgroundColor(0);
-                closebutton.setImageDrawable(mResources.getDrawable(R.drawable.close));
-                closebutton.setScaleX((float) 0.3);
-                closebutton.setScaleY((float) 0.3);
-                closebutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startAppBanner.hideBanner();
-                        closebutton.setVisibility(View.GONE);
-                    }
-                });
-                layoutParams2.addRule(RelativeLayout.RIGHT_OF, closebutton.getId());
-                layoutParams2.addRule(RelativeLayout.ALIGN_TOP, closebutton.getId());
-                layoutParams.bottomMargin = px(70);
-
-                if (mLicense == 1 || mLicense == 2) {
-                    startAppBanner.hideBanner();
-                    closebutton.setVisibility(View.GONE);
-                } else {
-                }
-                if (mLicense == 0) {
-                    mainLayout.addView(startAppBanner, layoutParams);
-                    mainLayout.addView(closebutton, layoutParams2);
-                }
-            }
-        });
-    }
-
     public void addGhost(InitPackageResourcesParam resparam) {
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "snap_preview", new XC_LayoutInflated() {
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
@@ -757,15 +702,5 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 }
             }
         });
-    }
-
-    private class Connection extends AsyncTask<String, Void, Void> {
-
-        @Override
-        protected Void doInBackground(String... params) {
-            postData();
-            return null;
-        }
-
     }
 }
