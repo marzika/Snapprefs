@@ -449,6 +449,7 @@ public class Saving {
             findAndHookMethod(Obfuscator.save.IMAGESNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.IMAGESNAPRENDERER_START, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    Logger.log("Imagesnaprenderer.start()", true);
                     Snap toSave = snapsMap.get(currentViewingSnap);
                     mImage = toSave.getImage();
                     saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
@@ -457,6 +458,7 @@ public class Saving {
             findAndHookMethod(Obfuscator.save.VIDEOSNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.VIDEOSNAPRENDERER_START, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    Logger.log("Videosnaprenderer.start()", true);
                     Snap toSave = snapsMap.get(currentViewingSnap);
                     mVideo = toSave.getVideo();
                     saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
@@ -480,6 +482,7 @@ public class Saving {
         String sender = null;
         SnapType snapType;
         if (receivedSnap == null) {
+            Logger.log("SRS - 1", true);
             //receivedSnap = oldreceivedSnap;
             //usedOldReceivedSnap = true;
             return;

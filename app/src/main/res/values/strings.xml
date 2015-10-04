@@ -45,7 +45,7 @@
     <string name="pref_update_title">To get the latest updates</string>
     <string name="pref_update_summary">Add \'snapprefs\' on Snapchat</string>
     <string name="version_text">Version</string>
-    <string name="version_summary" translatable="false">Current version is: v1.5.0</string>
+    <string name="version_summary" translatable="false">Current version is: v1.5.1</string>
     <string name="general">General settings</string>
     <string name="saving">Saving settings</string>
     <string name="sharing">Sharing settings</string>
@@ -291,7 +291,7 @@
         <!--AIzaSyD-XNCHffArxbrgQ_-CS1nDXZRTfcEIlO4 DEBUG-->
     </string>
     <string name="title_activity_reedem">Reedem</string>
-    <string name="buy_text"><![CDATA[<b>Premium:</b><br><small>AdFree, Unlimited Replays, Typing alert bypass, Chat presence bypass</small><br><br><b>Deluxe:</b><br><small>Every Premium feature, Stealth viewing (stories and snaps), GodMode (noone can save your Snaps -- not added yet)</small><br><br><b>NOTE:<br><small>You will receive an email with your Reedem ID from support@snapprefs.com.<br><br>With payment issues send me an email to the above mentioned email.</small>]]></string>
+    <string name="buy_text"><![CDATA[<b>Premium:</b><br><small>AdFree, Unlimited Replays, Typing alert bypass, Chat presence bypass</small><br><br><b>Deluxe:</b><br><small>Every Premium feature, Stealth viewing (stories and snaps), GodMode (noone can save your Snaps -- not added yet)</small><br><br><b>NOTE:<br><small>You will receive an email with your Reedem ID from support@snapprefs.com (Check your Spam/Junk folder).<br>Your transaction ID is NOT your Reedem ID.<br><br>Payments can take up to 24 hours to activate. With payment issues send me an email to the above mentioned address.</small>]]></string>
     <string name="buy_deluxe">Deluxe (9.99$)</string>
     <string name="buy_premium">Premium (2.99$)</string>
     <string name="hello_world">Hello world!</string>

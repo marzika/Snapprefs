@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
     <release
+        version="1.5.1"
+        versioncode="18">
+        <change>Removed Ads from the SC app</change>
+        <change>Crashes should be fixed when leaving the app</change>
+        <change>Performance improvement when taking a Snap</change>
+        <change>NOTE: The last snap will not get saved, unless you reopen it by swiping down. God
+            mode is not added
+            yet.
+        </change>
+    </release>
+    <release
         version="1.5.0"
         versioncode="17">
         <change>Added Premium and Deluxe features (unlimited replays, stealth viewing, typing and
