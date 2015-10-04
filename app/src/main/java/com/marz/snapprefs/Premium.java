@@ -11,9 +11,9 @@ import static de.robv.android.xposed.XposedHelpers.findClass;
 
 public class Premium {
     static void initReplay(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
-        findAndHookMethod("aty", lpparam.classLoader, "d", XC_MethodReplacement.returnConstant(true));
-        findAndHookMethod("ate", lpparam.classLoader, "y", XC_MethodReplacement.returnConstant(false));
-        findAndHookMethod("ate", lpparam.classLoader, "u", XC_MethodReplacement.returnConstant(false));
+        findAndHookMethod("auz", lpparam.classLoader, "d", XC_MethodReplacement.returnConstant(true));
+        findAndHookMethod("aue", lpparam.classLoader, "y", XC_MethodReplacement.returnConstant(false));
+        findAndHookMethod("aue", lpparam.classLoader, "u", XC_MethodReplacement.returnConstant(false));
         //findAndHookMethod("aty", lpparam.classLoader, "b",XC_MethodReplacement.DO_NOTHING);
 
         //findAndHookMethod("ate", lpparam.classLoader, "o", XC_MethodReplacement.DO_NOTHING);
@@ -28,7 +28,7 @@ public class Premium {
     }
 
     static void initViewed(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
-        Class<?> ate = findClass("ate", lpparam.classLoader);
-        findAndHookMethod("aty", lpparam.classLoader, "a", ate, XC_MethodReplacement.DO_NOTHING);
+        Class<?> ate = findClass("aue", lpparam.classLoader);
+        findAndHookMethod("auz", lpparam.classLoader, "a", ate, XC_MethodReplacement.DO_NOTHING);
     }
 }

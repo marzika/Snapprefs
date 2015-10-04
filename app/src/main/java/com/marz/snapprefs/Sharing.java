@@ -51,8 +51,6 @@ public class Sharing {
             return;
         }
 
-        final Class snapCapturedEventClass = findClass(Obfuscator.sharing.SNAPCAPTUREDEVENT_CLASS, lpparam.classLoader);
-        final Class SnapCaptureContext = findClass(Obfuscator.sharing.SNAPCAPTURECONTEXT_CLASS, lpparam.classLoader);
         final Media mediaImg = new Media(); // a place to store the image
         final Media mediaVid = new Media(); // a place to store the video
 

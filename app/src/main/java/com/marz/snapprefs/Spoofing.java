@@ -57,8 +57,8 @@ public class Spoofing {
     }
 
     static void initWeather(final LoadPackageParam lpparam, final Context context) {
-        Class<?> avl = findClass("avl", lpparam.classLoader);
-        findAndHookConstructor("aue", lpparam.classLoader, avl, new XC_MethodHook() {
+        Class<?> avl = findClass(Obfuscator.spoofing.WEATHER_FIRST, lpparam.classLoader);
+        findAndHookConstructor(Obfuscator.spoofing.WEATHER_CLASS, lpparam.classLoader, avl, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 String temp = FileUtils.readFromFile(context, "weather");
