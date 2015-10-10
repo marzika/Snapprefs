@@ -140,7 +140,7 @@ public class Saving {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     //We have to store the file data before snapchat deletes it
                     try {
-                        mVideo = new FileInputStream(param.args[0].toString());
+                        mVideo = new FileInputStream(Uri.parse(param.args[0].toString()).getPath());
                         Logger.log(param.args[0].toString(), true);
 
                         newSaveMethod(mVideo, null, false);
