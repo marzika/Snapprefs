@@ -7,27 +7,27 @@ import android.content.res.XModuleResources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
@@ -132,71 +132,18 @@ public class Saving {
         refreshPreferences();
 
         try {
-            /**
-             * We hook this method to get the newly set VideoUri.
-             */
-            findAndHookMethod(VideoView.class, "setVideoURI", Uri.class, Map.class, new XC_MethodHook() {
+            findAndHookMethod("azg", lpparam.classLoader, "c", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    //We have to store the file data before snapchat deletes it
-                    try {
-                        mVideo = new FileInputStream(Uri.parse(param.args[0].toString()).getPath());
-                        Logger.log(param.args[0].toString(), true);
-
-                        newSaveMethod(mVideo, null, false);
-
-                        //Logger.log("It is a Video", true);
-                        //saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
-                        //mVideo = null;
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                    ImageView imageview = (ImageView) getObjectField(param.thisObject, "h");
+                    mImage = ((BitmapDrawable) imageview.getDrawable()).getBitmap();
+                    newSaveMethod(null, mImage, false);
+                    saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
                 }
             });
-
             /**
              * We hook this method to get the BitmapDrawable currently displayed.
              */
-            findAndHookMethod(ImageView.class, "updateDrawable", Drawable.class, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    try {
-                        if (!mSCResources.getResourceName(((View) param.thisObject).getId()).equals(Common.basename + ":id/snap_image_view"))
-                            return;
-
-                        if (((BitmapDrawable) param.args[0]).getBitmap() == null) return;
-                        mImage = ((BitmapDrawable) param.args[0]).getBitmap();
-
-                        newSaveMethod(null, mImage, false);
-
-                        //Logger.log("It is a Bitmap", true);
-                        //saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
-                    } catch (NullPointerException | Resources.NotFoundException ignore) {
-                        //Sometimes getResourceName is going to return null that's okay
-                    }
-                }
-            });            /**
-             * We hook this method to get the BitmapDrawable currently displayed.
-             */
-            findAndHookMethod(ImageView.class, "updateDrawable", Drawable.class, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    try {
-                        if (!mSCResources.getResourceName(((View) param.thisObject).getId()).equals(Common.basename + ":id/snap_video_image_overlay"))
-                            return;
-
-                        if (((BitmapDrawable) param.args[0]).getBitmap() == null) return;
-                        mImage = ((BitmapDrawable) param.args[0]).getBitmap();
-
-                        newSaveMethod(null, mImage, true);
-
-                        //Logger.log("It is a Bitmap", true);
-                        //saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE_OVERLAY);
-                    } catch (NullPointerException | Resources.NotFoundException ignore) {
-                        //Sometimes getResourceName is going to return null that's okay
-                    }
-                }
-            });
 
             /**
              * When the SnapView.a method gets called to show the actual snap, therefore it can be
@@ -208,7 +155,6 @@ public class Saving {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     viewingSnap = true;
                     currentViewingSnap++;
-                    //currentViewingSnap++;
                     Logger.log("Starting to view a snap, plus viewingSnap: " + viewingSnap, true);
                 }
             });
@@ -243,7 +189,7 @@ public class Saving {
                                     gestureModel.setSaved();
                                     //TODO add new saving method (also added image overlay saving to S2S)
                                     //newSaveMethod2(snapContext);
-                                    Snap toSave = snapsMap.get(currentViewingSnap);
+                                    Snap toSave = snapsMap.get(snapsMap.size() - 1);
                                     if (toSave.getMediaType() == MediaType.IMAGE) {
                                         mImage = toSave.getImage();
                                         saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDIMAGE);
@@ -446,22 +392,41 @@ public class Saving {
              * Sets the Snap as Screenshotted, so we constantly return false to it.
              */
             findAndHookMethod(Obfuscator.save.SNAP_CLASS, lpparam.classLoader, Obfuscator.save.SNAP_ISSCREENSHOTTED, XC_MethodReplacement.returnConstant(false));
-            findAndHookMethod(Obfuscator.save.IMAGESNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.IMAGESNAPRENDERER_START, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Logger.log("Imagesnaprenderer.start()", true);
-                    Snap toSave = snapsMap.get(currentViewingSnap);
-                    mImage = toSave.getImage();
-                    saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
-                }
-            });
-            findAndHookMethod(Obfuscator.save.VIDEOSNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.VIDEOSNAPRENDERER_START, new XC_MethodHook() {
+            /*findAndHookMethod(Obfuscator.save.VIDEOSNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.VIDEOSNAPRENDERER_START, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Logger.log("Videosnaprenderer.start()", true);
                     Snap toSave = snapsMap.get(currentViewingSnap);
                     mVideo = toSave.getVideo();
                     saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
+                }
+            });*/
+            findAndHookMethod("azj", lpparam.classLoader, "c", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    View view = (View) getObjectField(param.thisObject, "c");
+                    boolean found = false;
+                    ArrayList<View> allViewsWithinMyTopView = getAllChildren(view);
+                    for (View child : allViewsWithinMyTopView) {
+                        if (child instanceof VideoView) {
+                            Logger.log("FOUND VIDEOVIEW AS A CHILD - " + child.getId(), true);
+                            Uri mUri = null;
+                            try {
+                                Field mUriField = VideoView.class.getDeclaredField("mUri");
+                                mUriField.setAccessible(true);
+                                mUri = (Uri) mUriField.get(view);
+                                mVideo = new FileInputStream(Uri.parse(mUri.toString()).getPath());
+                                newSaveMethod(mVideo, null, false);
+                                saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
+                                found = true;
+                            } catch (Exception e) {
+
+                            }
+                        }
+                    }
+                    if (!found) {
+                        Logger.log("NOT FOUND VIDEOVIEW AS A CHILD", true);
+                    }
                 }
             });
 
@@ -790,6 +755,30 @@ public class Saving {
 
     }
 
+    static private ArrayList<View> getAllChildren(View v) {
+
+        if (!(v instanceof ViewGroup)) {
+            ArrayList<View> viewArrayList = new ArrayList<View>();
+            viewArrayList.add(v);
+            return viewArrayList;
+        }
+
+        ArrayList<View> result = new ArrayList<View>();
+
+        ViewGroup vg = (ViewGroup) v;
+        for (int i = 0; i < vg.getChildCount(); i++) {
+
+            View child = vg.getChildAt(i);
+
+            ArrayList<View> viewArrayList = new ArrayList<View>();
+            viewArrayList.add(v);
+            viewArrayList.addAll(getAllChildren(child));
+
+            result.addAll(viewArrayList);
+        }
+        return result;
+    }
+
     public enum SnapType {
         SNAP("snap", "/ReceivedSnaps"),
         STORY("story", "/Stories"),
@@ -804,7 +793,6 @@ public class Saving {
             this.subdir = subdir;
         }
     }
-
     public enum MediaType {
         IMAGE(".jpg"),
         IMAGE_OVERLAY(".png"),
