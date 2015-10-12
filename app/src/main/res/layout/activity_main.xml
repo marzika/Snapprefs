@@ -85,6 +85,27 @@
                 android:layout_gravity="center"
                 android:text="Settings" />
 
+            <LinearLayout
+                android:id="@+id/layout3"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+
+                <Button
+                    android:id="@+id/filterStore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Filters" />
+
+                <!--<Button
+                    android:id="@+id/stickersStore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Stickers" /> -->
+            </LinearLayout>
+
             <Button
                 android:id="@+id/reedem"
                 android:layout_width="fill_parent"
@@ -103,23 +124,26 @@
                 android:layout_gravity="center"
                 android:text="Donate" />
 
-            <Button
-                android:id="@+id/about"
+            <LinearLayout
+                android:id="@+id/layout2"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/donate"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="center"
-                android:text="About" />
+                android:layout_alignParentBottom="true">
 
-            <Button
-                android:id="@+id/legal"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/about"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="center"
-                android:text="Legal" />
+                <Button
+                    android:id="@+id/about"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="About"></Button>
+
+                <Button
+                    android:id="@+id/legal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Legal"></Button>
+            </LinearLayout>
 
 
         </LinearLayout>

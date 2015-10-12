@@ -104,6 +104,12 @@
             android:name="com.startapp.android.publish.FullScreenActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@android:style/Theme" />
+        <activity
+            android:name=".FilterStoreUtils.TabsFragmentActivity"
+            android:label="Filter Store"></activity>
+        <activity
+            android:name=".FilterStoreUtils.FilterPreview"
+            android:label="Filter Preview"></activity>
     </application>
 
 </manifest>

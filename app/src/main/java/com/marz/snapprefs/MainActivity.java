@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.marz.snapprefs.FilterStoreUtils.TabsFragmentActivity;
 
 import de.cketti.library.changelog.ChangeLog;
 
@@ -43,6 +44,7 @@ public class MainActivity extends Activity {
         //PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.activity_main);
         Button settings = (Button) findViewById(R.id.settings);
+        Button filterStore = (Button) findViewById(R.id.filterStore);
         Button reedem = (Button) findViewById(R.id.reedem);
         Button donate = (Button) findViewById(R.id.donate);
         Button about = (Button) findViewById(R.id.about);
@@ -53,6 +55,12 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 getFragmentManager().beginTransaction().replace(R.id.frame_layout, new Settings()).commit();
                 PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.preferences, false);
+            }
+        });
+        filterStore.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), TabsFragmentActivity.class);
+                startActivity(intent);
             }
         });
         reedem.setOnClickListener(new Button.OnClickListener() {

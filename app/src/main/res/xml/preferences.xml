@@ -214,12 +214,12 @@
                 android:entryValues="@array/pref_save_mode_values"
                 android:key="pref_key_stories_videos"
                 android:title="@string/pref_save_stories_videos" />
-            <CheckBoxPreference
+            <!--<CheckBoxPreference
                 android:defaultValue="false"
                 android:key="pref_key_overlay"
                 android:summaryOff="@string/pref_overlay_summary_off"
                 android:summaryOn="@string/pref_overlay_summary_on"
-                android:title="@string/pref_overlay_title" />
+                android:title="@string/pref_overlay_title" /> -->
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="pref_key_save_sent_snaps"

@@ -155,7 +155,7 @@ public class Saving {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     viewingSnap = true;
                     currentViewingSnap++;
-                    Logger.log("Starting to view a snap, plus viewingSnap: " + viewingSnap, true);
+                    //Logger.log("Starting to view a snap, plus viewingSnap: " + viewingSnap, true);
                 }
             });
 
@@ -163,11 +163,11 @@ public class Saving {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     if (gestureModel == null || gestureModel.isSaved()) return;
-                    Logger.log("GestureHook: Not saved nor null", true);
+                    //Logger.log("GestureHook: Not saved nor null", true);
                     MotionEvent motionEvent = (MotionEvent) param.args[0];
                     if (motionEvent.getActionMasked() == MotionEvent.ACTION_MOVE) {
-                        Logger.log("GestureHook: action_move is done", true);
-                        Logger.log("viewingSnap is: " + viewingSnap, true);
+                        //Logger.log("GestureHook: action_move is done", true);
+                        //Logger.log("viewingSnap is: " + viewingSnap, true);
                         if (!viewingSnap) return;
                         // Result true means the event is handled
                         param.setResult(true);
@@ -366,7 +366,7 @@ public class Saving {
             findAndHookMethod(Obfuscator.save.SNAPVIEW_CLASS, lpparam.classLoader, Obfuscator.save.SNAPVIEW_SHOW, findClass(Obfuscator.save.SNAPVIEW_SHOW_FIRST, lpparam.classLoader), findClass(Obfuscator.save.SNAPVIEW_SHOW_SECOND, lpparam.classLoader), findClass(Obfuscator.save.SNAPVIEW_SHOW_THIRD, lpparam.classLoader), findClass(Obfuscator.save.SNAPVIEW_SHOW_FOURTH, lpparam.classLoader), new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Logger.log("Starting to view a snap");
+                    //Logger.log("Starting to view a snap");
                     receivedSnap = param.args[0];
                     oldreceivedSnap = receivedSnap;
                     //Call for savereceivedsnap
@@ -409,7 +409,7 @@ public class Saving {
                     ArrayList<View> allViewsWithinMyTopView = getAllChildren(view);
                     for (View child : allViewsWithinMyTopView) {
                         if (child instanceof VideoView) {
-                            Logger.log("FOUND VIDEOVIEW AS A CHILD - " + child.getId(), true);
+                            //Logger.log("FOUND VIDEOVIEW AS A CHILD - " + child.getId(), true);
                             Uri mUri = null;
                             try {
                                 Field mUriField = VideoView.class.getDeclaredField("mUri");
@@ -425,7 +425,7 @@ public class Saving {
                         }
                     }
                     if (!found) {
-                        Logger.log("NOT FOUND VIDEOVIEW AS A CHILD", true);
+                        //Logger.log("NOT FOUND VIDEOVIEW AS A CHILD", true);
                     }
                 }
             });

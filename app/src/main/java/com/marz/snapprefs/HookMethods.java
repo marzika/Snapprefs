@@ -345,12 +345,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 param.args[0] = 120000;
             }
         });
-        findAndHookMethod("baz", lpparam.classLoader, "j", new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                param.setResult(null);
-            }
-        });
 
         final Class<?> receivedSnapClass = findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
         try{
