@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
     <release
+        version="1.6.0"
+        versioncode="19">
+        <change>Fixed every saving error (both video and image)</change>
+        <change>Added Filter Store (thanks to ddmanfire)</change>
+        <change>Removed overlay saving (noone used it)</change>
+        <change>NOTE: God mode is not added yet.</change>
+    </release>
+    <release
         version="1.5.1"
         versioncode="18">
         <change>Updated for 9.16.1.0</change>
