@@ -144,12 +144,17 @@ public class Tab1Fragment extends Fragment {
         protected Void doInBackground(Void... params) {
 
             File[] files = targetDirector.listFiles();
-            if (files.length > 0) {
-                for (File file : files) {
-                    publishProgress(file.getAbsolutePath());
-                    if (isCancelled()) break;
+            if (files != null) {
+                if (files.length > 0) {
+                    for (File file : files) {
+                        publishProgress(file.getAbsolutePath());
+                        if (isCancelled()) break;
+                    }
                 }
+            } else {
+                targetDirector.mkdir();
             }
+
             return null;
         }
 

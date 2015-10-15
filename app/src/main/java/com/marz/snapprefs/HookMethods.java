@@ -162,7 +162,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         txtstyle = prefs.getBoolean("pref_key_txtstyle", false);
         txtgravity = prefs.getBoolean("pref_key_txtgravity", false);
         mCustomFilterBoolean = prefs.getBoolean("pref_key_custom_filter_checkbox", mCustomFilterBoolean);
-        mCustomFilterLocation = prefs.getString("pref_key_filter_location", mCustomFilterLocation);
+        mCustomFilterLocation = Environment.getExternalStorageDirectory().toString() + "/Snapprefs/Filters";
+        ;
         mCustomFilterType = prefs.getInt("pref_key_filter_type", 0);
         mSpeed = prefs.getBoolean("pref_key_speed", false);
         mWeather = prefs.getBoolean("pref_key_weather", false);
