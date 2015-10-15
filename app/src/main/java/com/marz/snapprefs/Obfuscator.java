@@ -153,6 +153,8 @@ public class Obfuscator {
         public static final String FRIEND_CLASS = "com.snapchat.android.model.Friend";
         //PostToStory class
         public static final String POSTTOSTORY_CLASS = "zn"; //prev. aku
+        //PostToVenue class
+        public static final String POSTTOVENUE_CLASS = "zr"; //prev. aku
     }
 
     public class sharing {

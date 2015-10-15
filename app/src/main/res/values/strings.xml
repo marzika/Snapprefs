@@ -29,6 +29,8 @@
     <string name="select_text_summary">Adds Select-All function for sending snaps</string>
     <string name="selectstory_text">Including My Story</string>
     <string name="selectstory_text_summary">Includes My Story to the Select-All function</string>
+    <string name="selectvenue_text">Including Local Venues</string>
+    <string name="selectvenue_text_summary">Includes Local Venues to the Select-All function</string>
 
     <string name="rainbow_text">Rainbow text</string>
     <string name="rainbow_text_summary">Makes each letter separately colored</string>

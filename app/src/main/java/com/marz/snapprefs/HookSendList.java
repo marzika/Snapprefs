@@ -80,6 +80,11 @@ public class HookSendList {
                                             StoryList.add(thingToAdd);
                                         else
                                             StoryList.remove(thingToAdd);
+                                    } else if (types[i].getCanonicalName().equals(Obfuscator.select.POSTTOVENUE_CLASS) && HookMethods.selectVenue == true) {
+                                        if (set)
+                                            StoryList.add(thingToAdd);
+                                        else
+                                            StoryList.remove(thingToAdd);
                                     } else {
                                         Logger.log("SnapPrefs: Unknown type value at: " + types[i].toString());
                                     }

@@ -105,6 +105,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static int mLicense = 0;
     static XSharedPreferences prefs;
     static boolean selectStory;
+    static boolean selectVenue;
     static boolean txtcolours;
     static boolean bgcolours;
     static boolean size;
@@ -151,6 +152,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         fullCaption = prefs.getBoolean("pref_key_fulltext", false);
         selectAll = prefs.getBoolean("pref_key_selectall", false);
         selectStory = prefs.getBoolean("pref_key_selectstory", false);
+        selectVenue = prefs.getBoolean("pref_key_selectvenue", false);
         hideBf = prefs.getBoolean("pref_key_hidebf", false);
         hideRecent = prefs.getBoolean("pref_key_hiderecent", false);
         txtcolours = prefs.getBoolean("pref_key_txtcolour", false);
@@ -535,6 +537,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("FullCaption: " + fullCaption);
         logging("SelectAll: " + selectAll);
         logging("SelectStory: " + selectStory);
+        logging("SelectVenue: " + selectVenue);
         logging("HideBF: " + hideBf);
         logging("HideRecent: " + hideRecent);
         logging("ShouldAddGhost: " + shouldAddGhost);

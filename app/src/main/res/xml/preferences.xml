@@ -55,6 +55,11 @@
                 android:key="pref_key_selectstory"
                 android:summary="@string/selectstory_text_summary"
                 android:title="@string/selectstory_text" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_selectvenue"
+                android:summary="@string/selectvenue_text_summary"
+                android:title="@string/selectvenue_text" />
         </PreferenceCategory>
         <PreferenceCategory
             android:key="pref_sticker"
@@ -96,23 +101,18 @@
                 android:entryValues="@array/pref_filter_values"
                 android:key="pref_key_filter_type"
                 android:title="@string/pref_filter_type_title" />
-            <Preference
-                android:defaultValue="-1"
-                android:key="pref_key_filter_location"
-                android:persistent="true"
-                android:title="@string/pref_custom_filter_title" />
-            <Preference
-                android:key="pref_filter_readme"
-                android:summary="@string/pref_filter_readme_summary"
-                android:title="@string/pref_filter_readme_title" />
-            <Preference
-                android:key="pref_filter_group"
-                android:summary="@string/pref_filter_group_summary"
-                android:title="@string/pref_filter_group_title">
-                <intent
-                    android:action="android.intent.action.VIEW"
-                    android:data="https://plus.google.com/communities/111884042638955665569" />
-            </Preference>
+            <!--            <Preference
+                            android:key="pref_filter_readme"
+                            android:summary="@string/pref_filter_readme_summary"
+                            android:title="@string/pref_filter_readme_title" />
+                        <Preference
+                            android:key="pref_filter_group"
+                            android:summary="@string/pref_filter_group_summary"
+                            android:title="@string/pref_filter_group_title">
+                            <intent
+                                android:action="android.intent.action.VIEW"
+                                android:data="https://plus.google.com/communities/111884042638955665569" />
+                        </Preference>-->
         </PreferenceCategory>
     </PreferenceScreen>
     <PreferenceScreen
