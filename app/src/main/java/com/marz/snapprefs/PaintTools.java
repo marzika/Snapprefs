@@ -69,14 +69,14 @@ public class PaintTools {
             }
         });
         Class<?> legacyCanvasView = findClass("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader);
-        XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, legacyCanvasView, int.class, float.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, int.class, float.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Logger.log("CanvasView - ORIGINAL, setColor: " + param.args[1] + " setStrokeWidth: " + param.args[2], true);
+                Logger.log("CanvasView - ORIGINAL, setColor: " + param.args[0] + " setStrokeWidth: " + param.args[1], true);
                 //param.args[2] = width;
                 //Logger.log("CanvasView - NEW setColor: " + color + " setStrokeWidth: " + width, true);
-                param.args[1] = color;
-                param.args[2] = width;
+                param.args[0] = color;
+                param.args[1] = width;
             }
 
             @Override

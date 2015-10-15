@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -132,10 +131,10 @@ public class Saving {
         refreshPreferences();
 
         try {
-            findAndHookMethod("azg", lpparam.classLoader, "c", new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.IMAGESNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.IMAGESNAPRENDERER_START, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    ImageView imageview = (ImageView) getObjectField(param.thisObject, "h");
+                    ImageView imageview = (ImageView) getObjectField(param.thisObject, Obfuscator.save.IMAGESNAPRENDERER_VAR_IMAGEVIEW);
                     mImage = ((BitmapDrawable) imageview.getDrawable()).getBitmap();
                     newSaveMethod(null, mImage, false);
                     saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
@@ -209,7 +208,7 @@ public class Saving {
                 }
             };
 
-            final Class<?> snapImagebryo = findClass("aum", lpparam.classLoader);
+            final Class<?> snapImagebryo = findClass(Obfuscator.save.SNAPIMAGEBRYO_CLASS, lpparam.classLoader);
             final Class<?> mediabryoClass = findClass("com.snapchat.android.model.Mediabryo", lpparam.classLoader);
             findAndHookMethod(Obfuscator.save.SENT_CLASS, lpparam.classLoader, Obfuscator.save.SENT_METHOD, Bitmap.class, new XC_MethodHook() {
                 @Override
@@ -217,16 +216,7 @@ public class Saving {
                     sentImage = (Bitmap) param.args[0];
                 }
             });
-            /*findAndHookMethod("com.snapchat.android.model.Mediabryo", lpparam.classLoader, "c", mediabryoClass, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Uri videoUri = (Uri) param.getResult();
-                    Logger.log("We have the URI " + videoUri.toString(), true);
-                    video = new FileInputStream(videoUri.toString());
-                    //Logger.log("Saving sent VIDEO SNAP", true);
-                    //saveSnap(SnapType.SENT, MediaType.VIDEO, snapContext, null, video, fileName, null);
-                }
-            });*/
+
             Class<?> mediabryoA = findClass("com.snapchat.android.model.Mediabryo$a", lpparam.classLoader);
             findAndHookConstructor("com.snapchat.android.model.Mediabryo", lpparam.classLoader, mediabryoA, new XC_MethodHook() {
                 @Override
@@ -401,18 +391,20 @@ public class Saving {
                     saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
                 }
             });*/
-            findAndHookMethod("azj", lpparam.classLoader, "c", new XC_MethodHook() {
+            final Class<?> TextureVideoView = findClass("com.snapchat.android.ui.TextureVideoView", lpparam.classLoader);
+            findAndHookMethod("Ca", lpparam.classLoader, "c", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     View view = (View) getObjectField(param.thisObject, "c");
                     boolean found = false;
                     ArrayList<View> allViewsWithinMyTopView = getAllChildren(view);
                     for (View child : allViewsWithinMyTopView) {
-                        if (child instanceof VideoView) {
-                            //Logger.log("FOUND VIDEOVIEW AS A CHILD - " + child.getId(), true);
+                        //Logger.log("CHILD: "+ child.getId(), true);
+                        //if (child instanceof TextureVideoView) {
+                        Logger.log("FOUND VIDEOVIEW AS A CHILD - " + child.getId(), true);
                             Uri mUri = null;
                             try {
-                                Field mUriField = VideoView.class.getDeclaredField("mUri");
+                                Field mUriField = TextureVideoView.getDeclaredField("i");
                                 mUriField.setAccessible(true);
                                 mUri = (Uri) mUriField.get(view);
                                 mVideo = new FileInputStream(Uri.parse(mUri.toString()).getPath());
@@ -420,12 +412,12 @@ public class Saving {
                                 saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
                                 found = true;
                             } catch (Exception e) {
-
+                                Logger.log("FUCKYOUFUCKINGNSPACHAT: " + e.toString());
                             }
-                        }
+                        //}
                     }
                     if (!found) {
-                        //Logger.log("NOT FOUND VIDEOVIEW AS A CHILD", true);
+                        Logger.log("NOT FOUND VIDEOVIEW AS A CHILD", true);
                     }
                 }
             });

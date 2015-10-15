@@ -517,7 +517,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         });
         //Used to emulate the battery status as being FULL -> above 90%
         final Class<?> batteryInfoProviderEnum = findClass("com.snapchat.android.location.smartFilterProviders.BatteryInfoProvider$BatteryLevel", lpparam.classLoader);
-        findAndHookMethod(/*"com.snapchat.android.location.smartFilterProviders.BatteryInfoProvider"*/"ath", lpparam.classLoader, "a", new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.spoofing.BATTERY_FILTER, lpparam.classLoader, "a", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 Object battery = getStaticObjectField(batteryInfoProviderEnum, "FULL_BATTERY");
