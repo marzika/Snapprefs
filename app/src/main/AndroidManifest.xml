@@ -86,7 +86,7 @@
             android:label="@string/title_activity_maps" />
         <activity
             android:name=".Reedem"
-            android:label="@string/title_activity_reedem"></activity>
+            android:label="@string/title_activity_redeem"></activity>
         <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
