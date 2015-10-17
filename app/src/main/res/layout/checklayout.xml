@@ -16,7 +16,7 @@
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Reedem ID:"
+        android:text="Redeem ID:"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <EditText
