@@ -77,7 +77,9 @@ public class Reedem extends Activity {
         TextView dID = (TextView) findViewById(R.id.deviceID);
         dID.setText(deviceId);
         cID.setText(readStringPreference("confirmation_id"));
-        if (readIntPreference("license_status") == 0) {
+        final String deviceID = dID.getText().toString();
+        final String confirmationID = cID.getText().toString();
+        if (readLicense(deviceID, confirmationID) == 0) {
             String text = "Your license status is: <font color='blue'>Free</font>";
             textView.setText(Html.fromHtml(text), TextView.BufferType.SPANNABLE);
             buynow.setText("Click here to buy a license");
@@ -102,7 +104,7 @@ public class Reedem extends Activity {
                 }
             });
             buynow.setVisibility(View.VISIBLE);
-        } else if (readIntPreference("license_status") == 1) {
+        } else if (readLicense(deviceID, confirmationID) == 1) {
             String text = "Your license status is: <font color='green'>Premium</font>";
             textView.setText(Html.fromHtml(text), TextView.BufferType.SPANNABLE);
             buynow.setText("Click here to upgrade your license");
@@ -121,15 +123,13 @@ public class Reedem extends Activity {
                             .show();
                 }
             });
-        } else if (readIntPreference("license_status") == 2) {
+        } else if (readLicense(deviceID, confirmationID) == 2) {
             String text = "Your license status is: <font color='#FFCC00'>Deluxe</font>";
             textView.setText(Html.fromHtml(text), TextView.BufferType.SPANNABLE);
             buynow.setVisibility(View.GONE);
         }
-        final String confirmationID = cID.getText().toString();
-        final String deviceID = dID.getText().toString();
         if (!confirmationID.isEmpty()) {
-            new Connection().execute(cID.getText().toString(), deviceID);
+            //new Connection().execute(cID.getText().toString(), deviceID);
         }
 
         submitbtn.setOnClickListener(new Button.OnClickListener() {
@@ -138,12 +138,12 @@ public class Reedem extends Activity {
             }
         });
         AdView mAdView = (AdView) findViewById(R.id.adView2);
-        if (readIntPreference("license_status") == 1 || readIntPreference("license_status") == 2) {
+        if (readLicense(deviceID, confirmationID) == 1 || readLicense(deviceID, confirmationID) == 2) {
             mAdView.destroy();
             mAdView.setVisibility(View.GONE);
         } else {
             AdRequest adRequest = new AdRequest.Builder()
-                    .addTestDevice("753D126B83124EE69FA573A9D07FEF54")
+                    .addTestDevice("75466CD74A6342D488B5B5EA749E1265")
                     .build();
             mAdView.loadAd(adRequest);
             mAdView.setVisibility(View.VISIBLE);
@@ -154,6 +154,7 @@ public class Reedem extends Activity {
         // Create a new HttpClient and Post Header
         HttpClient httpclient = new DefaultHttpClient();
         HttpPost httppost = new HttpPost("http://snapprefs.com/checkuser.php");
+        saveDeviceID(deviceID);
         saveStringPreference("device_id", deviceID);
         saveStringPreference("confirmation_id", confirmationID);
 
@@ -219,7 +220,8 @@ public class Reedem extends Activity {
                                 }
                             });
                             buynow.setVisibility(View.VISIBLE);
-                            saveIntPreference("license_status", 0);
+                            //saveIntPreference("license_status", 0);
+                            saveLicense(deviceID, confirmationID, 0);
                         }
                         if (status.equals("1") && error_msg.isEmpty()) {
                             String text2 = "Your license status is: <font color='green'>Premium</font>";
@@ -241,20 +243,59 @@ public class Reedem extends Activity {
                                 }
                             });
                             buynow.setVisibility(View.VISIBLE);
-                            saveIntPreference("license_status", 1);
+                            saveLicense(deviceID, confirmationID, 1);
+
+                            new AlertDialog.Builder(Reedem.this)
+                                    .setTitle("Apply License")
+                                    .setMessage("License verification is done, you have to do a soft reboot. If you want to type in your Redeem ID, click dismiss, otherwise click Soft Reboot. Without it, you will not be able to use your license and Snapprefs properly.")
+                                    .setPositiveButton("Soft reboot", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            try {
+                                                Process proc = Runtime.getRuntime()
+                                                        .exec(new String[]{"su", "-c", "busybox killall system_server"});
+                                                proc.waitFor();
+                                            } catch (Exception ex) {
+                                                ex.printStackTrace();
+                                            }
+                                        }
+                                    })
+                                    .setNegativeButton("Dismiss", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    })
+                                    .show();
                         }
                         if (status.equals("2") && error_msg.isEmpty()) {
                             String text2 = "Your license status is: <font color='#FFCC00'>Deluxe</font>";
                             txtvw.setText(Html.fromHtml(text2), TextView.BufferType.SPANNABLE);
                             buynow.setVisibility(View.GONE);
                             errorTV.setText("");
-                            saveIntPreference("license_status", 2);
+                            saveLicense(deviceID, confirmationID, 2);
+                            new AlertDialog.Builder(Reedem.this)
+                                    .setTitle("Apply License")
+                                    .setMessage("License verification is done, you have to do a soft reboot. If you want to type in your Redeem ID, click dismiss, otherwise click Soft Reboot. Without it, you will not be able to use your license and Snapprefs properly.")
+                                    .setPositiveButton("Soft reboot", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            try {
+                                                Process proc = Runtime.getRuntime()
+                                                        .exec(new String[]{"su", "-c", "busybox killall system_server"});
+                                                proc.waitFor();
+                                            } catch (Exception ex) {
+                                                ex.printStackTrace();
+                                            }
+                                        }
+                                    })
+                                    .setNegativeButton("Dismiss", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    })
+                                    .show();
                         }
 
                     } catch (Throwable t) {
                         Log.e("Snapprefs", "Could not parse malformed JSON: \"" + text + "\"");
                         errorTV.setText("Error while reedeming your license, bad response");
-                        saveIntPreference("license_status", 0);
+                        saveLicense(deviceID, confirmationID, 0);
                     }
 
                 }
@@ -262,13 +303,38 @@ public class Reedem extends Activity {
         } catch (ClientProtocolException e) {
             // TODO Auto-generated catch block
             Toast.makeText(Reedem.this, "ClientProtocolException" + e.toString(), Toast.LENGTH_SHORT).show();
-            saveIntPreference("license_status", 0);
+            saveLicense(deviceID, confirmationID, 0);
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
             Toast.makeText(Reedem.this, "IOException" + e.toString(), Toast.LENGTH_SHORT).show();
-            saveIntPreference("license_status", 0);
+            saveLicense(deviceID, confirmationID, 0);
         }
+    }
+
+    private void saveLicense(String deviceID, String confirmationID, int i) {
+        if (confirmationID != null) {
+            SharedPreferences.Editor editor = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE).edit();
+            editor.putString("device_id", deviceID);
+            editor.putInt(deviceID, i);
+            editor.apply();
+        }
+    }
+
+    public int readLicense(String deviceID, String confirmationID) {
+        int status;
+        if (confirmationID != null) {
+            SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
+            String dvcid = prefs.getString("device_id", null);
+            if (dvcid != null && dvcid.equals(deviceID)) {
+                status = prefs.getInt(deviceID, 0);
+            } else {
+                status = 0;
+            }
+        } else {
+            status = 0;
+        }
+        return status;
     }
 
     public void saveStringPreference(String key, String value) {
@@ -277,21 +343,14 @@ public class Reedem extends Activity {
         editor.apply();
     }
 
-    public void saveIntPreference(String key, int value) {
+    public void saveDeviceID(String value) {
         SharedPreferences.Editor editor = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE).edit();
-        editor.putInt(key, value);
+        editor.putString("device_id", value);
         editor.apply();
     }
-
     public String readStringPreference(String key) {
         SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
         String returned = prefs.getString(key, null);
-        return returned;
-    }
-
-    public int readIntPreference(String key) {
-        SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
-        int returned = prefs.getInt(key, 0);
         return returned;
     }
 

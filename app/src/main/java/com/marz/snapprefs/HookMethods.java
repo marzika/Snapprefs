@@ -19,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.marz.snapprefs.Util.XposedUtils;
 
@@ -89,6 +90,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static boolean mToastEnabled = true;
     public static String mSavePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
     public static String mCustomFilterLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/Filters";
+    public static String mConfirmationID = "";
+    public static String mDeviceID = "";
     public static boolean mSaveSentSnaps = false;
     public static boolean mSortByCategory = true;
     public static boolean mSortByUsername = true;
@@ -104,6 +107,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static boolean mTyping = false;
     public static int mLicense = 0;
     static XSharedPreferences prefs;
+    static XSharedPreferences license;
     static boolean selectStory;
     static boolean selectVenue;
     static boolean txtcolours;
@@ -143,12 +147,12 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     }
 
     static void refreshPreferences() {
-
         prefs = new XSharedPreferences(new File(
                 Environment.getDataDirectory(), "data/"
                 + PACKAGE_NAME + "/shared_prefs/" + PACKAGE_NAME
                 + "_preferences" + ".xml"));
         prefs.reload();
+        prefs.makeWorldReadable();
         fullCaption = prefs.getBoolean("pref_key_fulltext", false);
         selectAll = prefs.getBoolean("pref_key_selectall", false);
         selectStory = prefs.getBoolean("pref_key_selectstory", false);
@@ -165,7 +169,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         txtgravity = prefs.getBoolean("pref_key_txtgravity", false);
         mCustomFilterBoolean = prefs.getBoolean("pref_key_custom_filter_checkbox", mCustomFilterBoolean);
         mCustomFilterLocation = Environment.getExternalStorageDirectory().toString() + "/Snapprefs/Filters";
-        ;
         mCustomFilterType = prefs.getInt("pref_key_filter_type", 0);
         mSpeed = prefs.getBoolean("pref_key_speed", false);
         mWeather = prefs.getBoolean("pref_key_weather", false);
@@ -176,8 +179,10 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mReplay = prefs.getBoolean("pref_key_replay", false);
         mStealth = prefs.getBoolean("pref_key_viewed", false);
         mTyping = prefs.getBoolean("pref_key_typing", false);
-        mLicense = prefs.getInt("license_status", mLicense);
+        mConfirmationID = prefs.getString("confirmation_id", "");
         debug = prefs.getBoolean("pref_key_debug", false);
+        mDeviceID = prefs.getString("device_id", null);
+        mLicense = prefs.getInt(mDeviceID, 0);
 
         //SAVING
 
@@ -324,6 +329,11 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             PackageInfo piSnapChat = context.getPackageManager().getPackageInfo(lpparam.packageName, 0);
             XposedUtils.log("SnapChat Version: " + piSnapChat.versionName + " (" + piSnapChat.versionCode + ")", false);
             XposedUtils.log("SnapPrefs Version: " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")", false);
+            if (!Obfuscator.isSupported(piSnapChat.versionCode)) {
+                Logger.log("This Snapchat version is unsupported", true, true);
+                Toast.makeText(context, "This Snapchat version is unsupported", Toast.LENGTH_SHORT).show();
+                return;
+            }
         } catch (Exception e) {
             XposedUtils.log("Exception while trying to get version info", e);
             return;
@@ -332,6 +342,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         refreshPreferences();
         printSettings();
         if (mLicense == 1 || mLicense == 2) {
+
             if (mReplay == true) {
                 Premium.initReplay(lpparam, modRes, SnapContext);
             }
@@ -341,7 +352,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             if (mStealth == true && mLicense == 2) {
                 Premium.initViewed(lpparam, modRes, SnapContext);
             }
-        }
+            }
         findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {

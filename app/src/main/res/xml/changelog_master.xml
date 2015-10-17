@@ -4,7 +4,11 @@
         version="1.6.1"
         versioncode="20">
         <change>Updated for 9.17.0.0</change>
-
+        <change>Added Venue selecting for Select All</change>
+        <change>Fixed the Filter Store bugs/crashes</change>
+        <change>Added zoom buttons to the Map</change>
+        <change>Added check for unsupported Snapchat versions</change>
+        <change>NOTE: God mode is not added yet.</change>
     </release>
     <release
         version="1.6.0"
