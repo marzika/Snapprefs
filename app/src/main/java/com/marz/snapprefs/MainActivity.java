@@ -14,6 +14,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.telephony.TelephonyManager;
 import android.text.Html;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +23,9 @@ import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.marz.snapprefs.FilterStoreUtils.TabsFragmentActivity;
+
+import java.util.UUID;
 
 import de.cketti.library.changelog.ChangeLog;
 
@@ -31,6 +35,16 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#00a650"));
+        final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+
+        final String tmDevice, tmSerial, androidId;
+        tmDevice = "" + tm.getDeviceId();
+        tmSerial = "" + tm.getSimSerialNumber();
+        androidId = "" + android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+
+        UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
+        String deviceId = deviceUuid.toString();
+        final String confirmationID = readStringPreference("confirmation_id");
         getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getActionBar().setCustomView(R.layout.abs);
         getActionBar().setBackgroundDrawable(colorDrawable);
@@ -43,6 +57,7 @@ public class MainActivity extends Activity {
         //PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.activity_main);
         Button settings = (Button) findViewById(R.id.settings);
+        Button filterStore = (Button) findViewById(R.id.filterStore);
         Button reedem = (Button) findViewById(R.id.reedem);
         Button donate = (Button) findViewById(R.id.donate);
         Button about = (Button) findViewById(R.id.about);
@@ -53,6 +68,12 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 getFragmentManager().beginTransaction().replace(R.id.frame_layout, new Settings()).commit();
                 PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.preferences, false);
+            }
+        });
+        filterStore.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), TabsFragmentActivity.class);
+                startActivity(intent);
             }
         });
         reedem.setOnClickListener(new Button.OnClickListener() {
@@ -137,21 +158,37 @@ public class MainActivity extends Activity {
             }
         });
         AdView mAdView = (AdView) findViewById(R.id.adView);
-        if (readIntPreference("license_status") == 1 || readIntPreference("license_status") == 2) {
+        if (readLicense(deviceId, confirmationID) == 1 || readLicense(deviceId, confirmationID) == 2) {
             mAdView.destroy();
             mAdView.setVisibility(View.GONE);
         } else {
             AdRequest adRequest = new AdRequest.Builder()
-                    .addTestDevice("753D126B83124EE69FA573A9D07FEF54")
+                    .addTestDevice("75466CD74A6342D488B5B5EA749E1265")
                     .build();
             mAdView.loadAd(adRequest);
             mAdView.setVisibility(View.VISIBLE);
         }
     }
 
-    public int readIntPreference(String key) {
+    public int readLicense(String deviceID, String confirmationID) {
+        int status;
+        if (confirmationID != null) {
+            SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
+            String dvcid = prefs.getString("device_id", null);
+            if (dvcid != null && dvcid.equals(deviceID)) {
+                status = prefs.getInt(deviceID, 0);
+            } else {
+                status = 0;
+            }
+        } else {
+            status = 0;
+        }
+        return status;
+    }
+
+    public String readStringPreference(String key) {
         SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
-        int returned = prefs.getInt(key, 0);
+        String returned = prefs.getString(key, null);
         return returned;
     }
 }

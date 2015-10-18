@@ -1,22 +1,27 @@
-Custom Stickers -- MrYawnie
+Custom Stickers Tutorial (courtesy of Mr.Yawnie)
 
-For Custom stickers, you need to have a 72x72 PNG (preview image) and a 47.5 x 47.5 SVG vector graphic.
+For Custom stickers, you need to have a 72x72 PNG (preview image) and a 48 x 48 SVG vector graphic.
+
+PNG instructions:
+
+1. Create a 72x72 PNG with the image you want. Remember to have transparent background, or it will look odd.
+2. Name the PNG with the sticker name you want to replace (found in twitter_emojis_png... folder)
+3. Open the zip with 7-zip (do not extract!), and drag-and-drop the custom sticker in the zip while. Overwrite the existing png.
+4. That's it for PNG for now.
 
 SVG instructions:
 
-1. Trace an image into vector by using any vector editor (results vary depending on the tracing options). 
-2. Save the vector in any size, and open the SVG with notepad++.
-3. On the top of the code, you'll see something like this:
-	"<svg version="1.2" baseProfile="tiny" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-	 x="0px" y="0px" width="48px" height="48px" viewBox="0 0 48 48" xml:space="preserve">"
+1. Download Incscape from https://inkscape.org/en/download/ (or use any other vector editor)
+2. Open the PNG you created with Incscape. Leave the settings as is (or change the "Image rendering mode" to "smooth" if you wish.
+3. Go to File -> Save As and save the file as SVG.
+4. Open the SVG file with Notepad++, and delete the the width and hight rows completely.
+5. Under viewBox row, add the following line:
+	style="enable-background:new 0 0 48 48;" 
+6. Save the file, and open the SVG with a browser. If you see the image big and centered, it's ready for Snapchat.
+7. Open the twitter_emojis_svg... folder with 7-zip, replace the existing svg with the custom one (should be named the same as the custom png!)
+8. Close 7-zip. 
 
-	Delete the x, y, width and heigth attributes and replace them with 
+You have now added your custom PNG's and SVG's into the twitter_emoji zips. Now copy those zips to your phone in SD/Snapprefs/Stickers folder (in case you don't have it, create it!)
 
-	viewBox="0 0 47.5 47.5" style="enable-background:new 0 0 47.5 47.5;"
+You have now successfully created and added your custom stickers into Snapchat with Snapprefs.
 
-	so the endresult looks like this:
-
-	"<svg version="1.2" baseProfile="tiny" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-	 viewBox="0 0 47.5 47.5" style="enable-background:new 0 0 47.5 47.5;" xml:space="preserve">"
-
-4. Save the changed code. You are now done with creating and editing the SVG to work with Snapprefs custom stickers. 

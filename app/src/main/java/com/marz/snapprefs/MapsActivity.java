@@ -43,7 +43,7 @@ public class MapsActivity extends Activity {
                 Toast.makeText(MapsActivity.this, "Spoofing location for " + location.toString(), Toast.LENGTH_SHORT).show();
             }
         });
-
+        map.getUiSettings().setZoomControlsEnabled(true);
         // Getting reference to btn_find of the layout activity_main
         Button btn_find = (Button) findViewById(R.id.btn_find);
 

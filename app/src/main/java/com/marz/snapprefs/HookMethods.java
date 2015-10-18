@@ -8,13 +8,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,9 +22,6 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Util.XposedUtils;
-import com.startapp.android.publish.StartAppAd;
-import com.startapp.android.publish.StartAppSDK;
-import com.startapp.android.publish.banner.Banner;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -95,6 +90,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static boolean mToastEnabled = true;
     public static String mSavePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
     public static String mCustomFilterLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/Filters";
+    public static String mConfirmationID = "";
+    public static String mDeviceID = "";
     public static boolean mSaveSentSnaps = false;
     public static boolean mSortByCategory = true;
     public static boolean mSortByUsername = true;
@@ -110,7 +107,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static boolean mTyping = false;
     public static int mLicense = 0;
     static XSharedPreferences prefs;
+    static XSharedPreferences license;
     static boolean selectStory;
+    static boolean selectVenue;
     static boolean txtcolours;
     static boolean bgcolours;
     static boolean size;
@@ -122,7 +121,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     static boolean debug;
     static EditText editText;
     static XModuleResources modRes;
-    static Context SnapContext;
+    static Activity SnapContext;
     static Context context;
     static int counter = 0;
     private static XModuleResources mResources;
@@ -148,15 +147,16 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     }
 
     static void refreshPreferences() {
-
         prefs = new XSharedPreferences(new File(
                 Environment.getDataDirectory(), "data/"
                 + PACKAGE_NAME + "/shared_prefs/" + PACKAGE_NAME
                 + "_preferences" + ".xml"));
         prefs.reload();
+        prefs.makeWorldReadable();
         fullCaption = prefs.getBoolean("pref_key_fulltext", false);
         selectAll = prefs.getBoolean("pref_key_selectall", false);
         selectStory = prefs.getBoolean("pref_key_selectstory", false);
+        selectVenue = prefs.getBoolean("pref_key_selectvenue", false);
         hideBf = prefs.getBoolean("pref_key_hidebf", false);
         hideRecent = prefs.getBoolean("pref_key_hiderecent", false);
         txtcolours = prefs.getBoolean("pref_key_txtcolour", false);
@@ -168,7 +168,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         txtstyle = prefs.getBoolean("pref_key_txtstyle", false);
         txtgravity = prefs.getBoolean("pref_key_txtgravity", false);
         mCustomFilterBoolean = prefs.getBoolean("pref_key_custom_filter_checkbox", mCustomFilterBoolean);
-        mCustomFilterLocation = prefs.getString("pref_key_filter_location", mCustomFilterLocation);
+        mCustomFilterLocation = Environment.getExternalStorageDirectory().toString() + "/Snapprefs/Filters";
         mCustomFilterType = prefs.getInt("pref_key_filter_type", 0);
         mSpeed = prefs.getBoolean("pref_key_speed", false);
         mWeather = prefs.getBoolean("pref_key_weather", false);
@@ -179,8 +179,10 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mReplay = prefs.getBoolean("pref_key_replay", false);
         mStealth = prefs.getBoolean("pref_key_viewed", false);
         mTyping = prefs.getBoolean("pref_key_typing", false);
-        mLicense = prefs.getInt("license_status", mLicense);
+        mConfirmationID = prefs.getString("confirmation_id", "");
         debug = prefs.getBoolean("pref_key_debug", false);
+        mDeviceID = prefs.getString("device_id", null);
+        mLicense = prefs.getInt(mDeviceID, 0);
 
         //SAVING
 
@@ -313,8 +315,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         if (mCustomFilterType == 0) {
             fullScreenFilter(resparam);
         }
-        //addSaveBtn(resparam);
-        addAd(resparam);
     }
 
     @Override
@@ -327,19 +327,22 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             context = (Context) callMethod(activityThread, "getSystemContext");
 
             PackageInfo piSnapChat = context.getPackageManager().getPackageInfo(lpparam.packageName, 0);
-            StartAppAd startAppAd = new StartAppAd(context);
             XposedUtils.log("SnapChat Version: " + piSnapChat.versionName + " (" + piSnapChat.versionCode + ")", false);
             XposedUtils.log("SnapPrefs Version: " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")", false);
+            if (!Obfuscator.isSupported(piSnapChat.versionCode)) {
+                Logger.log("This Snapchat version is unsupported", true, true);
+                Toast.makeText(context, "This Snapchat version is unsupported", Toast.LENGTH_SHORT).show();
+                return;
+            }
         } catch (Exception e) {
             XposedUtils.log("Exception while trying to get version info", e);
             return;
         }
-        new Connection().execute();
         prefs.reload();
         refreshPreferences();
         printSettings();
-        //findAndHookMethod("com.google.android.gms.common.GooglePlayServicesUtil", lpparam.classLoader, "isGooglePlayServicesAvailable", Context.class, XC_MethodReplacement.returnConstant(0));
         if (mLicense == 1 || mLicense == 2) {
+
             if (mReplay == true) {
                 Premium.initReplay(lpparam, modRes, SnapContext);
             }
@@ -349,7 +352,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             if (mStealth == true && mLicense == 2) {
                 Premium.initViewed(lpparam, modRes, SnapContext);
             }
-        }
+            }
         findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -357,7 +360,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             }
         });
 
-        final Class<?> receivedSnapClass = findClass("ate", lpparam.classLoader);
+        final Class<?> receivedSnapClass = findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
         try{
             XposedHelpers.setStaticIntField(receivedSnapClass, "SECOND_MAX_VIDEO_DURATION", 99999);
             Logger.log("SECOND_MAX_VIDEO_DURATION set over 10", true);
@@ -369,20 +372,11 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         XC_MethodHook initHook = new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                /*if (SnapContext == null)*/
                 SnapContext = (Activity) param.thisObject;
-
-                if (latest == false) {
-                    Toast.makeText(SnapContext, "Snapprefs is NOT the latest or an error has occured, please update from the repo", Toast.LENGTH_SHORT).show();
-                    return;
-                } else if (latest == true) {
-                    //Toast.makeText(SnapContext, "Snapprefs is the latest", Toast.LENGTH_SHORT).show();
-                }
                 prefs.reload();
                 refreshPreferences();
                 //SNAPPREFS
                 Saving.initSaving(lpparam, mResources, SnapContext);
-                //Test.initTest(lpparam, SnapContext);
                 if (mDiscoverSnap == true) {
                     DataSaving.blockDsnap(lpparam);
                 }
@@ -430,13 +424,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             }
         };
         findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, initHook);
-        findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Context ctx = (Activity) param.thisObject;
-                StartAppSDK.init(ctx, "108991393", "208402174", true);
-            }
-        });
         findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onResume", initHook);
 
         // VanillaCaptionEditText was moved from an inner-class to a separate class in 8.1.0
@@ -488,12 +475,11 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 @Override
                 protected Object replaceHookedMethod(MethodHookParam param)
                         throws Throwable {
-                    logging("Snap Prefs: Removing Best-friends");
+                    //logging("Snap Prefs: Removing Best-friends");
                     return false;
                 }
             });
         }
-
 		/*if (hideRecent == true){
         findAndHookMethod(Common.Class_Friend, lpparam.classLoader, Common.Method_Recent, new XC_MethodReplacement(){
 		@Override
@@ -545,7 +531,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         });
         //Used to emulate the battery status as being FULL -> above 90%
         final Class<?> batteryInfoProviderEnum = findClass("com.snapchat.android.location.smartFilterProviders.BatteryInfoProvider$BatteryLevel", lpparam.classLoader);
-        findAndHookMethod(/*"com.snapchat.android.location.smartFilterProviders.BatteryInfoProvider"*/"asc", lpparam.classLoader, "a", new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.spoofing.BATTERY_FILTER, lpparam.classLoader, "a", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 Object battery = getStaticObjectField(batteryInfoProviderEnum, "FULL_BATTERY");
@@ -562,6 +548,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("FullCaption: " + fullCaption);
         logging("SelectAll: " + selectAll);
         logging("SelectStory: " + selectStory);
+        logging("SelectVenue: " + selectVenue);
         logging("HideBF: " + hideBf);
         logging("HideRecent: " + hideRecent);
         logging("ShouldAddGhost: " + shouldAddGhost);
@@ -634,54 +621,15 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             }
         });
     }
-
-    public void addAd(InitPackageResourcesParam resparam) {
-        resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "snap_preview", new XC_LayoutInflated() {
-            //resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "home_pager", new XC_LayoutInflated() {
-            public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
-                RelativeLayout mainLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("snap_preview_header", "id", Common.PACKAGE_SNAP)).getParent();
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.CENTER_HORIZONTAL);
-                final Banner startAppBanner = new Banner(SnapContext);
-                final ImageButton closebutton = new ImageButton(SnapContext);
-                closebutton.setBackgroundColor(0);
-                closebutton.setImageDrawable(mResources.getDrawable(R.drawable.close));
-                closebutton.setScaleX((float) 0.3);
-                closebutton.setScaleY((float) 0.3);
-                closebutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        startAppBanner.hideBanner();
-                        closebutton.setVisibility(View.GONE);
-                    }
-                });
-                layoutParams2.addRule(RelativeLayout.RIGHT_OF, closebutton.getId());
-                layoutParams2.addRule(RelativeLayout.ALIGN_TOP, closebutton.getId());
-                layoutParams.bottomMargin = px(70);
-
-                if (mLicense == 1 || mLicense == 2) {
-                    startAppBanner.hideBanner();
-                    closebutton.setVisibility(View.GONE);
-                } else {
-                }
-                if (mLicense == 0) {
-                    mainLayout.addView(startAppBanner, layoutParams);
-                    mainLayout.addView(closebutton, layoutParams2);
-                }
-            }
-        });
-    }
-
     public void addGhost(InitPackageResourcesParam resparam) {
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "snap_preview", new XC_LayoutInflated() {
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
-                RelativeLayout relativeLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("snap_preview_header", "id", Common.PACKAGE_SNAP)).getParent();
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
+                final RelativeLayout relativeLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("snap_preview_header", "id", Common.PACKAGE_SNAP)).getParent();
+                final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
                 layoutParams.topMargin = px(45.0f);
                 layoutParams.leftMargin = px(10.0f);
-                ImageButton ghost = new ImageButton(SnapContext);
+                final ImageButton ghost = new ImageButton(SnapContext);
                 ghost.setBackgroundColor(0);
                 ghost.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
                 ghost.setScaleX((float) 0.75);
@@ -693,11 +641,11 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         logging("SnapPrefs: Displaying MainDialog");
                     }
                 });
-                RelativeLayout.LayoutParams paramsSpeed = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
+                final RelativeLayout.LayoutParams paramsSpeed = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
                 paramsSpeed.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
                 paramsSpeed.topMargin = px(90.0f);
                 paramsSpeed.leftMargin = px(10.0f);
-                ImageButton speed = new ImageButton(SnapContext);
+                final ImageButton speed = new ImageButton(SnapContext);
                 speed.setBackgroundColor(0);
                 speed.setImageDrawable(mResources.getDrawable(R.drawable.speed));
                 speed.setScaleX((float) 0.4);
@@ -709,11 +657,11 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         logging("SnapPrefs: Displaying SpeedDialog");
                     }
                 });
-                RelativeLayout.LayoutParams paramsWeather = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
+                final RelativeLayout.LayoutParams paramsWeather = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
                 paramsWeather.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
                 paramsWeather.topMargin = px(180.0f);
                 paramsWeather.leftMargin = px(10.0f);
-                ImageButton weather = new ImageButton(SnapContext);
+                final ImageButton weather = new ImageButton(SnapContext);
                 weather.setBackgroundColor(0);
                 weather.setImageDrawable(mResources.getDrawable(R.drawable.weather));
                 weather.setScaleX((float) 0.4);
@@ -725,11 +673,11 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         logging("SnapPrefs: Displaying WeatherDialog");
                     }
                 });
-                RelativeLayout.LayoutParams paramsLocation = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
+                final RelativeLayout.LayoutParams paramsLocation = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
                 paramsLocation.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
                 paramsLocation.topMargin = px(135.0f);
                 paramsLocation.leftMargin = px(10.0f);
-                ImageButton location = new ImageButton(SnapContext);
+                final ImageButton location = new ImageButton(SnapContext);
                 location.setBackgroundColor(0);
                 location.setImageDrawable(mResources.getDrawable(R.drawable.location));
                 location.setScaleX((float) 0.4);
@@ -743,29 +691,24 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         logging("SnapPrefs: Displaying Map");
                     }
                 });
-                if (mColours == true) {
-                    relativeLayout.addView(ghost, layoutParams);
-                }
-                if (mSpeed == true) {
-                    relativeLayout.addView(speed, paramsSpeed);
-                }
-                if (mLocation == true) {
-                    relativeLayout.addView(location, paramsLocation);
-                }
-                if (mWeather == true) {
-                    relativeLayout.addView(weather, paramsWeather);
-                }
+                SnapContext.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mColours == true) {
+                            relativeLayout.addView(ghost, layoutParams);
+                        }
+                        if (mSpeed == true) {
+                            relativeLayout.addView(speed, paramsSpeed);
+                        }
+                        if (mLocation == true) {
+                            relativeLayout.addView(location, paramsLocation);
+                        }
+                        if (mWeather == true) {
+                            relativeLayout.addView(weather, paramsWeather);
+                        }
+                    }
+                });
             }
         });
-    }
-
-    private class Connection extends AsyncTask<String, Void, Void> {
-
-        @Override
-        protected Void doInBackground(String... params) {
-            postData();
-            return null;
-        }
-
     }
 }

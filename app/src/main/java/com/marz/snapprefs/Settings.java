@@ -76,20 +76,6 @@ public class Settings extends PreferenceFragment {
                 return true;
             }
         });
-
-        Preference filterChooser = findPreference(PREF_KEY_FILTER_LOCATION);
-        filterChooser.setSummary(sharedPreferences.getString(PREF_KEY_FILTER_LOCATION, ""));
-        filterChooser.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                // Open a new activity asking the user to select a folder
-                final Intent chooserIntent = new Intent(getActivity(), DirectoryChooserActivity.class);
-                chooserIntent.putExtra(DirectoryChooserActivity.EXTRA_NEW_DIR_NAME, "Snapprefs");
-                startActivityForResult(chooserIntent, REQUEST_FILTER_DIR);
-                return true;
-            }
-        });
-
         // Set onClickListener for choosing the Save Location
         Preference locationChooser = findPreference(PREF_KEY_SAVE_LOCATION);
         locationChooser.setSummary(sharedPreferences.getString(PREF_KEY_SAVE_LOCATION, ""));

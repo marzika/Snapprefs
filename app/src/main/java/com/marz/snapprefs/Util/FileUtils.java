@@ -58,7 +58,7 @@ public class FileUtils {
             }
             myReader.close();
         } catch (Exception e) {
-            Logger.log("FileUtils: File SDread failed: " + e.toString());
+            Logger.log("INSTALL HANDLEEXTERNALSTORAGE TO FIX THE ISSUE -- FileUtils: File SDread failed " + e.toString(), true);
         }
         return aBuffer;
     }

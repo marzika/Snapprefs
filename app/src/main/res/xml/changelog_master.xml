@@ -1,6 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
     <release
+        version="1.6.1"
+        versioncode="20">
+        <change>Updated for 9.17.0.0</change>
+        <change>Added Venue selecting for Select All</change>
+        <change>Fixed the Filter Store bugs/crashes</change>
+        <change>Added zoom buttons to the Map</change>
+        <change>Added check for unsupported Snapchat versions</change>
+        <change>NOTE: God mode is not added yet.</change>
+    </release>
+    <release
+        version="1.6.0"
+        versioncode="19">
+        <change>Fixed every saving error (both video and image)</change>
+        <change>Added Filter Store (thanks to ddmanfire)</change>
+        <change>Removed overlay saving (noone used it)</change>
+        <change>NOTE: God mode is not added yet.</change>
+    </release>
+    <release
+        version="1.5.1"
+        versioncode="18">
+        <change>Updated for 9.16.1.0</change>
+        <change>Removed Ads from the SC app</change>
+        <change>Crashes should be fixed when leaving the app</change>
+        <change>Performance improvement when taking a Snap</change>
+        <change>NOTE: The last snap will not get saved, unless you reopen it by swiping down. God
+            mode is not added
+            yet.
+        </change>
+    </release>
+    <release
         version="1.5.0"
         versioncode="17">
         <change>Added Premium and Deluxe features (unlimited replays, stealth viewing, typing and
