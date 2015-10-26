@@ -30,7 +30,7 @@ import java.net.URLConnection;
 /**
  * @author mwho
  */
-public class Tab2Fragment extends Fragment {
+public class Tab3Fragment extends Fragment {
     public static Context context1;
     /**
      * (non-Javadoc)
@@ -52,14 +52,14 @@ public class Tab2Fragment extends Fragment {
             // the view hierarchy; it would just never be used.
             return null;
         }
-        View v = (View) inflater.inflate(R.layout.tab2_layout, container, false);
+        View v = (View) inflater.inflate(R.layout.tab4_layout, container, false);
         browser = (WebView) v.findViewById(R.id.webview);
         browser.setWebViewClient(new MyBrowser());
         browser.getSettings().setLoadsImagesAutomatically(true);
         browser.getSettings().setJavaScriptEnabled(true);
         browser.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         if (savedInstanceState == null) {
-            browser.loadUrl("https://m.reddit.com/r/snapprefs/");
+            browser.loadUrl("https://plus.google.com/communities/111884042638955665569");
         }
         browser.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -195,7 +195,7 @@ public class Tab2Fragment extends Fragment {
     }
 }
 
-class MyBrowser extends WebViewClient {
+class MyBrowser2 extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         view.loadUrl(url);
