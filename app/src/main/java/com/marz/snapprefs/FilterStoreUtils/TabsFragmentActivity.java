@@ -76,7 +76,9 @@ public class TabsFragmentActivity extends FragmentActivity implements TabHost.On
         TabInfo tabInfo = null;
         TabsFragmentActivity.addTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab1").setIndicator("My Filters"), (tabInfo = new TabInfo("Tab1", Tab1Fragment.class, args)));
         this.mapTabInfo.put(tabInfo.tag, tabInfo);
-        TabsFragmentActivity.addTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab2").setIndicator("Get Filters"), (tabInfo = new TabInfo("Tab2", Tab2Fragment.class, args)));
+        TabsFragmentActivity.addTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab2").setIndicator("Reddit - Get Filters"), (tabInfo = new TabInfo("Tab2", Tab2Fragment.class, args)));
+        this.mapTabInfo.put(tabInfo.tag, tabInfo);
+        TabsFragmentActivity.addTab(this, this.mTabHost, this.mTabHost.newTabSpec("Tab3").setIndicator("G+ - Request Filters"), (tabInfo = new TabInfo("Tab3", Tab3Fragment.class, args)));
         this.mapTabInfo.put(tabInfo.tag, tabInfo);
         // Default to first tab
         this.onTabChanged("Tab1");
