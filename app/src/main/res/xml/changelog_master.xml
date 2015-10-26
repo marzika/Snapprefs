@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
     <release
+        version="1.6.2"
+        versioncode="21">
+        <change>Updated for 9.17.1.0</change>
+        <change>Added Reddit as the main source for filters</change>
+        <change>Added Lens support for older devices - image only</change>
+        <change>Sticker size limit is removed (by stirante)</change>
+        <change>Added drawing of shapes - long press the opacity button (by stirante)</change>
+        <change>NOTE: God mode is not added yet.</change>
+    </release>
+    <release
         version="1.6.1"
         versioncode="20">
         <change>Updated for 9.17.0.0</change>
