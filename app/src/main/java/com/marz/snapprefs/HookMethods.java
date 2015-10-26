@@ -34,12 +34,20 @@ import org.apache.http.util.ByteArrayBuffer;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import de.robv.android.xposed.IXposedHookInitPackageResources;
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -377,6 +385,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 refreshPreferences();
                 //SNAPPREFS
                 Saving.initSaving(lpparam, mResources, SnapContext);
+                Lens.initLens(lpparam, mResources, SnapContext);
                 if (mDiscoverSnap == true) {
                     DataSaving.blockDsnap(lpparam);
                 }
@@ -404,22 +413,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                     }
                 });
                 if (mCustomSticker == true) {
-                    findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "open", String.class, new XC_MethodHook() {
-                        @Override
-                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                            Logger.log("Open asset: " + param.args[0], true);
-                            String str = (String) param.args[0];
-                            if (str.contains("twitter_emojis_")) {
-                                String url = Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/" + str;
-                                Logger.log("Sdcard path: " + url, true);
-                                File file = new File(url);
-                                InputStream is = null;
-                                is = new BufferedInputStream(new FileInputStream(file));
-                                param.setResult(is);
-                                Logger.log("setResult for AssetManager", true);
-                            }
-                        }
-                    });
+                    Stickers.initStickers(lpparam, modRes, SnapContext);
                 }
             }
         };

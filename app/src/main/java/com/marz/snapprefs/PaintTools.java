@@ -4,10 +4,13 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.XModuleResources;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader;
@@ -24,6 +27,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -54,10 +58,89 @@ public class PaintTools {
     static boolean shouldErase = false;
     static ImageButton eraserbutton;
     static Context context;
+    public static final String START_POINT = "startPoint";
+    public static final String END_POINT = "endPoint";
+    private static final String TYPE = "type";
+    private static DrawingType type = DrawingType.DEFAULT;
+
+    enum DrawingType {
+        DEFAULT, LINE, RECTANGLE, CIRCLE, STAR
+    }
 
 
     public static void initPaint(XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes) {
         colorList.add(Color.RED);
+        //Use method for setting last point
+        XposedHelpers.findAndHookMethod("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, "a", float.class, float.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Object i = XposedHelpers.getObjectField(param.thisObject, "i");
+                if (i != null && type != null && type != DrawingType.DEFAULT) {//only if there is object being drawn
+                    XposedHelpers.callMethod(i, "a", param.args[0], param.args[1]);
+                }
+            }
+        });
+        //it's not normally method onMove but i made it work like that xD (normally it just sets start of drawing)
+        XposedHelpers.findAndHookMethod("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, "a", float.class, float.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
+                if (type == DrawingType.DEFAULT || type == null) return;
+                if (XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, TYPE) == null) {
+                    XposedHelpers.setAdditionalInstanceField(methodHookParam.thisObject, TYPE, type);
+                }
+                if (XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, START_POINT) == null) {
+                    PointF p = new PointF();
+                    p.set((float) methodHookParam.args[0] - 0.1f, (float) methodHookParam.args[1] - 0.1f);
+                    XposedHelpers.setAdditionalInstanceField(methodHookParam.thisObject, START_POINT, p);
+                }
+                if (XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, END_POINT) == null) {
+                    XposedHelpers.setAdditionalInstanceField(methodHookParam.thisObject, END_POINT, new PointF());
+                }
+                PointF startPoint = (PointF) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, START_POINT);
+                PointF endPoint = (PointF) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, END_POINT);
+                endPoint.set((float) methodHookParam.args[0], (float) methodHookParam.args[1]);
+                if (XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, TYPE) == DrawingType.STAR) {
+                    //FIXME: this shit needs fixing or removing
+                    //Right now draws star, but it's not well scaled (not following straight the touch, test it to get the idea)
+                    float size = Math.max(Math.abs(endPoint.x - startPoint.x), Math.abs(endPoint.y - startPoint.y));
+                    float size1 = size * 2;
+                    if (XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, "path") == null) {
+                        XposedHelpers.setAdditionalInstanceField(methodHookParam.thisObject, "path", new Path());
+                    }
+                    Path path = (Path) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, "path");
+                    path.reset();
+                    path.moveTo(startPoint.x + size1 * 0.5f - size, startPoint.y + size1 * 0.84f - size);
+                    path.lineTo(startPoint.x + size1 * 1.5f - size, startPoint.y + size1 * 0.84f - size);
+                    path.lineTo(startPoint.x + size1 * 0.68f - size, startPoint.y + size1 * 1.45f - size);
+                    path.lineTo(startPoint.x + size1 * 1.0f - size, startPoint.y + size1 * 0.5f - size);
+                    path.lineTo(startPoint.x + size1 * 1.32f - size, startPoint.y + size1 * 1.45f - size);
+                    path.lineTo(startPoint.x + size1 * 0.5f - size, startPoint.y + size1 * 0.84f - size);
+                }
+                methodHookParam.setResult(null);
+            }
+        });
+        XposedHelpers.findAndHookMethod("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, "a", Canvas.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
+                    DrawingType dType = (DrawingType) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, TYPE);
+                    if (dType == DrawingType.DEFAULT || dType == null) return;
+                    Canvas c = (Canvas) methodHookParam.args[0];
+                    PointF startPoint = (PointF) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, START_POINT);
+                    PointF endPoint = (PointF) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, END_POINT);
+                    if (dType == DrawingType.RECTANGLE)
+                        c.drawRect(startPoint.x, startPoint.y, endPoint.x, endPoint.y, (Paint) XposedHelpers.getObjectField(methodHookParam.thisObject, "a"));
+                    else if (dType == DrawingType.CIRCLE) {
+                        float radius = (float) Math.sqrt(Math.pow(startPoint.x - endPoint.x, 2) + Math.pow(startPoint.y - endPoint.y, 2));
+                        c.drawCircle(startPoint.x, startPoint.y, radius, (Paint) XposedHelpers.getObjectField(methodHookParam.thisObject, "a"));
+                    } else if (dType == DrawingType.STAR) {
+                        Path path = (Path) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, "path");
+                        c.drawPath(path, (Paint) XposedHelpers.getObjectField(methodHookParam.thisObject, "a"));
+                    } else if (dType == DrawingType.LINE)
+                        c.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y, (Paint) XposedHelpers.getObjectField(methodHookParam.thisObject, "a"));
+                    methodHookParam.setResult(null);
+                }
+        });
+
         XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, Context.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -290,6 +373,66 @@ public class PaintTools {
                         builder.show();
                     }
                 });
+                alphabutton.setOnLongClickListener(new View.OnLongClickListener() {
+                    public boolean onLongClick(View arg0) {
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setTitle("Choose shape type");
+                        LinearLayout linearLayout = new LinearLayout(context);
+                        linearLayout.setOrientation(LinearLayout.VERTICAL);
+
+                        Button rectangle = new Button(context);
+                        rectangle.setText("Rectangle");
+                        rectangle.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View view) {
+                                type = DrawingType.RECTANGLE;
+                                builder.create().cancel();
+                            }
+                        });
+                        Button circle = new Button(context);
+                        circle.setText("Circle");
+                        circle.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View view) {
+                                type = DrawingType.CIRCLE;
+                            }
+                        });
+                        Button line = new Button(context);
+                        line.setText("Line");
+                        line.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View view) {
+                                type = DrawingType.LINE;
+                            }
+                        });
+                        Button star = new Button(context);
+                        star.setText("Star");
+                        star.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View view) {
+                                type = DrawingType.STAR;
+                            }
+                        });
+                        Button default_btn = new Button(context);
+                        default_btn.setText("Default");
+                        default_btn.setOnClickListener(new View.OnClickListener() {
+                            public void onClick(View view) {
+                                type = DrawingType.DEFAULT;
+                            }
+                        });
+                        linearLayout.addView((View) rectangle);
+                        linearLayout.addView((View) circle);
+                        linearLayout.addView((View) line);
+                        linearLayout.addView((View) star);
+                        linearLayout.addView((View) default_btn);
+                        builder.setView((View) linearLayout);
+                        builder.setNegativeButton(Common.dialog_cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // TODO Auto-generated method stub
+
+                            }
+                        });
+                        builder.show();
+                        return true;    // <- set to true
+                    }
+                });
                 RelativeLayout.LayoutParams paramsAlpha = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 paramsAlpha.topMargin = HookMethods.px(0.0f);
                 paramsAlpha.rightMargin = HookMethods.px(55.0f);
@@ -392,7 +535,7 @@ public class PaintTools {
                                                     );
                                                     builder.show();
                                                 }
-            }
+                                            }
 
                 );
                 RelativeLayout.LayoutParams paramsHex = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
