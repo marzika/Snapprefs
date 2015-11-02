@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -157,6 +158,21 @@ public class Saving {
                     //Logger.log("Starting to view a snap, plus viewingSnap: " + viewingSnap, true);
                 }
             });
+            /*findAndHookConstructor("com.snapchat.android.ui.snapview.SnapView", lpparam.classLoader, Context.class, lpparam.classLoader.loadClass("com.snapchat.android.ui.snapview.MultiLeveledSnapView"), new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    Button button = new Button((Context) param.args[0]);
+                    button.setText("Save");
+                    button.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(v.getContext(), "Saved!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    ViewGroup viewGroup = (ViewGroup) param.thisObject;
+                    viewGroup.addView(button);
+                }
+            });*/
 
             XC_MethodHook gestureMethodHook = new XC_MethodHook() {
                 @Override

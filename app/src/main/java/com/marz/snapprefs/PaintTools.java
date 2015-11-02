@@ -56,7 +56,7 @@ public class PaintTools {
     static Paint paint = null;
     static boolean easterEgg = false;
     static boolean shouldErase = false;
-    static ImageButton eraserbutton;
+    public static boolean hidden = false;
     static Context context;
     public static final String START_POINT = "startPoint";
     public static final String END_POINT = "endPoint";
@@ -120,25 +120,25 @@ public class PaintTools {
             }
         });
         XposedHelpers.findAndHookMethod("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, "a", Canvas.class, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
-                    DrawingType dType = (DrawingType) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, TYPE);
-                    if (dType == DrawingType.DEFAULT || dType == null) return;
-                    Canvas c = (Canvas) methodHookParam.args[0];
-                    PointF startPoint = (PointF) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, START_POINT);
-                    PointF endPoint = (PointF) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, END_POINT);
-                    if (dType == DrawingType.RECTANGLE)
-                        c.drawRect(startPoint.x, startPoint.y, endPoint.x, endPoint.y, (Paint) XposedHelpers.getObjectField(methodHookParam.thisObject, "a"));
-                    else if (dType == DrawingType.CIRCLE) {
-                        float radius = (float) Math.sqrt(Math.pow(startPoint.x - endPoint.x, 2) + Math.pow(startPoint.y - endPoint.y, 2));
-                        c.drawCircle(startPoint.x, startPoint.y, radius, (Paint) XposedHelpers.getObjectField(methodHookParam.thisObject, "a"));
-                    } else if (dType == DrawingType.STAR) {
-                        Path path = (Path) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, "path");
-                        c.drawPath(path, (Paint) XposedHelpers.getObjectField(methodHookParam.thisObject, "a"));
-                    } else if (dType == DrawingType.LINE)
-                        c.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y, (Paint) XposedHelpers.getObjectField(methodHookParam.thisObject, "a"));
-                    methodHookParam.setResult(null);
-                }
+            @Override
+            protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
+                DrawingType dType = (DrawingType) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, TYPE);
+                if (dType == DrawingType.DEFAULT || dType == null) return;
+                Canvas c = (Canvas) methodHookParam.args[0];
+                PointF startPoint = (PointF) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, START_POINT);
+                PointF endPoint = (PointF) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, END_POINT);
+                if (dType == DrawingType.RECTANGLE)
+                    c.drawRect(startPoint.x, startPoint.y, endPoint.x, endPoint.y, (Paint) XposedHelpers.getObjectField(methodHookParam.thisObject, "a"));
+                else if (dType == DrawingType.CIRCLE) {
+                    float radius = (float) Math.sqrt(Math.pow(startPoint.x - endPoint.x, 2) + Math.pow(startPoint.y - endPoint.y, 2));
+                    c.drawCircle(startPoint.x, startPoint.y, radius, (Paint) XposedHelpers.getObjectField(methodHookParam.thisObject, "a"));
+                } else if (dType == DrawingType.STAR) {
+                    Path path = (Path) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, "path");
+                    c.drawPath(path, (Paint) XposedHelpers.getObjectField(methodHookParam.thisObject, "a"));
+                } else if (dType == DrawingType.LINE)
+                    c.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y, (Paint) XposedHelpers.getObjectField(methodHookParam.thisObject, "a"));
+                methodHookParam.setResult(null);
+            }
         });
 
         XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, Context.class, new XC_MethodHook() {
@@ -196,28 +196,29 @@ public class PaintTools {
                 } else {
                     Logger.log("colorPickerView-launched -- colorpickerview = NOT null", true);
                 }
-                eraserbutton = new ImageButton(context);
+                final ImageButton eraserbutton = new ImageButton(context);
                 eraserbutton.setBackgroundColor(0);
                 eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser));
-                eraserbutton.setScaleX((float) 0.4);
-                eraserbutton.setScaleY((float) 0.4);
+                eraserbutton.setScaleX((float) 0.325);
+                eraserbutton.setScaleY((float) 0.325);
                 eraserbutton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        type = DrawingType.DEFAULT;
                         shouldErase = true;
                         eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser_clicked));
                     }
                 });
                 RelativeLayout.LayoutParams paramsErase = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                paramsErase.topMargin = HookMethods.px(0.0f);
+                paramsErase.topMargin = HookMethods.px(-5.0f);
                 paramsErase.rightMargin = HookMethods.px(5.0f);
                 paramsErase.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
-                ImageButton colorpicker = new ImageButton(context);
+                final ImageButton colorpicker = new ImageButton(context);
                 colorpicker.setBackgroundColor(0);
                 colorpicker.setImageDrawable(modRes.getDrawable(R.drawable.colorpicker));
-                colorpicker.setScaleX((float) 0.4);
-                colorpicker.setScaleY((float) 0.4);
+                colorpicker.setScaleX((float) 0.325);
+                colorpicker.setScaleY((float) 0.325);
                 colorpicker.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
@@ -252,11 +253,11 @@ public class PaintTools {
                 paramsPicker.rightMargin = HookMethods.px(5.0f);
                 paramsPicker.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
-                ImageButton widthpicker = new ImageButton(context);
+                final ImageButton widthpicker = new ImageButton(context);
                 widthpicker.setBackgroundColor(0);
                 widthpicker.setImageDrawable(modRes.getDrawable(R.drawable.width));
-                widthpicker.setScaleX((float) 0.4);
-                widthpicker.setScaleY((float) 0.4);
+                widthpicker.setScaleX((float) 0.325);
+                widthpicker.setScaleY((float) 0.325);
                 widthpicker.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -314,15 +315,15 @@ public class PaintTools {
                 });
                 RelativeLayout.LayoutParams paramsWidth = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 paramsWidth.topMargin = HookMethods.px(-40.0f);
-                paramsWidth.rightMargin = HookMethods.px(55.0f);
+                paramsWidth.rightMargin = HookMethods.px(40.0f);
                 paramsWidth.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
-                ImageButton alphabutton = new ImageButton(context);
+                final ImageButton alphabutton = new ImageButton(context);
                 alphabutton.setBackgroundColor(0);
                 alphabutton.setImageDrawable(modRes.getDrawable(R.drawable.opacity));
                 alphabutton.getDrawable().setDither(true);
-                alphabutton.setScaleX((float) 0.4);
-                alphabutton.setScaleY((float) 0.4);
+                alphabutton.setScaleX((float) 0.325);
+                alphabutton.setScaleY((float) 0.325);
                 alphabutton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -373,76 +374,16 @@ public class PaintTools {
                         builder.show();
                     }
                 });
-                alphabutton.setOnLongClickListener(new View.OnLongClickListener() {
-                    public boolean onLongClick(View arg0) {
-                        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                        builder.setTitle("Choose shape type");
-                        LinearLayout linearLayout = new LinearLayout(context);
-                        linearLayout.setOrientation(LinearLayout.VERTICAL);
-
-                        Button rectangle = new Button(context);
-                        rectangle.setText("Rectangle");
-                        rectangle.setOnClickListener(new View.OnClickListener() {
-                            public void onClick(View view) {
-                                type = DrawingType.RECTANGLE;
-                                builder.create().cancel();
-                            }
-                        });
-                        Button circle = new Button(context);
-                        circle.setText("Circle");
-                        circle.setOnClickListener(new View.OnClickListener() {
-                            public void onClick(View view) {
-                                type = DrawingType.CIRCLE;
-                            }
-                        });
-                        Button line = new Button(context);
-                        line.setText("Line");
-                        line.setOnClickListener(new View.OnClickListener() {
-                            public void onClick(View view) {
-                                type = DrawingType.LINE;
-                            }
-                        });
-                        Button star = new Button(context);
-                        star.setText("Star");
-                        star.setOnClickListener(new View.OnClickListener() {
-                            public void onClick(View view) {
-                                type = DrawingType.STAR;
-                            }
-                        });
-                        Button default_btn = new Button(context);
-                        default_btn.setText("Default");
-                        default_btn.setOnClickListener(new View.OnClickListener() {
-                            public void onClick(View view) {
-                                type = DrawingType.DEFAULT;
-                            }
-                        });
-                        linearLayout.addView((View) rectangle);
-                        linearLayout.addView((View) circle);
-                        linearLayout.addView((View) line);
-                        linearLayout.addView((View) star);
-                        linearLayout.addView((View) default_btn);
-                        builder.setView((View) linearLayout);
-                        builder.setNegativeButton(Common.dialog_cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // TODO Auto-generated method stub
-
-                            }
-                        });
-                        builder.show();
-                        return true;    // <- set to true
-                    }
-                });
                 RelativeLayout.LayoutParams paramsAlpha = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                paramsAlpha.topMargin = HookMethods.px(0.0f);
-                paramsAlpha.rightMargin = HookMethods.px(55.0f);
+                paramsAlpha.topMargin = HookMethods.px(-5.0f);
+                paramsAlpha.rightMargin = HookMethods.px(40.0f);
                 paramsAlpha.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
-                ImageButton hexinput = new ImageButton(context);
+                final ImageButton hexinput = new ImageButton(context);
                 hexinput.setBackgroundColor(0);
                 hexinput.setImageDrawable(modRes.getDrawable(R.drawable.hashtag));
-                hexinput.setScaleX((float) 0.4);
-                hexinput.setScaleY((float) 0.4);
+                hexinput.setScaleX((float) 0.325);
+                hexinput.setScaleY((float) 0.325);
                 hexinput.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View v) {
@@ -539,15 +480,15 @@ public class PaintTools {
 
                 );
                 RelativeLayout.LayoutParams paramsHex = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                paramsHex.topMargin = HookMethods.px(50.0f);
-                paramsHex.rightMargin = HookMethods.px(55.0f);
+                paramsHex.topMargin = HookMethods.px(30.0f);
+                paramsHex.rightMargin = HookMethods.px(40.0f);
                 paramsHex.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
-                ImageButton colorhistory = new ImageButton(context);
+                final ImageButton colorhistory = new ImageButton(context);
                 colorhistory.setBackgroundColor(0);
                 colorhistory.setImageDrawable(modRes.getDrawable(R.drawable.history));
-                colorhistory.setScaleX((float) 0.4);
-                colorhistory.setScaleY((float) 0.4);
+                colorhistory.setScaleX((float) 0.325);
+                colorhistory.setScaleY((float) 0.325);
                 colorhistory.setOnClickListener(new View.OnClickListener()
 
                                                 {
@@ -625,18 +566,193 @@ public class PaintTools {
 
                 );
                 RelativeLayout.LayoutParams paramsHistory = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                paramsHistory.topMargin = HookMethods.px(50.0f);
+                paramsHistory.topMargin = HookMethods.px(30.0f);
                 paramsHistory.rightMargin = HookMethods.px(5.0f);
                 paramsHistory.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
+                final ImageButton shape = new ImageButton(context);
+                shape.setBackgroundColor(0);
+                shape.setImageDrawable(modRes.getDrawable(R.drawable.shape));
+                shape.setScaleX((float) 0.325);
+                shape.setScaleY((float) 0.325);
+                shape.setOnClickListener(new View.OnClickListener() {
+                                             @Override
+                                             public void onClick(View v) {
+                                                 eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser));
+                                                 shouldErase = false;
+                                                 final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                                 builder.setTitle("Choose shape type");
+                                                 LinearLayout linearLayout = new LinearLayout(context);
+                                                 linearLayout.setOrientation(LinearLayout.VERTICAL);
 
-                ((RelativeLayout) colorpickerview.getParent().getParent()).addView(alphabutton, paramsAlpha);
-                ((RelativeLayout) colorpickerview.getParent().getParent()).addView(eraserbutton, paramsErase);
-                ((RelativeLayout) colorpickerview.getParent().getParent()).addView(colorpicker, paramsPicker);
-                ((RelativeLayout) colorpickerview.getParent().getParent()).addView(widthpicker, paramsWidth);
-                ((RelativeLayout) colorpickerview.getParent().getParent()).addView(colorhistory, paramsHistory);
-                ((RelativeLayout) colorpickerview.getParent().getParent()).addView(hexinput, paramsHex);
-            }
+                                                 final Button rectangle = new Button(context);
+                                                 final Button circle = new Button(context);
+                                                 final Button star = new Button(context);
+                                                 final Button line = new Button(context);
+                                                 final Button default_btn = new Button(context);
+                                                 rectangle.setText("Rectangle");
+                                                 rectangle.setOnClickListener(new View.OnClickListener() {
+                                                     public void onClick(View view) {
+                                                         type = DrawingType.RECTANGLE;
+                                                         rectangle.setTextColor(Color.GREEN);
+                                                         circle.setTextColor(Color.BLACK);
+                                                         star.setTextColor(Color.BLACK);
+                                                         line.setTextColor(Color.BLACK);
+                                                         default_btn.setTextColor(Color.BLACK);
+                                                         builder.create().cancel();
+                                                     }
+                                                 });
+
+                                                 circle.setText("Circle");
+                                                 circle.setOnClickListener(new View.OnClickListener() {
+                                                     public void onClick(View view) {
+                                                         type = DrawingType.CIRCLE;
+                                                         rectangle.setTextColor(Color.BLACK);
+                                                         circle.setTextColor(Color.GREEN);
+                                                         star.setTextColor(Color.BLACK);
+                                                         line.setTextColor(Color.BLACK);
+                                                         default_btn.setTextColor(Color.BLACK);
+                                                     }
+                                                 });
+                                                 line.setText("Line");
+                                                 line.setOnClickListener(new View.OnClickListener() {
+                                                     public void onClick(View view) {
+                                                         type = DrawingType.LINE;
+                                                         rectangle.setTextColor(Color.BLACK);
+                                                         circle.setTextColor(Color.BLACK);
+                                                         star.setTextColor(Color.BLACK);
+                                                         line.setTextColor(Color.GREEN);
+                                                         default_btn.setTextColor(Color.BLACK);
+                                                     }
+                                                 });
+                                                 star.setText("Star");
+                                                 star.setOnClickListener(new View.OnClickListener() {
+                                                     public void onClick(View view) {
+                                                         type = DrawingType.STAR;
+                                                         rectangle.setTextColor(Color.BLACK);
+                                                         circle.setTextColor(Color.BLACK);
+                                                         star.setTextColor(Color.GREEN);
+                                                         line.setTextColor(Color.BLACK);
+                                                         default_btn.setTextColor(Color.BLACK);
+                                                     }
+                                                 });
+                                                 default_btn.setText("Default");
+                                                 default_btn.setOnClickListener(new View.OnClickListener() {
+                                                     public void onClick(View view) {
+                                                         rectangle.setTextColor(Color.BLACK);
+                                                         circle.setTextColor(Color.BLACK);
+                                                         star.setTextColor(Color.BLACK);
+                                                         line.setTextColor(Color.BLACK);
+                                                         default_btn.setTextColor(Color.GREEN);
+                                                         type = DrawingType.DEFAULT;
+                                                     }
+                                                 });
+                                                 linearLayout.addView((View) rectangle);
+                                                 linearLayout.addView((View) circle);
+                                                 linearLayout.addView((View) line);
+                                                 linearLayout.addView((View) star);
+                                                 linearLayout.addView((View) default_btn);
+                                                 builder.setView((View) linearLayout);
+                                                 builder.setNegativeButton(Common.dialog_cancel, new DialogInterface.OnClickListener() {
+                                                     @Override
+                                                     public void onClick(DialogInterface dialog, int which) {
+                                                         // TODO Auto-generated method stub
+
+                                                     }
+                                                 });
+                                                 builder.show();
+                                             }
+                                         }
+
+                );
+                RelativeLayout.LayoutParams paramsShape = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                paramsShape.topMargin = HookMethods.px(-40.0f);
+                paramsShape.rightMargin = HookMethods.px(75.0f);
+                paramsShape.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+
+                final ImageButton hide = new ImageButton(context);
+                hide.setBackgroundColor(0);
+                hide.setImageDrawable(modRes.getDrawable(R.drawable.hide));
+                hide.setScaleX((float) 0.325);
+                hide.setScaleY((float) 0.325);
+                hide.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        hidden = !hidden;
+                        Toast.makeText(context, "hidden: " + hidden, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            RelativeLayout.LayoutParams paramsHide = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            paramsHide.topMargin=HookMethods.px(-5.0f);
+            paramsHide.rightMargin=HookMethods.px(75.0f);
+            paramsHide.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+
+
+            ((RelativeLayout)colorpickerview.getParent().
+
+            getParent()
+
+            ).
+
+            addView(alphabutton, paramsAlpha);
+
+            ((RelativeLayout)colorpickerview.getParent().
+
+            getParent()
+
+            ).
+
+            addView(eraserbutton, paramsErase);
+
+            ((RelativeLayout)colorpickerview.getParent().
+
+            getParent()
+
+            ).
+
+            addView(colorpicker, paramsPicker);
+
+            ((RelativeLayout)colorpickerview.getParent().
+
+            getParent()
+
+            ).
+
+            addView(widthpicker, paramsWidth);
+
+            ((RelativeLayout)colorpickerview.getParent().
+
+            getParent()
+
+            ).
+
+            addView(colorhistory, paramsHistory);
+
+            ((RelativeLayout)colorpickerview.getParent().
+
+            getParent()
+
+            ).
+
+            addView(hexinput, paramsHex);
+
+            ((RelativeLayout)colorpickerview.getParent().
+
+            getParent()
+
+            ).
+
+            addView(shape, paramsShape);
+
+            ((RelativeLayout)colorpickerview.getParent().
+
+            getParent()
+
+            ).
+
+            addView(hide, paramsHide);
+        }
         });
 
         findAndHookMethod("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, "setColor", int.class, new XC_MethodHook() {
@@ -648,7 +764,7 @@ public class PaintTools {
                 }
                 color = (Integer) param.args[0];
                 if (shouldErase == true) {
-                    eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser));
+                    //eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser));
                     shouldErase = false;
                 }
             }

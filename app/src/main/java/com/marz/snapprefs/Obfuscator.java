@@ -102,7 +102,7 @@ public class Obfuscator {
         //ImageView instance in ImageSnapRenderer
         public static final String IMAGESNAPRENDERER_VAR_IMAGEVIEW = "a";
         //SnapImageBryo - JPEG_ENCODING_QUALITY
-        public static final String SNAPIMAGEBRYO_CLASS = "zB";
+        public static final String SNAPIMAGEBRYO_CLASS = "Ac";
         //VideoSnapRenderer.start()
         public static final String VIDEOSNAPRENDERER_CLASS = "Cz";
         //VideoSnapRenderer.show()

@@ -2,7 +2,12 @@ package com.marz.snapprefs;
 
 import android.content.Context;
 import android.content.res.XModuleResources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.os.AsyncTask;
 import android.os.Environment;
+import android.view.MotionEvent;
+import android.widget.ImageView;
 
 import com.marz.snapprefs.Util.BiHashMap;
 
@@ -30,6 +35,7 @@ import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 public class Stickers {
     private static BiHashMap<String, String> emojiNames = new BiHashMap<>();
     private static ArrayList<String> existing = new ArrayList<>();
+    static boolean isResizing = false;
 
     private static void initEmojiNames() {
         emojiNames.put("sticker1", "1f550");
@@ -138,6 +144,21 @@ public class Stickers {
             }
         });
 
+            XposedHelpers.findAndHookMethod("com.snapchat.android.ui.emojipicker.EmojiMovableImageView", lpparam.classLoader, "onTouchEvent", MotionEvent.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    if (XposedHelpers.getAdditionalInstanceField(param.thisObject, "scale") == null)
+                        XposedHelpers.setAdditionalInstanceField(param.thisObject, "scale", 1.0F);
+                    float diff = ((ImageView) param.thisObject).getScaleY() - (float) XposedHelpers.getAdditionalInstanceField(param.thisObject, "scale");
+                    if (diff > .5F && !isResizing) {
+                        XposedHelpers.setAdditionalInstanceField(param.thisObject, "scale", ((ImageView) param.thisObject).getScaleY());
+                        Object svg = XposedHelpers.callMethod(XposedHelpers.getObjectField(param.thisObject, "j"), "b", XposedHelpers.getObjectField(param.thisObject, "h"));
+                        Bitmap emoji = Bitmap.createBitmap((int) (((ImageView) param.thisObject).getHeight() * ((ImageView) param.thisObject).getScaleY()), (int) (((ImageView) param.thisObject).getHeight() * ((ImageView) param.thisObject).getScaleY()), Bitmap.Config.ARGB_8888);
+                        new ResizeTask(param.thisObject, svg, emoji).execute();
+                    }
+                }
+            });
+
             findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "open", String.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -173,5 +194,30 @@ public class Stickers {
             //Logger.log("INSTALL HANDLEEXTERNALSTORAGE TO FIX THE ISSUE -- FileUtils: File SDread failed " + e.toString(), true);
         }
         return data;
+    }
+    static class ResizeTask extends AsyncTask<Void, Void, Void> {
+
+        private final Object thisObject;
+        private final Object svg;
+        private final Bitmap emoji;
+
+        public ResizeTask(Object thisObject, Object svg, Bitmap emoji) {
+            this.thisObject = thisObject;
+            this.svg = svg;
+            this.emoji = emoji;
+            isResizing = true;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            XposedHelpers.callMethod(svg, "a", new Canvas(emoji));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            ((ImageView) thisObject).setImageBitmap(emoji);
+            isResizing = false;
+        }
     }
 }
