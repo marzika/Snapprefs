@@ -9,19 +9,18 @@ import java.util.ArrayList;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XSharedPreferences;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
-import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 
 public class Lens {
-    public static boolean mDebugging = false;
-    static XSharedPreferences prefs;
     private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
+    static XSharedPreferences prefs;
+    public static boolean mDebugging = true;
 
     static void initLens(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
         refreshPreferences();
-
-        findAndHookMethod("com.snapchat.android.database.SharedPreferenceKey", lpparam.classLoader, "getBoolean", boolean.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.snapchat.android.database.SharedPreferenceKey", lpparam.classLoader, "getBoolean", boolean.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(XC_MethodHook.MethodHookParam methodHookParam) throws Throwable {
                 if (XposedHelpers.getObjectField(methodHookParam.thisObject, "b").equals("is_device_whitelisted_for_lenses_on_backend")) {
@@ -29,19 +28,19 @@ public class Lens {
                 }
             }
         });
-        if(mDebugging){
-            findAndHookMethod("qo", lpparam.classLoader, "e", new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    ArrayList result = (ArrayList) param.getResult();
-                    for (Object o : result) {
-                        Logger.log("LOADED LENS: " + o.toString() + "\n ########");//This just prints loaded lenses
+
+        XposedHelpers.findAndHookMethod(Obfuscator.lens.LENSESPROVIDER_CLASS, lpparam.classLoader, Obfuscator.lens.LENSESPROVIDER_GETLENSES, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                ArrayList result = (ArrayList) param.getResult();
+                for (Object o : result) {
+                    if (mDebugging) {
+                        Logger.log("LOADED LENS: " + o.toString());
                     }
                 }
-            });
-        }
+            }
+        });
     }
-
     static void refreshPreferences() {
 
         prefs = new XSharedPreferences(new File(

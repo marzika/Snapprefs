@@ -37,25 +37,25 @@ public class Obfuscator {
     public class save {
 
         //User class
-        public static final String USER_CLASS = "zO";
+        public static final String USER_CLASS = "Ap";
         //ReceivedSnap class
-        public static final String RECEIVEDSNAP_CLASS = "zu";
+        public static final String RECEIVEDSNAP_CLASS = "zV";
         // ReceivedSnap.getCanonicalDisplayTime()
         public static final String RECEIVEDSNAP_DISPLAYTIME = "G";
         //StorySnap class
-        public static final String STORYSNAP_CLASS = "zJ";
+        public static final String STORYSNAP_CLASS = "Ak";
         //SnapView class
         public static final String SNAPVIEW_CLASS = "com.snapchat.android.ui.snapview.SnapView";
         //SnapView.show(ReceivedSnap, ChronologicalSnapProvider, Booleans(?))
-        public static final String SNAPVIEW_SHOW = "a"; // prev. c
+        public static final String SNAPVIEW_SHOW = "b"; // prev. a
         //First param of SnapView.show -> bdl, avf
-        public static final String SNAPVIEW_SHOW_FIRST = "Fc";
+        public static final String SNAPVIEW_SHOW_FIRST = "FI";
         //Second param of SnapView.show -> asz, alr
-        public static final String SNAPVIEW_SHOW_SECOND = "zp";
+        public static final String SNAPVIEW_SHOW_SECOND = "zQ";
         //Third param of SnapView.show -> agd, abp
-        public static final String SNAPVIEW_SHOW_THIRD = "rV";
+        public static final String SNAPVIEW_SHOW_THIRD = "sk";
         //Fourth param of SnapView.show -> agd, abp
-        public static final String SNAPVIEW_SHOW_FOURTH = "rX";
+        public static final String SNAPVIEW_SHOW_FOURTH = "sm";
         //SnapView.hide(SnapViewEventAnalytics.EndReason)
         public static final String SNAPVIEW_HIDE = "a";
         //SnapPreviewFragment class
@@ -63,7 +63,7 @@ public class Obfuscator {
         //ImageResourceView class
         public static final String IMAGERESOURCEVIEW_CLASS = "com.snapchat.android.ui.ImageResourceView";
         //imageResource instance variable name in ui.ImageResourceView
-        public static final String IMAGERESOURCEVIEW_VAR_IMAGERESOURCE = "b"; // Ds
+        public static final String IMAGERESOURCEVIEW_VAR_IMAGERESOURCE = "c"; // DX
         //LandingPageActivity class
         public static final String LANDINGPAGEACTIVITY_CLASS = "com.snapchat.android.LandingPageActivity";
         //Snap class
@@ -74,7 +74,7 @@ public class Obfuscator {
         public static final String SNAP_GETTIMESTAMP = "W";
         //EndReason class
         public static final String ENDREASON_CLASS = "com.snapchat.android.analytics.SnapViewEventAnalytics.EndReason";
-        //ImageResource -> avg prev. apz --  mIsSavedByRecipient:Z
+        //ImageResource -> Aw prev. avg, apz --  mIsSavedByRecipient:Z
         //ChatMedia instance variable name in ImageResource
         public static final String IMAGERESOURCE_VAR_CHATMEDIA = "a";
         //.model.chat.Chat -> zV.2
@@ -84,54 +84,54 @@ public class Obfuscator {
         //StatefulChatFeedItem.getSender()
         public static final String STATEFULCHATFEEDITEM_GETSENDER = "j";
         //ScreenshotDetector class -> onLoaderReset
-        public static final String SCREENSHOTDETECTOR_CLASS = "Cq";
+        public static final String SCREENSHOTDETECTOR_CLASS = "CP";
         //ScreenshotDetector.run(List)
         public static final String SCREENSHOTDETECTOR_RUN = "a";
         //SnapStateMessage class
-        public static final String SNAPSTATEMESSAGE_CLASS = "Qq";
+        public static final String SNAPSTATEMESSAGE_CLASS = "Rb";
         //SnapStateMessage.setScreenshotCount(Long)
         public static final String SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT = "b";
         //SentSnap Bitmap class
-        public static final String SENT_CLASS = "zc";
+        public static final String SENT_CLASS = "zD";
         //SentSnap Bitmap method
         public static final String SENT_METHOD = "a";
         //ImagesnapRenderer
-        public static final String IMAGESNAPRENDERER_CLASS = "BX";
+        public static final String IMAGESNAPRENDERER_CLASS = "Cw";
         //ImagesnapRenderer.start()
-        public static final String IMAGESNAPRENDERER_START = "c";
+        public static final String IMAGESNAPRENDERER_START = "d";
         //ImageView instance in ImageSnapRenderer
         public static final String IMAGESNAPRENDERER_VAR_IMAGEVIEW = "a";
-        //SnapImageBryo
+        //SnapImageBryo - JPEG_ENCODING_QUALITY
         public static final String SNAPIMAGEBRYO_CLASS = "zB";
         //VideoSnapRenderer.start()
-        public static final String VIDEOSNAPRENDERER_CLASS = "Ca";
+        public static final String VIDEOSNAPRENDERER_CLASS = "Cz";
         //VideoSnapRenderer.show()
-        public static final String VIDEOSNAPRENDERER_SHOW = "c";
+        public static final String VIDEOSNAPRENDERER_SHOW = "d";
         //View Instance in VideoSnapRenderer
         public static final String VIDEOSNAPRENDERER_VAR_VIEW = "c";
 
     }
     //Data-saving
     public class datasaving {
-        public static final String DSNAPDOWNLOADER_CLASS = "ue";
+        public static final String DSNAPDOWNLOADER_CLASS = "ut";
         public static final String DSNAPDOWNLOADER_DOWNLOADSNAP = "a";
-        public static final String DOWNLOADREQUEST_CLASS = "AI";
-        public static final String DYNAMICBYTEBUFFER_CLASS = "MX";
-        public static final String NETWORKRESULT_CLASS = "oy";
-        public static final String CHANNELDOWNLOADER_CLASS = "uG";
-        public static final String CHANNELDOWNLOADER_START = "a";
+        public static final String DOWNLOADREQUEST_CLASS = "Bh";
+        public static final String DYNAMICBYTEBUFFER_CLASS = "NH";
+        public static final String NETWORKRESULT_CLASS = "oD";
+        public static final String CHANNELDOWNLOADER_CLASS = "uW";
+        public static final String CHANNELDOWNLOADER_START = "b";
     }
     //Spoofing
     public class spoofing {
         //SpeedometerView class
-        public static final String SPEEDOMETERVIEW_CLASS = "EO";
+        public static final String SPEEDOMETERVIEW_CLASS = "Fu";
         //SpeedometerView.setSpeed(Float)
         public static final String SPEEDOMETERVIEW_SETSPEED = "a";
-        public static final String LOCATION_CLASS = "yD";
+        public static final String LOCATION_CLASS = "ze";
         public static final String LOCATION_GETLOCATION = "d";
-        public static final String WEATHER_CLASS = "zU";
-        public static final String WEATHER_FIRST = "Re";
-        public static final String BATTERY_FILTER = "yX";
+        public static final String WEATHER_CLASS = "Av";
+        public static final String WEATHER_FIRST = "RQ";
+        public static final String BATTERY_FILTER = "zy";
     }
     //Select-All
     public class select {
@@ -146,20 +146,20 @@ public class Obfuscator {
         //ArrayList instance variable in SendToFragment
         public static final String SENDTOFRAGMENT_VAR_ARRAYLIST = "l";
         //SendToAdapter class
-        public static final String SENDTOADAPTER_CLASS = "wT"; //prev. ajj, ahz, ahe
+        public static final String SENDTOADAPTER_CLASS = "xq"; //prev. wT
         //List instance variable in SendToAdapter
         public static final String SENDTOADAPTER_VAR_LIST = "e";
         //Friend class
         public static final String FRIEND_CLASS = "com.snapchat.android.model.Friend";
         //PostToStory class
-        public static final String POSTTOSTORY_CLASS = "zn"; //prev. aku
+        public static final String POSTTOSTORY_CLASS = "zO"; //prev. zn
         //PostToVenue class
-        public static final String POSTTOVENUE_CLASS = "zr"; //prev. aku
+        public static final String POSTTOVENUE_CLASS = "zS"; //prev. zr
     }
 
     public class sharing {
         //cameraStateEvent class
-        public static final String CAMERASTATEEVENT_CLASS = "Kh";
+        public static final String CAMERASTATEEVENT_CLASS = "KQ";
         //snapCapturedEvent class
         public static final String SNAPCAPTUREDEVENT_CLASS = "bhv"; //prev. bhv, bfy ->from LandingPageActivity$8
         //snapCaptureContext class
@@ -168,5 +168,19 @@ public class Obfuscator {
         public static final String BUSPROVIDER_CLASS = "bey";
         //BussProvider.returnBus()
         public static final String BUSPROVIDER_RETURNBUS = "a";
+    }
+    public class lens {
+        //ScheduledLensesProvider class
+        public static final String LENSESPROVIDER_CLASS = "qy";
+        //getLenses()
+        public static final String LENSESPROVIDER_GETLENSES = "e";
+    }
+    public class stickers {
+        //FastZippedAssetReader class
+        public static final String ASSETREADER_CLASS = "GV";
+        //FastZippedAssetReader.a
+        public static final String ASSETREADER_A_CLASS = "GV$a";
+        //read()
+        public static final String ASSETREADER_READ = "a";
     }
 }

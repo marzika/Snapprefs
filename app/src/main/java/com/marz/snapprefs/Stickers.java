@@ -71,7 +71,7 @@ public class Stickers {
             existing.add(s);
         }
         //This method loads contents of a zip
-        XposedHelpers.findAndHookMethod("Gn", lpparam.classLoader, "a", new XC_MethodReplacement() {
+        XposedHelpers.findAndHookMethod(Obfuscator.stickers.ASSETREADER_CLASS, lpparam.classLoader, "a", new XC_MethodReplacement() {
             @Override
             protected Object replaceHookedMethod(MethodHookParam methodHookParam) throws Throwable {
                 if (XposedHelpers.getBooleanField(methodHookParam.thisObject, "mIsUnzipped"))
@@ -88,8 +88,8 @@ public class Stickers {
                 ZipEntry entry;
                 ByteArrayOutputStream output = new ByteArrayOutputStream();
                 HashMap mAssets = (HashMap) XposedHelpers.getObjectField(methodHookParam.thisObject, "mAssets");
-                Class<?> gna = lpparam.classLoader.loadClass("Gn$a");
-                Constructor<?> constructor = XposedHelpers.findConstructorBestMatch(gna, lpparam.classLoader.loadClass("Gn"), byte[].class, int.class, int.class);
+                Class<?> gna = lpparam.classLoader.loadClass(Obfuscator.stickers.ASSETREADER_A_CLASS);
+                Constructor<?> constructor = XposedHelpers.findConstructorBestMatch(gna, lpparam.classLoader.loadClass(Obfuscator.stickers.ASSETREADER_CLASS), byte[].class, int.class, int.class);
                 while ((entry = zis.getNextEntry()) != null) {
                     String coolName = entry.getName().substring(0, entry.getName().lastIndexOf("."));
                     String type = entry.getName().substring(entry.getName().lastIndexOf("."));

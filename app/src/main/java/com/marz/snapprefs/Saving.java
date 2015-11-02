@@ -225,7 +225,7 @@ public class Saving {
                     //String vidString = videoUri.toString();
                     //sentVideo = new FileInputStream(videoUri.toString());
                     if (videoUri != null) {
-                    Logger.log("We have the URI " + videoUri.toString(), true);
+                        Logger.log("We have the URI " + videoUri.toString(), true);
                     }
                     //sentVideo = new FileInputStream(videoUri.toString());
                 }
@@ -234,7 +234,7 @@ public class Saving {
              * Method which gets called to prepare an image for sending (before selecting contacts).
              * We check whether it's an image or a video and save it.
              */
-            findAndHookMethod("com.snapchat.android.preview.SnapPreviewFragment", lpparam.classLoader, "m", new XC_MethodHook() {
+            findAndHookMethod("com.snapchat.android.preview.SnapPreviewFragment", lpparam.classLoader, "n", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     refreshPreferences();
@@ -344,6 +344,7 @@ public class Saving {
             });
             if (mTimerUnlimited == true || mHideTimer == true) {
                 findAndHookMethod("com.snapchat.android.ui.SnapTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
+                findAndHookMethod("com.snapchat.android.ui.StoryTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
             /**
              * We hook this method to handle our gestures made in the SC app itself.
@@ -392,28 +393,28 @@ public class Saving {
                 }
             });*/
             final Class<?> TextureVideoView = findClass("com.snapchat.android.ui.TextureVideoView", lpparam.classLoader);
-            findAndHookMethod("Ca", lpparam.classLoader, "c", new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.VIDEOSNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.VIDEOSNAPRENDERER_SHOW, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    View view = (View) getObjectField(param.thisObject, "c");
+                    View view = (View) getObjectField(param.thisObject, Obfuscator.save.VIDEOSNAPRENDERER_VAR_VIEW);
                     boolean found = false;
                     ArrayList<View> allViewsWithinMyTopView = getAllChildren(view);
                     for (View child : allViewsWithinMyTopView) {
                         //Logger.log("CHILD: "+ child.getId(), true);
                         //if (child instanceof TextureVideoView) {
                         Logger.log("FOUND VIDEOVIEW AS A CHILD - " + child.getId(), true);
-                            Uri mUri = null;
-                            try {
-                                Field mUriField = TextureVideoView.getDeclaredField("i");
-                                mUriField.setAccessible(true);
-                                mUri = (Uri) mUriField.get(view);
-                                mVideo = new FileInputStream(Uri.parse(mUri.toString()).getPath());
-                                newSaveMethod(mVideo, null, false);
-                                saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
-                                found = true;
-                            } catch (Exception e) {
-                                Logger.log("FUCKYOUFUCKINGNSPACHAT: " + e.toString());
-                            }
+                        Uri mUri = null;
+                        try {
+                            Field mUriField = TextureVideoView.getDeclaredField("i");
+                            mUriField.setAccessible(true);
+                            mUri = (Uri) mUriField.get(view);
+                            mVideo = new FileInputStream(Uri.parse(mUri.toString()).getPath());
+                            newSaveMethod(mVideo, null, false);
+                            saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
+                            found = true;
+                        } catch (Exception e) {
+                            Logger.log("FUCKYOUFUCKINGNSPACHAT: " + e.toString());
+                        }
                         //}
                     }
                     if (!found) {
@@ -587,14 +588,14 @@ public class Saving {
                 }
 
 
-            if (saveImagePNG(image, overlayFile)) {
-                //showToast(context, "This overlay ");
-                Logger.log("VideoOverlay " + snapType.name + " has been saved");
-                Logger.log("Path: " + overlayFile.toString());
-                runMediaScanner(context, overlayFile.getAbsolutePath());
-            } else {
-                showToast(context, "An error occured while saving this overlay.");
-            }
+                if (saveImagePNG(image, overlayFile)) {
+                    //showToast(context, "This overlay ");
+                    Logger.log("VideoOverlay " + snapType.name + " has been saved");
+                    Logger.log("Path: " + overlayFile.toString());
+                    runMediaScanner(context, overlayFile.getAbsolutePath());
+                } else {
+                    showToast(context, "An error occured while saving this overlay.");
+                }
             }
         } else if (mediaType == MediaType.VIDEO) {
             if (videoFile.exists()) {
