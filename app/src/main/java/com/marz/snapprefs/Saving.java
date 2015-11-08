@@ -97,6 +97,7 @@ public class Saving {
     private static SimpleDateFormat dateFormatSent = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
     private static XModuleResources mResources;
     private static GestureModel gestureModel;
+    private static Class<?> storySnap;
     private static int screenHeight;
 
     static void newSaveMethod(FileInputStream mVideo, Bitmap mImage, boolean isOverlay) {
@@ -132,6 +133,7 @@ public class Saving {
         refreshPreferences();
 
         try {
+            storySnap = findClass(Obfuscator.save.STORYSNAP_CLASS, lpparam.classLoader);
             findAndHookMethod(Obfuscator.save.IMAGESNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.IMAGESNAPRENDERER_START, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -372,12 +374,21 @@ public class Saving {
              */
             findAndHookMethod(Obfuscator.save.SNAPVIEW_CLASS, lpparam.classLoader, Obfuscator.save.SNAPVIEW_SHOW, findClass(Obfuscator.save.SNAPVIEW_SHOW_FIRST, lpparam.classLoader), findClass(Obfuscator.save.SNAPVIEW_SHOW_SECOND, lpparam.classLoader), findClass(Obfuscator.save.SNAPVIEW_SHOW_THIRD, lpparam.classLoader), findClass(Obfuscator.save.SNAPVIEW_SHOW_FOURTH, lpparam.classLoader), new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     //Logger.log("Starting to view a snap");
                     receivedSnap = param.args[0];
                     oldreceivedSnap = receivedSnap;
                     //Call for savereceivedsnap
                     snapCL = lpparam.classLoader;
+                }
+            });
+            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass("FI", lpparam.classLoader), new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    receivedSnap = param.args[0];
+                    viewingSnap = true;
+                    currentViewingSnap++;
+                    Logger.log("Starting to view a story", true);
                 }
             });
             /**
@@ -468,7 +479,7 @@ public class Saving {
         } catch (NullPointerException ignore) {
         }
         if (sender == null) { //This means its a story
-            Class<?> storySnap = findClass(Obfuscator.save.STORYSNAP_CLASS, snapCL);
+            //Class<?> storySnap = findClass(Obfuscator.save.STORYSNAP_CLASS, snapCL);
             try {
                 sender = (String) getObjectField(storySnap.cast(receivedSnap), "mUsername");
             } catch (Exception e) {
