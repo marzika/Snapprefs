@@ -1,16 +1,19 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+    useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
         applicationId "com.marz.snapprefs"
         minSdkVersion 12
         targetSdkVersion 21
-        versionCode 21
-        versionName "1.6.2"
+        versionCode 22
+        versionName "1.6.3"
+
     }
+
 
     buildTypes {
         release {
@@ -25,7 +28,7 @@ repositories {
 
 dependencies {
     provided files('lib/XposedBridgeApi-54.jar')
-    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile 'com.android.support:appcompat-v7:23.+'
     compile 'net.rdrei.android.dirchooser:library:2.1@aar'
     compile 'com.googlecode.mp4parser:isoparser:1.0.5.4'
     compile 'de.cketti.library.changelog:ckchangelog:1.2.2'
