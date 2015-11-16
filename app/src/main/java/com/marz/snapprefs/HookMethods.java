@@ -307,7 +307,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public void initZygote(StartupParam startupParam) throws Throwable {
         MODULE_PATH = startupParam.modulePath;
         mResources = XModuleResources.createInstance(startupParam.modulePath, null);
-        //refreshPreferences();
+        refreshPreferences();
     }
 
     @Override
