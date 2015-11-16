@@ -45,6 +45,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -96,8 +97,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static boolean mTimerUnlimited = true;
     public static boolean mHideTimer = false;
     public static boolean mToastEnabled = true;
-    public static String mSavePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
-    public static String mCustomFilterLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/Filters";
+    public static String mSavePath = "";
+    public static String mCustomFilterLocation = "";
     public static String mConfirmationID = "";
     public static String mDeviceID = "";
     public static boolean mSaveSentSnaps = false;
@@ -306,23 +307,24 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public void initZygote(StartupParam startupParam) throws Throwable {
         MODULE_PATH = startupParam.modulePath;
         mResources = XModuleResources.createInstance(startupParam.modulePath, null);
-        refreshPreferences();
+        //refreshPreferences();
     }
 
     @Override
     public void handleInitPackageResources(InitPackageResourcesParam resparam) throws Throwable {
         if (!resparam.packageName.equals(Common.PACKAGE_SNAP))
             return;
-
+        mSavePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
+        mCustomFilterLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/Filters";
         refreshPreferences();
         resParam = resparam;
         modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
         if (shouldAddGhost) {
             addGhost(resparam);
         }
-        if (mCustomFilterType == 0) {
+        //if (mCustomFilterType == 0) {
             fullScreenFilter(resparam);
-        }
+        //}
     }
 
     @Override
@@ -330,6 +332,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         if (!lpparam.packageName.equals(Common.PACKAGE_SNAP))
             return;
         try {
+            mSavePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
+            mCustomFilterLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/Filters";
             XposedUtils.log("----------------- SNAPPREFS HOOKED -----------------", false);
             Object activityThread = callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
             context = (Context) callMethod(activityThread, "getSystemContext");
@@ -360,7 +364,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             if (mStealth == true && mLicense == 2) {
                 Premium.initViewed(lpparam, modRes, SnapContext);
             }
-            }
+        }
         findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -510,9 +514,11 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                                     Logger.log("Replaced batteryfilter from R.drawable", true);
                                 } else {
                                     if (mCustomFilterType == 0) {
-                                        iv.setImageDrawable(Drawable.createFromPath(mCustomFilterLocation + "/fullscreen_filter.png"));
+                                        //iv.setImageDrawable(Drawable.createFromPath(mCustomFilterLocation + "/fullscreen_filter.png"));
+                                        iv.setImageDrawable(modRes.getDrawable(R.drawable.imsafe));
                                     } else if (mCustomFilterType == 1) {
-                                        iv.setImageDrawable(Drawable.createFromPath(mCustomFilterLocation + "/banner_filter.png"));
+                                        iv.setImageDrawable(modRes.getDrawable(R.drawable.imsafe));
+                                        //iv.setImageDrawable(Drawable.createFromPath(mCustomFilterLocation + "/banner_filter.png"));
                                     }
                                     Logger.log("Replaced batteryfilter from " + mCustomFilterLocation + " Type: " + mCustomFilterType, true);
                                 }
