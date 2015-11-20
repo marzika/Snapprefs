@@ -20,8 +20,9 @@ package com.marz.snapprefs;
 
 public class Obfuscator {
     // Snapprefs supports v9.15.1.0 and up
-    public static final int SUPPORTED_VERSION_CODE = 736;
-    public static final String SUPPORTED_VERSION_CODENAME = "9.17.1.0";
+    public static final int SUPPORTED_VERSION_CODE = 748;
+    public static final String SUPPORTED_VERSION_CODENAME = "9.20.0.0";
+    public static final String[] ROOTDETECTOR_METHODS= {"b", "c", "d", "e"};
 
     /**
      * Check if Snapprefs is compatible with this Snapchat version.
@@ -37,25 +38,25 @@ public class Obfuscator {
     public class save {
 
         //User class
-        public static final String USER_CLASS = "Ap";
+        public static final String USER_CLASS = "GK";
         //ReceivedSnap class
-        public static final String RECEIVEDSNAP_CLASS = "zV";
+        public static final String RECEIVEDSNAP_CLASS = "Gm";
         // ReceivedSnap.getCanonicalDisplayTime()
         public static final String RECEIVEDSNAP_DISPLAYTIME = "G";
         //StorySnap class
-        public static final String STORYSNAP_CLASS = "Ak";
+        public static final String STORYSNAP_CLASS = "GD";
         //SnapView class
         public static final String SNAPVIEW_CLASS = "com.snapchat.android.ui.snapview.SnapView";
         //SnapView.show(ReceivedSnap, ChronologicalSnapProvider, Booleans(?))
         public static final String SNAPVIEW_SHOW = "b"; // prev. a
         //First param of SnapView.show -> bdl, avf
-        public static final String SNAPVIEW_SHOW_FIRST = "FI";
+        public static final String SNAPVIEW_SHOW_FIRST = "MO";
         //Second param of SnapView.show -> asz, alr
-        public static final String SNAPVIEW_SHOW_SECOND = "zQ";
+        public static final String SNAPVIEW_SHOW_SECOND = "Gh";
         //Third param of SnapView.show -> agd, abp
-        public static final String SNAPVIEW_SHOW_THIRD = "sk";
+        public static final String SNAPVIEW_SHOW_THIRD = "xU";
         //Fourth param of SnapView.show -> agd, abp
-        public static final String SNAPVIEW_SHOW_FOURTH = "sm";
+        public static final String SNAPVIEW_SHOW_FOURTH = "xW";
         //SnapView.hide(SnapViewEventAnalytics.EndReason)
         public static final String SNAPVIEW_HIDE = "a";
         //SnapPreviewFragment class
@@ -69,7 +70,8 @@ public class Obfuscator {
         //Snap class
         public static final String SNAP_CLASS = "com.snapchat.android.model.Snap";
         //Snap.isScreenshotted()
-        public static final String SNAP_ISSCREENSHOTTED = "ar";
+        public static final String SNAP_ISSCREENSHOTTED = "at";
+        //public static final String SNAP_ISSCREENSHOTTED2 = "au";
         //Snap.getTimestamp()
         public static final String SNAP_GETTIMESTAMP = "W";
         //EndReason class
