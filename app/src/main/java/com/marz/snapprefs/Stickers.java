@@ -77,7 +77,7 @@ public class Stickers {
             existing.add(s);
         }
         //This method loads contents of a zip
-        XposedHelpers.findAndHookMethod(Obfuscator.stickers.ASSETREADER_CLASS, lpparam.classLoader, "a", new XC_MethodReplacement() {
+        XposedHelpers.findAndHookMethod(Obfuscator.stickers.ASSETREADER_CLASS, lpparam.classLoader, Obfuscator.stickers.ASSETREADER_READ, new XC_MethodReplacement() {
             @Override
             protected Object replaceHookedMethod(MethodHookParam methodHookParam) throws Throwable {
                 if (XposedHelpers.getBooleanField(methodHookParam.thisObject, "mIsUnzipped"))

@@ -85,55 +85,55 @@ public class Obfuscator {
         //.model.chat.StatefulChatFeedItem
         //StatefulChatFeedItem.getSender()
         public static final String STATEFULCHATFEEDITEM_GETSENDER = "j";
-        //ScreenshotDetector class -> onLoaderReset
-        public static final String SCREENSHOTDETECTOR_CLASS = "CP";
+        //ScreenshotDetector class -> _display_name
+        public static final String SCREENSHOTDETECTOR_CLASS = "Jo";
         //ScreenshotDetector.run(List)
         public static final String SCREENSHOTDETECTOR_RUN = "a";
         //SnapStateMessage class
-        public static final String SNAPSTATEMESSAGE_CLASS = "Rb";
+        public static final String SNAPSTATEMESSAGE_CLASS = "YC";
         //SnapStateMessage.setScreenshotCount(Long)
         public static final String SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT = "b";
         //SentSnap Bitmap class
-        public static final String SENT_CLASS = "zD";
+        public static final String SENT_CLASS = "FT";
         //SentSnap Bitmap method
         public static final String SENT_METHOD = "a";
         //ImagesnapRenderer
-        public static final String IMAGESNAPRENDERER_CLASS = "Cw";
+        public static final String IMAGESNAPRENDERER_CLASS = "IS";
         //ImagesnapRenderer.start()
-        public static final String IMAGESNAPRENDERER_START = "d";
+        public static final String IMAGESNAPRENDERER_START = "c";
         //ImageView instance in ImageSnapRenderer
-        public static final String IMAGESNAPRENDERER_VAR_IMAGEVIEW = "a";
+        public static final String IMAGESNAPRENDERER_VAR_IMAGEVIEW = "h";
         //SnapImageBryo - JPEG_ENCODING_QUALITY
-        public static final String SNAPIMAGEBRYO_CLASS = "Ac";
+        public static final String SNAPIMAGEBRYO_CLASS = "Gv";
         //VideoSnapRenderer.start()
-        public static final String VIDEOSNAPRENDERER_CLASS = "Cz";
+        public static final String VIDEOSNAPRENDERER_CLASS = "IV";
         //VideoSnapRenderer.show()
-        public static final String VIDEOSNAPRENDERER_SHOW = "d";
+        public static final String VIDEOSNAPRENDERER_SHOW = "c";
         //View Instance in VideoSnapRenderer
         public static final String VIDEOSNAPRENDERER_VAR_VIEW = "c";
 
     }
     //Data-saving
     public class datasaving {
-        public static final String DSNAPDOWNLOADER_CLASS = "ut";
+        public static final String DSNAPDOWNLOADER_CLASS = "Ai";
         public static final String DSNAPDOWNLOADER_DOWNLOADSNAP = "a";
-        public static final String DOWNLOADREQUEST_CLASS = "Bh";
-        public static final String DYNAMICBYTEBUFFER_CLASS = "NH";
-        public static final String NETWORKRESULT_CLASS = "oD";
-        public static final String CHANNELDOWNLOADER_CLASS = "uW";
+        public static final String DOWNLOADREQUEST_CLASS = "HF";
+        public static final String DYNAMICBYTEBUFFER_CLASS = "Vc";
+        public static final String NETWORKRESULT_CLASS = "ug";
+        public static final String CHANNELDOWNLOADER_CLASS = "AN";
         public static final String CHANNELDOWNLOADER_START = "b";
     }
     //Spoofing
     public class spoofing {
         //SpeedometerView class
-        public static final String SPEEDOMETERVIEW_CLASS = "Fu";
+        public static final String SPEEDOMETERVIEW_CLASS = "MA";
         //SpeedometerView.setSpeed(Float)
         public static final String SPEEDOMETERVIEW_SETSPEED = "a";
-        public static final String LOCATION_CLASS = "ze";
+        public static final String LOCATION_CLASS = "Fu";
         public static final String LOCATION_GETLOCATION = "d";
-        public static final String WEATHER_CLASS = "Av";
-        public static final String WEATHER_FIRST = "RQ";
-        public static final String BATTERY_FILTER = "zy";
+        public static final String WEATHER_CLASS = "GQ";
+        public static final String WEATHER_FIRST = "Zv";
+        public static final String BATTERY_FILTER = "FO";
     }
     //Select-All
     public class select {
@@ -148,20 +148,20 @@ public class Obfuscator {
         //ArrayList instance variable in SendToFragment
         public static final String SENDTOFRAGMENT_VAR_ARRAYLIST = "l";
         //SendToAdapter class
-        public static final String SENDTOADAPTER_CLASS = "xq"; //prev. wT
+        public static final String SENDTOADAPTER_CLASS = "Dz";
         //List instance variable in SendToAdapter
         public static final String SENDTOADAPTER_VAR_LIST = "e";
         //Friend class
         public static final String FRIEND_CLASS = "com.snapchat.android.model.Friend";
         //PostToStory class
-        public static final String POSTTOSTORY_CLASS = "zO"; //prev. zn
+        public static final String POSTTOSTORY_CLASS = "Gf";
         //PostToVenue class
-        public static final String POSTTOVENUE_CLASS = "zS"; //prev. zr
+        public static final String POSTTOVENUE_CLASS = "Gj";
     }
 
     public class sharing {
         //cameraStateEvent class
-        public static final String CAMERASTATEEVENT_CLASS = "KQ";
+        public static final String CAMERASTATEEVENT_CLASS = "Sc";
         //snapCapturedEvent class
         public static final String SNAPCAPTUREDEVENT_CLASS = "bhv"; //prev. bhv, bfy ->from LandingPageActivity$8
         //snapCaptureContext class
@@ -173,15 +173,15 @@ public class Obfuscator {
     }
     public class lens {
         //ScheduledLensesProvider class
-        public static final String LENSESPROVIDER_CLASS = "qy";
+        public static final String LENSESPROVIDER_CLASS = "wh";
         //getLenses()
-        public static final String LENSESPROVIDER_GETLENSES = "e";
+        public static final String LENSESPROVIDER_GETLENSES = "f";
     }
     public class stickers {
         //FastZippedAssetReader class
-        public static final String ASSETREADER_CLASS = "GV";
+        public static final String ASSETREADER_CLASS = "Ob";
         //FastZippedAssetReader.a
-        public static final String ASSETREADER_A_CLASS = "GV$a";
+        public static final String ASSETREADER_A_CLASS = "Ob$a";
         //read()
         public static final String ASSETREADER_READ = "a";
     }

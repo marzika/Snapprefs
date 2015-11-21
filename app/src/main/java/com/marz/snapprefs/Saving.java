@@ -382,7 +382,7 @@ public class Saving {
                     snapCL = lpparam.classLoader;
                 }
             });
-            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass("FI", lpparam.classLoader), new XC_MethodHook() {
+            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass("MO", lpparam.classLoader), new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     receivedSnap = param.args[0];

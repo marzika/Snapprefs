@@ -63,12 +63,14 @@ import de.robv.android.xposed.callbacks.XC_LayoutInflated;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
 import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
+import static de.robv.android.xposed.XposedBridge.hookAllMethods;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
 import static de.robv.android.xposed.XposedHelpers.setObjectField;
+import static de.robv.android.xposed.XposedHelpers.setStaticIntField;
 
 
 public class HookMethods implements IXposedHookInitPackageResources, IXposedHookLoadPackage, IXposedHookZygoteInit {
@@ -307,7 +309,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public void initZygote(StartupParam startupParam) throws Throwable {
         MODULE_PATH = startupParam.modulePath;
         mResources = XModuleResources.createInstance(startupParam.modulePath, null);
-        refreshPreferences();
+        //refreshPreferences();
     }
 
     @Override
@@ -350,7 +352,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             XposedUtils.log("Exception while trying to get version info", e);
             return;
         }
-        prefs.reload();
         refreshPreferences();
         printSettings();
         if (mLicense == 1 || mLicense == 2) {
@@ -365,12 +366,23 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 Premium.initViewed(lpparam, modRes, SnapContext);
             }
         }
-        findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
+        for (String s: Obfuscator.ROOTDETECTOR_METHODS) {
+            findAndHookMethod("VE", lpparam.classLoader, s, XC_MethodReplacement.returnConstant(false));
+            Logger.log("ROOTCHECK: " + s, true);
+        }
+        findAndHookMethod("XK", lpparam.classLoader, "h", String.class, XC_MethodReplacement.DO_NOTHING);
+        findAndHookMethod("pr.2", lpparam.classLoader, "call", new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                param.args[0] = 120000;
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                printStackTraces();
             }
         });
+        findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        param.args[0] = 120000;
+                    }
+                });
 
         final Class<?> receivedSnapClass = findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
         try{
@@ -514,11 +526,11 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                                     Logger.log("Replaced batteryfilter from R.drawable", true);
                                 } else {
                                     if (mCustomFilterType == 0) {
-                                        //iv.setImageDrawable(Drawable.createFromPath(mCustomFilterLocation + "/fullscreen_filter.png"));
-                                        iv.setImageDrawable(modRes.getDrawable(R.drawable.imsafe));
+                                        iv.setImageDrawable(Drawable.createFromPath(mCustomFilterLocation + "/fullscreen_filter.png"));
+                                        //iv.setImageDrawable(modRes.getDrawable(R.drawable.imsafe));
                                     } else if (mCustomFilterType == 1) {
-                                        iv.setImageDrawable(modRes.getDrawable(R.drawable.imsafe));
-                                        //iv.setImageDrawable(Drawable.createFromPath(mCustomFilterLocation + "/banner_filter.png"));
+                                        //iv.setImageDrawable(modRes.getDrawable(R.drawable.imsafe));
+                                        iv.setImageDrawable(Drawable.createFromPath(mCustomFilterLocation + "/banner_filter.png"));
                                     }
                                     Logger.log("Replaced batteryfilter from " + mCustomFilterLocation + " Type: " + mCustomFilterType, true);
                                 }
