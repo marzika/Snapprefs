@@ -366,17 +366,17 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 Premium.initViewed(lpparam, modRes, SnapContext);
             }
         }
+        /*findAndHookMethod("com.snapchat.android.Timber", lpparam.classLoader, "c", String.class, String.class, Object[].class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Logger.log("TIMBER: " + param.args[0] + " : " + param.args[1], true);
+            }
+        });*/
         for (String s: Obfuscator.ROOTDETECTOR_METHODS) {
-            findAndHookMethod("VE", lpparam.classLoader, s, XC_MethodReplacement.returnConstant(false));
+            findAndHookMethod(Obfuscator.ROOTDETECTOR_CLASS, lpparam.classLoader, s, XC_MethodReplacement.returnConstant(false));
             Logger.log("ROOTCHECK: " + s, true);
         }
-        findAndHookMethod("XK", lpparam.classLoader, "h", String.class, XC_MethodReplacement.DO_NOTHING);
-        findAndHookMethod("pr.2", lpparam.classLoader, "call", new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                printStackTraces();
-            }
-        });
+        findAndHookMethod("XU", lpparam.classLoader, "h", String.class, XC_MethodReplacement.DO_NOTHING);
         findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
