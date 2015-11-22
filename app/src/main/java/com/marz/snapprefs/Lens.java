@@ -29,7 +29,7 @@ public class Lens {
             }
         });
 
-        XposedHelpers.findAndHookMethod(Obfuscator.lens.LENSESPROVIDER_CLASS, lpparam.classLoader, Obfuscator.lens.LENSESPROVIDER_GETLENSES, new XC_MethodHook() {
+        /*XposedHelpers.findAndHookMethod(Obfuscator.lens.LENSESPROVIDER_CLASS, lpparam.classLoader, Obfuscator.lens.LENSESPROVIDER_GETLENSES, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 ArrayList result = (ArrayList) param.getResult();
@@ -39,7 +39,7 @@ public class Lens {
                     }
                 }
             }
-        });
+        });*/
     }
     static void refreshPreferences() {
 
