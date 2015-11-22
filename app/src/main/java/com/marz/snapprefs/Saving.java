@@ -385,7 +385,7 @@ public class Saving {
             findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass("MY", lpparam.classLoader), new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    receivedSnap = param.args[0];
+                    //receivedSnap = param.args[0];
                     viewingSnap = true;
                     currentViewingSnap++;
                     Logger.log("Starting to view a story", true);
@@ -421,16 +421,15 @@ public class Saving {
             /**
              * Sets the Snap as Screenshotted, so we constantly return false to it.
              */
-            findAndHookMethod(Obfuscator.save.SNAP_CLASS, lpparam.classLoader, Obfuscator.save.SNAP_ISSCREENSHOTTED, XC_MethodReplacement.returnConstant(false));
-            /*findAndHookMethod(Obfuscator.save.VIDEOSNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.VIDEOSNAPRENDERER_START, new XC_MethodHook() {
+            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass("MY", lpparam.classLoader), findClass("Gr", lpparam.classLoader), new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Logger.log("Videosnaprenderer.start()", true);
-                    Snap toSave = snapsMap.get(currentViewingSnap);
-                    mVideo = toSave.getVideo();
-                    saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    if (param.args[0] != null){
+                        //Logger.log("MY INST NULL, IS IT BEFORE THE RENDERING?");
+                        receivedSnap = param.args[0];
+                    }
                 }
-            });*/
+            });
             final Class<?> TextureVideoView = findClass("com.snapchat.android.ui.TextureVideoView", lpparam.classLoader);
             findAndHookMethod(Obfuscator.save.VIDEOSNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.VIDEOSNAPRENDERER_SHOW, new XC_MethodHook() {
                 @Override
@@ -475,9 +474,9 @@ public class Saving {
     }
 
     private static void saveReceivedSnap(Context context, Object receivedSnap, MediaType mediaType) {
-        Logger.log("----------------------- SNAPPREFS ------------------------", false);
         String sender = null;
         SnapType snapType;
+        Date timestamp = null;
         if (receivedSnap == null) {
             Logger.log("SRS - 1", true);
             //receivedSnap = oldreceivedSnap;
@@ -499,13 +498,15 @@ public class Saving {
             }
             snapType = SnapType.STORY;
             lastSnapType = SnapType.STORY;
+            timestamp = new Date();
         } else {
             snapType = SnapType.SNAP;
             lastSnapType = SnapType.SNAP;
+            timestamp = new Date((Long) callMethod(receivedSnap, Obfuscator.save.SNAP_GETTIMESTAMP)); //Gettimestamp-Snap
         }
-        Date timestamp = new Date((Long) callMethod(receivedSnap, Obfuscator.save.SNAP_GETTIMESTAMP)); //Gettimestamp-Snap
+
         String filename = sender + "_" + dateFormat.format(timestamp);
-        Logger.log("usedOldReceivedSnap = " + usedOldReceivedSnap, true);
+        //Logger.log("usedOldReceivedSnap = " + usedOldReceivedSnap, true);
         if (usedOldReceivedSnap) {
             filename = filename + "_1";
         }
@@ -516,7 +517,6 @@ public class Saving {
         }
         switch (mediaType) {
             case VIDEO: {
-                setAdditionalInstanceField(receivedSnap, "snap_media_type", MediaType.VIDEO);
                 Logger.log("Video " + snapType.name + " opened");
                 int saveMode = (snapType == SnapType.SNAP ? mModeSnapVideo : mModeStoryVideo);
                 //if (saveMode == SAVE_S2S) {
@@ -535,7 +535,6 @@ public class Saving {
                 break;
             }
             case IMAGE: {
-                setAdditionalInstanceField(receivedSnap, "snap_media_type", MediaType.IMAGE);
                 Logger.log("Image " + snapType.name + " opened");
                 int saveMode = (snapType == SnapType.SNAP ? mModeSnapImage : mModeStoryImage);
                 //if (saveMode == SAVE_S2S) {
@@ -654,7 +653,7 @@ public class Saving {
         }
         image = null;
         video = null;
-        receivedSnap = null;
+        //receivedSnap = null;
         //viewingSnap = false;
     }
 
