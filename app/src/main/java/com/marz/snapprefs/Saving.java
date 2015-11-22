@@ -382,7 +382,7 @@ public class Saving {
                     snapCL = lpparam.classLoader;
                 }
             });
-            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass("MO", lpparam.classLoader), new XC_MethodHook() {
+            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass("MY", lpparam.classLoader), new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     receivedSnap = param.args[0];
@@ -398,6 +398,18 @@ public class Saving {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     //Logger.log("Stopped viewing the Snap", true);
+                    viewingSnap = false;
+
+                    //TODO clear maps & values
+                    snapsMap.clear();
+                    currentSavingSnap = -1;
+                    currentViewingSnap = -1;
+                }
+            });
+            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass("MY", lpparam.classLoader), findClass("com.snapchat.android.ui.snapview.SnapViewSessionStopReason", lpparam.classLoader), int.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    Logger.log("Stopped viewing the Story", true);
                     viewingSnap = false;
 
                     //TODO clear maps & values
