@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
     <release
+        version="1.6.3"
+        versioncode="22">
+        <change>Added Marshmallow compatiblity</change>
+        <change>Updated for 9.20.2.0</change>
+        <change>Increased quality of Stickers</change>
+        <change>You can now have multiple custom filters</change>
+        <change>Vibration feedback added</change>
+        <change>Added button to Shape drawing</change>
+        <change>Paint Tools can be disabled</change>
+        <change>Added root check bypass</change>
+        <change>NOTE: God mode is not added yet.</change>
+    </release>
+    <release
         version="1.6.2"
         versioncode="21">
         <change>Updated for 9.17.1.0</change>
