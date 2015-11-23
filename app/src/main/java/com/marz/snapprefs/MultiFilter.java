@@ -48,7 +48,7 @@ public class MultiFilter {
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 XposedBridge.log("Adding new filters");
                 for (File f : files) {
-                    XposedBridge.log("Trying to add: " + f.toString());
+                    //XposedBridge.log("Trying to add: " + f.toString());
                     if(added.contains(f.toString())){
                         continue;
                     }
