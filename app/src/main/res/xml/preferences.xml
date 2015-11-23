@@ -95,13 +95,19 @@
                 android:summaryOff="@string/pref_custom_filter_cb_summary_off"
                 android:summaryOn="@string/pref_custom_filter_cb_summary_on"
                 android:title="@string/pref_custom_filter_cb_title" />
-            <com.marz.snapprefs.BetterListPreference
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_key_multi_filter_checkbox"
+                android:summaryOff="@string/pref_multi_filter_cb_summary_off"
+                android:summaryOn="@string/pref_multi_filter_cb_summary_on"
+                android:title="@string/pref_multi_filter_cb_title" />
+            <!-- <com.marz.snapprefs.BetterListPreference
                 android:defaultValue="@string/pref_filter_default_value"
                 android:entries="@array/pref_filter_entries"
                 android:entryValues="@array/pref_filter_values"
                 android:key="pref_key_filter_type"
                 android:title="@string/pref_filter_type_title" />
-            <!--            <Preference
+                       <Preference
                             android:key="pref_filter_readme"
                             android:summary="@string/pref_filter_readme_summary"
                             android:title="@string/pref_filter_readme_title" />
@@ -113,6 +119,16 @@
                                 android:action="android.intent.action.VIEW"
                                 android:data="https://plus.google.com/communities/111884042638955665569" />
                         </Preference>-->
+        </PreferenceCategory>
+        <PreferenceCategory
+            android:key="pref_key_paint"
+            android:title="@string/pref_paint_title">
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_key_paint_checkbox"
+                android:summaryOff="@string/pref_paint_cb_summary_off"
+                android:summaryOn="@string/pref_paint_cb_summary_on"
+                android:title="@string/pref_paint_cb_title" />
         </PreferenceCategory>
     </PreferenceScreen>
     <PreferenceScreen
@@ -243,6 +259,13 @@
                 android:entryValues="@array/pref_toasts_duration_values"
                 android:key="pref_key_toasts_duration"
                 android:title="@string/pref_toasts_duration_title" />
+
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_key_vibration_checkbox"
+                android:summaryOff="@string/pref_vibration_summary_off"
+                android:summaryOn="@string/pref_vibration_summary_on"
+                android:title="@string/pref_vibration_title" />
         </PreferenceCategory>
 
         <PreferenceCategory android:title="@string/pref_category_folder">
@@ -355,12 +378,12 @@
         android:persistent="false"
         android:title="@string/premdeluxe">
         <PreferenceCategory android:title="@string/premdeluxe">
-            <CheckBoxPreference
+            <!-- <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="pref_key_replay"
                 android:summaryOff="@string/pref_replay_summary_off"
                 android:summaryOn="@string/pref_replay_summary_on"
-                android:title="@string/pref_replay_title" />
+                android:title="@string/pref_replay_title" /> -->
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="pref_key_typing"

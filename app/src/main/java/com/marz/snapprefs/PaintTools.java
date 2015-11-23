@@ -309,7 +309,7 @@ public class PaintTools {
                         });
                         linearLayout.addView(tv, params);
                         linearLayout.addView(seekBar2, params);
-                        builder.setView((View) linearLayout);
+                        builder.setView(linearLayout);
                         builder.show();
                     }
                 });
@@ -370,7 +370,7 @@ public class PaintTools {
                         });
                         linearLayout.addView(tv, params);
                         linearLayout.addView(seekBar2, params);
-                        builder.setView((View) linearLayout);
+                        builder.setView(linearLayout);
                         builder.show();
                     }
                 });
@@ -427,7 +427,7 @@ public class PaintTools {
                                                     });
                                                     eText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
                                                     linearLayout.addView(eText);
-                                                    builder.setView((View) linearLayout);
+                                                    builder.setView(linearLayout);
                                                     builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
                                                                 @Override
                                                                 public void onClick(DialogInterface dialog, int which) {
@@ -553,7 +553,7 @@ public class PaintTools {
                                                         }
                                                         colors.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20.0f);
                                                         linearLayout.addView(colors, paramColors);
-                                                        builder.setView((View) linearLayout);
+                                                        builder.setView(linearLayout);
                                                         builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
                                                                     @Override
                                                                     public void onClick(DialogInterface dialog, int which) {
@@ -647,12 +647,12 @@ public class PaintTools {
                                                          type = DrawingType.DEFAULT;
                                                      }
                                                  });
-                                                 linearLayout.addView((View) rectangle);
-                                                 linearLayout.addView((View) circle);
-                                                 linearLayout.addView((View) line);
-                                                 linearLayout.addView((View) star);
-                                                 linearLayout.addView((View) default_btn);
-                                                 builder.setView((View) linearLayout);
+                                                 linearLayout.addView(rectangle);
+                                                 linearLayout.addView(circle);
+                                                 linearLayout.addView(line);
+                                                 linearLayout.addView(star);
+                                                 linearLayout.addView(default_btn);
+                                                 builder.setView(linearLayout);
                                                  builder.setNegativeButton(Common.dialog_cancel, new DialogInterface.OnClickListener() {
                                                      @Override
                                                      public void onClick(DialogInterface dialog, int which) {
@@ -689,69 +689,14 @@ public class PaintTools {
             paramsHide.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
 
-            ((RelativeLayout)colorpickerview.getParent().
-
-            getParent()
-
-            ).
-
-            addView(alphabutton, paramsAlpha);
-
-            ((RelativeLayout)colorpickerview.getParent().
-
-            getParent()
-
-            ).
-
-            addView(eraserbutton, paramsErase);
-
-            ((RelativeLayout)colorpickerview.getParent().
-
-            getParent()
-
-            ).
-
-            addView(colorpicker, paramsPicker);
-
-            ((RelativeLayout)colorpickerview.getParent().
-
-            getParent()
-
-            ).
-
-            addView(widthpicker, paramsWidth);
-
-            ((RelativeLayout)colorpickerview.getParent().
-
-            getParent()
-
-            ).
-
-            addView(colorhistory, paramsHistory);
-
-            ((RelativeLayout)colorpickerview.getParent().
-
-            getParent()
-
-            ).
-
-            addView(hexinput, paramsHex);
-
-            ((RelativeLayout)colorpickerview.getParent().
-
-            getParent()
-
-            ).
-
-            addView(shape, paramsShape);
-
-            ((RelativeLayout)colorpickerview.getParent().
-
-            getParent()
-
-            ).
-
-            addView(hide, paramsHide);
+            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(alphabutton, paramsAlpha);
+            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(eraserbutton, paramsErase);
+            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(colorpicker, paramsPicker);
+            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(widthpicker, paramsWidth);
+            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(colorhistory, paramsHistory);
+            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(hexinput, paramsHex);
+            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(shape, paramsShape);
+            //((RelativeLayout)colorpickerview.getParent().getParent()).addView(hide, paramsHide);
         }
         });
 
@@ -759,7 +704,7 @@ public class PaintTools {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 Logger.log("Called setColor: " + param.args[0], true);
-                if (!colorList.contains((Integer) param.args[0])) {
+                if (!colorList.contains(param.args[0])) {
                     colorList.add((Integer) param.args[0]);
                 }
                 color = (Integer) param.args[0];

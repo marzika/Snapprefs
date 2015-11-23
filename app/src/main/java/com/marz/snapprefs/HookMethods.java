@@ -95,10 +95,13 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static int mToastLength = TOAST_LENGTH_LONG;
     public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
     public static boolean mCustomFilterBoolean = false;
+    public static boolean mPaintTools = true;
+    public static boolean mMultiFilterBoolean = true;
     public static int mCustomFilterType;
     public static boolean mTimerUnlimited = true;
     public static boolean mHideTimer = false;
     public static boolean mToastEnabled = true;
+    public static boolean mVibrationEnabled = true;
     public static String mSavePath = "";
     public static String mCustomFilterLocation = "";
     public static String mConfirmationID = "";
@@ -178,7 +181,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         bg_transparency = prefs.getBoolean("pref_key_bg_transparency", false);
         txtstyle = prefs.getBoolean("pref_key_txtstyle", false);
         txtgravity = prefs.getBoolean("pref_key_txtgravity", false);
+        mPaintTools = prefs.getBoolean("pref_key_paint_checkbox", mPaintTools);
         mCustomFilterBoolean = prefs.getBoolean("pref_key_custom_filter_checkbox", mCustomFilterBoolean);
+        mMultiFilterBoolean = prefs.getBoolean("pref_key_multi_filter_checkbox", mMultiFilterBoolean);
         mCustomFilterLocation = Environment.getExternalStorageDirectory().toString() + "/Snapprefs/Filters";
         mCustomFilterType = prefs.getInt("pref_key_filter_type", 0);
         mSpeed = prefs.getBoolean("pref_key_speed", false);
@@ -203,6 +208,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mModeStoryVideo = prefs.getInt("pref_key_stories_videos", mModeStoryVideo);
         mTimerMinimum = prefs.getInt("pref_key_timer_minimum", mTimerMinimum);
         mToastEnabled = prefs.getBoolean("pref_key_toasts_checkbox", mToastEnabled);
+        mVibrationEnabled = prefs.getBoolean("pref_key_vibration_checkbox", mVibrationEnabled);
         mToastLength = prefs.getInt("pref_key_toasts_duration", mToastLength);
         mSavePath = prefs.getString("pref_key_save_location", mSavePath);
         mSaveSentSnaps = prefs.getBoolean("pref_key_save_sent_snaps", mSaveSentSnaps);
@@ -357,7 +363,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         if (mLicense == 1 || mLicense == 2) {
 
             if (mReplay == true) {
-                Premium.initReplay(lpparam, modRes, SnapContext);
+                //Premium.initReplay(lpparam, modRes, SnapContext);
             }
             if (mTyping == true) {
                 Premium.initTyping(lpparam, modRes, SnapContext);
@@ -402,6 +408,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 //SNAPPREFS
                 Saving.initSaving(lpparam, mResources, SnapContext);
                 Lens.initLens(lpparam, mResources, SnapContext);
+                if (mMultiFilterBoolean == true){
+                    MultiFilter.initMultiFilter(lpparam, mResources, SnapContext);
+                }
                 if (mDiscoverSnap == true) {
                     DataSaving.blockDsnap(lpparam);
                 }
@@ -417,7 +426,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 if (mWeather == true) {
                     Spoofing.initWeather(lpparam, SnapContext);
                 }
-                PaintTools.initPaint(lpparam, mResources);
+                if (mPaintTools == true){
+                    PaintTools.initPaint(lpparam, mResources);
+                }
 
                 getEditText(lpparam);
                 findAndHookMethod(Obfuscator.save.SCREENSHOTDETECTOR_CLASS, lpparam.classLoader, Obfuscator.save.SCREENSHOTDETECTOR_RUN, List.class, XC_MethodReplacement.DO_NOTHING);
@@ -572,7 +583,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("Background Transparency: " + bg_transparency);
         logging("TextStyle: " + txtstyle);
         logging("TextGravity: " + txtgravity);
+        logging("mPaintTools: " + mPaintTools);
         logging("CustomFilters: " + mCustomFilterBoolean);
+        logging("MultiFilters: " + mMultiFilterBoolean);
         logging("CustomFiltersLocation: " + mCustomFilterLocation);
         logging("CustomFilterType: " + mCustomFilterType);
         logging("mSpeed: " + mSpeed);
@@ -600,6 +613,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("~ mOverlays: " + mOverlays);
         logging("~ mTimerMinimum: " + mTimerMinimum);
         logging("~ mToastEnabled: " + mToastEnabled);
+        logging("~ mVibrationEnabled: " + mVibrationEnabled);
         logging("~ mToastLength: " + mToastLength);
         logging("~ mSavePath: " + mSavePath);
         logging("~ mSaveSentSnaps: " + mSaveSentSnaps);

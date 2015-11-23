@@ -135,7 +135,7 @@
 
     <!-- Viewing settings -->
     <string name="pref_timer_title">Timer</string>
-    <string name="pref_category_viewing">Viewing</string>
+    <string name="pref_category_viewing">Feedback</string>
     <string name="pref_timer_hide_title">Hide the Timer</string>
     <string name="pref_timer_hide_summary_off">It will hide the timer while watching a snap</string>
     <string name="pref_timer_hide_summary_on">It will NOT hide the timer while watching a snap</string>
@@ -163,6 +163,9 @@
     <string name="pref_custom_filter_cb_title">Enable custom filter</string>
     <string name="pref_custom_filter_cb_summary_on">Select a custom filter below</string>
     <string name="pref_custom_filter_cb_summary_off">Custom filters are disabled</string>
+    <string name="pref_multi_filter_cb_title">Enable Multi-filters</string>
+    <string name="pref_multi_filter_cb_summary_on">Every filter will be loaded from /sdcard/Snapprefs/Filters</string>
+    <string name="pref_multi_filter_cb_summary_off">Multi filters are disabled</string>
     <string name="pref_custom_filter_title">Choose custom filter</string>
     <string name="pref_filter_group_summary">Here you can download custom filters to have</string>
     <string name="pref_filter_group_title">Open the Google+ group for filters</string>
@@ -183,6 +186,9 @@
     <string name="pref_toasts_title">Show toast messages</string>
     <string name="pref_toasts_summary_on">Toast messages are enabled</string>
     <string name="pref_toasts_summary_off">Toast messages are disabled</string>
+    <string name="pref_vibration_title">Vibrate when saved</string>
+    <string name="pref_vibration_summary_on">Vibration is enabled</string>
+    <string name="pref_vibration_summary_off">Vibration is disabled</string>
     <string name="pref_toasts_duration_title">Toast duration</string>
     <string name="pref_toasts_duration_default_value" translatable="false">0</string>
     <string-array name="pref_toasts_duration_entries">
@@ -310,4 +316,8 @@
     <string name="pref_viewed_summary_on">Stealth viewing will be executed</string>
     <string name="pref_viewed_title">Stealth Viewing</string>
     <string name="pref_viewed_readme_summary">After the snaps are loaded, enable Airplane mode, view the desired snap, then KILL SNAPCHAT from the Recent Apps page. You can disable Airplane mode now.</string>
+    <string name="pref_paint_title">Paint Tools</string>
+    <string name="pref_paint_cb_summary_off">Paint Tools are not enabled</string>
+    <string name="pref_paint_cb_summary_on">Paint Tools are enabled</string>
+    <string name="pref_paint_cb_title">Enable Paint Tools</string>
 </resources>
