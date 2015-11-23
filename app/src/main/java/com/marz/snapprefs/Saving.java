@@ -11,6 +11,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,6 +69,7 @@ public class Saving {
     public static boolean mTimerUnlimited = true;
     public static boolean mHideTimer = false;
     public static boolean mToastEnabled = true;
+    public static boolean mVibrationEnabled = true;
     public static int mToastLength = TOAST_LENGTH_LONG;
     public static String mSavePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
     public static boolean mSaveSentSnaps = false;
@@ -604,11 +606,13 @@ public class Saving {
             if (imageFile.exists()) {
                 Logger.log("Image already exists");
                 showToast(context, mResources.getString(R.string.image_exists));
+                vibrate(context, false);
                 return;
             }
 
             if (saveImageJPG(image, imageFile)) {
                 showToast(context, mResources.getString(R.string.image_saved));
+                vibrate(context, true);
                 Logger.log("Image " + snapType.name + " has been saved");
                 Logger.log("Path: " + imageFile.toString());
 
@@ -620,6 +624,7 @@ public class Saving {
         } else if (mediaType == MediaType.IMAGE_OVERLAY) {
             if (mOverlays == true) {
                 if (overlayFile.exists()) {
+                    vibrate(context, false);
                     Logger.log("VideoOverlay already exists");
                     showToast(context, mResources.getString(R.string.video_exists));
                     return;
@@ -628,6 +633,7 @@ public class Saving {
 
                 if (saveImagePNG(image, overlayFile)) {
                     //showToast(context, "This overlay ");
+                    vibrate(context, true);
                     Logger.log("VideoOverlay " + snapType.name + " has been saved");
                     Logger.log("Path: " + overlayFile.toString());
                     runMediaScanner(context, overlayFile.getAbsolutePath());
@@ -637,12 +643,14 @@ public class Saving {
             }
         } else if (mediaType == MediaType.VIDEO) {
             if (videoFile.exists()) {
+                vibrate(context, false);
                 Logger.log("Video already exists");
                 showToast(context, mResources.getString(R.string.video_exists));
                 return;
             }
 
             if (saveVideo(video, videoFile)) {
+                vibrate(context, true);
                 showToast(context, mResources.getString(R.string.video_saved));
                 Logger.log("Video " + snapType.name + " has been saved");
                 Logger.log("Path: " + videoFile.toString());
@@ -758,6 +766,37 @@ public class Saving {
                 Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show();
             }
         }
+    }
+    private static void vibrate(Context context, boolean success) {
+        if (mVibrationEnabled) {
+            if (success) {
+                Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(genVibratorPattern(0.5f, 200), -1);
+            } else {
+                Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+                v.vibrate(genVibratorPattern(0.7f, 500), -1);
+            }
+        }
+    }
+
+    //http://stackoverflow.com/questions/20808479/algorithm-for-generating-vibration-patterns-ranging-in-intensity-in-android/20821575#20821575
+    // intensity 0-1
+    // duration mS
+    public static long[] genVibratorPattern( float intensity, long duration )
+    {
+        float dutyCycle = Math.abs( ( intensity * 2.0f ) - 1.0f );
+        long hWidth = (long) ( dutyCycle * ( duration - 1 ) ) + 1;
+        long lWidth = dutyCycle == 1.0f ? 0 : 1;
+
+        int pulseCount = (int) ( 2.0f * ( (float) duration / (float) ( hWidth + lWidth ) ) );
+        long[] pattern = new long[ pulseCount ];
+
+        for( int i = 0; i < pulseCount; i++ )
+        {
+            pattern[i] = intensity < 0.5f ? ( i % 2 == 0 ? hWidth : lWidth ) : ( i % 2 == 0 ? lWidth : hWidth );
+        }
+
+        return pattern;
     }
 
     static void refreshPreferences() {
