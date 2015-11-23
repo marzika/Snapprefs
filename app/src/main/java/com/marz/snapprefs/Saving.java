@@ -313,6 +313,13 @@ public class Saving {
              * We hook this method to get the ChatImage from the imageView of ImageResourceView,
              * then we get the properties and save the actual Image.
              */
+            final Object[] chatMediaArr = new Object[1];
+            findAndHookMethod("com.snapchat.android.ui.ImageResourceView", lpparam.classLoader, "setChatMedia", findClass("com.snapchat.android.model.chat.ChatMedia", lpparam.classLoader), findClass("com.snapchat.android.ui.SnapchatResource.a", lpparam.classLoader), new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    chatMediaArr[0] = param.args[0];
+                }
+            });
             final Class<?> imageResourceViewClass = findClass(Obfuscator.save.IMAGERESOURCEVIEW_CLASS, lpparam.classLoader);
             hookAllConstructors(imageResourceViewClass, new XC_MethodHook() {
                 @Override
@@ -328,9 +335,11 @@ public class Saving {
                             Logger.log("We have the chat image", true);
                             Object imageResource = getObjectField(param.thisObject, Obfuscator.save.IMAGERESOURCEVIEW_VAR_IMAGERESOURCE);
                             Logger.log("We have the imageResource", true);
-                            Object chatMedia = getObjectField(imageResource, Obfuscator.save.IMAGERESOURCE_VAR_CHATMEDIA); // in ImageResource
+                            //Object chatMedia = getObjectField(imageResource, Obfuscator.save.IMAGERESOURCE_VAR_CHATMEDIA); // in ImageResource
+                            Object chatMedia = chatMediaArr[0];
                             Logger.log("We have the chatMedia", true);
                             Long timestamp = (Long) callMethod(chatMedia, Obfuscator.save.CHAT_GETTIMESTAMP); // model.chat.Chat
+                            //Long timestamp = 0L;
                             Logger.log("We have the timestamp " + timestamp.toString(), true);
                             String sender = (String) callMethod(chatMedia, Obfuscator.save.STATEFULCHATFEEDITEM_GETSENDER); //in StatefulChatFeedItem
                             Logger.log("We have the sender " + sender, true);
@@ -771,10 +780,10 @@ public class Saving {
         if (mVibrationEnabled) {
             if (success) {
                 Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-                v.vibrate(genVibratorPattern(0.5f, 200), -1);
+                v.vibrate(genVibratorPattern(0.5f, 300), -1);
             } else {
                 Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-                v.vibrate(genVibratorPattern(0.7f, 500), -1);
+                v.vibrate(genVibratorPattern(0.7f, 700), -1);
             }
         }
     }
