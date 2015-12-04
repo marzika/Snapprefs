@@ -780,10 +780,10 @@ public class Saving {
         if (mVibrationEnabled) {
             if (success) {
                 Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-                v.vibrate(genVibratorPattern(0.5f, 300), -1);
+                v.vibrate(genVibratorPattern(0.7f, 400), -1);
             } else {
                 Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-                v.vibrate(genVibratorPattern(0.7f, 700), -1);
+                v.vibrate(genVibratorPattern(1.0f, 700), -1);
             }
         }
     }
@@ -824,6 +824,7 @@ public class Saving {
         mToastEnabled = prefs.getBoolean("pref_key_toasts_checkbox", mToastEnabled);
         mToastLength = prefs.getInt("pref_key_toasts_duration", mToastLength);
         mSavePath = prefs.getString("pref_key_save_location", mSavePath);
+        mVibrationEnabled = prefs.getBoolean("pref_key_vibration_checkbox", mVibrationEnabled);
         mSaveSentSnaps = prefs.getBoolean("pref_key_save_sent_snaps", mSaveSentSnaps);
         mSortByCategory = prefs.getBoolean("pref_key_sort_files_mode", mSortByCategory);
         mSortByUsername = prefs.getBoolean("pref_key_sort_files_username", mSortByUsername);
