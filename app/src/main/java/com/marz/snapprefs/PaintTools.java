@@ -1,12 +1,15 @@
 package com.marz.snapprefs;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.XModuleResources;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
+import android.graphics.MaskFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -56,6 +59,7 @@ public class PaintTools {
     static Paint paint = null;
     static boolean easterEgg = false;
     static boolean shouldErase = false;
+    static boolean shouldBlur = false;
     public static boolean hidden = false;
     static Context context;
     public static final String START_POINT = "startPoint";
@@ -125,6 +129,7 @@ public class PaintTools {
                 DrawingType dType = (DrawingType) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, TYPE);
                 if (dType == DrawingType.DEFAULT || dType == null) return;
                 Canvas c = (Canvas) methodHookParam.args[0];
+                Toast.makeText(context, "ishardwareaccelerated? " + c.isHardwareAccelerated(), Toast.LENGTH_SHORT).show();
                 PointF startPoint = (PointF) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, START_POINT);
                 PointF endPoint = (PointF) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, END_POINT);
                 if (dType == DrawingType.RECTANGLE)
@@ -168,6 +173,7 @@ public class PaintTools {
                 if (paint == null) {
                     Logger.log("CanvasView-launched -- paint = null", true);
                 } else {
+                    MaskFilter oldMF = paint.getMaskFilter();
                     if (shouldErase) {
                         paint.setColor(0x00000000);
                         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
@@ -175,6 +181,12 @@ public class PaintTools {
                     } else {
                         paint.setXfermode(null);
                         paint.setAlpha(alpha);
+                    }
+                    if (shouldBlur) {
+                        paint.setColor(0xccFFFFFF);
+                        paint.setMaskFilter(new BlurMaskFilter(25, BlurMaskFilter.Blur.NORMAL));
+                    } else {
+                        paint.setMaskFilter(oldMF);
                     }
                     if (easterEgg) {
                         int[] rainbow = getRainbowColors();
@@ -206,6 +218,7 @@ public class PaintTools {
                     public void onClick(View v) {
                         type = DrawingType.DEFAULT;
                         shouldErase = true;
+                        shouldBlur = false;
                         eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser_clicked));
                     }
                 });
@@ -233,6 +246,8 @@ public class PaintTools {
                         eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser));
                         easterEgg = false;
                         shouldErase = false;
+                        shouldBlur = false;
+
                         ColorPickerDialog colorPickerDialog = new ColorPickerDialog(context, color, new ColorPickerDialog.OnColorSelectedListener() {
 
                             @Override
@@ -497,6 +512,7 @@ public class PaintTools {
                                                         eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser));
                                                         easterEgg = false;
                                                         shouldErase = false;
+                                                        shouldBlur = false;
 
                                                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                                         SpannableStringBuilder spanBuilder = new SpannableStringBuilder();
@@ -580,6 +596,7 @@ public class PaintTools {
                                              public void onClick(View v) {
                                                  eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser));
                                                  shouldErase = false;
+                                                 shouldBlur = false;
                                                  final AlertDialog.Builder builder = new AlertDialog.Builder(context);
                                                  builder.setTitle("Choose shape type");
                                                  LinearLayout linearLayout = new LinearLayout(context);
@@ -672,14 +689,16 @@ public class PaintTools {
 
                 final ImageButton hide = new ImageButton(context);
                 hide.setBackgroundColor(0);
-                hide.setImageDrawable(modRes.getDrawable(R.drawable.hide));
+                hide.setImageDrawable(modRes.getDrawable(R.drawable.blur));
                 hide.setScaleX((float) 0.325);
                 hide.setScaleY((float) 0.325);
                 hide.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        hidden = !hidden;
-                        Toast.makeText(context, "hidden: " + hidden, Toast.LENGTH_SHORT).show();
+                        type = DrawingType.DEFAULT;
+                        shouldErase = false;
+                        shouldBlur = true;
+                        Toast.makeText(context, "hidden: " + shouldBlur, Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -689,14 +708,14 @@ public class PaintTools {
             paramsHide.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 
 
-            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(alphabutton, paramsAlpha);
+                ((RelativeLayout)colorpickerview.getParent().getParent()).addView(alphabutton, paramsAlpha);
             ((RelativeLayout)colorpickerview.getParent().getParent()).addView(eraserbutton, paramsErase);
             ((RelativeLayout)colorpickerview.getParent().getParent()).addView(colorpicker, paramsPicker);
             ((RelativeLayout)colorpickerview.getParent().getParent()).addView(widthpicker, paramsWidth);
             ((RelativeLayout)colorpickerview.getParent().getParent()).addView(colorhistory, paramsHistory);
             ((RelativeLayout)colorpickerview.getParent().getParent()).addView(hexinput, paramsHex);
             ((RelativeLayout)colorpickerview.getParent().getParent()).addView(shape, paramsShape);
-            //((RelativeLayout)colorpickerview.getParent().getParent()).addView(hide, paramsHide);
+            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(hide, paramsHide);
         }
         });
 
@@ -711,6 +730,10 @@ public class PaintTools {
                 if (shouldErase == true) {
                     //eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser));
                     shouldErase = false;
+                }
+                if (shouldBlur == true) {
+                    //eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser));
+                    shouldBlur = false;
                 }
             }
         });
