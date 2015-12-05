@@ -28,12 +28,24 @@
                 android:summaryOn="@string/pref_timer_hide_summary_on"
                 android:title="@string/pref_timer_hide_title" />
             <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_key_timer_story_hide"
+                android:summaryOff="@string/pref_timer_story_hide_summary_off"
+                android:summaryOn="@string/pref_timer_story_hide_summary_on"
+                android:title="@string/pref_timer_story_hide_title" />
+            <CheckBoxPreference
                 android:defaultValue="true"
                 android:disableDependentsState="true"
                 android:key="pref_key_timer_unlimited"
                 android:summaryOff="@string/pref_timer_unlimited_summary_off"
                 android:summaryOn="@string/pref_timer_unlimited_summary_on"
                 android:title="@string/pref_timer_unlimited_title" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_key_looping_video"
+                android:summaryOff="@string/pref_video_looping_summary_off"
+                android:summaryOn="@string/pref_video_looping_summary_on"
+                android:title="@string/pref_video_looping_title" />
             <com.marz.snapprefs.BetterListPreference
                 android:defaultValue="@string/pref_timer_minimum_default_value"
                 android:dependency="pref_key_timer_unlimited"

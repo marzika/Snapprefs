@@ -8,7 +8,7 @@
     <string name="pref_debug_title">INFORMATIONS</string>
 
     <string name="pref_thanks_title">Thanks to</string>
-    <string name="pref_thanks_summary">P1ngu1n, manvir, elesbb, chiralcode, Yoganandh, bnalls33, cketti, ddmanfire</string>
+    <string name="pref_thanks_summary">stirante, P1ngu1n, manvir, elesbb, chiralcode, Yoganandh, bnalls33, cketti, ddmanfire, MikeOrtiz, sangmingming</string>
     <string name="pref_donate_title">Donate</string>
     <string name="pref_donate_summary">Support me by buying some coffee using PayPal. Donations are highly appreciated.</string>
 
@@ -136,12 +136,18 @@
     <!-- Viewing settings -->
     <string name="pref_timer_title">Timer</string>
     <string name="pref_category_viewing">Feedback</string>
-    <string name="pref_timer_hide_title">Hide the Timer</string>
-    <string name="pref_timer_hide_summary_off">It will hide the timer while watching a snap</string>
-    <string name="pref_timer_hide_summary_on">It will NOT hide the timer while watching a snap</string>
+    <string name="pref_timer_hide_title">Hide the Snap Timer</string>
+    <string name="pref_timer_hide_summary_off">It will NOT hide the timer while watching a snap</string>
+    <string name="pref_timer_hide_summary_on">It will hide the timer while watching a snap</string>
+    <string name="pref_timer_story_hide_title">Hide the Story Timer</string>
+    <string name="pref_timer_story_hide_summary_off">It will NOT hide the timer while watching a story</string>
+    <string name="pref_timer_story_hide_summary_on">It will hide the timer while watching a story</string>
     <string name="pref_timer_unlimited_title">Unlimited viewing time</string>
     <string name="pref_timer_unlimited_summary_off">You will have limited viewing time, select below</string>
     <string name="pref_timer_unlimited_summary_on">You can watch the snap as long as you want</string>
+    <string name="pref_video_looping_title">Looping videos</string>
+    <string name="pref_video_looping_summary_off">Videos will play once</string>
+    <string name="pref_video_looping_summary_on">Videos will be looped for as long as you want</string>
     <string name="pref_timer_minimum_title">Minimum timer duration</string>
     <string name="pref_timer_minimum_default_value" translatable="false">0</string>
     <string-array name="pref_timer_minimum_entries">
@@ -299,6 +305,8 @@
         <!--AIzaSyD-XNCHffArxbrgQ_-CS1nDXZRTfcEIlO4 DEBUG-->
     </string>
     <string name="title_activity_redeem">Redeem</string>
+    <string name="title_activity_visual">Visual Filters</string>
+    <string name="title_activity_visual_preview">Visual Filters Preview</string>
     <string name="buy_text"><![CDATA[<b>Premium:</b><br><small>AdFree, Typing alert bypass, Chat presence bypass</small><br><br><b>Deluxe:</b><br><small>Every Premium feature, Stealth viewing (stories and snaps), GodMode (noone can save your Snaps -- not added yet)</small><br><br><b>NOTE:<br><small>You will receive an email with your Redeem ID from support@snapprefs.com (Check your Spam/Junk folder).<br>Your transaction ID is NOT your Redeem ID.<br><br>Payments can take up to 24 hours to activate. With payment issues send me an email to the above mentioned address.</small>]]></string>
     <string name="buy_deluxe">Deluxe (9.99$)</string>
     <string name="buy_premium">Premium (2.99$)</string>

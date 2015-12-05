@@ -92,8 +92,15 @@
                 android:layout_alignParentBottom="true">
 
                 <Button
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Visual Filters"
+                    android:id="@+id/visualbtn"
+                    android:layout_weight="1" />
+
+                <Button
                     android:id="@+id/filterStore"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Filters" />

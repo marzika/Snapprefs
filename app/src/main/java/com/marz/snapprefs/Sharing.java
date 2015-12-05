@@ -29,6 +29,9 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
+import static de.robv.android.xposed.XposedHelpers.setObjectField;
+import static de.robv.android.xposed.XposedHelpers.getObjectField;
 
 public class Sharing {
 
@@ -220,6 +223,16 @@ public class Sharing {
                         Logger.log("Set IMAGE media in camerafragment", true);
                     }
                 });
+                /*findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onSnapCapturedEvent", lpparam.classLoader.loadClass("Ue"), new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        Object Ue = param.args[0];
+                        Object captureContext = getStaticObjectField(lpparam.classLoader.loadClass("com.snapchat.android.util.eventbus.SnapCaptureContext"), "CAMERA");
+                        Object snapType = getStaticObjectField(lpparam.classLoader.loadClass("com.snapchat.android.model.Mediabryo$SnapType"), "SNAP");
+                        setObjectField(Ue, "mCaptureContext", captureContext);
+                        setObjectField(getObjectField(Ue, "mMediabryo"), "mSnapType", snapType);
+                    }
+                });*/
                 findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Uri.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {

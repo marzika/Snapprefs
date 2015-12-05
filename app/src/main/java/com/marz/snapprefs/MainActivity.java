@@ -66,6 +66,7 @@ public class MainActivity extends Activity {
         Button donate = (Button) findViewById(R.id.donate);
         Button about = (Button) findViewById(R.id.about);
         Button legal = (Button) findViewById(R.id.legal);
+        Button visual = (Button) findViewById(R.id.visualbtn);
         TextView SC_text = (TextView) findViewById(R.id.SC_text);
         SC_text.setPaintFlags(SC_text.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         settings.setOnClickListener(new Button.OnClickListener() {
@@ -77,6 +78,12 @@ public class MainActivity extends Activity {
         filterStore.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), TabsFragmentActivity.class);
+                startActivity(intent);
+            }
+        });
+        visual.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), VisualActivity.class);
                 startActivity(intent);
             }
         });

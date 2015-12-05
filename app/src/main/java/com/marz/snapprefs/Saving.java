@@ -40,6 +40,7 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.getLongField;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
 
@@ -67,6 +68,8 @@ public class Saving {
     public static int mModeStoryVideo = SAVE_AUTO;
     public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
     public static boolean mTimerUnlimited = true;
+    public static boolean mHideTimerStory = false;
+    public static boolean mLoopingVids = true;
     public static boolean mHideTimer = false;
     public static boolean mToastEnabled = true;
     public static boolean mVibrationEnabled = true;
@@ -79,6 +82,7 @@ public class Saving {
     public static boolean mOverlays = true;
     public static boolean viewingSnap;
     public static Object receivedSnap;
+    public static Object storyReceivedSnap;
     public static Object oldreceivedSnap;
     public static boolean usedOldReceivedSnap = false;
     public static Resources mSCResources;
@@ -93,14 +97,13 @@ public class Saving {
     public static FileInputStream video;
     static XSharedPreferences prefs;
     static SnapType lastSnapType;
-    static String lastSender;
-    static Date lastTimestamp;
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.getDefault());
     private static SimpleDateFormat dateFormatSent = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
     private static XModuleResources mResources;
     private static GestureModel gestureModel;
     private static Class<?> storySnap;
     private static int screenHeight;
+    private static long storyTimestamp;
 
     static void newSaveMethod(FileInputStream mVideo, Bitmap mImage, boolean isOverlay) {
         if (mVideo == null && mImage == null) {
@@ -371,9 +374,25 @@ public class Saving {
                     }
                 }
             });
-            if (mTimerUnlimited == true || mHideTimer == true) {
+            if (mHideTimer == true) {
                 findAndHookMethod("com.snapchat.android.ui.SnapTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
+            }
+            if (mHideTimerStory == true) {
                 findAndHookMethod("com.snapchat.android.ui.StoryTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
+            }
+            if (mLoopingVids == true) {
+                findAndHookMethod("com.snapchat.android.ui.TextureVideoView", lpparam.classLoader, "start", new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        callMethod(param.thisObject, "setLooping", true);
+                    }
+                });
+                findAndHookMethod("com.snapchat.android.controller.countdown.SnapCountdownController ", lpparam.classLoader, "a", long.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        param.args[0] = 100000L;//It's how long you see video looping in milliseconds
+                    }
+                });
             }
             /**
              * We hook this method to handle our gestures made in the SC app itself.
@@ -435,10 +454,17 @@ public class Saving {
             findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass("MY", lpparam.classLoader), findClass("Gr", lpparam.classLoader), new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    if (param.args[0] != null){
+                    if (param.args[0] != null) {
                         //Logger.log("MY INST NULL, IS IT BEFORE THE RENDERING?");
                         receivedSnap = param.args[0];
+                        storyReceivedSnap = param.args[0];
                     }
+                }
+            });
+            findAndHookMethod("GN", lpparam.classLoader, "aK", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    storyTimestamp = getLongField(param.thisObject, "mExpirationTimestamp");
                 }
             });
             final Class<?> TextureVideoView = findClass("com.snapchat.android.ui.TextureVideoView", lpparam.classLoader);
@@ -509,13 +535,13 @@ public class Saving {
             }
             snapType = SnapType.STORY;
             lastSnapType = SnapType.STORY;
+            //timestamp = new Date((Long) getObjectField(storySnap.cast(receivedSnap), "mExpirationTimestamp"));
             timestamp = new Date();
         } else {
             snapType = SnapType.SNAP;
             lastSnapType = SnapType.SNAP;
             timestamp = new Date((Long) callMethod(receivedSnap, Obfuscator.save.SNAP_GETTIMESTAMP)); //Gettimestamp-Snap
         }
-
         String filename = sender + "_" + dateFormat.format(timestamp);
         //Logger.log("usedOldReceivedSnap = " + usedOldReceivedSnap, true);
         if (usedOldReceivedSnap) {
@@ -535,7 +561,7 @@ public class Saving {
                 //}
                 if (saveMode == DO_NOT_SAVE) {
                     Logger.log("Mode: don't save");
-                } else if (saveMode == SAVE_S2S) {
+                } else if (saveMode == SAVE_S2S || saveMode == SAVE_AUTO) {
                     Logger.log("Mode: sweep to save");
                     gestureModel = new GestureModel(receivedSnap, screenHeight, MediaType.GESTUREDVIDEO);
                 } else {
@@ -553,7 +579,7 @@ public class Saving {
                 //}
                 if (saveMode == DO_NOT_SAVE) {
                     Logger.log("Mode: don't save");
-                } else if (saveMode == SAVE_S2S) {
+                } else if (saveMode == SAVE_S2S || saveMode == SAVE_AUTO) {
                     Logger.log("Mode: sweep to save");
                     gestureModel = new GestureModel(receivedSnap, screenHeight, MediaType.GESTUREDIMAGE);
                 } else {
@@ -831,8 +857,20 @@ public class Saving {
         mOverlays = prefs.getBoolean("pref_key_overlay", mOverlays);
         mDebugging = prefs.getBoolean("pref_key_debug_mode", mDebugging);
         mTimerUnlimited = prefs.getBoolean("pref_key_timer_unlimited", mTimerUnlimited);
+        mHideTimerStory = prefs.getBoolean("pref_key_timer_story_hide", mHideTimerStory);
+        mLoopingVids = prefs.getBoolean("pref_key_looping_video", mLoopingVids);
         mHideTimer = prefs.getBoolean("pref_key_timer_hide", mHideTimer);
 
+    }
+
+    public static long hashBitmap(Bitmap bmp){
+        long hash = 31; //or a higher prime at your choice
+        for(int x = 0; x < bmp.getWidth(); x++){
+            for (int y = 0; y < bmp.getHeight(); y++){
+                hash *= (bmp.getPixel(x,y) + 31);
+            }
+        }
+        return hash;
     }
 
     static private ArrayList<View> getAllChildren(View v) {
