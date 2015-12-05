@@ -18,7 +18,7 @@ public class VisualPreview extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.visualpreview);
-        new DownloadImageTask((TouchImageView) findViewById(R.id.img)).execute("https://www.dropbox.com/sh/wf2g0nkl2895pvo/AAAGnOVx0OJi0m_tCLYEuPxQa/visualfilters.png?dl=1");
+        new DownloadImageTask((TouchImageView) findViewById(R.id.img)).execute("http://snapprefs.com/filter.jpg");
     }
     public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         TouchImageView bmImage;

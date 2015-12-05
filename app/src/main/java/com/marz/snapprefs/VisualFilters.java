@@ -16,6 +16,7 @@ package com.marz.snapprefs;
         import android.widget.TextView;
 
         import java.io.File;
+        import java.util.ArrayList;
 
         import de.robv.android.xposed.XC_MethodHook;
         import de.robv.android.xposed.XSharedPreferences;
@@ -71,6 +72,8 @@ public class VisualFilters {
     private static boolean mWalden = false;
     private static boolean mXproll = false;
     static XSharedPreferences prefs;
+    public static ArrayList<String> added = new ArrayList<String>();
+    public static ArrayList<String> added2 = new ArrayList<String>();
 
     enum FilterType {
         AMARO(IFAmaroFilter.class),
@@ -175,10 +178,14 @@ public class VisualFilters {
                         if (visualFilterType == grey) {
                             for (FilterType fType : FilterType.values()) {
                                 if (!fType.isEnabled()) continue;
+                                if(added.contains(fType.toString())){
+                                    continue;
+                                }
                                 Object filter = XposedHelpers.newInstance(lpparam.classLoader.loadClass("Nt$3"), new Class[]{lpparam.classLoader.loadClass("Nt"), lpparam.classLoader.loadClass("com.snapchat.android.ui.swipefilters.VisualFilterType")}, null, null);
                                 XposedHelpers.setAdditionalInstanceField(filter, FILTER_TYPE, fType);
                                 Object wrapper = XposedHelpers.newInstance(fk, new Class[]{lpparam.classLoader.loadClass("Nl")}, filter);
                                 XposedHelpers.callMethod(param.thisObject, "a", wrapper);
+                                added.add(fType.toString());
                             }
                         }
                     }
@@ -189,10 +196,14 @@ public class VisualFilters {
                         if (visualFilterType == grey) {
                             for (FilterType fType : FilterType.values()) {
                                 if (!fType.isEnabled()) continue;
+                                if(added2.contains(fType.toString())){
+                                    continue;
+                                }
                                 Object filter = XposedHelpers.newInstance(lpparam.classLoader.loadClass("Np"), new Class[]{lpparam.classLoader.loadClass("adb$b")}, new Object[]{null});
                                 XposedHelpers.setAdditionalInstanceField(filter, FILTER_TYPE, fType);
                                 Object wrapper = XposedHelpers.newInstance(fk, new Class[]{lpparam.classLoader.loadClass("Nl")}, filter);
                                 XposedHelpers.callMethod(param.thisObject, "a", wrapper);
+                                added2.add(fType.toString());
                             }
                         }
                     }
@@ -286,6 +297,14 @@ public class VisualFilters {
                     v.animate().cancel();
                     v.setAlpha(1.0F);
                 }
+            }
+        });
+        findAndHookMethod(Obfuscator.save.LANDINGPAGEACTIVITY_CLASS, lpparam.classLoader, "onSnapCapturedEvent", findClass("Ue", lpparam.classLoader), new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                added.clear();
+                added2.clear();
+                XposedBridge.log("CLEARING ADDED - VS");
             }
         });
     }

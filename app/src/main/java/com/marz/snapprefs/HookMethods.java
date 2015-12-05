@@ -412,7 +412,12 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 //SNAPPREFS
                 Saving.initSaving(lpparam, mResources, SnapContext);
                 Lens.initLens(lpparam, mResources, SnapContext);
-                VisualFilters.initVisualFilters(lpparam);
+                File vfilters = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/VisualFilters/xpro_map.png");
+                if(vfilters.exists()){
+                    VisualFilters.initVisualFilters(lpparam);
+                } else {
+                    Toast.makeText(context, "VisualFilter files are missing, download them!", Toast.LENGTH_SHORT).show();
+                }
                 if (mMultiFilterBoolean == true){
                     MultiFilter.initMultiFilter(lpparam, mResources, SnapContext);
                 }

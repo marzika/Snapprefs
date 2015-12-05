@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
     <release
+        version="1.6.4"
+        versioncode="23">
+        <change>Updated for 9.20.4.0</change>
+        <change>Added Visual Filters - You can use Instagram like filters (17)</change>
+        <change>Added Visual Filter manager</change>
+        <change>Looping videos - You can watch videos forever</change>
+        <change>Added Blur tool</change>
+        <change>Fixed Vibration settings</change>
+        <change>Removed Auto-save for Stories temporarly</change>
+        <change>NOTE: God mode is not added yet.</change>
+    </release>
+    <release
         version="1.6.3"
         versioncode="22">
         <change>Added Marshmallow compatiblity</change>

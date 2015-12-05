@@ -21,7 +21,7 @@ package com.marz.snapprefs;
 public class Obfuscator {
     // Snapprefs supports v9.15.1.0 and up
     public static final int SUPPORTED_VERSION_CODE = 752;
-    public static final String SUPPORTED_VERSION_CODENAME = "9.20.2.0";
+    public static final String SUPPORTED_VERSION_CODENAME = "9.20.4.0";
     public static final String ROOTDETECTOR_CLASS = "VO";
     public static final String[] ROOTDETECTOR_METHODS= {"b", "c", "d", "e"};
 
