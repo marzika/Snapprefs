@@ -9,6 +9,10 @@
                 android:key="F1997"
                 android:title="F1997" />
             <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="BRANNAN"
+                android:title="BRANNAN" />
+            <CheckBoxPreference
                 android:defaultValue="true"
                 android:key="EARLYBIRD"
                 android:title="EARLYBIRD" />
