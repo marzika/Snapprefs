@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.marz.snapprefs"
     android:versionCode="16"
     android:versionName="1.4.9 beta">
@@ -28,11 +29,12 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     -->
     <application
+        tools:replace="theme"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap = "true"
-        android:theme="@style/App_Theme">
+        android:theme="@style/Snapprefs_Theme">
         <activity
             android:name=".ReceiveMediaActivity"
             android:excludeFromRecents="true"

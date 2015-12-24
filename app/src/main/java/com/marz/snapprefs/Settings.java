@@ -14,6 +14,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
 import net.rdrei.android.dirchooser.DirectoryChooserActivity;
+import net.rdrei.android.dirchooser.DirectoryChooserConfig;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -84,7 +85,13 @@ public class Settings extends PreferenceFragment {
             public boolean onPreferenceClick(Preference preference) {
                 // Open a new activity asking the user to select a folder
                 final Intent chooserIntent = new Intent(getActivity(), DirectoryChooserActivity.class);
-                chooserIntent.putExtra(DirectoryChooserActivity.EXTRA_NEW_DIR_NAME, "Snapprefs");
+                final DirectoryChooserConfig config = DirectoryChooserConfig.builder()
+                        .newDirectoryName("Snapprefs")
+                        .allowReadOnlyDirectory(true)
+                        .allowNewDirectoryNameModification(true)
+                        .build();
+
+                chooserIntent.putExtra(DirectoryChooserActivity.EXTRA_CONFIG, config);
                 startActivityForResult(chooserIntent, REQUEST_CHOOSE_DIR);
                 return true;
             }
@@ -97,7 +104,13 @@ public class Settings extends PreferenceFragment {
             public boolean onPreferenceClick(Preference preference) {
                 // Open a new activity asking the user to select a folder
                 final Intent chooserIntent = new Intent(getActivity(), DirectoryChooserActivity.class);
-                chooserIntent.putExtra(DirectoryChooserActivity.EXTRA_NEW_DIR_NAME, "Snapprefs");
+                final DirectoryChooserConfig config = DirectoryChooserConfig.builder()
+                        .newDirectoryName("Snapprefs")
+                        .allowReadOnlyDirectory(true)
+                        .allowNewDirectoryNameModification(true)
+                        .build();
+
+                chooserIntent.putExtra(DirectoryChooserActivity.EXTRA_CONFIG, config);
                 startActivityForResult(chooserIntent, REQUEST_HIDE_DIR);
                 return true;
             }

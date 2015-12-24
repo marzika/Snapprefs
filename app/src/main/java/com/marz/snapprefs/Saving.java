@@ -257,7 +257,7 @@ public class Saving {
              * Method which gets called to prepare an image for sending (before selecting contacts).
              * We check whether it's an image or a video and save it.
              */
-            findAndHookMethod("com.snapchat.android.preview.SnapPreviewFragment", lpparam.classLoader, "n", new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.SNAPPREVIEWFRAGMENT_CLASS, lpparam.classLoader, "n", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     refreshPreferences();

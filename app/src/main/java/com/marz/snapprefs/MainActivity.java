@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.Html;
 import android.view.View;
@@ -34,7 +35,7 @@ import java.util.jar.Manifest;
 import de.cketti.library.changelog.ChangeLog;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,9 +50,6 @@ public class MainActivity extends Activity {
         UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
         String deviceId = deviceUuid.toString();
         final String confirmationID = readStringPreference("confirmation_id");
-        getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getActionBar().setCustomView(R.layout.abs);
-        getActionBar().setBackgroundDrawable(colorDrawable);
         final Context context = this;
         ChangeLog cl = new ChangeLog(context);
         if (cl.isFirstRun()) {
@@ -60,6 +58,9 @@ public class MainActivity extends Activity {
         //getFragmentManager().beginTransaction().replace(android.R.id.content, new Settings()).commit();
         //PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.activity_main);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setCustomView(R.layout.abs);
+        getSupportActionBar().setBackgroundDrawable(colorDrawable);
         Button settings = (Button) findViewById(R.id.settings);
         Button filterStore = (Button) findViewById(R.id.filterStore);
         Button reedem = (Button) findViewById(R.id.reedem);
