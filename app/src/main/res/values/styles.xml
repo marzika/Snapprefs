@@ -19,6 +19,7 @@
         <item name="android:textColor">@color/white</item>
         <item name="android:paddingTop">4.0dip</item>
         <item name="android:paddingBottom">4.0dip</item>
+        <item name="android:padding">0.0dip</item>
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
