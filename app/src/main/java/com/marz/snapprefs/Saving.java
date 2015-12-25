@@ -257,7 +257,7 @@ public class Saving {
              * Method which gets called to prepare an image for sending (before selecting contacts).
              * We check whether it's an image or a video and save it.
              */
-            findAndHookMethod(Obfuscator.save.SNAPPREVIEWFRAGMENT_CLASS, lpparam.classLoader, "n", new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.SNAPPREVIEWFRAGMENT_CLASS, lpparam.classLoader, "o", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     refreshPreferences();
@@ -412,7 +412,7 @@ public class Saving {
                     snapCL = lpparam.classLoader;
                 }
             });
-            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass("MY", lpparam.classLoader), new XC_MethodHook() {
+            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass(Obfuscator.save.SNAPVIEW_SHOW_FIRST, lpparam.classLoader), new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     //receivedSnap = param.args[0];
@@ -436,7 +436,7 @@ public class Saving {
                     currentViewingSnap = -1;
                 }
             });
-            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass("MY", lpparam.classLoader), findClass("com.snapchat.android.ui.snapview.SnapViewSessionStopReason", lpparam.classLoader), int.class, new XC_MethodHook() {
+            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass(Obfuscator.save.STORYVIEW_SHOW_FIRST, lpparam.classLoader), findClass("com.snapchat.android.ui.snapview.SnapViewSessionStopReason", lpparam.classLoader), int.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Logger.log("Stopped viewing the Story", true);
@@ -451,7 +451,7 @@ public class Saving {
             /**
              * Sets the Snap as Screenshotted, so we constantly return false to it.
              */
-            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass("MY", lpparam.classLoader), findClass("Gr", lpparam.classLoader), new XC_MethodHook() {
+            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass(Obfuscator.save.STORYVIEW_SHOW_FIRST, lpparam.classLoader), findClass(Obfuscator.save.STORYVIEW_SHOW_SECOND, lpparam.classLoader), new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     if (param.args[0] != null) {
@@ -461,12 +461,12 @@ public class Saving {
                     }
                 }
             });
-            findAndHookMethod("GN", lpparam.classLoader, "aK", new XC_MethodHook() {
+            /*findAndHookMethod("GN", lpparam.classLoader, "aK", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     storyTimestamp = getLongField(param.thisObject, "mExpirationTimestamp");
                 }
-            });
+            });*/
             final Class<?> TextureVideoView = findClass("com.snapchat.android.ui.TextureVideoView", lpparam.classLoader);
             findAndHookMethod(Obfuscator.save.VIDEOSNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.VIDEOSNAPRENDERER_SHOW, new XC_MethodHook() {
                 @Override
@@ -480,7 +480,7 @@ public class Saving {
                         Logger.log("FOUND VIDEOVIEW AS A CHILD - " + child.getId(), true);
                         Uri mUri = null;
                         try {
-                            Field mUriField = TextureVideoView.getDeclaredField("i");
+                            Field mUriField = TextureVideoView.getDeclaredField("b");
                             mUriField.setAccessible(true);
                             mUri = (Uri) mUriField.get(view);
                             mVideo = new FileInputStream(Uri.parse(mUri.toString()).getPath());
@@ -561,7 +561,7 @@ public class Saving {
                 //}
                 if (saveMode == DO_NOT_SAVE) {
                     Logger.log("Mode: don't save");
-                } else if (saveMode == SAVE_S2S || saveMode == SAVE_AUTO) {
+                } else if (saveMode == SAVE_S2S) {
                     Logger.log("Mode: sweep to save");
                     gestureModel = new GestureModel(receivedSnap, screenHeight, MediaType.GESTUREDVIDEO);
                 } else {
@@ -579,7 +579,7 @@ public class Saving {
                 //}
                 if (saveMode == DO_NOT_SAVE) {
                     Logger.log("Mode: don't save");
-                } else if (saveMode == SAVE_S2S || saveMode == SAVE_AUTO) {
+                } else if (saveMode == SAVE_S2S) {
                     Logger.log("Mode: sweep to save");
                     gestureModel = new GestureModel(receivedSnap, screenHeight, MediaType.GESTUREDIMAGE);
                 } else {
@@ -846,6 +846,8 @@ public class Saving {
         mModeSnapVideo = prefs.getInt("pref_key_snaps_videos", mModeSnapVideo);
         mModeStoryImage = prefs.getInt("pref_key_stories_images", mModeStoryImage);
         mModeStoryVideo = prefs.getInt("pref_key_stories_videos", mModeStoryVideo);
+        if(mModeStoryVideo==SAVE_AUTO)
+            mModeStoryVideo=SAVE_S2S;
         mTimerMinimum = prefs.getInt("pref_key_timer_minimum", mTimerMinimum);
         mToastEnabled = prefs.getBoolean("pref_key_toasts_checkbox", mToastEnabled);
         mToastLength = prefs.getInt("pref_key_toasts_duration", mToastLength);

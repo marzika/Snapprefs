@@ -41,9 +41,9 @@ public class MultiFilter {
         for (File f : files) {
             XposedBridge.log("Adding " + f.getName());
         }
-        final Class<?> fc = findClass("NA", lpparam.classLoader);
-        final Class<?> el = findClass("MH", lpparam.classLoader); // e-> first param passed
-        findAndHookMethod("NN", lpparam.classLoader, "a", Context.class, findClass("KP", lpparam.classLoader), new XC_MethodHook() {
+        final Class<?> fc = findClass(Obfuscator.filters.OBJECT_CLASS, lpparam.classLoader);
+        final Class<?> el = findClass(Obfuscator.filters.FILTER_CLASS, lpparam.classLoader); // e-> first param passed
+        findAndHookMethod(Obfuscator.filters.LOADER_CLASS, lpparam.classLoader, "a", Context.class, findClass(Obfuscator.filters.LOADER_FIRST, lpparam.classLoader), new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 XposedBridge.log("Adding new filters");
@@ -53,9 +53,9 @@ public class MultiFilter {
                         continue;
                     }
                     Object elObj = XposedHelpers.newInstance(el, param.args[1]);
-                    View view = (View) XposedHelpers.callMethod(param.args[1], "a", new Class[]{int.class, ViewGroup.class, boolean.class}, 2130968587, null, false); //battery_view 2130968587
+                    View view = (View) XposedHelpers.callMethod(param.args[1], "a", new Class[]{int.class, ViewGroup.class, boolean.class}, Obfuscator.filters.BATTERY_VIEW, null, false); //battery_view 2130968587
                     XposedHelpers.setObjectField(elObj, "a", view);
-                    ImageView image = (ImageView) XposedHelpers.callMethod(view, "findViewById", 2131558544); //"Battery" - battery_icon
+                    ImageView image = (ImageView) XposedHelpers.callMethod(view, "findViewById", Obfuscator.filters.BATTERY_ICON); //"Battery" - battery_icon
                     image.setImageBitmap(BitmapFactory.decodeFile(f.getPath()));
                     image.setTranslationY(0);
                     ((List) param.getResult()).add(XposedHelpers.newInstance(fc, elObj));
@@ -63,7 +63,7 @@ public class MultiFilter {
                 }
             }
         });
-        findAndHookMethod(Obfuscator.save.LANDINGPAGEACTIVITY_CLASS, lpparam.classLoader, "onSnapCapturedEvent", findClass("Ue", lpparam.classLoader), new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.save.LANDINGPAGEACTIVITY_CLASS, lpparam.classLoader, "onSnapCapturedEvent", findClass(Obfuscator.filters.CAPTURED_FIRST, lpparam.classLoader), new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 added.clear();

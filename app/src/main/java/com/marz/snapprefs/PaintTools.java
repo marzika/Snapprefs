@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.XModuleResources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -47,9 +49,12 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
+import static de.robv.android.xposed.XposedHelpers.callMethod;
+import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
+import static de.robv.android.xposed.XposedHelpers.callMethod;
 
 public class PaintTools {
     static int color = Color.RED;
@@ -73,6 +78,13 @@ public class PaintTools {
 
 
     public static void initPaint(XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes) {
+        final Bitmap[] bground = new Bitmap[1];
+        findAndHookConstructor("com.snapchat.android.model.Mediabryo", lpparam.classLoader, findClass("com.snapchat.android.model.Mediabryo$a", lpparam.classLoader), new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                bground[0] = (Bitmap) getObjectField(param.thisObject, "mRawImageBitmap");
+            }
+        });
         colorList.add(Color.RED);
         //Use method for setting last point
         XposedHelpers.findAndHookMethod("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, "a", float.class, float.class, new XC_MethodHook() {
@@ -129,7 +141,6 @@ public class PaintTools {
                 DrawingType dType = (DrawingType) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, TYPE);
                 if (dType == DrawingType.DEFAULT || dType == null) return;
                 Canvas c = (Canvas) methodHookParam.args[0];
-                Toast.makeText(context, "ishardwareaccelerated? " + c.isHardwareAccelerated(), Toast.LENGTH_SHORT).show();
                 PointF startPoint = (PointF) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, START_POINT);
                 PointF endPoint = (PointF) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, END_POINT);
                 if (dType == DrawingType.RECTANGLE)
@@ -183,7 +194,12 @@ public class PaintTools {
                         paint.setAlpha(alpha);
                     }
                     if (shouldBlur) {
-                        paint.setColor(0xccFFFFFF);
+                        if (bground[0] != null) {
+                            paint.setColor(0x00000000);
+                            paint.setShader(new BitmapShader(bground[0], Shader.TileMode.REPEAT, Shader.TileMode.REPEAT));
+                        } else {
+                            paint.setColor(0xccFFFFFF);
+                        }
                         paint.setMaskFilter(new BlurMaskFilter(25, BlurMaskFilter.Blur.NORMAL));
                     } else {
                         paint.setMaskFilter(oldMF);
@@ -607,6 +623,45 @@ public class PaintTools {
                                                  final Button star = new Button(context);
                                                  final Button line = new Button(context);
                                                  final Button default_btn = new Button(context);
+                                                 switch (type){
+                                                     case RECTANGLE:
+                                                         rectangle.setTextColor(Color.GREEN);
+                                                         circle.setTextColor(Color.BLACK);
+                                                         star.setTextColor(Color.BLACK);
+                                                         line.setTextColor(Color.BLACK);
+                                                         default_btn.setTextColor(Color.BLACK);
+                                                         break;
+                                                     case CIRCLE:
+                                                         rectangle.setTextColor(Color.BLACK);
+                                                         circle.setTextColor(Color.GREEN);
+                                                         star.setTextColor(Color.BLACK);
+                                                         line.setTextColor(Color.BLACK);
+                                                         default_btn.setTextColor(Color.BLACK);
+                                                         break;
+                                                     case STAR:
+                                                         rectangle.setTextColor(Color.BLACK);
+                                                         circle.setTextColor(Color.BLACK);
+                                                         star.setTextColor(Color.GREEN);
+                                                         line.setTextColor(Color.BLACK);
+                                                         default_btn.setTextColor(Color.BLACK);
+                                                         break;
+                                                     case LINE:
+                                                         rectangle.setTextColor(Color.BLACK);
+                                                         circle.setTextColor(Color.BLACK);
+                                                         star.setTextColor(Color.BLACK);
+                                                         line.setTextColor(Color.GREEN);
+                                                         default_btn.setTextColor(Color.BLACK);
+                                                         break;
+                                                     case DEFAULT:
+                                                         rectangle.setTextColor(Color.BLACK);
+                                                         circle.setTextColor(Color.BLACK);
+                                                         star.setTextColor(Color.BLACK);
+                                                         line.setTextColor(Color.BLACK);
+                                                         default_btn.setTextColor(Color.GREEN);
+                                                         break;
+                                                     default:
+                                                         break;
+                                                 }
                                                  rectangle.setText("Rectangle");
                                                  rectangle.setOnClickListener(new View.OnClickListener() {
                                                      public void onClick(View view) {
@@ -698,7 +753,6 @@ public class PaintTools {
                         type = DrawingType.DEFAULT;
                         shouldErase = false;
                         shouldBlur = true;
-                        Toast.makeText(context, "hidden: " + shouldBlur, Toast.LENGTH_SHORT).show();
                     }
                 });
 

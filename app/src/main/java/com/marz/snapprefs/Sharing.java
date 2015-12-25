@@ -233,7 +233,7 @@ public class Sharing {
                         setObjectField(getObjectField(Ue, "mMediabryo"), "mSnapType", snapType);
                     }
                 });*/
-                findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Uri.class, new XC_MethodHook() {
+                findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Uri.class, int.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         param.args[0] = mediaVid.getContent();

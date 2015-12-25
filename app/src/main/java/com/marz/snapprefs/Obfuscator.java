@@ -20,9 +20,9 @@ package com.marz.snapprefs;
 
 public class Obfuscator {
     // Snapprefs supports v9.15.1.0 and up
-    public static final int SUPPORTED_VERSION_CODE = 752;
-    public static final String SUPPORTED_VERSION_CODENAME = "9.20.4.0";
-    public static final String ROOTDETECTOR_CLASS = "VO";
+    public static final int SUPPORTED_VERSION_CODE = 767;
+    public static final String SUPPORTED_VERSION_CODENAME = "9.21.1.0";
+    public static final String ROOTDETECTOR_CLASS = "abc";
     public static final String[] ROOTDETECTOR_METHODS= {"b", "c", "d", "e"};
 
     /**
@@ -52,6 +52,8 @@ public class Obfuscator {
         public static final String SNAPVIEW_SHOW = "b"; // prev. a
         //First param of SnapView.show -> bdl, avf
         public static final String SNAPVIEW_SHOW_FIRST = "Sp";
+        public static final String STORYVIEW_SHOW_FIRST = "Sp";
+        public static final String STORYVIEW_SHOW_SECOND = "Lw";
         //Second param of SnapView.show -> asz, alr
         public static final String SNAPVIEW_SHOW_SECOND = "Lw";
         //Third param of SnapView.show -> agd, abp
@@ -185,6 +187,22 @@ public class Obfuscator {
         public static final String ASSETREADER_A_CLASS = "TB$a";
         //read()
         public static final String ASSETREADER_READ = "a";
+    }
+    public class filters {
+        //FilterLoader class
+        public static final String LOADER_CLASS = "Te";
+        //FilterLoader First Param
+        public static final String LOADER_FIRST = "PX";
+        //added instance
+        public static final String FILTER_CLASS = "RY";
+        //called Object
+        public static final String OBJECT_CLASS = "SR";
+        //onSnapCapturedEvent first param
+        public static final String CAPTURED_FIRST = "Zs";
+        //public.xml - battery_view
+        public static final int BATTERY_VIEW = 2130968587;
+        //public.xml - battery_icon
+        public static final int BATTERY_ICON = 2131558548;
     }
     public class visualfilters {
         public static final String FILTERS_CLASS = "SC";
