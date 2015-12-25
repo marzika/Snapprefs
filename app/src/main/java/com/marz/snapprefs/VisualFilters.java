@@ -217,7 +217,7 @@ public class VisualFilters {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (context == null) {
-                    context = (Context) XposedHelpers.getObjectField(param.thisObject, "a");
+                    context = (Context) XposedHelpers.getObjectField(param.thisObject, "b");
                 }
             }
         });

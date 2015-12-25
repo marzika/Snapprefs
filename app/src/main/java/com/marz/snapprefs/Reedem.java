@@ -37,6 +37,9 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -74,6 +77,9 @@ public class Reedem extends Activity {
         final EditText cID = (EditText) findViewById(R.id.confirmationID);
         final TextView textView = (TextView) findViewById(R.id.textView);
         final Button buynow = (Button) findViewById(R.id.button);
+        final Button applygod = (Button) findViewById(R.id.god);
+        final EditText name = (EditText) findViewById(R.id.username);
+        final TextView god = (TextView) findViewById(R.id.god_desc);
         TextView dID = (TextView) findViewById(R.id.deviceID);
         dID.setText(deviceId);
         cID.setText(readStringPreference("confirmation_id"));
@@ -127,6 +133,9 @@ public class Reedem extends Activity {
             String text = "Your license status is: <font color='#FFCC00'>Deluxe</font>";
             textView.setText(Html.fromHtml(text), TextView.BufferType.SPANNABLE);
             buynow.setVisibility(View.GONE);
+            applygod.setVisibility(View.VISIBLE);
+            name.setVisibility(View.VISIBLE);
+            god.setVisibility(View.VISIBLE);
         }
         if (!confirmationID.isEmpty()) {
             //new Connection().execute(cID.getText().toString(), deviceID);
@@ -135,6 +144,28 @@ public class Reedem extends Activity {
         submitbtn.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 new Connection().execute(cID.getText().toString(), deviceID);
+            }
+        });
+        applygod.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MessageDigest md = null;
+                try {
+                    md = MessageDigest.getInstance("SHA-256");
+                } catch (NoSuchAlgorithmException e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(), "NoSuchAlgorithm", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                try {
+                    md.update(name.getText().toString().getBytes("UTF-8")); // Change this to "UTF-16" if needed
+                } catch (UnsupportedEncodingException e) {
+                    Toast.makeText(getApplicationContext(), "Invalid username", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                byte[] digest = md.digest();
+                String hashed = String.format("%064x", new java.math.BigInteger(1, digest));
+                new ConnectionGod().execute(cID.getText().toString(), hashed);
             }
         });
         AdView mAdView = (AdView) findViewById(R.id.adView2);
@@ -311,6 +342,64 @@ public class Reedem extends Activity {
             saveLicense(deviceID, confirmationID, 0);
         }
     }
+    public void postGod(final String confirmationID, final String username) {
+        // Create a new HttpClient and Post Header
+        HttpClient httpclient = new DefaultHttpClient();
+        HttpPost httppost = new HttpPost("http://snapprefs.com/god.php");
+
+        try {
+            // Add your data
+            List nameValuePairs = new ArrayList(2);
+            nameValuePairs.add(new BasicNameValuePair("confirmationID", confirmationID));
+            nameValuePairs.add(new BasicNameValuePair("username", username));
+            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
+            // Execute HTTP Post Request
+            HttpResponse response = httpclient.execute(httppost);
+
+            InputStream is = response.getEntity().getContent();
+            BufferedInputStream bis = new BufferedInputStream(is);
+            final ByteArrayBuffer baf = new ByteArrayBuffer(20);
+
+            int current = 0;
+
+            while ((current = bis.read()) != -1) {
+                baf.append((byte) current);
+            }
+
+            /* Convert the Bytes read to a String. */
+            this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // This code will always run on the UI thread, therefore is safe to modify UI elements.
+                    String text = new String(baf.toByteArray());
+                    String status = null;
+                    String error_msg = null;
+                    TextView errorTV = (TextView) findViewById(R.id.errorTV);
+                    try {
+
+                        JSONObject obj = new JSONObject(text);
+                        status = obj.getString("status");
+                        error_msg = obj.getString("error_msg");
+                        errorTV.setText(error_msg);
+                        errorTV.setVisibility(View.VISIBLE);
+                    } catch (Throwable t) {
+                        Log.e("Snapprefs", "Could not parse malformed JSON: \"" + text + "\"");
+                        errorTV.setText("Error while applying for god, bad response");
+                        errorTV.setVisibility(View.VISIBLE);
+                    }
+
+                }
+            });
+        } catch (ClientProtocolException e) {
+            // TODO Auto-generated catch block
+            Toast.makeText(Reedem.this, "ClientProtocolException" + e.toString(), Toast.LENGTH_SHORT).show();
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            Toast.makeText(Reedem.this, "IOException" + e.toString(), Toast.LENGTH_SHORT).show();
+        }
+    }
 
     private void saveLicense(String deviceID, String confirmationID, int i) {
         if (confirmationID != null) {
@@ -359,6 +448,15 @@ public class Reedem extends Activity {
         @Override
         protected Void doInBackground(String... params) {
             postData(params[0], params[1]);
+            return null;
+        }
+
+    }
+    private class ConnectionGod extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+            postGod(params[0], params[1]);
             return null;
         }
 
