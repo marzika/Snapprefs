@@ -14,9 +14,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.Html;
 import android.view.View;
@@ -35,7 +32,7 @@ import java.util.jar.Manifest;
 import de.cketti.library.changelog.ChangeLog;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,9 +55,9 @@ public class MainActivity extends AppCompatActivity {
         //getFragmentManager().beginTransaction().replace(android.R.id.content, new Settings()).commit();
         //PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setCustomView(R.layout.abs);
-        getSupportActionBar().setBackgroundDrawable(colorDrawable);
+        getActionBar().setDisplayShowCustomEnabled(true);
+        getActionBar().setCustomView(R.layout.abs);
+        getActionBar().setBackgroundDrawable(colorDrawable);
         Button settings = (Button) findViewById(R.id.settings);
         Button filterStore = (Button) findViewById(R.id.filterStore);
         Button reedem = (Button) findViewById(R.id.reedem);
@@ -72,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         SC_text.setPaintFlags(SC_text.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         settings.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                getFragmentManager().beginTransaction().replace(R.id.frame_layout, new Settings()).commit();
+                getFragmentManager().beginTransaction().replace(R.id.frame_layout, new Settings()).addToBackStack("preferences").commit();
                 PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.preferences, false);
             }
         });
