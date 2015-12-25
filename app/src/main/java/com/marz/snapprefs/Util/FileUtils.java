@@ -60,6 +60,8 @@ public class FileUtils {
         } catch (Exception e) {
             Logger.log("INSTALL HANDLEEXTERNALSTORAGE TO FIX THE ISSUE -- FileUtils: File SDread failed " + e.toString(), true);
         }
+        if (aBuffer.equalsIgnoreCase(""))
+            aBuffer="0";
         return aBuffer;
     }
 
