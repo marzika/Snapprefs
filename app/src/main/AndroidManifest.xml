@@ -65,6 +65,10 @@
         </activity>
 
         <meta-data
+            android:name="storeprefs_mainclass"
+            android:value="com.marz.snapprefs.StorePrefs" />
+
+        <meta-data
             android:name="xposedmodule"
             android:value="true" />
         <meta-data
