@@ -47,7 +47,7 @@
     <string name="pref_update_title">To get the latest updates</string>
     <string name="pref_update_summary">Add \'snapprefs\' on Snapchat</string>
     <string name="version_text">Version</string>
-    <string name="version_summary" translatable="false">Current version is: v1.6.4</string>
+    <string name="version_summary" translatable="false">Current version is: v1.6.5</string>
     <string name="general">General settings</string>
     <string name="saving">Saving settings</string>
     <string name="sharing">Sharing settings</string>

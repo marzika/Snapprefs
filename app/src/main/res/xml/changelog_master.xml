@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
     <release
+        version="1.6.5"
+        versioncode="24">
+        <change>Updated for 9.21.1.0</change>
+        <change>Re-enabled auto-save for snaps</change>
+        <change>Deluxe users now can apply for the GOD mode</change>
+        <change>Fixed the bug which exited the app when pressing back button in the settings</change>
+        <change>GIVEAWAY: VISIT http://snapprefs.com/giveaway.php FOR MORE INFO</change>
+    </release>
+    <release
         version="1.6.4"
         versioncode="23">
         <change>Updated for 9.20.4.0</change>
