@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/frame_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginTop="@dimen/default_gap_3x">
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:gravity="center|center_horizontal|top"
+                android:text="Welcome to SNAPPREFS!"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_below="@+id/textView4"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:background="@drawable/logo"
+                android:layout_marginTop="@dimen/default_gap" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/about"
+                android:layout_centerHorizontal="true"
+                android:layout_gravity="center"
+                android:baselineAligned="false"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginTop="@dimen/default_gap_2x">
+
+                <TextView
+                    android:id="@+id/IG_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:clickable="true"
+                    android:text="Follow me on IG: \@meszarosmarci"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <TextView
+                    android:id="@+id/SC_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:clickable="false"
+                    android:text="Add me on SC: snapprefs"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:layout_marginTop="@dimen/default_gap" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="Build version:"
+                    android:id="@+id/textView9"
+                    android:layout_marginTop="@dimen/default_gap_5x"
+                    android:layout_gravity="center" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:text="For Snapchat™ version:"
+                    android:id="@+id/textView10"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="@dimen/default_gap"
+                    android:phoneNumber="false" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </FrameLayout>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center|bottom"
+        android:visibility="visible"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-6910530129073042/7440988016"></com.google.android.gms.ads.AdView>
+</RelativeLayout>

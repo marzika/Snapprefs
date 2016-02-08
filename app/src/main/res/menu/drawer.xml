@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+<item android:title="Main"
+    android:id="@+id/nav_item_main"
+    android:icon="@drawable/snapprefs_btn_check_on_holo_light"/>
+
+<item android:title="Settings"
+    android:id="@+id/nav_item_settings"
+    android:icon="@drawable/snapprefs_btn_check_on_holo_light"/>
+
+
+</menu>

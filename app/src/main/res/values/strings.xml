@@ -8,7 +8,7 @@
     <string name="pref_debug_title">INFORMATIONS</string>
 
     <string name="pref_thanks_title">Thanks to</string>
-    <string name="pref_thanks_summary">stirante, P1ngu1n, manvir, elesbb, chiralcode, Yoganandh, bnalls33, cketti, ddmanfire, MikeOrtiz, sangmingming</string>
+    <string name="pref_thanks_summary">stirante, Mr. Yawnie, P1ngu1n, manvir, elesbb, chiralcode, Yoganandh, bnalls33, cketti, ddmanfire, MikeOrtiz, sangmingming</string>
     <string name="pref_donate_title">Donate</string>
     <string name="pref_donate_summary">Support me by buying some coffee using PayPal. Donations are highly appreciated.</string>
 
@@ -328,4 +328,5 @@
     <string name="pref_paint_cb_summary_off">Paint Tools are not enabled</string>
     <string name="pref_paint_cb_summary_on">Paint Tools are enabled</string>
     <string name="pref_paint_cb_title">Enable Paint Tools</string>
+    <string name="licenses">Snapprefs is licensed under GNU GPLv3. \n\n\nUsed libraries - License:\n\nckChangeLog - Apache License 2.0\nColorPicker for Android - Apache Lic. 2.0\nDirChooser - Apache License 2.0\nmp4parser - Free License\n\n\nModule was originally based on:\nKeepchat - GNU GPLv3\nSnapshare - GNU GPLv3</string>
 </resources>
