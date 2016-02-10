@@ -12,7 +12,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginTop="@dimen/default_gap_3x">
 
@@ -21,32 +21,66 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Huge thanks to:"
-                android:id="@+id/textView8"
-                android:layout_gravity="center" />
+                android:id="@+id/thanks_title"
+                android:layout_gravity="center"
+                android:textColor="@color/black" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@string/pref_thanks_summary"
-                android:id="@+id/textView11"
-                android:layout_marginTop="@dimen/default_gap" />
+                android:id="@+id/thanks_desc"
+                android:layout_marginTop="@dimen/default_gap"
+                android:layout_margin="@dimen/default_gap"
+                android:layout_gravity="center"
+                android:gravity="center" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="Legal"
-                android:id="@+id/textView12"
+                android:id="@+id/legal_title"
                 android:layout_gravity="center"
-                android:layout_marginTop="@dimen/default_gap_3x" />
+                android:layout_marginTop="@dimen/default_gap_3x"
+                android:textColor="@color/black" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@string/licenses"
-                android:id="@+id/textView13" />
+                android:id="@+id/legal_desc"
+                android:layout_margin="@dimen/default_gap"
+                android:layout_gravity="center"
+                android:gravity="center" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_margin="@dimen/default_gap">
+
+                <Button
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="GPLv3"
+                    android:id="@+id/GPL"
+                    android:layout_weight="1"
+                    android:singleLine="false" />
+
+                <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Apache 2.0"
+                    android:id="@+id/apache"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
         </LinearLayout>
     </FrameLayout>
 
@@ -59,6 +93,6 @@
         android:layout_gravity="center|bottom"
         android:visibility="visible"
         ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-6910530129073042/7440988016"></com.google.android.gms.ads.AdView>
+        ads:adUnitId="ca-app-pub-6910530129073042/7440988016"/>
 
 </RelativeLayout>

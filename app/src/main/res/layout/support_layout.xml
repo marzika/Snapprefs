@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/frame_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Support"
+                android:id="@+id/support_title"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/default_gap_2x" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Click to visit the official XDA thread"
+                android:id="@+id/xda_text"
+                android:layout_marginTop="@dimen/default_gap_2x"
+                android:layout_gravity="center" />
+
+            <ImageButton
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:id="@+id/xda"
+                android:layout_marginTop="@dimen/default_gap_2x"
+                android:layout_gravity="center"
+                android:src="@drawable/xda"
+                android:scaleType="centerCrop"
+                android:background="@drawable/aa_blank" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Click to visit the official G+ page"
+                android:id="@+id/gplu_text"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/default_gap_2x" />
+
+            <ImageButton
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:id="@+id/gplus"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/default_gap"
+                android:src="@drawable/googleplus"
+                android:scaleType="fitXY"
+                android:background="@drawable/aa_blank" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Click to visit the official Reddit subreddit"
+                android:id="@+id/reddit_text"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/default_gap_2x" />
+
+            <ImageButton
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:id="@+id/reddit"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/default_gap"
+                android:src="@drawable/reddit"
+                android:scaleType="fitXY"
+                android:background="@drawable/aa_blank" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center|bottom"
+        android:visibility="visible"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-6910530129073042/7440988016"/>
+</RelativeLayout>

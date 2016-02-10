@@ -328,5 +328,5 @@
     <string name="pref_paint_cb_summary_off">Paint Tools are not enabled</string>
     <string name="pref_paint_cb_summary_on">Paint Tools are enabled</string>
     <string name="pref_paint_cb_title">Enable Paint Tools</string>
-    <string name="licenses">Snapprefs is licensed under GNU GPLv3. \n\n\nUsed libraries - License:\n\nckChangeLog - Apache License 2.0\nColorPicker for Android - Apache Lic. 2.0\nDirChooser - Apache License 2.0\nmp4parser - Free License\n\n\nModule was originally based on:\nKeepchat - GNU GPLv3\nSnapshare - GNU GPLv3</string>
+    <string name="licenses">Snapprefs is licensed under GNU GPLv3. \n\nUsed libraries - License:\nckChangeLog - Apache License 2.0\nColorPicker for Android - Apache Lic. 2.0\nDirChooser - Apache License 2.0\nmp4parser - Free License\n\nModule was originally based on:\nKeepchat - GNU GPLv3\nSnapshare - GNU GPLv3\n\nSnapchat™ is the property of Snapchat Inc.\nSnapprefs is in no way affiliated with, authorized, maintained, sponsored or endorsed by the Snapchat Inc. or any of its affiliates or subsidiaries. This is an independent application.</string>
 </resources>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/default_gap">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Premium ($2.99)"
+        android:id="@+id/premium_title"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/default_gap"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Black typing alert\nBlock presence from Chat\nUnlimited groups"
+        android:id="@+id/premium_desc"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/default_gap"
+        android:layout_marginLeft="@dimen/default_gap_4x"
+        android:layout_marginRight="@dimen/default_gap_4x" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/premium"
+        android:src="@drawable/buy"
+        android:background="@drawable/aa_blank"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/default_gap"
+        android:minHeight="35dp"
+        android:minWidth="125dp"
+        android:scaleType="fitXY" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Deluxe ($9.99)"
+        android:id="@+id/deluxe_title"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/default_gap_3x"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Every Premium Feature\nStealth Viewing - snaps appear as unviewed\nGod mode - users can&apos;t save your snaps"
+        android:id="@+id/deluxe_desc"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/default_gap"
+        android:layout_marginLeft="@dimen/default_gap_4x"
+        android:layout_marginRight="@dimen/default_gap_4x" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/deluxe"
+        android:src="@drawable/buy"
+        android:background="@drawable/aa_blank"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/default_gap"
+        android:minHeight="35dp"
+        android:minWidth="125dp"
+        android:scaleType="fitXY" />
+
+</LinearLayout>

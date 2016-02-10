@@ -1,4 +1,4 @@
-package com.marz.snapprefs;
+package com.marz.snapprefs.Tabs;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,10 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.marz.snapprefs.Fragments.AboutFragment;
-import com.marz.snapprefs.Fragments.CreditsFragment;
+import com.marz.snapprefs.Fragments.SupportFragment;
 import com.marz.snapprefs.Fragments.MainFragment;
+import com.marz.snapprefs.R;
 
-public class TabFragment extends Fragment {
+public class SavingTabFragment extends Fragment {
 
     public static TabLayout tabLayout;
     public static ViewPager viewPager;
@@ -68,8 +69,8 @@ public class TabFragment extends Fragment {
         {
             switch (position){
                 case 0 : return new MainFragment();
-                case 1 : return new AboutFragment();
-                case 2 : return new CreditsFragment();
+                case 1 : return new SupportFragment();
+                case 2 : return new AboutFragment();
             }
             return null;
         }
@@ -90,11 +91,11 @@ public class TabFragment extends Fragment {
 
             switch (position){
                 case 0 :
-                    return "Main";
+                    return "Welcome";
                 case 1 :
-                    return "About";
+                    return "Support";
                 case 2 :
-                    return "Credits";
+                    return "About";
             }
             return null;
         }
