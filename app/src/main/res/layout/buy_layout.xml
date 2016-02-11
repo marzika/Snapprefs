@@ -18,7 +18,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Black typing alert\nBlock presence from Chat\nUnlimited groups"
+        android:text="Block typing alert\nBlock presence from Chat\nUnlimited groups\nRemove Ads"
         android:id="@+id/premium_desc"
         android:layout_gravity="center"
         android:layout_marginTop="@dimen/default_gap"
@@ -44,7 +44,7 @@
         android:text="Deluxe ($9.99)"
         android:id="@+id/deluxe_title"
         android:layout_gravity="center"
-        android:layout_marginTop="@dimen/default_gap_3x"
+        android:layout_marginTop="@dimen/default_gap_4x"
         android:textColor="@color/black" />
 
     <TextView

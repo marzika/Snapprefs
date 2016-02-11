@@ -320,6 +320,7 @@
     <string name="pref_typing_title">Block typing and presence alert in chat</string>
     <string name="pref_typing_summary_on">They will be blocked</string>
     <string name="pref_typing_summary_off">They will NOT be blocked</string>
+    <string name="pref_group_unlim_title">Unlimited Groups (3+)</string>
     <string name="pref_viewed_summary_off">Stealth viewing will NOT be executed</string>
     <string name="pref_viewed_summary_on">Stealth viewing will be executed</string>
     <string name="pref_viewed_title">Stealth Viewing</string>

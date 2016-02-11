@@ -1,6 +1,5 @@
 package com.marz.snapprefs;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
@@ -25,9 +24,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.marz.snapprefs.FilterStoreUtils.TabsFragmentActivity;
 
-import java.security.Permission;
 import java.util.UUID;
-import java.util.jar.Manifest;
 
 import de.cketti.library.changelog.ChangeLog;
 
@@ -52,7 +49,7 @@ public class MainActivity extends Activity {
         if (cl.isFirstRun()) {
             cl.getLogDialog().show();
         }
-        //getFragmentManager().beginTransaction().replace(android.R.id.content, new Settings()).commit();
+        //getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsOld()).commit();
         //PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.activity_main);
         getActionBar().setDisplayShowCustomEnabled(true);
@@ -69,7 +66,7 @@ public class MainActivity extends Activity {
         SC_text.setPaintFlags(SC_text.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         settings.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
-                getFragmentManager().beginTransaction().replace(R.id.frame_layout, new Settings()).addToBackStack("preferences").commit();
+                getFragmentManager().beginTransaction().replace(R.id.frame_layout, new SettingsOld()).addToBackStack("preferences").commit();
                 PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.preferences, false);
             }
         });

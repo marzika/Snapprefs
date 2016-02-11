@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_hidebf"
+        android:summary="@string/hidebf_summary"
+        android:title="@string/hidebf_text" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_key_paint_checkbox"
+        android:summaryOff="@string/pref_paint_cb_summary_off"
+        android:summaryOn="@string/pref_paint_cb_summary_on"
+        android:title="@string/pref_paint_cb_title" />
+</PreferenceScreen>

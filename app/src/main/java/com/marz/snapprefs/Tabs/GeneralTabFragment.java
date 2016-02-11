@@ -5,22 +5,19 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.marz.snapprefs.Fragments.AboutFragment;
-import com.marz.snapprefs.Fragments.SupportFragment;
-import com.marz.snapprefs.Fragments.MainFragment;
 import com.marz.snapprefs.R;
+import com.marz.snapprefs.Settings.BaseSettings;
 
 public class GeneralTabFragment extends Fragment {
 
     public static TabLayout tabLayout;
     public static ViewPager viewPager;
-    public static int int_items = 3 ;
+    public static int int_items = 5 ;
 
     @Nullable
     @Override
@@ -28,7 +25,7 @@ public class GeneralTabFragment extends Fragment {
         /**
          *Inflate tab_layout and setup Views.
          */
-        View x =  inflater.inflate(R.layout.tab_layout,null);
+        View x =  inflater.inflate(R.layout.tab_layout,container, false);
         tabLayout = (TabLayout) x.findViewById(R.id.tabs);
         viewPager = (ViewPager) x.findViewById(R.id.viewpager);
 
@@ -54,7 +51,7 @@ public class GeneralTabFragment extends Fragment {
 
     }
 
-    class MyAdapter extends FragmentPagerAdapter{
+    class MyAdapter extends CachedFragmentPager{
 
         public MyAdapter(FragmentManager fm) {
             super(fm);
@@ -65,12 +62,14 @@ public class GeneralTabFragment extends Fragment {
          */
 
         @Override
-        public Fragment getItem(int position)
+        public Fragment initItem(int position)
         {
             switch (position){
-                case 0 : return new MainFragment();
-                case 1 : return new SupportFragment();
-                case 2 : return new AboutFragment();
+                case 0 : return new BaseSettings().setPreferenceId(R.xml.timer_prefs);
+                case 1 : return new BaseSettings().setPreferenceId(R.xml.select_prefs);
+                case 2 : return new BaseSettings().setPreferenceId(R.xml.stickers_prefs);
+                case 3 : return new BaseSettings().setPreferenceId(R.xml.filters_prefs);
+                case 4 : return new BaseSettings().setPreferenceId(R.xml.misc_prefs);
             }
             return null;
         }
@@ -91,11 +90,15 @@ public class GeneralTabFragment extends Fragment {
 
             switch (position){
                 case 0 :
-                    return "Welcome";
+                    return "Timer";
                 case 1 :
-                    return "Support";
+                    return "Select all";
                 case 2 :
-                    return "About";
+                    return "Stickers";
+                case 3 :
+                    return "Filters";
+                case 4 :
+                    return "Misc.";
             }
             return null;
         }

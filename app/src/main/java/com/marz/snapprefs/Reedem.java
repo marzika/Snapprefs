@@ -60,7 +60,7 @@ public class Reedem extends Activity {
         getActionBar().setCustomView(R.layout.abs);
         getActionBar().setBackgroundDrawable(colorDrawable);
         final Context context = this;
-        //getFragmentManager().beginTransaction().replace(android.R.id.content, new Settings()).commit();
+        //getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsOld()).commit();
         //PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
 

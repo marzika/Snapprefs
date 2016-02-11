@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_custom_filter_checkbox"
+        android:summaryOff="@string/pref_custom_filter_cb_summary_off"
+        android:summaryOn="@string/pref_custom_filter_cb_summary_on"
+        android:title="@string/pref_custom_filter_cb_title" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_key_multi_filter_checkbox"
+        android:summaryOff="@string/pref_multi_filter_cb_summary_off"
+        android:summaryOn="@string/pref_multi_filter_cb_summary_on"
+        android:title="@string/pref_multi_filter_cb_title" />
+</PreferenceScreen>

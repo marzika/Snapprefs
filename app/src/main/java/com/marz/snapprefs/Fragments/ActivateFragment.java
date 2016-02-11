@@ -57,7 +57,7 @@ public class ActivateFragment extends Fragment {
         view = inflater.inflate(R.layout.activate_layout,
                 container, false);
         final Context context = getActivity().getApplicationContext();
-        //getFragmentManager().beginTransaction().replace(android.R.id.content, new Settings()).commit();
+        //getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsOld()).commit();
         //PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         final TelephonyManager tm = (TelephonyManager) getActivity().getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
 

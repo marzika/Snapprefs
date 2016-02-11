@@ -18,7 +18,7 @@ import net.rdrei.android.dirchooser.DirectoryChooserActivity;
 import java.io.File;
 import java.io.FileOutputStream;
 
-public class Settings extends PreferenceFragment {
+public class SettingsOld extends PreferenceFragment {
     public static final String PREF_KEY_SAVE_LOCATION = "pref_key_save_location";
     public static final String PREF_KEY_HIDE_LOCATION = "pref_key_hide_location";
     public static final String PREF_KEY_FILTER_LOCATION = "pref_key_filter_location";

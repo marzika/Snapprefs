@@ -35,4 +35,6 @@ dependencies {
     compile 'com.google.android.gms:play-services:7.0.0'
     compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.3.0'
     compile 'com.android.support:design:23.1.1'
+    compile 'com.android.support:preference-v7:23.1.1'
+    compile 'com.android.support:preference-v14:23.1.1'
 }

@@ -8,16 +8,16 @@
     android:icon="@drawable/snapprefs_btn_check_on_holo_light" />
 <item android:title="Premium / Deluxe"
         android:id="@+id/nav_item_deluxe_section"
-        android:icon="@drawable/snapprefs_btn_check_on_holo_light">
+        android:icon="@drawable/premium">
         <menu>
             <item
                 android:title="Buy / Activate membership"
                 android:id="@+id/nav_item_buy"
-                android:icon="@drawable/snapprefs_btn_check_on_holo_light"/>
+                android:icon="@drawable/premium_buy"/>
             <item
                 android:title="Premium &amp; Deluxe settings"
                 android:id="@+id/nav_item_deluxe"
-                android:icon="@drawable/snapprefs_btn_check_on_holo_light"/>
+                android:icon="@drawable/premium"/>
         </menu>
 </item>
 <item android:title="Settings"
@@ -27,7 +27,7 @@
         <item
             android:title="General"
             android:id="@+id/nav_item_general"
-            android:icon="@drawable/snapprefs_btn_check_on_holo_light"/>
+            android:icon="@drawable/general"/>
         <item
             android:title="Saving"
             android:id="@+id/nav_item_saving"
@@ -35,23 +35,23 @@
         <item
             android:title="Text customization"
             android:id="@+id/nav_item_text"
-            android:icon="@drawable/snapprefs_btn_check_on_holo_light"/>
+            android:icon="@drawable/text"/>
         <item
             android:title="Spoofing"
             android:id="@+id/nav_item_spoofing"
-            android:icon="@drawable/snapprefs_btn_check_on_holo_light"/>
+            android:icon="@drawable/spoof"/>
         <item
             android:title="Sharing"
             android:id="@+id/nav_item_sharing"
-            android:icon="@drawable/snapprefs_btn_check_on_holo_light"/>
+            android:icon="@drawable/sharing"/>
         <item
             android:title="Data saving"
             android:id="@+id/nav_item_data"
-            android:icon="@drawable/snapprefs_btn_check_on_holo_light"/>
+            android:icon="@drawable/datasaving"/>
         <item
             android:title="Visual Filters / Filters"
             android:id="@+id/nav_item_filters"
-            android:icon="@drawable/snapprefs_btn_check_on_holo_light"/>
+            android:icon="@drawable/filter"/>
     </menu>
 </item>
 </menu>

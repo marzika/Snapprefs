@@ -11,16 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.marz.snapprefs.Fragments.AboutFragment;
-import com.marz.snapprefs.Fragments.SupportFragment;
-import com.marz.snapprefs.Fragments.MainFragment;
 import com.marz.snapprefs.R;
+import com.marz.snapprefs.Settings.BaseSettings;
 
 public class DeluxeTabFragment extends Fragment {
 
     public static TabLayout tabLayout;
     public static ViewPager viewPager;
-    public static int int_items = 3 ;
+    public static int int_items = 2;
 
     @Nullable
     @Override
@@ -68,9 +66,8 @@ public class DeluxeTabFragment extends Fragment {
         public Fragment getItem(int position)
         {
             switch (position){
-                case 0 : return new MainFragment();
-                case 1 : return new SupportFragment();
-                case 2 : return new AboutFragment();
+                case 0 : return new BaseSettings().setPreferenceId(R.xml.premium_prefs);
+                case 1 : return new BaseSettings().setPreferenceId(R.xml.deluxe_prefs);
             }
             return null;
         }
@@ -91,11 +88,9 @@ public class DeluxeTabFragment extends Fragment {
 
             switch (position){
                 case 0 :
-                    return "Welcome";
+                    return "Premium";
                 case 1 :
-                    return "Support";
-                case 2 :
-                    return "About";
+                    return "Deluxe";
             }
             return null;
         }
