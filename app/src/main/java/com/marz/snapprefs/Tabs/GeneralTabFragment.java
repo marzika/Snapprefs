@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.marz.snapprefs.R;
 import com.marz.snapprefs.Settings.BaseSettings;
+import com.marz.snapprefs.Settings.MiscSettings;
 
 public class GeneralTabFragment extends Fragment {
 
@@ -69,7 +70,7 @@ public class GeneralTabFragment extends Fragment {
                 case 1 : return new BaseSettings().setPreferenceId(R.xml.select_prefs);
                 case 2 : return new BaseSettings().setPreferenceId(R.xml.stickers_prefs);
                 case 3 : return new BaseSettings().setPreferenceId(R.xml.filters_prefs);
-                case 4 : return new BaseSettings().setPreferenceId(R.xml.misc_prefs);
+                case 4 : return new MiscSettings().setPreferenceId(R.xml.misc_prefs);
             }
             return null;
         }

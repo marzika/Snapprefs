@@ -13,6 +13,10 @@
         android:title="@string/pref_paint_cb_title" />
     <CheckBoxPreference
         android:defaultValue="false"
+        android:key="pref_key_launcher"
+        android:title="@string/hide_text" />
+    <CheckBoxPreference
+        android:defaultValue="true"
         android:key="pref_key_debug"
         android:title="@string/debug_text" />
 </PreferenceScreen>

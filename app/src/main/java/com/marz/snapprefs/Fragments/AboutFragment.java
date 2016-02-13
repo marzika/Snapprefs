@@ -23,6 +23,7 @@ public class AboutFragment extends Fragment {
         View view = inflater.inflate(R.layout.about_layout,null);
         Button gpl = (Button) view.findViewById(R.id.GPL);
         Button apache  = (Button) view.findViewById(R.id.apache);
+        Button mpl2  = (Button) view.findViewById(R.id.mpl2);
         gpl.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 try {
@@ -38,6 +39,17 @@ public class AboutFragment extends Fragment {
             public void onClick(View v) {
                 try {
                     Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.apache.org/licenses/LICENSE-2.0"));
+                    startActivity(myIntent);
+                } catch (ActivityNotFoundException e) {
+                    Toast.makeText(getActivity().getApplicationContext(), "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+            }
+        });
+        mpl2.setOnClickListener(new Button.OnClickListener() {
+            public void onClick(View v) {
+                try {
+                    Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.mozilla.org/en-US/MPL/2.0/"));
                     startActivity(myIntent);
                 } catch (ActivityNotFoundException e) {
                     Toast.makeText(getActivity().getApplicationContext(), "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
