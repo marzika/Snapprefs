@@ -13,7 +13,6 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
-import net.rdrei.android.dirchooser.DirectoryChooserActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -53,100 +52,6 @@ public class SettingsOld extends PreferenceFragment {
         // Add listener to the Launcher preference
         //Preference launcherPref = findPreference("pref_launcher");
         //launcherPref.setOnPreferenceChangeListener(launcherChangeListener);
-        /*
-        // Add version to the About preference
-        Preference aboutPreference = findPreference("pref_about");
-        aboutPreference.setTitle(getString(R.string.pref_about_title, BuildConfig.VERSION_NAME));
-*/
-        // If the Save Location doesn't exist in SharedPreferences add it
-       /* if (!sharedPreferences.contains(PREF_KEY_SAVE_LOCATION)) {
-            String defaultLocation = Environment.getExternalStorageDirectory().toString() + "/Snapprefs";
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(PREF_KEY_SAVE_LOCATION, defaultLocation);
-            editor.apply();
-        }
-        */
-
-        Preference spoofingChooser = findPreference(PREF_KEY_LOCATION_PICKER);
-        spoofingChooser.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                final Intent mapIntent = new Intent(getActivity(), MapsActivity.class);
-                startActivity(mapIntent);
-                return true;
-            }
-        });
-        // Set onClickListener for choosing the Save Location
-        Preference locationChooser = findPreference(PREF_KEY_SAVE_LOCATION);
-        locationChooser.setSummary(sharedPreferences.getString(PREF_KEY_SAVE_LOCATION, ""));
-        locationChooser.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                // Open a new activity asking the user to select a folder
-                final Intent chooserIntent = new Intent(getActivity(), DirectoryChooserActivity.class);
-                chooserIntent.putExtra(DirectoryChooserActivity.EXTRA_NEW_DIR_NAME, "Snapprefs");
-                startActivityForResult(chooserIntent, REQUEST_CHOOSE_DIR);
-                return true;
-            }
-        });
-
-        Preference hidingChooser = findPreference(PREF_KEY_HIDE_LOCATION);
-        hidingChooser.setSummary(sharedPreferences.getString(PREF_KEY_HIDE_LOCATION, ""));
-        hidingChooser.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                // Open a new activity asking the user to select a folder
-                final Intent chooserIntent = new Intent(getActivity(), DirectoryChooserActivity.class);
-                chooserIntent.putExtra(DirectoryChooserActivity.EXTRA_NEW_DIR_NAME, "Snapprefs");
-                startActivityForResult(chooserIntent, REQUEST_HIDE_DIR);
-                return true;
-            }
-        });
-    }
-
-    // Receives the result of the DirectoryChooserActivity
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == REQUEST_CHOOSE_DIR) {
-            if (resultCode == DirectoryChooserActivity.RESULT_CODE_DIR_SELECTED) {
-                String newLocation = data.getStringExtra(DirectoryChooserActivity.RESULT_SELECTED_DIR);
-
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(PREF_KEY_SAVE_LOCATION, newLocation);
-                editor.apply();
-
-                Preference pref = findPreference(PREF_KEY_SAVE_LOCATION);
-                pref.setSummary(newLocation);
-            }
-        }
-        if (requestCode == REQUEST_HIDE_DIR) {
-            if (resultCode == DirectoryChooserActivity.RESULT_CODE_DIR_SELECTED) {
-                String newHiddenLocation = data.getStringExtra(DirectoryChooserActivity.RESULT_SELECTED_DIR);
-
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(PREF_KEY_HIDE_LOCATION, "Last hidden:" + newHiddenLocation);
-                editor.apply();
-
-                writeNoMediaFile(newHiddenLocation);
-                Preference pref = findPreference(PREF_KEY_HIDE_LOCATION);
-                pref.setSummary("Last hidden:" + newHiddenLocation);
-            }
-        }
-        if (requestCode == REQUEST_FILTER_DIR) {
-            if (resultCode == DirectoryChooserActivity.RESULT_CODE_DIR_SELECTED) {
-                String newFilterLocation = data.getStringExtra(DirectoryChooserActivity.RESULT_SELECTED_DIR);
-
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(PREF_KEY_FILTER_LOCATION, newFilterLocation);
-                editor.apply();
-
-                writeNoMediaFile(newFilterLocation);
-                Preference pref = findPreference(PREF_KEY_FILTER_LOCATION);
-                pref.setSummary(newFilterLocation);
-            }
-        }
     }
 
     public void onDestroy() {

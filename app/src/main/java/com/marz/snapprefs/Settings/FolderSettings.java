@@ -8,10 +8,9 @@ import android.preference.PreferenceManager;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
-import net.rdrei.android.dirchooser.DirectoryChooserActivity;
+import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.io.File;
-import java.io.FileOutputStream;
 
 /**
  * Created by MARZ on 2016. 02. 11..
@@ -21,10 +20,8 @@ public class FolderSettings extends PreferenceFragmentCompat implements SharedPr
     private int preferenceId;
     public static final String PREF_KEY_SAVE_LOCATION = "pref_key_save_location";
     public static final String PREF_KEY_HIDE_LOCATION = "pref_key_hide_location";
-    public static final String PREF_KEY_FILTER_LOCATION = "pref_key_filter_location";
     private static final int REQUEST_CHOOSE_DIR = 1;
     private static final int REQUEST_HIDE_DIR = 2;
-    private static final int REQUEST_FILTER_DIR = 3;
 
     @SuppressWarnings("deprecation")
     public void onCreate(Bundle savedInstanceState) {
@@ -41,10 +38,18 @@ public class FolderSettings extends PreferenceFragmentCompat implements SharedPr
         locationChooser.setOnPreferenceClickListener(new android.support.v7.preference.Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                // Open a new activity asking the user to select a folder
+                /*// Open a new activity asking the user to select a folder
                 final Intent chooserIntent = new Intent(getActivity(), DirectoryChooserActivity.class);
                 chooserIntent.putExtra(DirectoryChooserActivity.EXTRA_NEW_DIR_NAME, "Snapprefs");
-                getActivity().startActivityForResult(chooserIntent, REQUEST_CHOOSE_DIR);
+                getActivity().startActivityForResult(chooserIntent, REQUEST_CHOOSE_DIR);*/
+                Intent i = new Intent(getActivity(), FilePickerActivity.class);
+                // Set these depending on your use case. These are the defaults.
+                i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
+                i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
+                i.putExtra(FilePickerActivity.EXTRA_START_PATH, "/mnt/sdcard/");
+                i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
+
+                getActivity().startActivityForResult(i, REQUEST_CHOOSE_DIR);
                 return true;
             }
         });
@@ -55,9 +60,17 @@ public class FolderSettings extends PreferenceFragmentCompat implements SharedPr
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 // Open a new activity asking the user to select a folder
-                final Intent chooserIntent = new Intent(getActivity(), DirectoryChooserActivity.class);
+                /*final Intent chooserIntent = new Intent(getActivity(), DirectoryChooserActivity.class);
                 chooserIntent.putExtra(DirectoryChooserActivity.EXTRA_NEW_DIR_NAME, "Snapprefs");
-                getActivity().startActivityForResult(chooserIntent, REQUEST_HIDE_DIR);
+                getActivity().startActivityForResult(chooserIntent, REQUEST_HIDE_DIR);*/
+                Intent i = new Intent(getActivity(), FilePickerActivity.class);
+                // Set these depending on your use case. These are the defaults.
+                i.putExtra(FilePickerActivity.EXTRA_ALLOW_MULTIPLE, false);
+                i.putExtra(FilePickerActivity.EXTRA_ALLOW_CREATE_DIR, true);
+                i.putExtra(FilePickerActivity.EXTRA_START_PATH, "/mnt/sdcard/");
+                i.putExtra(FilePickerActivity.EXTRA_MODE, FilePickerActivity.MODE_DIR);
+
+                getActivity().startActivityForResult(i, REQUEST_HIDE_DIR);
                 return true;
             }
         });

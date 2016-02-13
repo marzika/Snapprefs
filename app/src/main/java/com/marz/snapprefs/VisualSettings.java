@@ -1,22 +1,12 @@
 package com.marz.snapprefs;
 
-import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.res.XModuleResources;
 import android.os.Bundle;
-import android.os.Environment;
-import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
-import net.rdrei.android.dirchooser.DirectoryChooserActivity;
-
 import java.io.File;
-import java.io.FileOutputStream;
 
 public class VisualSettings extends PreferenceFragment {
 

@@ -79,6 +79,13 @@
                     android:text="Apache 2.0"
                     android:id="@+id/apache"
                     android:layout_weight="1" />
+                <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:text="MPL 2.0"
+                    android:id="@+id/mpl2"
+                    android:layout_weight="1" />
             </LinearLayout>
 
         </LinearLayout>

@@ -55,15 +55,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity2"
+            android:name="com.marz.snapprefs.MainActivity2"
             android:label="@string/app_name"
             android:theme="@style/Snapprefs_Theme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="de.robv.android.xposed.category.MODULE_SETTINGS"/>
             </intent-filter>
         </activity>
+        <activity-alias
+            android:enabled="true"
+            android:name="com.marz.snapprefs.MainActivity2-Alias"
+            android:label="@string/app_name"
+            android:icon="@drawable/ic_launcher"
+            android:targetActivity="com.marz.snapprefs.MainActivity2">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity-alias>
 
         <meta-data
             android:name="storeprefs_mainclass"
@@ -78,9 +88,6 @@
         <meta-data
             android:name="xposeddescription"
             android:value="The Ultimate Snapchat-utility." />
-
-        <activity android:name="net.rdrei.android.dirchooser.DirectoryChooserActivity" />
-
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -114,6 +121,10 @@
         <activity
             android:name=".FilterStoreUtils.FilterPreview"
             android:label="Filter Preview"></activity>
+        <activity
+            android:name="com.nononsenseapps.filepicker.FilePickerActivity"
+            android:label="@string/app_name"
+            android:theme="@style/FilePickerTheme"></activity>
     </application>
 
 </manifest>

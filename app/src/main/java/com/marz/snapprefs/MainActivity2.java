@@ -1,7 +1,9 @@
 package com.marz.snapprefs;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.NavigationView;
@@ -27,7 +29,6 @@ import com.marz.snapprefs.Tabs.SharingTabFragment;
 import com.marz.snapprefs.Tabs.SpoofingTabFragment;
 import com.marz.snapprefs.Tabs.TextTabFragment;
 
-import net.rdrei.android.dirchooser.DirectoryChooserActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,10 +42,8 @@ public class MainActivity2 extends AppCompatActivity{
     HashMap<Integer, Fragment> cache = new HashMap<>();
     public static final String PREF_KEY_SAVE_LOCATION = "pref_key_save_location";
     public static final String PREF_KEY_HIDE_LOCATION = "pref_key_hide_location";
-    public static final String PREF_KEY_FILTER_LOCATION = "pref_key_filter_location";
     private static final int REQUEST_CHOOSE_DIR = 1;
     private static final int REQUEST_HIDE_DIR = 2;
-    private static final int REQUEST_FILTER_DIR = 3;
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -147,7 +146,7 @@ public class MainActivity2 extends AppCompatActivity{
 
     }
 
-    public Fragment getForId(int id) {//WTFWTFWTFWTFWTFWTFW no idea... its only gets initalized once..BaseFragmentActivityHoneycomb.java:34)...
+    public Fragment getForId(int id) {
         if (cache.get(id) == null) {
             switch (id) {
                 case R.id.nav_item_buy:
@@ -189,9 +188,8 @@ public class MainActivity2 extends AppCompatActivity{
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_CHOOSE_DIR) {
-            if (resultCode == DirectoryChooserActivity.RESULT_CODE_DIR_SELECTED) {
-                String newLocation = data.getStringExtra(DirectoryChooserActivity.RESULT_SELECTED_DIR);
+        if (requestCode == REQUEST_CHOOSE_DIR && resultCode == Activity.RESULT_OK) {
+                String newLocation = data.getData().toString().substring(7);
 
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString(PREF_KEY_SAVE_LOCATION, newLocation);
@@ -200,32 +198,14 @@ public class MainActivity2 extends AppCompatActivity{
                 //Preference pref = PreferenceFragmentCompat.findPreference(PREF_KEY_SAVE_LOCATION);
                 //pref.setSummary(newLocation);
             }
-        }
-        if (requestCode == REQUEST_HIDE_DIR) {
-            if (resultCode == DirectoryChooserActivity.RESULT_CODE_DIR_SELECTED) {
-                String newHiddenLocation = data.getStringExtra(DirectoryChooserActivity.RESULT_SELECTED_DIR);
+        if (requestCode == REQUEST_HIDE_DIR && resultCode == Activity.RESULT_OK) {
+                String newHiddenLocation =  data.getData().toString().substring(7);
 
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(PREF_KEY_HIDE_LOCATION, "Last hidden:" + newHiddenLocation);
+                editor.putString(PREF_KEY_HIDE_LOCATION, "Last hidden: " + newHiddenLocation);
                 editor.apply();
 
                 writeNoMediaFile(newHiddenLocation);
-                //Preference pref = findPreference(PREF_KEY_HIDE_LOCATION);
-                //pref.setSummary("Last hidden:" + newHiddenLocation);
-            }
-        }
-        if (requestCode == REQUEST_FILTER_DIR) {
-            if (resultCode == DirectoryChooserActivity.RESULT_CODE_DIR_SELECTED) {
-                String newFilterLocation = data.getStringExtra(DirectoryChooserActivity.RESULT_SELECTED_DIR);
-
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(PREF_KEY_FILTER_LOCATION, newFilterLocation);
-                editor.apply();
-
-                writeNoMediaFile(newFilterLocation);
-                //Preference pref = findPreference(PREF_KEY_FILTER_LOCATION);
-                //pref.setSummary(newFilterLocation);
-            }
         }
     }
     /**

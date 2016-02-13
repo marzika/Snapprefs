@@ -34,5 +34,4 @@
         <item name="colorAccent">#9E9E9E</item>
         <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
-
 </resources> 
