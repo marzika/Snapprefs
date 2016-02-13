@@ -11,4 +11,8 @@
         android:summaryOff="@string/pref_paint_cb_summary_off"
         android:summaryOn="@string/pref_paint_cb_summary_on"
         android:title="@string/pref_paint_cb_title" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_debug"
+        android:title="@string/debug_text" />
 </PreferenceScreen>

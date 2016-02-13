@@ -5,7 +5,7 @@
 
 <item android:title="Main Menu"
     android:id="@+id/nav_item_main"
-    android:icon="@drawable/snapprefs_btn_check_on_holo_light" />
+    android:icon="@drawable/main" />
 <item android:title="Premium / Deluxe"
         android:id="@+id/nav_item_deluxe_section"
         android:icon="@drawable/premium">
@@ -31,7 +31,7 @@
         <item
             android:title="Saving"
             android:id="@+id/nav_item_saving"
-            android:icon="@drawable/snapprefs_btn_check_on_holo_light"/>
+            android:icon="@drawable/save"/>
         <item
             android:title="Text customization"
             android:id="@+id/nav_item_text"

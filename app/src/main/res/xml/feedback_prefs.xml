@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_key_toasts_checkbox"
+        android:summaryOff="@string/pref_toasts_summary_off"
+        android:summaryOn="@string/pref_toasts_summary_on"
+        android:title="@string/pref_toasts_title" />
+
+    <com.marz.snapprefs.BetterListPreference
+        android:defaultValue="@string/pref_toasts_duration_default_value"
+        android:dependency="pref_key_toasts_checkbox"
+        android:entries="@array/pref_toasts_duration_entries"
+        android:entryValues="@array/pref_toasts_duration_values"
+        android:key="pref_key_toasts_duration"
+        android:title="@string/pref_toasts_duration_title" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_key_vibration_checkbox"
+        android:summaryOff="@string/pref_vibration_summary_off"
+        android:summaryOn="@string/pref_vibration_summary_on"
+        android:title="@string/pref_vibration_title" />
+</PreferenceScreen>

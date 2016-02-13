@@ -15,6 +15,8 @@ import com.marz.snapprefs.Fragments.AboutFragment;
 import com.marz.snapprefs.Fragments.SupportFragment;
 import com.marz.snapprefs.Fragments.MainFragment;
 import com.marz.snapprefs.R;
+import com.marz.snapprefs.Settings.BaseSettings;
+import com.marz.snapprefs.Settings.FolderSettings;
 
 public class SavingTabFragment extends Fragment {
 
@@ -68,9 +70,9 @@ public class SavingTabFragment extends Fragment {
         public Fragment getItem(int position)
         {
             switch (position){
-                case 0 : return new MainFragment();
-                case 1 : return new SupportFragment();
-                case 2 : return new AboutFragment();
+                case 0 : return new BaseSettings().setPreferenceId(R.xml.saving_prefs);
+                case 1 : return new BaseSettings().setPreferenceId(R.xml.feedback_prefs);
+                case 2 : return new FolderSettings().setPreferenceId(R.xml.folder_prefs);
             }
             return null;
         }
@@ -91,11 +93,11 @@ public class SavingTabFragment extends Fragment {
 
             switch (position){
                 case 0 :
-                    return "Welcome";
+                    return "Saving";
                 case 1 :
-                    return "Support";
+                    return "Feedback";
                 case 2 :
-                    return "About";
+                    return "Folder";
             }
             return null;
         }

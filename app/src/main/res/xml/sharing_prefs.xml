@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:defaultValue="@string/pref_rotation_default"
+        android:dialogTitle="@string/pref_rotation_title"
+        android:entries="@array/pref_rotation_entries"
+        android:entryValues="@array/pref_rotation_values"
+        android:key="pref_rotation"
+        android:title="@string/pref_rotation_title" />
+
+    <ListPreference
+        android:defaultValue="@string/pref_adjustment_default"
+        android:dialogTitle="@string/pref_adjustment_title"
+        android:entries="@array/pref_adjustment_entries"
+        android:entryValues="@array/pref_adjustment_values"
+        android:key="pref_adjustment"
+        android:title="@string/pref_adjustment_title" />
+</PreferenceScreen>

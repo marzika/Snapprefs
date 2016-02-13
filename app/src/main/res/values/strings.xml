@@ -81,6 +81,10 @@
     <string name="pref_location_longitude_title">Longitude</string>
     <string name="pref_location_location_picker_title">HOW TO USE</string>
     <string name="pref_location_location_picker_summary">Upon opening the map from SC, LONG click on the desired location, preferably to the middle of the city to set the spoofed location.</string>
+    <string name="pref_speed_how_title">HOW TO USE</string>
+    <string name="pref_speed_how_summary">After typing in your desired speed (m/s), click on the speed filter to apply it.</string>
+    <string name="pref_weather_how_title">HOW TO USE</string>
+    <string name="pref_weather_how_summary">After typing in your desired value, you have to kill Snapchat, then restart to apply it.</string>
     <string name="pref_discover_summary_off">Discover will load and download</string>
     <string name="pref_discover_summary_on">Discover will NOT load NOR download</string>
     <string name="pref_discover_title">Block Discover snaps</string>
@@ -233,7 +237,7 @@
     <string name="nomedia_storage">Unable to write to the storage.</string>
 
     <!-- Dialogs -->
-    <string name="module_not_enabled">Snapshare is not enabled. Please enable it in Xposed Installer and reboot your device.</string>
+    <string name="module_not_enabled">Snapprefs is not enabled. Please enable it in Xposed Installer and reboot your device.</string>
     <string name="size_error">"The video you shared is too large (%1$s), it probably won't send. Snapshat only supports files up to %2$s."</string>
     <string name="unable_open_xposed">Unable to open Xposed Installer, is it installed?</string>
 
@@ -273,7 +277,7 @@
 
     <!-- Caption settings -->
     <string name="pref_caption">Unlimited Captions</string>
-    <string name="pref_caption_explanation">Note: unlimited captions works for BOTH snaps taken with Snapchat\'s camera and snaps shared with Snapshare, so it\'s NOT limited to shared snaps.</string>
+    <string name="pref_caption_explanation">Note: unlimited captions works for BOTH snaps taken with Snapchat\'s camera and snaps shared from the Gallery, so it\'s NOT limited to shared snaps.</string>
 
     <string name="pref_caption_unlimited_vanilla_title">Unlimited regular captions</string>
     <string name="pref_caption_unlimited_vanilla_on">Regular captions are unlimited</string>

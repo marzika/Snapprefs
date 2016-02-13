@@ -15,12 +15,13 @@ import com.marz.snapprefs.Fragments.AboutFragment;
 import com.marz.snapprefs.Fragments.SupportFragment;
 import com.marz.snapprefs.Fragments.MainFragment;
 import com.marz.snapprefs.R;
+import com.marz.snapprefs.Settings.BaseSettings;
 
 public class SharingTabFragment extends Fragment {
 
     public static TabLayout tabLayout;
     public static ViewPager viewPager;
-    public static int int_items = 3 ;
+    public static int int_items = 1;
 
     @Nullable
     @Override
@@ -68,9 +69,7 @@ public class SharingTabFragment extends Fragment {
         public Fragment getItem(int position)
         {
             switch (position){
-                case 0 : return new MainFragment();
-                case 1 : return new SupportFragment();
-                case 2 : return new AboutFragment();
+                case 0 : return new BaseSettings().setPreferenceId(R.xml.sharing_prefs);
             }
             return null;
         }
@@ -91,11 +90,7 @@ public class SharingTabFragment extends Fragment {
 
             switch (position){
                 case 0 :
-                    return "Welcome";
-                case 1 :
-                    return "Support";
-                case 2 :
-                    return "About";
+                    return "Sharing";
             }
             return null;
         }

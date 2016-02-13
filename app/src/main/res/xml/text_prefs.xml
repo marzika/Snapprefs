@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_rainbow"
+        android:summary="@string/rainbow_text_summary"
+        android:title="@string/rainbow_text" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_txtcolour"
+        android:title="@string/txtcolour_text" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_txtstyle"
+        android:summary="@string/txtstyle_text_summary"
+        android:title="@string/txtstyle_text" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_txtgravity"
+        android:summary="@string/txtgravity_text_summary"
+        android:title="@string/txtgravity_text" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_bgcolour"
+        android:title="@string/bgcolour_text" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_bg_transparency"
+        android:title="@string/bg_transparency_text" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_size"
+        android:title="@string/size_text" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_transparency"
+        android:title="@string/transparency_text" />
+</PreferenceScreen>

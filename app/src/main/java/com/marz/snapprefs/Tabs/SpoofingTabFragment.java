@@ -12,9 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.marz.snapprefs.Fragments.AboutFragment;
+import com.marz.snapprefs.Fragments.BaseFragment;
 import com.marz.snapprefs.Fragments.SupportFragment;
 import com.marz.snapprefs.Fragments.MainFragment;
 import com.marz.snapprefs.R;
+import com.marz.snapprefs.Settings.BaseSettings;
 
 public class SpoofingTabFragment extends Fragment {
 
@@ -68,9 +70,9 @@ public class SpoofingTabFragment extends Fragment {
         public Fragment getItem(int position)
         {
             switch (position){
-                case 0 : return new MainFragment();
-                case 1 : return new SupportFragment();
-                case 2 : return new AboutFragment();
+                case 0 : return new BaseSettings().setPreferenceId(R.xml.speed_prefs);
+                case 1 : return new BaseSettings().setPreferenceId(R.xml.location_prefs);
+                case 2 : return new BaseSettings().setPreferenceId(R.xml.weather_prefs);
             }
             return null;
         }
@@ -91,11 +93,11 @@ public class SpoofingTabFragment extends Fragment {
 
             switch (position){
                 case 0 :
-                    return "Welcome";
+                    return "Speed";
                 case 1 :
-                    return "Support";
+                    return "Location";
                 case 2 :
-                    return "About";
+                    return "Weather";
             }
             return null;
         }

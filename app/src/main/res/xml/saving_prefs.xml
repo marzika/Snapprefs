@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.marz.snapprefs.BetterListPreference
+        android:defaultValue="@string/pref_save_snapchats_default"
+        android:dialogTitle="@string/pref_save_snaps_images"
+        android:entries="@array/pref_save_mode_entries"
+        android:entryValues="@array/pref_save_mode_values"
+        android:key="pref_key_snaps_images"
+        android:title="@string/pref_save_snaps_images" />
+
+    <com.marz.snapprefs.BetterListPreference
+        android:defaultValue="@string/pref_save_snapchats_default"
+        android:dialogTitle="@string/pref_save_snaps_videos"
+        android:entries="@array/pref_save_mode_entries"
+        android:entryValues="@array/pref_save_mode_values"
+        android:key="pref_key_snaps_videos"
+        android:title="@string/pref_save_snaps_videos" />
+
+    <com.marz.snapprefs.BetterListPreference
+        android:defaultValue="@string/pref_save_snapchats_default"
+        android:dialogTitle="@string/pref_save_stories_images"
+        android:entries="@array/pref_save_mode_entries"
+        android:entryValues="@array/pref_save_mode_values"
+        android:key="pref_key_stories_images"
+        android:title="@string/pref_save_stories_images" />
+
+    <com.marz.snapprefs.BetterListPreference
+        android:defaultValue="@string/pref_save_snapchats_default"
+        android:dialogTitle="@string/pref_save_stories_videos"
+        android:entries="@array/pref_save_mode_entries"
+        android:entryValues="@array/pref_save_mode_values"
+        android:key="pref_key_stories_videos"
+        android:title="@string/pref_save_stories_videos" />
+    <!--<CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_overlay"
+        android:summaryOff="@string/pref_overlay_summary_off"
+        android:summaryOn="@string/pref_overlay_summary_on"
+        android:title="@string/pref_overlay_title" /> -->
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_save_sent_snaps"
+        android:summaryOff="@string/pref_save_sent_snaps_summary_off"
+        android:summaryOn="@string/pref_save_sent_snaps_summary_on"
+        android:title="@string/pref_save_sent_snaps_title" />
+</PreferenceScreen>

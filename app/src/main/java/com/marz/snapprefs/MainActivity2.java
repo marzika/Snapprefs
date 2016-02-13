@@ -1,6 +1,9 @@
 package com.marz.snapprefs;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -8,6 +11,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.view.MenuItem;
 
 import com.marz.snapprefs.Tabs.BuyTabFragment;
@@ -21,6 +27,10 @@ import com.marz.snapprefs.Tabs.SharingTabFragment;
 import com.marz.snapprefs.Tabs.SpoofingTabFragment;
 import com.marz.snapprefs.Tabs.TextTabFragment;
 
+import net.rdrei.android.dirchooser.DirectoryChooserActivity;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.HashMap;
 
 public class MainActivity2 extends AppCompatActivity{
@@ -29,10 +39,19 @@ public class MainActivity2 extends AppCompatActivity{
     FragmentManager mFragmentManager;
     FragmentTransaction mFragmentTransaction;
     HashMap<Integer, Fragment> cache = new HashMap<>();
+    public static final String PREF_KEY_SAVE_LOCATION = "pref_key_save_location";
+    public static final String PREF_KEY_HIDE_LOCATION = "pref_key_hide_location";
+    public static final String PREF_KEY_FILTER_LOCATION = "pref_key_filter_location";
+    private static final int REQUEST_CHOOSE_DIR = 1;
+    private static final int REQUEST_HIDE_DIR = 2;
+    private static final int REQUEST_FILTER_DIR = 3;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.activity_main2);
 
         /**
@@ -165,5 +184,73 @@ public class MainActivity2 extends AppCompatActivity{
         }
         return cache.get(id);
     }
+    // Receives the result of the DirectoryChooserActivity
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CHOOSE_DIR) {
+            if (resultCode == DirectoryChooserActivity.RESULT_CODE_DIR_SELECTED) {
+                String newLocation = data.getStringExtra(DirectoryChooserActivity.RESULT_SELECTED_DIR);
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(PREF_KEY_SAVE_LOCATION, newLocation);
+                editor.apply();
+
+                //Preference pref = PreferenceFragmentCompat.findPreference(PREF_KEY_SAVE_LOCATION);
+                //pref.setSummary(newLocation);
+            }
+        }
+        if (requestCode == REQUEST_HIDE_DIR) {
+            if (resultCode == DirectoryChooserActivity.RESULT_CODE_DIR_SELECTED) {
+                String newHiddenLocation = data.getStringExtra(DirectoryChooserActivity.RESULT_SELECTED_DIR);
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(PREF_KEY_HIDE_LOCATION, "Last hidden:" + newHiddenLocation);
+                editor.apply();
+
+                writeNoMediaFile(newHiddenLocation);
+                //Preference pref = findPreference(PREF_KEY_HIDE_LOCATION);
+                //pref.setSummary("Last hidden:" + newHiddenLocation);
+            }
+        }
+        if (requestCode == REQUEST_FILTER_DIR) {
+            if (resultCode == DirectoryChooserActivity.RESULT_CODE_DIR_SELECTED) {
+                String newFilterLocation = data.getStringExtra(DirectoryChooserActivity.RESULT_SELECTED_DIR);
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(PREF_KEY_FILTER_LOCATION, newFilterLocation);
+                editor.apply();
+
+                writeNoMediaFile(newFilterLocation);
+                //Preference pref = findPreference(PREF_KEY_FILTER_LOCATION);
+                //pref.setSummary(newFilterLocation);
+            }
+        }
+    }
+    /**
+     * @param directoryPath The full path to the directory to place the .nomedia file
+     * @return Returns true if the file was successfully written or appears to already exist
+     */
+    public boolean writeNoMediaFile(String directoryPath) {
+        String storageState = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(storageState)) {
+            try {
+                File noMedia = new File(directoryPath, ".nomedia");
+                if (noMedia.exists()) {
+                    return true;
+                }
+                FileOutputStream noMediaOutStream = new FileOutputStream(noMedia);
+                noMediaOutStream.write(0);
+                noMediaOutStream.close();
+            } catch (Exception e) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
 
 }
