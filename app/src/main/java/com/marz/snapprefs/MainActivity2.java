@@ -3,6 +3,7 @@ package com.marz.snapprefs;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -16,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceManager;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.marz.snapprefs.Tabs.BuyTabFragment;
@@ -32,7 +34,11 @@ import com.marz.snapprefs.Tabs.TextTabFragment;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Objects;
 
 public class MainActivity2 extends AppCompatActivity{
     DrawerLayout mDrawerLayout;
@@ -45,6 +51,7 @@ public class MainActivity2 extends AppCompatActivity{
     private static final int REQUEST_CHOOSE_DIR = 1;
     private static final int REQUEST_HIDE_DIR = 2;
     private SharedPreferences sharedPreferences;
+    private ArrayList<MenuItem> items = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +74,10 @@ public class MainActivity2 extends AppCompatActivity{
         mFragmentManager = getSupportFragmentManager();
 //        mFragmentTransaction = mFragmentManager.beginTransaction();
 //        mFragmentTransaction.replace(R.id.containerView,new MainTabFragment()).commit();
-        mFragmentManager.beginTransaction().replace(R.id.containerView, getForId(R.id.nav_item_main)).commit();//it makes no sense ofc it doesnt, its java
+        mFragmentManager.beginTransaction().replace(R.id.containerView, getForId(R.id.nav_item_main)).commit();
+        mNavigationView.getMenu().getItem(0).setCheckable(true);
+        mNavigationView.getMenu().getItem(0).setChecked(true);
+        items.add(mNavigationView.getMenu().getItem(0));
         /**
          * Setup click events on the Navigation View Items.
          */
@@ -76,57 +86,18 @@ public class MainActivity2 extends AppCompatActivity{
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 mDrawerLayout.closeDrawers();
-
+                menuItem.setCheckable(true);
+                menuItem.setChecked(true);
+                Iterator<MenuItem> it = items.iterator();
+                while (it.hasNext())
+                {
+                    MenuItem item = it.next();
+                    if(!item.equals(menuItem)){
+                        item.setChecked(false);
+                    }
+                }
+                items.add(menuItem);
                 mFragmentManager.beginTransaction().replace(R.id.containerView,getForId(menuItem.getItemId())).commit();
-
-
-//                if (menuItem.getItemId() == R.id.nav_item_main) {
-//                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-//                    fragmentTransaction.replace(R.id.containerView,new MainTabFragment()).commit();
-//                }
-//
-//
-//
-//                if (menuItem.getItemId() == R.id.nav_item_buy) {
-//                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-//                    fragmentTransaction.replace(R.id.containerView,new BuyTabFragment()).commit();
-//                }
-//                if (menuItem.getItemId() == R.id.nav_item_deluxe) {
-//                    FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
-//                    fragmentTransaction.replace(R.id.containerView,new DeluxeTabFragment()).commit();
-//                }
-//
-//
-//
-//                if (menuItem.getItemId() == R.id.nav_item_general) {
-//                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-//                    xfragmentTransaction.replace(R.id.containerView,new GeneralTabFragment()).commit();//CACHE EVERYTHING XD
-//                }
-//                if (menuItem.getItemId() == R.id.nav_item_saving) {
-//                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-//                    xfragmentTransaction.replace(R.id.containerView,new SavingTabFragment()).commit();
-//                }
-//                if (menuItem.getItemId() == R.id.nav_item_text) {
-//                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-//                    xfragmentTransaction.replace(R.id.containerView,new TextTabFragment()).commit();
-//                }
-//                if (menuItem.getItemId() == R.id.nav_item_spoofing) {
-//                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-//                    xfragmentTransaction.replace(R.id.containerView,new SpoofingTabFragment()).commit();
-//                }
-//                if (menuItem.getItemId() == R.id.nav_item_sharing) {
-//                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-//                    xfragmentTransaction.replace(R.id.containerView,new SharingTabFragment()).commit();
-//                }
-//                if (menuItem.getItemId() == R.id.nav_item_data) {
-//                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-//                    xfragmentTransaction.replace(R.id.containerView,new DataTabFragment()).commit();
-//                }
-//                if (menuItem.getItemId() == R.id.nav_item_filters) {
-//                    FragmentTransaction xfragmentTransaction = mFragmentManager.beginTransaction();
-//                    xfragmentTransaction.replace(R.id.containerView,new FiltersTabFragment()).commit();
-//                }
-
                 return false;
             }
 

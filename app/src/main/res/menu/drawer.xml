@@ -7,8 +7,7 @@
     android:id="@+id/nav_item_main"
     android:icon="@drawable/main" />
 <item android:title="Premium / Deluxe"
-        android:id="@+id/nav_item_deluxe_section"
-        android:icon="@drawable/premium">
+        android:id="@+id/nav_item_deluxe_section">
         <menu>
             <item
                 android:title="Buy / Activate membership"
@@ -21,8 +20,7 @@
         </menu>
 </item>
 <item android:title="Settings"
-    android:id="@+id/nav_item_settings"
-    android:icon="@drawable/snapprefs_btn_check_on_holo_light">
+    android:id="@+id/nav_item_settings">
     <menu>
         <item
             android:title="General"
@@ -39,15 +37,15 @@
         <item
             android:title="Spoofing"
             android:id="@+id/nav_item_spoofing"
-            android:icon="@drawable/spoof"/>
+            android:icon="@drawable/spoofing"/>
         <item
             android:title="Sharing"
             android:id="@+id/nav_item_sharing"
-            android:icon="@drawable/sharing"/>
+            android:icon="@drawable/share"/>
         <item
             android:title="Data saving"
             android:id="@+id/nav_item_data"
-            android:icon="@drawable/datasaving"/>
+            android:icon="@drawable/data_save"/>
         <item
             android:title="Visual Filters / Filters"
             android:id="@+id/nav_item_filters"

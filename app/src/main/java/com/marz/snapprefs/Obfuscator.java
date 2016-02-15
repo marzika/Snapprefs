@@ -24,6 +24,7 @@ public class Obfuscator {
     public static final String SUPPORTED_VERSION_CODENAME = "9.21.1.0";
     public static final String ROOTDETECTOR_CLASS = "abc";
     public static final String[] ROOTDETECTOR_METHODS= {"b", "c", "d", "e"};
+    public static final String FRIENDS_BF= "k";
 
     /**
      * Check if Snapprefs is compatible with this Snapchat version.
@@ -215,6 +216,5 @@ public class Obfuscator {
         public static final String ADDER_3_PARAM = "SK$3";
         public static final String ADDER_PARAM = "SK";
         public static final String SNAPCHAPTUREDEVENT_CLASS = "Zs";
-
     }
 }

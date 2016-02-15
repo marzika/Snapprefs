@@ -36,7 +36,8 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:id="@+id/fuckyou"
-            app:itemTextColor="@color/black"
+            app:itemTextColor="@color/item_text"
+            app:itemBackground="@drawable/item_background"
             app:menu="@menu/drawer"
             android:layout_marginTop="0dp"
             android:textSize="30dp"/>

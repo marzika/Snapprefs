@@ -508,7 +508,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         Sharing.initSharing(lpparam, mResources);
         //SNAPPREFS
         if (hideBf == true) {
-            findAndHookMethod("com.snapchat.android.model.Friend", lpparam.classLoader, "k", new XC_MethodReplacement() {
+            findAndHookMethod("com.snapchat.android.model.Friend", lpparam.classLoader, Obfuscator.FRIENDS_BF, new XC_MethodReplacement() {
                 @Override
                 protected Object replaceHookedMethod(MethodHookParam param)
                         throws Throwable {
