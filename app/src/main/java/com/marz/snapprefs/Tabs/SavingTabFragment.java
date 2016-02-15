@@ -22,7 +22,7 @@ public class SavingTabFragment extends Fragment {
 
     public static TabLayout tabLayout;
     public static ViewPager viewPager;
-    public static int int_items = 3 ;
+    public static int int_items = 4;
 
     @Nullable
     @Override
@@ -71,8 +71,9 @@ public class SavingTabFragment extends Fragment {
         {
             switch (position){
                 case 0 : return new BaseSettings().setPreferenceId(R.xml.saving_prefs);
-                case 1 : return new BaseSettings().setPreferenceId(R.xml.feedback_prefs);
-                case 2 : return new FolderSettings().setPreferenceId(R.xml.folder_prefs);
+                case 1 : return new BaseSettings().setPreferenceId(R.xml.chat_prefs);
+                case 2 : return new BaseSettings().setPreferenceId(R.xml.feedback_prefs);
+                case 3 : return new FolderSettings().setPreferenceId(R.xml.folder_prefs);
             }
             return null;
         }
@@ -95,8 +96,10 @@ public class SavingTabFragment extends Fragment {
                 case 0 :
                     return "Saving";
                 case 1 :
-                    return "Feedback";
+                    return "Chat";
                 case 2 :
+                    return "Feedback";
+                case 3 :
                     return "Folder";
             }
             return null;

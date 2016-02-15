@@ -153,6 +153,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     private static boolean mColours;
     private static boolean mLocation;
     private static boolean mTimerCounter;
+    private static boolean mChatAutoSave;
+    private static boolean mChatImageSave;
     private static InitPackageResourcesParam resParam;
     Class CaptionEditText;
     boolean latest = false;
@@ -188,6 +190,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         txtgravity = prefs.getBoolean("pref_key_txtgravity", false);
         mPaintTools = prefs.getBoolean("pref_key_paint_checkbox", mPaintTools);
         mTimerCounter = prefs.getBoolean("pref_key_timercounter", true);
+        mChatAutoSave = prefs.getBoolean("pref_key_save_chat_text", true);
+        mChatImageSave = prefs.getBoolean("pref_key_save_chat_image", true);
         mCustomFilterBoolean = prefs.getBoolean("pref_key_custom_filter_checkbox", mCustomFilterBoolean);
         mMultiFilterBoolean = prefs.getBoolean("pref_key_multi_filter_checkbox", mMultiFilterBoolean);
         mCustomFilterLocation = Environment.getExternalStorageDirectory().toString() + "/Snapprefs/Filters";
@@ -449,6 +453,12 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 if (mTimerCounter == true){
                     Misc.initTimer(lpparam, mResources);
                 }
+                if (mChatAutoSave == true){
+                    Chat.initTextSave(lpparam, mResources);
+                }
+                if (mChatImageSave == true){
+                    Chat.initImageSave(lpparam, mResources);
+                }
                 getEditText(lpparam);
                 findAndHookMethod(Obfuscator.save.SCREENSHOTDETECTOR_CLASS, lpparam.classLoader, Obfuscator.save.SCREENSHOTDETECTOR_RUN, LinkedHashMap.class, XC_MethodReplacement.DO_NOTHING);
                 findAndHookMethod(Obfuscator.save.SNAPSTATEMESSAGE_CLASS, lpparam.classLoader, Obfuscator.save.SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT, Long.class, new XC_MethodHook() {
@@ -608,6 +618,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("TextStyle: " + txtstyle);
         logging("TextGravity: " + txtgravity);
         logging("mTimerCounter: " + mTimerCounter);
+        logging("mChatAutoSave: " + mChatAutoSave);
+        logging("mChatImageSave: " + mChatImageSave);
         logging("mPaintTools: " + mPaintTools);
         logging("CustomFilters: " + mCustomFilterBoolean);
         logging("MultiFilters: " + mMultiFilterBoolean);

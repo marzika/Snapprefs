@@ -226,4 +226,13 @@ public class Obfuscator {
         public static final String TAKESNAPBUTTON_X = "m";
         public static final String TAKESNAPBUTTON_Y = "n";
     }
+    public class chat {
+        public static final String CHAT_CLASS = "com.snapchat.android.model.chat.Chat";
+        public static final String MESSAGEVIEWHOLDER_CLASS = "com.snapchat.android.fragments.chat.MessageViewHolder";
+        public static final String MESSAGEVIEWHOLDER_METHOD = "b";
+        public static final String MESSAGEVIEWHOLDER_VAR1 = "F";
+        public static final String MESSAGEVIEWHOLDER_VAR2 = "d";
+        public static final String MESSAGEVIEWHOLDER_ISSAVED = "ak_";
+        public static final String MESSAGEVIEWHOLDER_SAVE = "z";
+    }
 }

@@ -313,49 +313,6 @@ public class Saving {
             });
 
             /**
-             * We hook this method to get the ChatImage from the imageView of ImageResourceView,
-             * then we get the properties and save the actual Image.
-             */
-            final Object[] chatMediaArr = new Object[1];
-            findAndHookMethod("com.snapchat.android.ui.ImageResourceView", lpparam.classLoader, "setChatMedia", findClass("com.snapchat.android.model.chat.ChatMedia", lpparam.classLoader), findClass("com.snapchat.android.ui.SnapchatResource.a", lpparam.classLoader), new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    chatMediaArr[0] = param.args[0];
-                }
-            });
-            final Class<?> imageResourceViewClass = findClass(Obfuscator.save.IMAGERESOURCEVIEW_CLASS, lpparam.classLoader);
-            hookAllConstructors(imageResourceViewClass, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
-                    final ImageView imageView = (ImageView) param.thisObject;
-                    imageView.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View v) {
-                            Logger.log("----------------------- SNAPPREFS ------------------------", false);
-                            Logger.log("Long press on chat image detected");
-
-                            Bitmap chatImage = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-                            Logger.log("We have the chat image", true);
-                            Object imageResource = getObjectField(param.thisObject, Obfuscator.save.IMAGERESOURCEVIEW_VAR_IMAGERESOURCE);
-                            Logger.log("We have the imageResource", true);
-                            //Object chatMedia = getObjectField(imageResource, Obfuscator.save.IMAGERESOURCE_VAR_CHATMEDIA); // in ImageResource
-                            Object chatMedia = chatMediaArr[0];
-                            Logger.log("We have the chatMedia", true);
-                            Long timestamp = (Long) callMethod(chatMedia, Obfuscator.save.CHAT_GETTIMESTAMP); // model.chat.Chat
-                            //Long timestamp = 0L;
-                            Logger.log("We have the timestamp " + timestamp.toString(), true);
-                            String sender = (String) callMethod(chatMedia, Obfuscator.save.STATEFULCHATFEEDITEM_GETSENDER); //in StatefulChatFeedItem
-                            Logger.log("We have the sender " + sender, true);
-                            String filename = sender + "_" + dateFormat.format(timestamp);
-                            Logger.log("We have the file name " + filename, true);
-
-                            saveSnap(SnapType.CHAT, MediaType.IMAGE, imageView.getContext(), chatImage, null, filename, sender);
-                            return true;
-                        }
-                    });
-                }
-            });
-            /**
              * We hook this method to set the CanonicalDisplayTime to our desired one if it is under
              * our limit and hide the counter if we need it.
              */
@@ -624,7 +581,7 @@ public class Saving {
         }
     }
 
-    private static void saveSnap(SnapType snapType, MediaType mediaType, Context context, Bitmap image, FileInputStream video, String filename, String sender) {
+    public static void saveSnap(SnapType snapType, MediaType mediaType, Context context, Bitmap image, FileInputStream video, String filename, String sender) {
         File directory;
         try {
             directory = createFileDir(snapType.subdir, sender);
