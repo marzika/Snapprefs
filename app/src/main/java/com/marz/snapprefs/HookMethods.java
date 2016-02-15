@@ -13,13 +13,18 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.InputFilter;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Util.XposedUtils;
@@ -70,7 +75,9 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.getAdditionalStaticField;
 import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
+import static de.robv.android.xposed.XposedHelpers.setAdditionalStaticField;
 import static de.robv.android.xposed.XposedHelpers.setObjectField;
 import static de.robv.android.xposed.XposedHelpers.setStaticIntField;
 
@@ -155,6 +162,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     private static boolean mTimerCounter;
     private static boolean mChatAutoSave;
     private static boolean mChatImageSave;
+    private static boolean mIntegration;
     private static InitPackageResourcesParam resParam;
     Class CaptionEditText;
     boolean latest = false;
@@ -192,6 +200,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mTimerCounter = prefs.getBoolean("pref_key_timercounter", true);
         mChatAutoSave = prefs.getBoolean("pref_key_save_chat_text", true);
         mChatImageSave = prefs.getBoolean("pref_key_save_chat_image", true);
+        mIntegration = prefs.getBoolean("pref_key_integration", true);
         mCustomFilterBoolean = prefs.getBoolean("pref_key_custom_filter_checkbox", mCustomFilterBoolean);
         mMultiFilterBoolean = prefs.getBoolean("pref_key_multi_filter_checkbox", mMultiFilterBoolean);
         mCustomFilterLocation = Environment.getExternalStorageDirectory().toString() + "/Snapprefs/Filters";
@@ -370,167 +379,170 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             XposedUtils.log("Exception while trying to get version info", e);
             return;
         }
-        findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook(){
+        findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-        refreshPreferences();
-        printSettings();
-        if (mLicense == 1 || mLicense == 2) {
+                refreshPreferences();
+                printSettings();
+                if (mLicense == 1 || mLicense == 2) {
 
-            if (mReplay == true) {
-                //Premium.initReplay(lpparam, modRes, SnapContext);
-            }
-            if (mTyping == true) {
-                Premium.initTyping(lpparam, modRes, SnapContext);
-            }
-            if (mStealth == true && mLicense == 2) {
-                Premium.initViewed(lpparam, modRes, SnapContext);
-            }
-        }
+                    if (mReplay == true) {
+                        //Premium.initReplay(lpparam, modRes, SnapContext);
+                    }
+                    if (mTyping == true) {
+                        Premium.initTyping(lpparam, modRes, SnapContext);
+                    }
+                    if (mStealth == true && mLicense == 2) {
+                        Premium.initViewed(lpparam, modRes, SnapContext);
+                    }
+                }
         /*findAndHookMethod("com.snapchat.android.Timber", lpparam.classLoader, "c", String.class, String.class, Object[].class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 Logger.log("TIMBER: " + param.args[0] + " : " + param.args[1], true);
             }
         });*/
-        for (String s: Obfuscator.ROOTDETECTOR_METHODS) {
-            findAndHookMethod(Obfuscator.ROOTDETECTOR_CLASS, lpparam.classLoader, s, XC_MethodReplacement.returnConstant(false));
-            Logger.log("ROOTCHECK: " + s, true);
-        }
-        findAndHookMethod("adq", lpparam.classLoader, "h", String.class, XC_MethodReplacement.DO_NOTHING);
-        findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
+                for (String s : Obfuscator.ROOTDETECTOR_METHODS) {
+                    findAndHookMethod(Obfuscator.ROOTDETECTOR_CLASS, lpparam.classLoader, s, XC_MethodReplacement.returnConstant(false));
+                    Logger.log("ROOTCHECK: " + s, true);
+                }
+                findAndHookMethod("adq", lpparam.classLoader, "h", String.class, XC_MethodReplacement.DO_NOTHING);
+                findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         param.args[0] = 120000;
                     }
                 });
 
-        final Class<?> receivedSnapClass = findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
-        try{
-            XposedHelpers.setStaticIntField(receivedSnapClass, "SECOND_MAX_VIDEO_DURATION", 99999);
-            Logger.log("SECOND_MAX_VIDEO_DURATION set over 10", true);
-		} catch (Throwable t){
-			Logger.log("SECOND_MAX_VIDEO_DURATION set over 10 failed :(",true);
-			Logger.log(t.toString());
-        } /*For viewing longer videos?*/
+                final Class<?> receivedSnapClass = findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
+                try {
+                    XposedHelpers.setStaticIntField(receivedSnapClass, "SECOND_MAX_VIDEO_DURATION", 99999);
+                    Logger.log("SECOND_MAX_VIDEO_DURATION set over 10", true);
+                } catch (Throwable t) {
+                    Logger.log("SECOND_MAX_VIDEO_DURATION set over 10 failed :(", true);
+                    Logger.log(t.toString());
+                } /*For viewing longer videos?*/
 
-        XC_MethodHook initHook = new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                SnapContext = (Activity) param.thisObject;
-                prefs.reload();
-                refreshPreferences();
-                //SNAPPREFS
-                Saving.initSaving(lpparam, mResources, SnapContext);
-                Lens.initLens(lpparam, mResources, SnapContext);
-                File vfilters = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/VisualFilters/xpro_map.png");
-                if(vfilters.exists()){
-                    VisualFilters.initVisualFilters(lpparam);
-                } else {
-                    Toast.makeText(context, "VisualFilter files are missing, download them!", Toast.LENGTH_SHORT).show();
-                }
-                if (mMultiFilterBoolean == true){
-                    MultiFilter.initMultiFilter(lpparam, mResources, SnapContext);
-                }
-                if (mDiscoverSnap == true) {
-                    DataSaving.blockDsnap(lpparam);
-                }
-                if (mDiscoverUI == true) {
-                    DataSaving.blockFromUi(lpparam);
-                }
-                if (mSpeed == true) {
-                    Spoofing.initSpeed(lpparam, SnapContext);
-                }
-                if (mLocation == true) {
-                    Spoofing.initLocation(lpparam, SnapContext);
-                }
-                if (mWeather == true) {
-                    Spoofing.initWeather(lpparam, SnapContext);
-                }
-                if (mPaintTools == true){
-                    PaintTools.initPaint(lpparam, mResources);
-                }
-                if (mTimerCounter == true){
-                    Misc.initTimer(lpparam, mResources);
-                }
-                if (mChatAutoSave == true){
-                    Chat.initTextSave(lpparam, mResources);
-                }
-                if (mChatImageSave == true){
-                    Chat.initImageSave(lpparam, mResources);
-                }
-                getEditText(lpparam);
-                findAndHookMethod(Obfuscator.save.SCREENSHOTDETECTOR_CLASS, lpparam.classLoader, Obfuscator.save.SCREENSHOTDETECTOR_RUN, LinkedHashMap.class, XC_MethodReplacement.DO_NOTHING);
-                findAndHookMethod(Obfuscator.save.SNAPSTATEMESSAGE_CLASS, lpparam.classLoader, Obfuscator.save.SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT, Long.class, new XC_MethodHook() {
+                XC_MethodHook initHook = new XC_MethodHook() {
                     @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        param.args[0] = 0L;
-                        Logger.log("StateBuilder.setScreenshotCount set to 0L", true);
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        SnapContext = (Activity) param.thisObject;
+                        prefs.reload();
+                        refreshPreferences();
+                        //SNAPPREFS
+                        Saving.initSaving(lpparam, mResources, SnapContext);
+                        Lens.initLens(lpparam, mResources, SnapContext);
+                        File vfilters = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/VisualFilters/xpro_map.png");
+                        if (vfilters.exists()) {
+                            VisualFilters.initVisualFilters(lpparam);
+                        } else {
+                            Toast.makeText(context, "VisualFilter files are missing, download them!", Toast.LENGTH_SHORT).show();
+                        }
+                        if (mMultiFilterBoolean == true) {
+                            MultiFilter.initMultiFilter(lpparam, mResources, SnapContext);
+                        }
+                        if (mDiscoverSnap == true) {
+                            DataSaving.blockDsnap(lpparam);
+                        }
+                        if (mDiscoverUI == true) {
+                            DataSaving.blockFromUi(lpparam);
+                        }
+                        if (mSpeed == true) {
+                            Spoofing.initSpeed(lpparam, SnapContext);
+                        }
+                        if (mLocation == true) {
+                            Spoofing.initLocation(lpparam, SnapContext);
+                        }
+                        if (mWeather == true) {
+                            Spoofing.initWeather(lpparam, SnapContext);
+                        }
+                        if (mPaintTools == true) {
+                            PaintTools.initPaint(lpparam, mResources);
+                        }
+                        if (mTimerCounter == true) {
+                            Misc.initTimer(lpparam, mResources);
+                        }
+                        if (mChatAutoSave == true) {
+                            Chat.initTextSave(lpparam, mResources);
+                        }
+                        if (mChatImageSave == true) {
+                            Chat.initImageSave(lpparam, mResources);
+                        }
+                        if (mIntegration == true) {
+                            initIntegration(lpparam);
+                        }
+                        getEditText(lpparam);
+                        findAndHookMethod(Obfuscator.save.SCREENSHOTDETECTOR_CLASS, lpparam.classLoader, Obfuscator.save.SCREENSHOTDETECTOR_RUN, LinkedHashMap.class, XC_MethodReplacement.DO_NOTHING);
+                        findAndHookMethod(Obfuscator.save.SNAPSTATEMESSAGE_CLASS, lpparam.classLoader, Obfuscator.save.SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT, Long.class, new XC_MethodHook() {
+                            @Override
+                            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                                param.args[0] = 0L;
+                                Logger.log("StateBuilder.setScreenshotCount set to 0L", true);
+                            }
+                        });
+                        if (mCustomSticker == true) {
+                            Stickers.initStickers(lpparam, modRes, SnapContext);
+                        }
+                    }
+                };
+
+                findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, initHook);
+                findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onResume", initHook);
+
+                // VanillaCaptionEditText was moved from an inner-class to a separate class in 8.1.0
+                String vanillaCaptionEditTextClassName = "com.snapchat.android.ui.caption.VanillaCaptionEditText";
+                hookAllConstructors(findClass(vanillaCaptionEditTextClassName, lpparam.classLoader), new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        if (Common.CAPTION_UNLIMITED_VANILLA) {
+                            XposedUtils.log("Unlimited vanilla captions");
+                            EditText vanillaCaptionEditText = (EditText) param.thisObject;
+                            // Set single lines mode to false
+                            vanillaCaptionEditText.setSingleLine(false);
+
+                            // Remove actionDone IME option, by only setting flagNoExtractUi
+                            vanillaCaptionEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+                            // Remove listener hiding keyboard when enter is pressed by setting the listener to null
+                            vanillaCaptionEditText.setOnEditorActionListener(null);
+                            // Remove listener for cutting of text when the first line is full by setting the text change listeners list to null
+                            setObjectField(vanillaCaptionEditText, "mListeners", null);
+                        }
                     }
                 });
-                if (mCustomSticker == true) {
-                    Stickers.initStickers(lpparam, modRes, SnapContext);
+
+                // FatCaptionEditText was moved from an inner-class to a separate class in 8.1.0
+                String fatCaptionEditTextClassName = "com.snapchat.android.ui.caption.FatCaptionEditText";
+                hookAllConstructors(findClass(fatCaptionEditTextClassName, lpparam.classLoader), new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        if (Common.CAPTION_UNLIMITED_FAT) {
+                            XposedUtils.log("Unlimited fat captions");
+                            EditText fatCaptionEditText = (EditText) param.thisObject;
+                            // Remove InputFilter with character limit
+                            fatCaptionEditText.setFilters(new InputFilter[0]);
+
+                            // Remove actionDone IME option, by only setting flagNoExtractUi
+                            fatCaptionEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+                            // Remove listener hiding keyboard when enter is pressed by setting the listener to null
+                            fatCaptionEditText.setOnEditorActionListener(null);
+                            // Remove listener for removing new lines by setting the text change listeners list to null
+                            setObjectField(fatCaptionEditText, "mListeners", null);
+                        }
+                    }
+                });
+                //SNAPSHARE
+                Sharing.initSharing(lpparam, mResources);
+                //SNAPPREFS
+                if (hideBf == true) {
+                    findAndHookMethod("com.snapchat.android.model.Friend", lpparam.classLoader, Obfuscator.FRIENDS_BF, new XC_MethodReplacement() {
+                        @Override
+                        protected Object replaceHookedMethod(MethodHookParam param)
+                                throws Throwable {
+                            //logging("Snap Prefs: Removing Best-friends");
+                            return false;
+                        }
+                    });
                 }
-            }
-        };
-
-        findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, initHook);
-        findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onResume", initHook);
-
-        // VanillaCaptionEditText was moved from an inner-class to a separate class in 8.1.0
-        String vanillaCaptionEditTextClassName = "com.snapchat.android.ui.caption.VanillaCaptionEditText";
-        hookAllConstructors(findClass(vanillaCaptionEditTextClassName, lpparam.classLoader), new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                if (Common.CAPTION_UNLIMITED_VANILLA) {
-                    XposedUtils.log("Unlimited vanilla captions");
-                    EditText vanillaCaptionEditText = (EditText) param.thisObject;
-                    // Set single lines mode to false
-                    vanillaCaptionEditText.setSingleLine(false);
-
-                    // Remove actionDone IME option, by only setting flagNoExtractUi
-                    vanillaCaptionEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
-                    // Remove listener hiding keyboard when enter is pressed by setting the listener to null
-                    vanillaCaptionEditText.setOnEditorActionListener(null);
-                    // Remove listener for cutting of text when the first line is full by setting the text change listeners list to null
-                    setObjectField(vanillaCaptionEditText, "mListeners", null);
-                }
-            }
-        });
-
-        // FatCaptionEditText was moved from an inner-class to a separate class in 8.1.0
-        String fatCaptionEditTextClassName = "com.snapchat.android.ui.caption.FatCaptionEditText";
-        hookAllConstructors(findClass(fatCaptionEditTextClassName, lpparam.classLoader), new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                if (Common.CAPTION_UNLIMITED_FAT) {
-                    XposedUtils.log("Unlimited fat captions");
-                    EditText fatCaptionEditText = (EditText) param.thisObject;
-                    // Remove InputFilter with character limit
-                    fatCaptionEditText.setFilters(new InputFilter[0]);
-
-                    // Remove actionDone IME option, by only setting flagNoExtractUi
-                    fatCaptionEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
-                    // Remove listener hiding keyboard when enter is pressed by setting the listener to null
-                    fatCaptionEditText.setOnEditorActionListener(null);
-                    // Remove listener for removing new lines by setting the text change listeners list to null
-                    setObjectField(fatCaptionEditText, "mListeners", null);
-                }
-            }
-        });
-        //SNAPSHARE
-        Sharing.initSharing(lpparam, mResources);
-        //SNAPPREFS
-        if (hideBf == true) {
-            findAndHookMethod("com.snapchat.android.model.Friend", lpparam.classLoader, Obfuscator.FRIENDS_BF, new XC_MethodReplacement() {
-                @Override
-                protected Object replaceHookedMethod(MethodHookParam param)
-                        throws Throwable {
-                    //logging("Snap Prefs: Removing Best-friends");
-                    return false;
-                }
-            });
-        }
 		/*if (hideRecent == true){
         findAndHookMethod(Common.Class_Friend, lpparam.classLoader, Common.Method_Recent, new XC_MethodReplacement(){
 		@Override
@@ -541,12 +553,12 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         }
 		});
 		}*/
-        if (mCustomFilterBoolean == true) {
-            addFilter(lpparam);
-        }
-        if (selectAll == true) {
-            HookSendList.initSelectAll(lpparam);
-        }
+                if (mCustomFilterBoolean == true) {
+                    addFilter(lpparam);
+                }
+                if (selectAll == true) {
+                    HookSendList.initSelectAll(lpparam);
+                }
 
 
             }
@@ -620,6 +632,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("mTimerCounter: " + mTimerCounter);
         logging("mChatAutoSave: " + mChatAutoSave);
         logging("mChatImageSave: " + mChatImageSave);
+        logging("mIntegration: " + mIntegration);
         logging("mPaintTools: " + mPaintTools);
         logging("CustomFilters: " + mCustomFilterBoolean);
         logging("MultiFilters: " + mMultiFilterBoolean);
@@ -672,6 +685,43 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             }
         });
     }
+    public boolean setInt = false;
+    public void initIntegration(LoadPackageParam lpparam) {
+            findAndHookMethod("com.snapchat.android.fragments.addfriends.ProfileFragment", lpparam.classLoader, "onCreateView", LayoutInflater.class, ViewGroup.class, Bundle.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    TableLayout navigation = (TableLayout) ((LinearLayout) XposedHelpers.getObjectField(param.thisObject, "z")).getChildAt(0);
+                    ImageView orig = (ImageView) ((TableRow) navigation.getChildAt(0)).getChildAt(0);
+                    TextView orig1 = (TextView) ((TableRow) navigation.getChildAt(0)).getChildAt(1);
+                    TableRow row = new TableRow(navigation.getContext());
+                    row.setLayoutParams(navigation.getChildAt(0).getLayoutParams());
+                    ImageView iv = new ImageView(navigation.getContext());
+                    iv.setImageDrawable(mResources.getDrawable(R.drawable.profile_snapprefs));
+                    iv.setLayoutParams(orig.getLayoutParams());
+                    TextView textView = new TextView(navigation.getContext());
+                    textView.setText("Open Snapprefs");
+                    textView.setTextColor(orig1.getCurrentTextColor());
+                    textView.setTextSize(24);
+                    textView.setLayoutParams(orig1.getLayoutParams());
+                    row.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage("com.marz.snapprefs");
+                            context.startActivity(launchIntent);
+                        }
+                    });
+                    row.addView(iv);
+                    row.addView(textView);
+                    navigation.addView(row);
+                    if(setInt==false){
+                        setInt=true;
+                    }
+                    else {//cheap ass fix
+                        navigation.removeView(row);
+                    }
+                }
+            });
+        }
 
     public void fullScreenFilter(InitPackageResourcesParam resparam) {
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "battery_view", new XC_LayoutInflated() {
