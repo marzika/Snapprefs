@@ -217,4 +217,13 @@ public class Obfuscator {
         public static final String ADDER_PARAM = "SK";
         public static final String SNAPCHAPTUREDEVENT_CLASS = "Zs";
     }
+    public class timer {
+        public static final String TAKESNAPBUTTON_CLASS = "com.snapchat.android.ui.camera.TakeSnapButton";
+        public static final String TAKESNAPBUTTON_ONDRAW = "onDraw";
+        public static final String TAKESNAPBUTTON_BLEAN1 = "b";
+        public static final String TAKESNAPBUTTON_BLEAN2 = "d";
+        public static final String TAKESNAPBUTTON_TIME = "a";
+        public static final String TAKESNAPBUTTON_X = "m";
+        public static final String TAKESNAPBUTTON_Y = "n";
+    }
 }
