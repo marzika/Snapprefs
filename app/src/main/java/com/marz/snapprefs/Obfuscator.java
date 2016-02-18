@@ -235,4 +235,8 @@ public class Obfuscator {
         public static final String MESSAGEVIEWHOLDER_ISSAVED = "ak_";
         public static final String MESSAGEVIEWHOLDER_SAVE = "z";
     }
+    public class notification {
+        public static final String NOTIFICATION_CLASS_1 = "tX";
+        public static final String NOTIFICATION_CLASS_2 = "XU";
+    }
 }
