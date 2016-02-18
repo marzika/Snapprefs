@@ -151,7 +151,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     static int counter = 0;
     private static XModuleResources mResources;
     private static int snapchatVersion;
-    private static String MODULE_PATH = null;
+    public static String MODULE_PATH = null;
     private static boolean fullCaption;
     private static boolean selectAll;
     private static boolean hideBf;
@@ -706,7 +706,13 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                     row.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage("com.marz.snapprefs");
+                            if (context==null){
+                                Logger.log("CONTEXT IS NULL IN INITINTEGRATION");
+                            }
+                            //Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage("com.marz.snapprefs");
+                            Intent launchIntent = new Intent(Intent.ACTION_MAIN);
+                            launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            launchIntent.setComponent(new ComponentName("com.marz.snapprefs","com.marz.snapprefs.MainActivity2"));
                             context.startActivity(launchIntent);
                         }
                     });
