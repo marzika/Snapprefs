@@ -6,18 +6,23 @@ import android.content.res.Resources;
 import android.content.res.XModuleResources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Vibrator;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.marz.snapprefs.Util.NotificationUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -104,6 +109,8 @@ public class Saving {
     private static Class<?> storySnap;
     private static int screenHeight;
     private static long storyTimestamp;
+    public static XC_LoadPackage.LoadPackageParam lpparam2;
+
 
     static void newSaveMethod(FileInputStream mVideo, Bitmap mImage, boolean isOverlay) {
         if (mVideo == null && mImage == null) {
@@ -134,6 +141,7 @@ public class Saving {
     }
     static void initSaving(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
         mResources = modRes;
+        lpparam2 = lpparam;
         if (mSCResources == null) mSCResources = snapContext.getResources();
         refreshPreferences();
 
@@ -597,64 +605,33 @@ public class Saving {
         if (mediaType == MediaType.IMAGE) {
             if (imageFile.exists()) {
                 Logger.log("Image already exists");
-                showToast(context, mResources.getString(R.string.image_exists));
+                //showToast(context, mResources.getString(R.string.image_exists));
+                NotificationUtils.showMessage(mResources.getString(R.string.image_exists), Color.rgb(255,0,0), NotificationUtils.LENGHT_LONG, lpparam2.classLoader);
                 vibrate(context, false);
                 return;
             }
-
-            if (saveImageJPG(image, imageFile)) {
-                showToast(context, mResources.getString(R.string.image_saved));
-                vibrate(context, true);
-                Logger.log("Image " + snapType.name + " has been saved");
-                Logger.log("Path: " + imageFile.toString());
-
-                runMediaScanner(context, imageFile.getAbsolutePath());
-                Logger.log("Saving image", true);
-            } else {
-                showToast(context, mResources.getString(R.string.image_not_saved));
-            }
+            new saveImageJPGTask().execute(imageFile, image, context);
         } else if (mediaType == MediaType.IMAGE_OVERLAY) {
             if (mOverlays == true) {
                 if (overlayFile.exists()) {
-                    vibrate(context, false);
                     Logger.log("VideoOverlay already exists");
-                    showToast(context, mResources.getString(R.string.video_exists));
+                    NotificationUtils.showMessage(mResources.getString(R.string.image_exists), Color.rgb(255, 0, 0), NotificationUtils.LENGHT_LONG, lpparam2.classLoader);
+                    vibrate(context, false);
                     return;
                 }
-
-
-                if (saveImagePNG(image, overlayFile)) {
-                    //showToast(context, "This overlay ");
-                    vibrate(context, true);
-                    Logger.log("VideoOverlay " + snapType.name + " has been saved");
-                    Logger.log("Path: " + overlayFile.toString());
-                    runMediaScanner(context, overlayFile.getAbsolutePath());
-                } else {
-                    showToast(context, "An error occured while saving this overlay.");
-                }
+                new saveImagePNGTask().execute(overlayFile, image, context);
             }
         } else if (mediaType == MediaType.VIDEO) {
             if (videoFile.exists()) {
-                vibrate(context, false);
                 Logger.log("Video already exists");
-                showToast(context, mResources.getString(R.string.video_exists));
+                vibrate(context, false);
+                NotificationUtils.showMessage(mResources.getString(R.string.video_exists), Color.rgb(255, 0, 0), NotificationUtils.LENGHT_LONG, lpparam2.classLoader);
                 return;
             }
-
-            if (saveVideo(video, videoFile)) {
-                vibrate(context, true);
-                showToast(context, mResources.getString(R.string.video_saved));
-                Logger.log("Video " + snapType.name + " has been saved");
-                Logger.log("Path: " + videoFile.toString());
-                runMediaScanner(context, videoFile.getAbsolutePath());
-            } else {
-                showToast(context, mResources.getString(R.string.video_not_saved));
-            }
+            new saveVideoTask().execute(video, videoFile, context);
         }
         image = null;
         video = null;
-        //receivedSnap = null;
-        //viewingSnap = false;
     }
 
     private static File createFileDir(String category, String sender) throws IOException {
@@ -675,60 +652,137 @@ public class Saving {
         return directory;
     }
 
-    // function to saveimage
-    private static boolean saveImagePNG(Bitmap image, File fileToSave) {
-        try {
-            FileOutputStream out = new FileOutputStream(fileToSave);
-            image.compress(Bitmap.CompressFormat.PNG, 100, out);
-            out.flush();
-            out.close();
-            Logger.log("SAVEIMAGE DONE", true);
-            return true;
-        } catch (Exception e) {
-            Logger.log("Exception while saving an image", e);
-            return false;
-        }
-    }
+    public static class saveImageJPGTask extends AsyncTask<Object, Void, Boolean>{
+        @Override
+        protected Boolean doInBackground(Object... params) {
+            Boolean success;
+            File fileToSave = (File) params[0];
+            Bitmap bmp = (Bitmap) params[1];
+            Context context = (Context) params[2];
+            try {
+                FileOutputStream out = new FileOutputStream(fileToSave);
+                bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                out.flush();
+                out.close();
+                vibrate(context, true);
+                Logger.log("Image has been saved");
+                Logger.log("Path: " + fileToSave.toString());
+                runMediaScanner(context, fileToSave.getAbsolutePath());
 
-    public static boolean saveImageJPG(Bitmap image, File fileToSave) {
-        try {
-            FileOutputStream out = new FileOutputStream(fileToSave);
-            image.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            out.flush();
-            out.close();
-            Logger.log("SAVEIMAGE-JPG DONE", true);
-            return true;
-        } catch (Exception e) {
-            Logger.log("Exception while saving an image", e);
-            return false;
-        }
-    }
-
-    // function to save video
-    private static boolean saveVideo(FileInputStream video, File fileToSave) {
-        try {
-            FileInputStream in = video;
-            //Logger.log(in.toString(), true);
-            FileOutputStream out = new FileOutputStream(fileToSave);
-            //Logger.log(out.toString(), true);
-
-            byte[] buf = new byte[1024];
-            int len;
-
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
+                success = true;
+            } catch (Exception e) {
+                Logger.log("Exception while saving an image", e);
+                vibrate(context, false);
+                success = false;
             }
+            return success;
+        }
 
-            in.close();
-            out.flush();
-            out.close();
-            return true;
-        } catch (Exception e) {
-            Logger.log("Exception while saving a video", e);
-            return false;
+        @Override
+        protected void onPostExecute(Boolean result) {
+            String message;
+            int color;
+            if(result){
+                message = "Image saved";
+                color = mResources.getColor(R.color.primary);
+            } else {
+                message = "Error while saving";
+                color = Color.rgb(255,0,0);
+            }
+            NotificationUtils.showMessage(message, color, getToastLenght(), lpparam2.classLoader);
+        }
+    }
+    public static class saveImagePNGTask extends AsyncTask<Object, Void, Boolean>{
+        @Override
+        protected Boolean doInBackground(Object... params) {
+            Boolean success;
+            File fileToSave = (File) params[0];
+            Bitmap bmp = (Bitmap) params[1];
+            Context context = (Context) params[2];
+            try {
+                FileOutputStream out = new FileOutputStream(fileToSave);
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, out);
+                out.flush();
+                out.close();
+                vibrate(context, true);
+                Logger.log("Image has been saved");
+                Logger.log("Path: " + fileToSave.toString());
+                runMediaScanner(context, fileToSave.getAbsolutePath());
+
+                success = true;
+            } catch (Exception e) {
+                Logger.log("Exception while saving an image", e);
+                vibrate(context, false);
+                success = false;
+            }
+            return success;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            String message;
+            int color;
+            if(result){
+                message = "Image saved";
+                color = mResources.getColor(R.color.primary);
+            } else {
+                message = "Error while saving";
+                color = Color.rgb(255,0,0);
+            }
+            NotificationUtils.showMessage(message, color, getToastLenght(), lpparam2.classLoader);
         }
     }
 
+    public static class saveVideoTask extends AsyncTask<Object, Void, Boolean>{
+        @Override
+        protected Boolean doInBackground(Object... params) {
+            Boolean success;
+            FileInputStream video = (FileInputStream) params[0];
+            File fileToSave = (File) params[1];
+            Context context = (Context) params[2];
+            try {
+                FileInputStream in = video;
+                //Logger.log(in.toString(), true);
+                FileOutputStream out = new FileOutputStream(fileToSave);
+                //Logger.log(out.toString(), true);
+
+                byte[] buf = new byte[1024];
+                int len;
+
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+
+                in.close();
+                out.flush();
+                out.close();
+                vibrate(context, true);
+                Logger.log("Video has been saved");
+                Logger.log("Path: " + fileToSave.toString());
+                runMediaScanner(context, fileToSave.getAbsolutePath());
+                success = true;
+            } catch (Exception e) {
+                Logger.log("Exception while saving a video", e);
+                vibrate(context, false);
+                success = false;
+            }
+            return success;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            String message;
+            int color;
+            if(result){
+                message = "Video saved";
+                color = mResources.getColor(R.color.primary);
+            } else {
+                message = "Error while saving";
+                color = Color.rgb(255,0,0);
+            }
+            NotificationUtils.showMessage(message, color, getToastLenght(), lpparam2.classLoader);
+        }
+    }
     /*
      * Tells the media scanner to scan the newly added image or video so that it
      * shows up in the gallery without a reboot. And shows a Toast message where
@@ -750,14 +804,12 @@ public class Saving {
         }
     }
 
-    private static void showToast(Context context, String toastMessage) {
-        if (mToastEnabled) {
+    private static int getToastLenght() {
             if (mToastLength == TOAST_LENGTH_SHORT) {
-                Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show();
+                return NotificationUtils.LENGHT_SHORT;
             } else {
-                Toast.makeText(context, toastMessage, Toast.LENGTH_LONG).show();
+                return NotificationUtils.LENGHT_LONG;
             }
-        }
     }
     private static void vibrate(Context context, boolean success) {
         if (mVibrationEnabled) {
