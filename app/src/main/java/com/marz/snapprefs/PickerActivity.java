@@ -18,26 +18,22 @@ import java.io.File;
  */
 public class PickerActivity extends Activity {
     public static int SELECT_GALLERY = 1;
-    public static int SELECT_FILEPICKER = 2;
+    boolean finish = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        boolean finish = true;
+
         Intent intent = getIntent();
         String action = intent.getAction();
 
         if (Intent.ACTION_RUN.equals(action)) {
-            boolean isGallery = intent.getBooleanExtra("isGallery", false);
-
-            if(isGallery){
                 Intent galleryPickerIntent = new Intent(Intent.ACTION_PICK);
                 galleryPickerIntent.setType("video/*, image/*");
                 startActivityForResult(galleryPickerIntent, SELECT_GALLERY);
+
             } else {
-
-            }
-
+                finish = false;
         }
     }
     @Override
@@ -48,8 +44,6 @@ public class PickerActivity extends Activity {
                 String data = intent.getData().toString();
                 ContentResolver contentResolver = this.getContentResolver();
                 String mediaUri = CommonUtils.getPathFromContentUri(contentResolver, Uri.parse(data));
-                Log.e("SNAPPREFS", mediaUri);
-                //intent.putExtra("URI", mediaUri);
                 File toSend = new File(mediaUri);
                 intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(toSend));
                 intent.setType(getMime(mediaUri));
@@ -58,6 +52,11 @@ public class PickerActivity extends Activity {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             }
+        } else {
+            finish = false;
+        }
+        if (finish) {
+            finish();
         }
     }
 

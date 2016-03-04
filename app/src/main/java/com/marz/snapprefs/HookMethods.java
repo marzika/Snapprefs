@@ -159,6 +159,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     private static boolean hideBf;
     private static boolean hideRecent;
     private static boolean shouldAddGhost;
+    private static boolean shouldAddVFilters;
     private static boolean mColours;
     private static boolean mLocation;
     private static boolean mTimerCounter;
@@ -169,6 +170,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     private static ClassLoader classLoader;
     Class CaptionEditText;
     boolean latest = false;
+    public static ImageButton upload = null;
 
     public static int px(float f) {
         return Math.round((f * SnapContext.getResources().getDisplayMetrics().density));
@@ -354,6 +356,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         if (shouldAddGhost) {
             addGhost(resparam);
         }
+        addShare(resparam);
         //if (mCustomFilterType == 0) {
             fullScreenFilter(resparam);
         //}
@@ -406,11 +409,28 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 Logger.log("TIMBER: " + param.args[0] + " : " + param.args[1], true);
             }
         });*/
+                //Showing lenses or not
+                findAndHookMethod("Af", lpparam.classLoader, "a", boolean.class, boolean.class, new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        if((boolean)param.args[0]){
+                            upload.setVisibility(View.INVISIBLE);
+                        } else {
+                            upload.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+                //Recording of video ended
+                findAndHookMethod("Af", lpparam.classLoader, "c", boolean.class, new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        upload.setVisibility(View.VISIBLE);
+                    }
+                });
                 for (String s : Obfuscator.ROOTDETECTOR_METHODS) {
                     findAndHookMethod(Obfuscator.ROOTDETECTOR_CLASS, lpparam.classLoader, s, XC_MethodReplacement.returnConstant(false));
                     Logger.log("ROOTCHECK: " + s, true);
                 }
-                findAndHookMethod("adq", lpparam.classLoader, "h", String.class, XC_MethodReplacement.DO_NOTHING);
                 findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -746,41 +766,41 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             }
         });
     }
-    public void addGhost(InitPackageResourcesParam resparam) {
+    public void addShare(InitPackageResourcesParam resparam){
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "camera_preview", new XC_LayoutInflated() {
-                    public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
-                        final RelativeLayout relativeLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("camera_preview_layout", "id", Common.PACKAGE_SNAP));
-                        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("camera_take_snap_button", "id", Common.PACKAGE_SNAP)).getLayoutParams());
-                        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                        layoutParams.bottomMargin = px(60.0f);
-                        final ImageButton upload = new ImageButton(SnapContext);
-                        upload.setBackgroundColor(0);
-                        Drawable uploadimg = SnapContext.getResources().getDrawable(0x7f020024); //aa_chat_camera_upload - 0x7f020024
-                        //upload.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
-                        upload.setImageDrawable(uploadimg);
-                        upload.setScaleX((float) 0.55);
-                        upload.setScaleY((float) 0.55);
-                        upload.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                NotificationUtils.showMessage("UPLOAD BTN", Color.parseColor("#444444"), NotificationUtils.LENGHT_SHORT, classLoader);
-                                Intent launchIntent = new Intent(Intent.ACTION_RUN);
-                                launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                launchIntent.putExtra("isGallery", true);
-                                launchIntent.setComponent(new ComponentName("com.marz.snapprefs","com.marz.snapprefs.PickerActivity"));
-                                context.startActivity(launchIntent);
-                            }
-                        });
-                        SnapContext.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                relativeLayout.addView(upload, layoutParams);
-                            }
-                        });
-
+            public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
+                final RelativeLayout relativeLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("camera_preview_layout", "id", Common.PACKAGE_SNAP));
+                final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("camera_take_snap_button", "id", Common.PACKAGE_SNAP)).getLayoutParams());
+                layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                layoutParams.bottomMargin = px(65.0f);
+                upload = new ImageButton(SnapContext);
+                upload.setBackgroundColor(0);
+                Drawable uploadimg = SnapContext.getResources().getDrawable(+0x7f020024); //aa_chat_camera_upload - 0x7f020024
+                //upload.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
+                upload.setImageDrawable(uploadimg);
+                upload.setScaleX((float) 0.55);
+                upload.setScaleY((float) 0.55);
+                upload.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent launchIntent = new Intent(Intent.ACTION_RUN);
+                        launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        launchIntent.setComponent(new ComponentName("com.marz.snapprefs","com.marz.snapprefs.PickerActivity"));
+                        context.startActivity(launchIntent);
                     }
                 });
+                SnapContext.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        relativeLayout.addView(upload, layoutParams);
+                    }
+                });
+
+            }
+        });
+    }
+    public void addGhost(InitPackageResourcesParam resparam) {
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "snap_preview", new XC_LayoutInflated() {
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
                 final RelativeLayout relativeLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("snap_preview_header", "id", Common.PACKAGE_SNAP)).getParent();
