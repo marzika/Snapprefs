@@ -75,7 +75,10 @@ public class Sharing {
                     Uri mediaUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
                     // Check for bogus call
                     if (mediaUri == null) {
-                        return;
+                        mediaUri = Uri.parse(intent.getStringExtra("URI"));
+                        if (mediaUri == null){
+                            return;
+                        }
                     }
                     /* We check if the current media got already initialized and should exit instead
                      * of doing the media initialization again. This check is necessary

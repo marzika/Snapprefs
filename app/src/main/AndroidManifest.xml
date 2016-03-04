@@ -63,6 +63,16 @@
                 <category android:name="de.robv.android.xposed.category.MODULE_SETTINGS"/>
             </intent-filter>
         </activity>
+        <activity
+            android:exported="true"
+            android:name=".PickerActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:excludeFromRecents="true">
+            <intent-filter>
+                <action android:name="android.intent.action.RUN" />
+            </intent-filter>
+        </activity>
         <activity-alias
             android:enabled="true"
             android:name="com.marz.snapprefs.MainActivity2-Alias"

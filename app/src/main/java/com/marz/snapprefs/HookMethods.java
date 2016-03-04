@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
@@ -27,6 +28,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import org.apache.http.HttpResponse;
@@ -164,6 +166,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     private static boolean mChatImageSave;
     private static boolean mIntegration;
     private static InitPackageResourcesParam resParam;
+    private static ClassLoader classLoader;
     Class CaptionEditText;
     boolean latest = false;
 
@@ -366,6 +369,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             XposedUtils.log("----------------- SNAPPREFS HOOKED -----------------", false);
             Object activityThread = callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
             context = (Context) callMethod(activityThread, "getSystemContext");
+            classLoader = (ClassLoader) lpparam.classLoader;
 
             PackageInfo piSnapChat = context.getPackageManager().getPackageInfo(lpparam.packageName, 0);
             XposedUtils.log("SnapChat Version: " + piSnapChat.versionName + " (" + piSnapChat.versionCode + ")", false);
@@ -743,6 +747,40 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         });
     }
     public void addGhost(InitPackageResourcesParam resparam) {
+        resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "camera_preview", new XC_LayoutInflated() {
+                    public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
+                        final RelativeLayout relativeLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("camera_preview_layout", "id", Common.PACKAGE_SNAP));
+                        final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("camera_take_snap_button", "id", Common.PACKAGE_SNAP)).getLayoutParams());
+                        layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                        layoutParams.bottomMargin = px(60.0f);
+                        final ImageButton upload = new ImageButton(SnapContext);
+                        upload.setBackgroundColor(0);
+                        Drawable uploadimg = SnapContext.getResources().getDrawable(0x7f020024); //aa_chat_camera_upload - 0x7f020024
+                        //upload.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
+                        upload.setImageDrawable(uploadimg);
+                        upload.setScaleX((float) 0.55);
+                        upload.setScaleY((float) 0.55);
+                        upload.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                NotificationUtils.showMessage("UPLOAD BTN", Color.parseColor("#444444"), NotificationUtils.LENGHT_SHORT, classLoader);
+                                Intent launchIntent = new Intent(Intent.ACTION_RUN);
+                                launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                launchIntent.putExtra("isGallery", true);
+                                launchIntent.setComponent(new ComponentName("com.marz.snapprefs","com.marz.snapprefs.PickerActivity"));
+                                context.startActivity(launchIntent);
+                            }
+                        });
+                        SnapContext.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                relativeLayout.addView(upload, layoutParams);
+                            }
+                        });
+
+                    }
+                });
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "snap_preview", new XC_LayoutInflated() {
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
                 final RelativeLayout relativeLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("snap_preview_header", "id", Common.PACKAGE_SNAP)).getParent();

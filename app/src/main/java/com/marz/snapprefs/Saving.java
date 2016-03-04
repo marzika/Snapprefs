@@ -17,8 +17,6 @@ import android.os.Vibrator;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -40,14 +38,11 @@ import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
-import static de.robv.android.xposed.XposedHelpers.getLongField;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
-import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
 
 public class Saving {
 
@@ -689,7 +684,7 @@ public class Saving {
                 message = "Error while saving";
                 color = Color.rgb(255,0,0);
             }
-            NotificationUtils.showMessage(message, color, getToastLenght(), lpparam2.classLoader);
+            NotificationUtils.showMessage(message, color, getToastLength(), lpparam2.classLoader);
         }
     }
     public static class saveImagePNGTask extends AsyncTask<Object, Void, Boolean>{
@@ -729,7 +724,7 @@ public class Saving {
                 message = "Error while saving";
                 color = Color.rgb(255,0,0);
             }
-            NotificationUtils.showMessage(message, color, getToastLenght(), lpparam2.classLoader);
+            NotificationUtils.showMessage(message, color, getToastLength(), lpparam2.classLoader);
         }
     }
 
@@ -780,7 +775,7 @@ public class Saving {
                 message = "Error while saving";
                 color = Color.rgb(255,0,0);
             }
-            NotificationUtils.showMessage(message, color, getToastLenght(), lpparam2.classLoader);
+            NotificationUtils.showMessage(message, color, getToastLength(), lpparam2.classLoader);
         }
     }
     /*
@@ -804,7 +799,7 @@ public class Saving {
         }
     }
 
-    private static int getToastLenght() {
+    private static int getToastLength() {
             if (mToastLength == TOAST_LENGTH_SHORT) {
                 return NotificationUtils.LENGHT_SHORT;
             } else {
@@ -826,8 +821,7 @@ public class Saving {
     //http://stackoverflow.com/questions/20808479/algorithm-for-generating-vibration-patterns-ranging-in-intensity-in-android/20821575#20821575
     // intensity 0-1
     // duration mS
-    public static long[] genVibratorPattern( float intensity, long duration )
-    {
+    public static long[] genVibratorPattern( float intensity, long duration ) {
         float dutyCycle = Math.abs( ( intensity * 2.0f ) - 1.0f );
         long hWidth = (long) ( dutyCycle * ( duration - 1 ) ) + 1;
         long lWidth = dutyCycle == 1.0f ? 0 : 1;
@@ -872,16 +866,6 @@ public class Saving {
         mLoopingVids = prefs.getBoolean("pref_key_looping_video", mLoopingVids);
         mHideTimer = prefs.getBoolean("pref_key_timer_hide", mHideTimer);
 
-    }
-
-    public static long hashBitmap(Bitmap bmp){
-        long hash = 31; //or a higher prime at your choice
-        for(int x = 0; x < bmp.getWidth(); x++){
-            for (int y = 0; y < bmp.getHeight(); y++){
-                hash *= (bmp.getPixel(x,y) + 31);
-            }
-        }
-        return hash;
     }
 
     static private ArrayList<View> getAllChildren(View v) {
