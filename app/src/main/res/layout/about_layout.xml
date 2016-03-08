@@ -73,14 +73,14 @@
                     android:singleLine="false" />
 
                 <Button
-                    style="?android:attr/buttonStyleSmall"
+                    style="@style/Widget.AppCompat.Button"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:text="Apache 2.0"
                     android:id="@+id/apache"
                     android:layout_weight="1" />
                 <Button
-                    style="?android:attr/buttonStyleSmall"
+                    style="@style/Widget.AppCompat.Button"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:text="MPL 2.0"
