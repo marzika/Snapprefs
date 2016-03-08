@@ -99,7 +99,8 @@
         android:hint="Type here your username"
         android:inputType="textNoSuggestions|textVisiblePassword"
         android:maxLength="20"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/god_desc"
@@ -108,7 +109,8 @@
         android:layout_marginTop="@dimen/default_gap"
         android:text="Your privacy is key to us, that's why only your username's SHA256 hash is sent to the server."
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"
+        android:visibility="gone"/>
     <Button
         android:id="@+id/god"
         android:layout_width="wrap_content"
