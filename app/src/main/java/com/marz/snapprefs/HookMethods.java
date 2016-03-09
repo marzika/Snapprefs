@@ -1,34 +1,38 @@
 package com.marz.snapprefs;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
+import android.content.res.XResources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.InputFilter;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.GridLayout;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import org.apache.http.HttpResponse;
@@ -42,22 +46,12 @@ import org.apache.http.util.ByteArrayBuffer;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import de.robv.android.xposed.IXposedHookInitPackageResources;
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -72,7 +66,6 @@ import de.robv.android.xposed.callbacks.XC_LayoutInflated;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
 import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
-import static de.robv.android.xposed.XposedBridge.hookAllMethods;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
@@ -81,7 +74,6 @@ import static de.robv.android.xposed.XposedHelpers.getAdditionalStaticField;
 import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
 import static de.robv.android.xposed.XposedHelpers.setAdditionalStaticField;
 import static de.robv.android.xposed.XposedHelpers.setObjectField;
-import static de.robv.android.xposed.XposedHelpers.setStaticIntField;
 
 
 public class HookMethods implements IXposedHookInitPackageResources, IXposedHookLoadPackage, IXposedHookZygoteInit {
@@ -354,12 +346,10 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         resParam = resparam;
         modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
         if (shouldAddGhost) {
-            addGhost(resparam);
+            addIcons(resparam);
         }
-        addShare(resparam);
-        //if (mCustomFilterType == 0) {
-            fullScreenFilter(resparam);
-        //}
+        addShareIcons(resparam);
+        fullScreenFilter(resparam);
     }
 
     @Override
@@ -766,7 +756,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             }
         });
     }
-    public void addShare(InitPackageResourcesParam resparam){
+    public void addShareIcons(InitPackageResourcesParam resparam){
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "camera_preview", new XC_LayoutInflated() {
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
                 final RelativeLayout relativeLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("camera_preview_layout", "id", Common.PACKAGE_SNAP));
@@ -800,24 +790,53 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             }
         });
     }
-    public void addGhost(InitPackageResourcesParam resparam) {
+    public void addIcons(InitPackageResourcesParam resparam) {
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "snap_preview", new XC_LayoutInflated() {
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
                 final RelativeLayout relativeLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("snap_preview_header", "id", Common.PACKAGE_SNAP)).getParent();
+
+                final RelativeLayout outerOptionsLayout = new RelativeLayout(SnapContext);
+                final GridView innerOptionsView = new GridView(SnapContext);
+                innerOptionsView.setAdapter(new OptionsAdapter(SnapContext, mResources));
+                innerOptionsView.setNumColumns(3);
+//                innerOptionsView.setNumColumns(GridView.AUTO_FIT);
+                innerOptionsView.setHorizontalSpacing(px(10.0f));
+                innerOptionsView.setVerticalSpacing(px(10.0f));
+                innerOptionsView.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
+                innerOptionsView.setPadding(0,px(5.0f), 0, px(5.0f));
+                final RelativeLayout.LayoutParams outerOptionsLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                outerOptionsLayoutParams.topMargin = px(55.0f);
+                outerOptionsLayoutParams.bottomMargin = px(300.0f);
+                outerOptionsLayoutParams.leftMargin = px(75.0f);
+                outerOptionsLayoutParams.rightMargin = px(10.0f);
+                outerOptionsLayout.setVisibility(View.GONE);
+                outerOptionsLayout.setBackgroundDrawable(mResources.getDrawable(R.drawable.optionsbackground));
+                outerOptionsLayout.addView(innerOptionsView, GridLayout.LayoutParams.MATCH_PARENT, GridLayout.LayoutParams.MATCH_PARENT);
+
                 final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.ALIGN_PARENT_TOP);
                 layoutParams.topMargin = px(45.0f);
                 layoutParams.leftMargin = px(10.0f);
-                final ImageButton ghost = new ImageButton(SnapContext);
-                ghost.setBackgroundColor(0);
-                ghost.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
-                ghost.setScaleX((float) 0.75);
-                ghost.setScaleY((float) 0.75);
-                ghost.setOnClickListener(new View.OnClickListener() {
+                final ImageButton textButton = new ImageButton(SnapContext);
+                textButton.setBackgroundColor(0);
+                textButton.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
+                textButton.setScaleX((float) 0.75);
+                textButton.setScaleY((float) 0.75);
+                textButton.setOnClickListener(new View.OnClickListener() {
+                    boolean shouldShowOptions = true;
                     @Override
                     public void onClick(View v) {
-                        Dialogs.MainDialog(SnapContext, editText);
-                        logging("SnapPrefs: Displaying MainDialog");
+//                        Dialogs.MainDialog(SnapContext, editText);
+
+                        Toast.makeText(SnapContext, "shouldShowOptions = " + shouldShowOptions, Toast.LENGTH_SHORT).show();
+                        if(shouldShowOptions){
+                            outerOptionsLayout.setVisibility(View.VISIBLE);
+                            shouldShowOptions = false;
+                        }else{
+                            outerOptionsLayout.setVisibility(View.GONE);
+                            shouldShowOptions = true;
+                        }
+                        logging("SnapPrefs: Displaying Options");
                     }
                 });
                 final RelativeLayout.LayoutParams paramsSpeed = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
@@ -874,7 +893,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                     @Override
                     public void run() {
                         if (mColours == true) {
-                            relativeLayout.addView(ghost, layoutParams);
+                            relativeLayout.addView(textButton, layoutParams);
+                            relativeLayout.addView(outerOptionsLayout, outerOptionsLayoutParams);
                         }
                         if (mSpeed == true) {
                             relativeLayout.addView(speed, paramsSpeed);
@@ -889,5 +909,64 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 });
             }
         });
+    }
+
+    private static class OptionsAdapter extends BaseAdapter {
+        String[] options = {"Text Color", "Text Size", "Text Transparency", "Text Alignment", "Text Style", "Text Font", "Background Color", "Background Transparency", "Reset"};
+        Context context;
+        XModuleResources mRes;
+        int [] optionImageId = {R.drawable.text_color, R.drawable.text_size, R.drawable.text_transparency, R.drawable.text_alignment, R.drawable.text_style, R.drawable.text_font, R.drawable.bg_color, R.drawable.bg_transparency, R.drawable.reset};
+        private static LayoutInflater inflater=null;
+
+        public OptionsAdapter(Activity snapContext, XModuleResources mRes) {
+            this.context = snapContext;
+            this.mRes = mRes;
+            inflater = ( LayoutInflater ) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+
+        @Override
+        public int getCount() {
+            return options.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return position;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        public class Holder
+        {
+            TextView tv;
+            ImageView img;
+        }
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            Holder holder=new Holder();
+            View rowView;
+
+            rowView = inflater.inflate(mRes.getLayout(R.layout.optionlayout), null);
+            holder.tv=(TextView) rowView.findViewById(mRes.getIdentifier("description", "id", "com.marz.snapprefs"));
+            holder.img=(ImageView) rowView.findViewById(mRes.getIdentifier("textIcon", "id", "com.marz.snapprefs"));
+
+            holder.tv.setText(options[position]);
+            holder.img.setImageDrawable(mRes.getDrawable(optionImageId[position]));
+
+            rowView.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    // TODO Auto-generated method stub
+                    Toast.makeText(context, "You Clicked "+options[position], Toast.LENGTH_LONG).show();
+                }
+            });
+
+            return rowView;
+        }
     }
 }
