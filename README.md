@@ -3,7 +3,9 @@ Snapprefs
 Overview
 -------
 Snapprefs is a project which offers enhanced features for Snapchat thru the [Xposed framework](http://forum.xda-developers.com/showthread.php?t=1574401).
-[Snapprefs XDA](http://forum.xda-developers.com/xposed/modules/app-snapprefs-ultimate-snapchat-utility-t2947254)
+
+[Snapprefs XDA](http://forum.xda-developers.com/xposed/modules/app-snapprefs-ultimate-snapchat-utility-t2947254
+
 Current features are:
 
 -Hiding best friends
