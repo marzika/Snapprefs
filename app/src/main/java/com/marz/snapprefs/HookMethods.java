@@ -799,11 +799,10 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 final GridView innerOptionsView = new GridView(SnapContext);
                 innerOptionsView.setAdapter(new OptionsAdapter(SnapContext, mResources));
                 innerOptionsView.setNumColumns(3);
-//                innerOptionsView.setNumColumns(GridView.AUTO_FIT);
-                innerOptionsView.setHorizontalSpacing(px(10.0f));
-                innerOptionsView.setVerticalSpacing(px(10.0f));
+                innerOptionsView.setHorizontalSpacing(px(2.0f));
+                innerOptionsView.setVerticalSpacing(px(5.0f));
                 innerOptionsView.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
-                innerOptionsView.setPadding(0,px(5.0f), 0, px(5.0f));
+                innerOptionsView.setPadding(0,px(7.5f), px(1.0f), px(7.5f));
                 final RelativeLayout.LayoutParams outerOptionsLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
                 outerOptionsLayoutParams.topMargin = px(55.0f);
                 outerOptionsLayoutParams.bottomMargin = px(300.0f);
@@ -826,9 +825,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                     boolean shouldShowOptions = true;
                     @Override
                     public void onClick(View v) {
-//                        Dialogs.MainDialog(SnapContext, editText);
-
-                        Toast.makeText(SnapContext, "shouldShowOptions = " + shouldShowOptions, Toast.LENGTH_SHORT).show();
                         if(shouldShowOptions){
                             outerOptionsLayout.setVisibility(View.VISIBLE);
                             shouldShowOptions = false;
@@ -912,10 +908,10 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     }
 
     private static class OptionsAdapter extends BaseAdapter {
-        String[] options = {"Text Color", "Text Size", "Text Transparency", "Text Alignment", "Text Style", "Text Font", "Background Color", "Background Transparency", "Reset"};
+        String[] options = {"Text Color", "Text Size", "Text Transparency", "Text Gradient","Text Alignment", "Text Style", "Text Font", "Background Color", "Background Transparency", "Background Gradient", "Reset"};
         Context context;
         XModuleResources mRes;
-        int [] optionImageId = {R.drawable.text_color, R.drawable.text_size, R.drawable.text_transparency, R.drawable.text_alignment, R.drawable.text_style, R.drawable.text_font, R.drawable.bg_color, R.drawable.bg_transparency, R.drawable.reset};
+        int [] optionImageId = {R.drawable.text_color, R.drawable.text_size, R.drawable.text_transparency, R.drawable.text_gradient, R.drawable.text_alignment, R.drawable.text_style, R.drawable.text_font, R.drawable.bg_color, R.drawable.bg_transparency, R.drawable.bg_gradient, R.drawable.reset};
         private static LayoutInflater inflater=null;
 
         public OptionsAdapter(Activity snapContext, XModuleResources mRes) {

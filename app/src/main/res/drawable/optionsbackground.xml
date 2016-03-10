@@ -40,10 +40,10 @@
         </shape>
     </item>
     <item
-        android:left="-30dp"
-        android:top="5dp">
+        android:left="-32.5dp"
+        android:top="-1dp">
         <bitmap
             android:gravity="left|top"
-            android:src="@drawable/selector"/>
+            android:src="@drawable/arrow"/>
     </item>
 </layer-list>
