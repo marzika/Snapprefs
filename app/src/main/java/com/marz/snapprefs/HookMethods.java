@@ -1,38 +1,49 @@
 package com.marz.snapprefs;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
-import android.content.res.XResources;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PaintDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
 import android.os.Environment;
 import android.text.InputFilter;
-import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import org.apache.http.HttpResponse;
@@ -47,6 +58,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -139,6 +151,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     static boolean txtgravity;
     static boolean debug;
     static EditText editText;
+    static Typeface defTypeface;
+    static boolean haveDefTypeface;
     static XModuleResources modRes;
     static Activity SnapContext;
     static Context context;
@@ -696,6 +710,10 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             protected void afterHookedMethod(MethodHookParam param) throws PackageManager.NameNotFoundException {
                 refreshPreferences();
                 editText = (EditText) param.thisObject;
+                if (!haveDefTypeface) {
+                    defTypeface = editText.getTypeface();
+                    haveDefTypeface = true;
+                }
             }
         });
     }
@@ -822,17 +840,24 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 textButton.setScaleX((float) 0.75);
                 textButton.setScaleY((float) 0.75);
                 textButton.setOnClickListener(new View.OnClickListener() {
-                    boolean shouldShowOptions = true;
+                    boolean shouldHideOptions = true;
                     @Override
                     public void onClick(View v) {
-                        if(shouldShowOptions){
-                            outerOptionsLayout.setVisibility(View.VISIBLE);
-                            shouldShowOptions = false;
-                        }else{
+                        if(editText.getText().length()>=1){
+                            if(shouldHideOptions){
+                                outerOptionsLayout.setVisibility(View.VISIBLE);
+                                shouldHideOptions = false;
+                            }else{
+                                outerOptionsLayout.setVisibility(View.GONE);
+                                shouldHideOptions = true;
+                            }
+                            logging("SnapPrefs: Displaying Options");
+                        } else {
                             outerOptionsLayout.setVisibility(View.GONE);
-                            shouldShowOptions = true;
+                            shouldHideOptions = true;
+                            Toast.makeText(context, "Your caption is missing", Toast.LENGTH_SHORT).show();
+                            logging("SnapPrefs: Not displaying Options - edittext empty");
                         }
-                        logging("SnapPrefs: Displaying Options");
                     }
                 });
                 final RelativeLayout.LayoutParams paramsSpeed = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("drawing_btn", "id", Common.PACKAGE_SNAP)).getLayoutParams());
@@ -958,7 +983,290 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 @Override
                 public void onClick(View v) {
                     // TODO Auto-generated method stub
-                    Toast.makeText(context, "You Clicked "+options[position], Toast.LENGTH_LONG).show();
+                    switch (position) {
+                        case 0: { //textColor
+                            ColorPickerDialog colorPickerDialog = new ColorPickerDialog(context, Color.WHITE, new ColorPickerDialog.OnColorSelectedListener() {
+
+                                @Override
+                                public void onColorSelected(int color) {
+                                    // TODO Auto-generated method stub
+                                    editText.setTextColor(color);
+                                }
+                            });
+                            colorPickerDialog.setButton(-3, Common.dialog_default, new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int which) {
+                                    // TODO Auto-generated method stub
+                                    editText.setTextColor(Color.WHITE);
+                                    editText.setAlpha(1);
+                                }
+                            });
+                            colorPickerDialog.setTitle(Common.dialog_txtcolour);
+                            colorPickerDialog.show();
+                            return;
+                        }
+                        case 1: { //textSize
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            SeekBar seekBar = new SeekBar(context);
+                            seekBar.setMax(150);
+                            seekBar.setProgress((int) editText.getTextSize());
+                            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                                public void onProgressChanged(SeekBar seekBar, int n, boolean bl) {
+                                    editText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, n);
+                                }
+
+                                @Override
+                                public void onStartTrackingTouch(SeekBar arg0) {
+                                    // TODO Auto-generated method stub
+                                }
+
+                                @Override
+                                public void onStopTrackingTouch(SeekBar arg0) {
+                                    // TODO Auto-generated method stub
+                                }
+
+                            });
+                            builder.setNeutralButton(Common.dialog_default, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, 32.5125f);
+                                }
+                            });
+                            builder.setPositiveButton(Common.dialog_done, null);
+                            builder.setView((View) seekBar);
+                            builder.show();
+                            return;
+                        }
+                        case 2: { //textAlpha
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            SeekBar seekBar = new SeekBar(context);
+                            seekBar.setMax(100);
+                            seekBar.setProgress((int) editText.getAlpha() * 100);
+                            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                                public void onProgressChanged(SeekBar seekBar2, int n, boolean bl) {
+                                    float alpha = (float) n / 100;
+                                    editText.setAlpha(alpha);
+                                }
+
+                                @Override
+                                public void onStartTrackingTouch(SeekBar arg0) {
+                                    // TODO Auto-generated method stub
+                                }
+
+                                @Override
+                                public void onStopTrackingTouch(SeekBar arg0) {
+                                    // TODO Auto-generated method stub
+                                }
+
+                            });
+                            builder.setNeutralButton(Common.dialog_default, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    editText.setAlpha(1);
+                                }
+                            });
+                            builder.setPositiveButton(Common.dialog_done, null);
+                            builder.setView((View) seekBar);
+                            builder.show();
+                            return;
+                        }
+                        case 3: { //textGradient
+                            //TODO: customizable
+                            Shader textShader = new LinearGradient(0, 0, 0, editText.getHeight(), new int[]{Color.WHITE, Color.BLUE}, new float[]{0, 1}, Shader.TileMode.CLAMP);
+                            editText.getPaint().setShader(textShader);
+                            editText.setText(editText.getText());
+                            return;
+                        }
+                        case 4: { //textAlignment
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            Button button_left = new Button(context);
+                            Button button_center = new Button(context);
+                            Button button_right = new Button(context);
+                            LinearLayout linearLayout = new LinearLayout(context);
+                            linearLayout.setOrientation(1);
+                            button_left.setText(Common.dialog_left);
+                            button_left.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View view) {
+                                    editText.setGravity(Gravity.LEFT);
+                                }
+                            });
+                            button_center.setText(Common.dialog_center);
+                            button_center.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View view) {
+                                    editText.setGravity(Gravity.CENTER);
+                                }
+                            });
+                            button_right.setText(Common.dialog_right);
+                            button_right.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View view) {
+                                    editText.setGravity(Gravity.RIGHT);
+                                }
+                            });
+                            linearLayout.addView((View) button_left);
+                            linearLayout.addView((View) button_center);
+                            linearLayout.addView((View) button_right);
+                            builder.setView((View) linearLayout);
+                            builder.setPositiveButton(Common.dialog_done, null);
+                            builder.show();
+                            return;
+                        }
+                        case 5: { //textStyle
+                            //TODO: checkboxes
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            Button button_bold = new Button(context);
+                            Button button_italic = new Button(context);
+                            Button button_bolditalic = new Button(context);
+                            Button button_normal = new Button(context);
+                            LinearLayout linearLayout = new LinearLayout(context);
+                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+                            button_bold.setText(Common.dialog_bold);
+                            button_bold.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View view) {
+                                    editText.setTypeface(null, Typeface.BOLD);
+                                }
+                            });
+                            button_italic.setText(Common.dialog_italic);
+                            button_italic.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View view) {
+                                    editText.setTypeface(null, Typeface.ITALIC);
+                                }
+                            });
+                            button_bolditalic.setText(Common.dialog_bolditalic);
+                            button_bolditalic.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View view) {
+                                    editText.setTypeface(null, Typeface.BOLD_ITALIC);
+                                }
+                            });
+                            button_normal.setText(Common.dialog_normal);
+                            button_normal.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View view) {
+                                    editText.setTypeface(null, Typeface.NORMAL);
+                                }
+                            });
+                            linearLayout.addView((View) button_bold);
+                            linearLayout.addView((View) button_italic);
+                            linearLayout.addView((View) button_bolditalic);
+                            linearLayout.addView((View) button_normal);
+                            builder.setView((View) linearLayout);
+                            builder.setPositiveButton(Common.dialog_done, null);
+                            builder.show();
+                            return;
+                        }
+                        case 6: { //textFont
+                            File folder = new File(Environment.getExternalStorageDirectory() + "/Snapprefs/Fonts");
+                            if (folder.exists()) {
+                                FilenameFilter filter = new FilenameFilter() {
+                                    @Override
+                                    public boolean accept(File dir, String filename) {
+                                        if(filename.lastIndexOf('.')>0)
+                                        {
+                                            int lastIndex = filename.lastIndexOf('.');
+                                            String extension = filename.substring(lastIndex);
+                                            if(extension.equalsIgnoreCase(".ttf"))
+                                            {
+                                                return true;
+                                            }
+                                        }
+                                        return false;
+                                    }
+                                };
+                                File[] fonts = folder.listFiles(filter);
+                                for (File font : fonts) {
+                                    NotificationUtils.showMessage(font.getName(), Color.GREEN, NotificationUtils.LENGHT_SHORT, classLoader);
+                                }
+                            } else {
+                                NotificationUtils.showMessage("Fonts folder is not available", Color.RED, NotificationUtils.LENGHT_SHORT, classLoader);
+                            }
+                            return;
+                        }
+                        case 7: { //bgColor
+                            ColorPickerDialog colorPickerDialog = new ColorPickerDialog(context, Color.BLACK, new ColorPickerDialog.OnColorSelectedListener() {
+
+                                @Override
+                                public void onColorSelected(int color) {
+                                    // TODO Auto-generated method stub
+                                    editText.setBackgroundColor(color);
+                                }
+                            });
+                            colorPickerDialog.setButton(-3, Common.dialog_default, new DialogInterface.OnClickListener() {
+
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int which) {
+                                    // TODO Auto-generated method stub
+                                    editText.setBackgroundColor((Color.parseColor("#000000")));
+                                    editText.setAlpha(1);
+                                }
+                            });
+                            colorPickerDialog.setTitle(Common.dialog_bgcolour);
+                            colorPickerDialog.show();
+                            return;
+                        }
+                        case 8: { //bgAlpha
+                            AlertDialog.Builder builder = new AlertDialog.Builder(SnapContext);
+                            SeekBar seekBar = new SeekBar(SnapContext);
+                            seekBar.setMax(255);
+                            seekBar.setProgress((int) editText.getBackground().getAlpha());
+                            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                                public void onProgressChanged(SeekBar seekBar3, int n, boolean bl) {
+                                    editText.getBackground().setAlpha(n);
+                                }
+
+                                @Override
+                                public void onStartTrackingTouch(SeekBar arg0) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                                @Override
+                                public void onStopTrackingTouch(SeekBar arg0) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                            });
+                            builder.setNeutralButton(Common.dialog_default, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    editText.getBackground().setAlpha(153);
+                                }
+                            });
+                            builder.setPositiveButton(Common.dialog_done, null);
+                            builder.setView((View) seekBar);
+                            builder.show();
+                            return;
+                        }
+                        case 9: { //bgGradient
+                            //TODO: customizable
+                            PaintDrawable p = new PaintDrawable();
+                            p.setShape(new RectShape());
+                            ShapeDrawable.ShaderFactory sf = new ShapeDrawable.ShaderFactory() {
+                                @Override
+                                public Shader resize(int width, int height) {
+                                    return new LinearGradient(0, 0, width, height,
+                                            new int[]{Color.YELLOW, Color.GREEN, Color.BLUE},
+                                            new float[]{0, 0.5f, 1}, Shader.TileMode.MIRROR);
+                                }
+                            };
+                            p.setShaderFactory(sf);
+                            editText.setBackgroundDrawable(p);
+                            return;
+                        }
+                        case 10: { //reset
+                            editText.setBackgroundDrawable(null);
+                            editText.getPaint().reset();
+                            editText.setTextColor(Color.WHITE);
+                            editText.setBackgroundColor((Color.parseColor("#000000")));
+                            editText.setGravity(Gravity.CENTER);
+                            editText.setAlpha(1);
+                            editText.getBackground().setAlpha(153);
+                            editText.setTypeface(defTypeface);
+                            editText.setTextSize(TypedValue.COMPLEX_UNIT_PX, 32.5125f);
+                            return;
+                        }
+                        default:
+                            return;
+                    }
                 }
             });
 
