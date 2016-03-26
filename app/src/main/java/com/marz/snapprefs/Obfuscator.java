@@ -239,4 +239,7 @@ public class Obfuscator {
         public static final String NOTIFICATION_CLASS_1 = "tX";
         public static final String NOTIFICATION_CLASS_2 = "XU";
     }
+    public class misc {
+        public static final String SHARINGICON_CLASS = "Af";
+    }
 }

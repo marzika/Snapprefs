@@ -1396,9 +1396,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                                 final Button btn1 = ((Button) listLayout.findViewById(id_));
                                 btn1.setOnClickListener(new View.OnClickListener() {
                                     public void onClick(View view) {
-                                        /*Toast.makeText(view.getContext(),
-                                                "Button clicked index = " + id_, Toast.LENGTH_SHORT)
-                                                .show();*/
                                         ColorPickerDialog colorPickerDialog = new ColorPickerDialog(context, colorsBg[id_-1], new ColorPickerDialog.OnColorSelectedListener() {
 
                                             @Override
