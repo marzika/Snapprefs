@@ -64,6 +64,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -971,6 +972,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
+            final int[] colors = new int[]{Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE};
+            final int[] currentItem = {2};
             Holder holder=new Holder();
             View rowView;
 
@@ -1270,19 +1273,99 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                             return;
                         }
                         case 9: { //bgGradient
-                            //TODO: customizable
-                            PaintDrawable p = new PaintDrawable();
-                            p.setShape(new RectShape());
-                            ShapeDrawable.ShaderFactory sf = new ShapeDrawable.ShaderFactory() {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setTitle("Background Gradient");
+                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                 @Override
-                                public Shader resize(int width, int height) {
-                                    return new LinearGradient(0, 0, width, height,
-                                            new int[]{Color.YELLOW, Color.GREEN, Color.BLUE},
-                                            new float[]{0, 0.5f, 1}, Shader.TileMode.MIRROR);
+                                public void onClick(DialogInterface dialogInterface, int i) {
                                 }
-                            };
-                            p.setShaderFactory(sf);
-                            editText.setBackgroundDrawable(p);
+                            });
+                            builder.setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    final int[] usedColors = new int[currentItem[0]];
+                                    System.arraycopy(colors, 0, usedColors, 0, currentItem[0]);
+                                    PaintDrawable p = new PaintDrawable();
+                                    p.setShape(new RectShape());
+                                    ShapeDrawable.ShaderFactory sf = new ShapeDrawable.ShaderFactory() {
+                                        @Override
+                                        public Shader resize(int width, int height) {
+                                            return new LinearGradient(0, 0, width, height,
+                                                    usedColors,
+                                                    null, Shader.TileMode.MIRROR);
+                                        }
+                                    };
+                                    p.setShaderFactory(sf);
+                                    editText.setBackgroundDrawable(p);
+                                }
+                            });
+                            LinearLayout rootLayout = new LinearLayout(context);
+                            LinearLayout.LayoutParams rootParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            rootLayout.addView(inflater.inflate(modRes.getLayout(R.layout.gradient_layout), null), rootParams);
+                            final LinearLayout listLayout = (LinearLayout) rootLayout.findViewById(R.id.itemLayout);
+                            final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                            for (int i = 1; i <= 5; i++) {
+                                Button btn = new Button(context);
+                                btn.setId(i);
+                                final int id_ = btn.getId();
+                                btn.setText("Color: " + id_);
+                                btn.setBackgroundColor(colors[i - 1]);
+                                listLayout.addView(btn, params);
+                                final Button btn1 = ((Button) listLayout.findViewById(id_));
+                                btn1.setOnClickListener(new View.OnClickListener() {
+                                    public void onClick(View view) {
+                                        /*Toast.makeText(view.getContext(),
+                                                "Button clicked index = " + id_, Toast.LENGTH_SHORT)
+                                                .show();*/
+                                        ColorPickerDialog colorPickerDialog = new ColorPickerDialog(context, colors[id_-1], new ColorPickerDialog.OnColorSelectedListener() {
+
+                                            @Override
+                                            public void onColorSelected(int color) {
+                                                // TODO Auto-generated method stub
+                                                colors[id_-1] = color;
+                                                btn1.setBackgroundColor(colors[id_-1]);
+                                            }
+                                        });
+                                        colorPickerDialog.setTitle("Color: " + id_);
+                                        colorPickerDialog.show();
+                                    }
+                                });
+                                if (btn1.getId() <= currentItem[0]) {
+                                    btn1.setVisibility(View.VISIBLE);
+                                } else {
+                                    btn1.setVisibility(View.GONE);
+                                }
+                            }
+                            Button add = (Button) rootLayout.findViewById(R.id.add);
+                            add.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (currentItem[0] < 5) {
+                                        currentItem[0]++;
+                                        listLayout.findViewById(currentItem[0]).setVisibility(View.VISIBLE);
+                                    } else {
+                                        Toast.makeText(context, "You cannot add more than 5 colors", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            Button remove = (Button) rootLayout.findViewById(R.id.remove);
+                            remove.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (currentItem[0] > 2) {
+                                        listLayout.findViewById(currentItem[0]).setVisibility(View.GONE);
+                                        currentItem[0]--;
+                                    } else {
+                                        Toast.makeText(context, "You cannot have less than 2 colors", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            builder.setView(rootLayout);
+                            builder.show();
                             return;
                         }
                         case 10: { //reset
