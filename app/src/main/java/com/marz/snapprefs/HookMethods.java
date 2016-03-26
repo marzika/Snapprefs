@@ -1,5 +1,6 @@
 package com.marz.snapprefs;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -44,6 +45,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Util.NotificationUtils;
+import com.marz.snapprefs.Util.TypefaceUtil;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import org.apache.http.HttpResponse;
@@ -62,6 +64,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -414,7 +417,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             }
         });*/
                 //Showing lenses or not
-                findAndHookMethod("Af", lpparam.classLoader, "a", boolean.class, boolean.class, new XC_MethodHook() {
+                findAndHookMethod(Obfuscator.misc.SHARINGICON_CLASS, lpparam.classLoader, "a", boolean.class, boolean.class, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                         if((boolean)param.args[0]){
@@ -425,7 +428,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                     }
                 });
                 //Recording of video ended
-                findAndHookMethod("Af", lpparam.classLoader, "c", boolean.class, new XC_MethodHook() {
+                findAndHookMethod(Obfuscator.misc.SHARINGICON_CLASS, lpparam.classLoader, "c", boolean.class, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                         upload.setVisibility(View.VISIBLE);
@@ -1159,12 +1162,10 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                                 FilenameFilter filter = new FilenameFilter() {
                                     @Override
                                     public boolean accept(File dir, String filename) {
-                                        if(filename.lastIndexOf('.')>0)
-                                        {
+                                        if (filename.lastIndexOf('.') > 0) {
                                             int lastIndex = filename.lastIndexOf('.');
                                             String extension = filename.substring(lastIndex);
-                                            if(extension.equalsIgnoreCase(".ttf"))
-                                            {
+                                            if (extension.equalsIgnoreCase(".ttf")) {
                                                 return true;
                                             }
                                         }
@@ -1172,8 +1173,40 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                                     }
                                 };
                                 File[] fonts = folder.listFiles(filter);
-                                for (File font : fonts) {
-                                    NotificationUtils.showMessage(font.getName(), Color.GREEN, NotificationUtils.LENGHT_SHORT, classLoader);
+                                if (fonts.length > 0) {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                    builder.setTitle("Font list");
+                                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                        }
+                                    });
+                                    LinearLayout rootLayout = new LinearLayout(context);
+                                    LinearLayout.LayoutParams rootParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                                    LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                                    rootLayout.addView(inflater.inflate(modRes.getLayout(R.layout.font_list), null), rootParams);
+                                    LinearLayout listLayout = (LinearLayout) rootLayout.findViewById(R.id.fontLayout);
+                                    for (final File font : fonts) {
+                                        String fontname = font.getName().substring(0, font.getName().toLowerCase().lastIndexOf("."));
+                                        TextView item = new TextView(context);
+                                        item.setLayoutParams(new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                                        item.setPadding(0, 0, 0, 2);
+                                        item.setText(fontname);
+                                        item.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 22.0f);
+                                        item.setGravity(Gravity.CENTER_HORIZONTAL);
+                                        item.setTypeface(TypefaceUtil.get(font));
+                                        item.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                editText.setTypeface(TypefaceUtil.get(font));
+                                            }
+                                        });
+                                        listLayout.addView(item);
+                                    }
+                                    builder.setView(rootLayout);
+                                    builder.show();
+                                } else {
+                                    NotificationUtils.showMessage("Fonts folder is empty", Color.RED, NotificationUtils.LENGHT_SHORT, classLoader);
                                 }
                             } else {
                                 NotificationUtils.showMessage("Fonts folder is not available", Color.RED, NotificationUtils.LENGHT_SHORT, classLoader);
