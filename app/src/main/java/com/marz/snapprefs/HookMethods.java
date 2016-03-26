@@ -972,8 +972,10 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
-            final int[] colors = new int[]{Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE};
-            final int[] currentItem = {2};
+            final int[] colorsBg = new int[]{Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE};
+            final int[] currentItemBg = {2};
+            final int[] colorsText = new int[]{Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE};
+            final int[] currentItemText = {2};
             Holder holder=new Holder();
             View rowView;
 
@@ -1078,10 +1080,86 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                             return;
                         }
                         case 3: { //textGradient
-                            //TODO: customizable
-                            Shader textShader = new LinearGradient(0, 0, 0, editText.getHeight(), new int[]{Color.WHITE, Color.BLUE}, new float[]{0, 1}, Shader.TileMode.CLAMP);
-                            editText.getPaint().setShader(textShader);
-                            editText.setText(editText.getText());
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setTitle("Text Gradient");
+                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                }
+                            });
+                            builder.setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    final int[] usedColors = new int[currentItemText[0]];
+                                    System.arraycopy(colorsText, 0, usedColors, 0, currentItemText[0]);
+                                    Shader textShader = new LinearGradient(0, 0, 0, editText.getHeight(), usedColors, null, Shader.TileMode.CLAMP);
+                                    editText.getPaint().setShader(textShader);
+                                    editText.setText(editText.getText());
+                                }
+                            });
+                            LinearLayout rootLayout = new LinearLayout(context);
+                            LinearLayout.LayoutParams rootParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            rootLayout.addView(inflater.inflate(modRes.getLayout(R.layout.gradient_layout), null), rootParams);
+                            final LinearLayout listLayout = (LinearLayout) rootLayout.findViewById(R.id.itemLayout);
+                            final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                            for (int i = 1; i <= 5; i++) {
+                                Button btn = new Button(context);
+                                btn.setId(i);
+                                final int id_ = btn.getId();
+                                btn.setText("Color: " + id_);
+                                btn.setBackgroundColor(colorsText[i - 1]);
+                                listLayout.addView(btn, params);
+                                final Button btn1 = ((Button) listLayout.findViewById(id_));
+                                btn1.setOnClickListener(new View.OnClickListener() {
+                                    public void onClick(View view) {
+                                        ColorPickerDialog colorPickerDialog = new ColorPickerDialog(context, colorsText[id_-1], new ColorPickerDialog.OnColorSelectedListener() {
+                                            @Override
+                                            public void onColorSelected(int color) {
+                                                // TODO Auto-generated method stub
+                                                colorsText[id_-1] = color;
+                                                btn1.setBackgroundColor(colorsText[id_-1]);
+                                            }
+                                        });
+                                        colorPickerDialog.setTitle("Color: " + id_);
+                                        colorPickerDialog.show();
+                                    }
+                                });
+                                if (btn1.getId() <= currentItemText[0]) {
+                                    btn1.setVisibility(View.VISIBLE);
+                                } else {
+                                    btn1.setVisibility(View.GONE);
+                                }
+                            }
+                            Button add = (Button) rootLayout.findViewById(R.id.add);
+                            add.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (currentItemText[0] < 5) {
+                                        currentItemText[0]++;
+                                        listLayout.findViewById(currentItemText[0]).setVisibility(View.VISIBLE);
+                                    } else {
+                                        Toast.makeText(context, "You cannot add more than 5 colors", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            Button remove = (Button) rootLayout.findViewById(R.id.remove);
+                            remove.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (currentItemText[0] > 2) {
+                                        listLayout.findViewById(currentItemText[0]).setVisibility(View.GONE);
+                                        currentItemText[0]--;
+                                    } else {
+                                        Toast.makeText(context, "You cannot have less than 2 colors", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            builder.setView(rootLayout);
+                            builder.show();
                             return;
                         }
                         case 4: { //textAlignment
@@ -1283,8 +1361,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                             builder.setPositiveButton("Apply", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
-                                    final int[] usedColors = new int[currentItem[0]];
-                                    System.arraycopy(colors, 0, usedColors, 0, currentItem[0]);
+                                    final int[] usedColors = new int[currentItemBg[0]];
+                                    System.arraycopy(colorsBg, 0, usedColors, 0, currentItemBg[0]);
                                     PaintDrawable p = new PaintDrawable();
                                     p.setShape(new RectShape());
                                     ShapeDrawable.ShaderFactory sf = new ShapeDrawable.ShaderFactory() {
@@ -1313,7 +1391,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                                 btn.setId(i);
                                 final int id_ = btn.getId();
                                 btn.setText("Color: " + id_);
-                                btn.setBackgroundColor(colors[i - 1]);
+                                btn.setBackgroundColor(colorsBg[i - 1]);
                                 listLayout.addView(btn, params);
                                 final Button btn1 = ((Button) listLayout.findViewById(id_));
                                 btn1.setOnClickListener(new View.OnClickListener() {
@@ -1321,20 +1399,20 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                                         /*Toast.makeText(view.getContext(),
                                                 "Button clicked index = " + id_, Toast.LENGTH_SHORT)
                                                 .show();*/
-                                        ColorPickerDialog colorPickerDialog = new ColorPickerDialog(context, colors[id_-1], new ColorPickerDialog.OnColorSelectedListener() {
+                                        ColorPickerDialog colorPickerDialog = new ColorPickerDialog(context, colorsBg[id_-1], new ColorPickerDialog.OnColorSelectedListener() {
 
                                             @Override
                                             public void onColorSelected(int color) {
                                                 // TODO Auto-generated method stub
-                                                colors[id_-1] = color;
-                                                btn1.setBackgroundColor(colors[id_-1]);
+                                                colorsBg[id_-1] = color;
+                                                btn1.setBackgroundColor(colorsBg[id_-1]);
                                             }
                                         });
                                         colorPickerDialog.setTitle("Color: " + id_);
                                         colorPickerDialog.show();
                                     }
                                 });
-                                if (btn1.getId() <= currentItem[0]) {
+                                if (btn1.getId() <= currentItemBg[0]) {
                                     btn1.setVisibility(View.VISIBLE);
                                 } else {
                                     btn1.setVisibility(View.GONE);
@@ -1344,9 +1422,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                             add.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    if (currentItem[0] < 5) {
-                                        currentItem[0]++;
-                                        listLayout.findViewById(currentItem[0]).setVisibility(View.VISIBLE);
+                                    if (currentItemBg[0] < 5) {
+                                        currentItemBg[0]++;
+                                        listLayout.findViewById(currentItemBg[0]).setVisibility(View.VISIBLE);
                                     } else {
                                         Toast.makeText(context, "You cannot add more than 5 colors", Toast.LENGTH_SHORT).show();
                                     }
@@ -1356,9 +1434,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                             remove.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View view) {
-                                    if (currentItem[0] > 2) {
-                                        listLayout.findViewById(currentItem[0]).setVisibility(View.GONE);
-                                        currentItem[0]--;
+                                    if (currentItemBg[0] > 2) {
+                                        listLayout.findViewById(currentItemBg[0]).setVisibility(View.GONE);
+                                        currentItemBg[0]--;
                                     } else {
                                         Toast.makeText(context, "You cannot have less than 2 colors", Toast.LENGTH_SHORT).show();
                                     }
