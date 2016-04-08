@@ -37,4 +37,22 @@
             android:layout_marginLeft="5dp"
             android:background="#ffffff" />
     </LinearLayout>
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/orientation"
+        android:orientation="horizontal">
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Horizontal"
+            android:id="@+id/horizontal"
+            android:checked="true"/>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vertical"
+            android:id="@+id/vertical" />
+    </RadioGroup>
 </LinearLayout>

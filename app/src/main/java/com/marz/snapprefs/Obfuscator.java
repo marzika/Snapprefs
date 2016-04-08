@@ -239,7 +239,9 @@ public class Obfuscator {
         public static final String NOTIFICATION_CLASS_1 = "tX";
         public static final String NOTIFICATION_CLASS_2 = "XU";
     }
-    public class misc {
-        public static final String SHARINGICON_CLASS = "Af";
+    public class icons {
+        public static final String ICON_HANDLER_CLASS = "Af";
+        public static final String SHOW_LENS = "a";
+        public static final String RECORDING_VIDEO = "c";
     }
 }
