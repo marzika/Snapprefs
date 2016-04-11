@@ -126,6 +126,10 @@ public class Obfuscator {
         public static final String NETWORKRESULT_CLASS = "yM";
         public static final String CHANNELDOWNLOADER_CLASS = "FC";
         public static final String CHANNELDOWNLOADER_START = "b";
+        public static final String LIVESTORYPRELOAD_CLASS = "OX";
+        public static final String LIVESTORYPRELOAD_METHOD = "D_";
+        public static final String STORYPRELOAD_CLASS = "Ps";
+        public static final String STORYPRELOAD_METHOD = "D_";
     }
     //Spoofing
     public class spoofing {
