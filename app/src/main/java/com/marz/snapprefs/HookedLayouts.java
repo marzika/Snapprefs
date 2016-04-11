@@ -281,6 +281,17 @@ public class HookedLayouts {
         return Math.round((f * HookMethods.SnapContext.getResources().getDisplayMetrics().density));
     }
 
+    public static void initVisiblity(XC_LoadPackage.LoadPackageParam lpparam) {
+        XC_MethodHook hideLayout = new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                outerOptionsLayout.setVisibility(View.GONE);
+            }
+        };
+        findAndHookMethod("com.snapchat.android.analytics.ui.EmojiPickerAnalytics", lpparam.classLoader, "a", hideLayout);
+        findAndHookMethod("com.snapchat.android.ui.caption.SnapCaptionView", lpparam.classLoader, "a", boolean.class, hideLayout);
+    }
+
     private static class OptionsAdapter extends BaseAdapter {
         String[] options = {"Text Color", "Text Size", "Text Transparency", "Text Gradient","Text Alignment", "Text Style", "Text Font", "Background Color", "Background Transparency", "Background Gradient", "Reset"};
         Context context;
