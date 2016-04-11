@@ -1,50 +1,23 @@
 package com.marz.snapprefs;
 
-import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.PaintDrawable;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RectShape;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.text.InputFilter;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridLayout;
-import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.SeekBar;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.marz.snapprefs.Util.NotificationUtils;
-import com.marz.snapprefs.Util.TypefaceUtil;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import org.apache.http.HttpResponse;
@@ -59,12 +32,9 @@ import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -77,7 +47,6 @@ import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_InitPackageResources.InitPackageResourcesParam;
-import de.robv.android.xposed.callbacks.XC_LayoutInflated;
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam;
 
 import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
@@ -133,6 +102,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static boolean mOverlays = false;
     public static boolean mSpeed = false;
     public static boolean mWeather = false;
+    public static boolean mStoryPreload = false;
     public static boolean mDiscoverSnap = false;
     public static boolean mDiscoverUI = false;
     public static boolean mCustomSticker = false;
@@ -221,6 +191,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mSpeed = prefs.getBoolean("pref_key_speed", false);
         mWeather = prefs.getBoolean("pref_key_weather", false);
         mLocation = prefs.getBoolean("pref_key_location", false);
+        mStoryPreload = prefs.getBoolean("pref_key_storypreload", false);
         mDiscoverSnap = prefs.getBoolean("pref_key_discover", false);
         mDiscoverUI = prefs.getBoolean("pref_key_discover_ui", false);
         mCustomSticker = prefs.getBoolean("pref_key_sticker", false);
@@ -470,11 +441,17 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         } else {
                             Toast.makeText(context, "VisualFilter files are missing, download them!", Toast.LENGTH_SHORT).show();
                         }
+                        if(shouldAddGhost){
+                            HookedLayouts.initVisiblity(lpparam);
+                        }
                         if (mMultiFilterBoolean == true) {
                             MultiFilter.initMultiFilter(lpparam, mResources, SnapContext);
                         }
                         if (mDiscoverSnap == true) {
                             DataSaving.blockDsnap(lpparam);
+                        }
+                        if (mStoryPreload){
+                            DataSaving.blockStoryPreLoad(lpparam);
                         }
                         if (mDiscoverUI == true) {
                             DataSaving.blockFromUi(lpparam);
@@ -673,6 +650,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("mSpeed: " + mSpeed);
         logging("mWeather: " + mWeather);
         logging("mLocation: " + mLocation);
+        logging("mStoryPreload: " + mStoryPreload);
         logging("mDiscoverSnap: " + mDiscoverSnap);
         logging("mDiscoverUI: " + mDiscoverUI);
         logging("mCustomSticker: " + mCustomSticker);

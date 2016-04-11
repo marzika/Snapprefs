@@ -2,6 +2,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <CheckBoxPreference
         android:defaultValue="false"
+        android:key="pref_key_storypreload"
+        android:summaryOff="@string/pref_storypreload_summary_off"
+        android:summaryOn="@string/pref_storypreload_summary_on"
+        android:title="@string/pref_storypreload_title" />
+    <CheckBoxPreference
+        android:defaultValue="false"
         android:key="pref_key_discover"
         android:summaryOff="@string/pref_discover_summary_off"
         android:summaryOn="@string/pref_discover_summary_on"

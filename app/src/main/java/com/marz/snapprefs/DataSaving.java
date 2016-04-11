@@ -1,7 +1,14 @@
 package com.marz.snapprefs;
 
 import android.database.Cursor;
+import android.graphics.Color;
+import android.net.NetworkInfo;
+import android.os.Looper;
+import android.widget.Toast;
 
+import com.marz.snapprefs.Util.NotificationUtils;
+
+import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
@@ -34,12 +41,13 @@ public class DataSaving {
             Logger.log(t.toString());
         }
     }
-    /*static void blockStoryPreload(final XC_LoadPackage.LoadPackageParam lpparam){
+    static void blockStoryPreLoad(final XC_LoadPackage.LoadPackageParam lpparam){
         try {
-            findAndHookMethod("arz", lpparam.classLoader, "f", XC_MethodReplacement.DO_NOTHING);
+            findAndHookMethod("OX", lpparam.classLoader, "D_", XC_MethodReplacement.DO_NOTHING);
+            findAndHookMethod("Ps", lpparam.classLoader, "D_", XC_MethodReplacement.DO_NOTHING);
         } catch (Throwable t){
-            Logger.log("Error while blocking StoryPreload", true);
+            Logger.log("Error while blocking Story preload", true);
             Logger.log(t.toString());
         }
-    }*/
+    }
 }

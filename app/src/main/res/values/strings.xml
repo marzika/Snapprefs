@@ -85,6 +85,9 @@
     <string name="pref_speed_how_summary">After typing in your desired speed (m/s), click on the speed filter to apply it.</string>
     <string name="pref_weather_how_title">HOW TO USE</string>
     <string name="pref_weather_how_summary">After typing in your desired value, you have to kill Snapchat, then restart to apply it.</string>
+    <string name="pref_storypreload_summary_off">Stories will be preloaded</string>
+    <string name="pref_storypreload_summary_on">Stories will NOT be preloaded</string>
+    <string name="pref_storypreload_title">Block Story preload</string>
     <string name="pref_discover_summary_off">Discover will load and download</string>
     <string name="pref_discover_summary_on">Discover will NOT load NOR download</string>
     <string name="pref_discover_title">Block Discover snaps</string>
