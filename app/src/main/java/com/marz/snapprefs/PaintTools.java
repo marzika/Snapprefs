@@ -15,6 +15,7 @@ import android.graphics.MaskFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -29,13 +30,20 @@ import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.GridLayout;
+import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -62,7 +70,7 @@ public class PaintTools {
     static int alpha = 255;
     static List<Integer> colorList = new ArrayList<Integer>();
     static Paint paint = null;
-    static boolean easterEgg = false;
+    static boolean useShader = false;
     static boolean shouldErase = false;
     static boolean shouldBlur = false;
     public static boolean hidden = false;
@@ -71,13 +79,16 @@ public class PaintTools {
     public static final String END_POINT = "endPoint";
     private static final String TYPE = "type";
     private static DrawingType type = DrawingType.DEFAULT;
+    static boolean once = false;
+    static RelativeLayout outerOptionsLayout;
+    static Shader shader;
 
     enum DrawingType {
         DEFAULT, LINE, RECTANGLE, CIRCLE, STAR
     }
 
 
-    public static void initPaint(XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes) {
+    public static void initPaint(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources mResources) {
         final Bitmap[] bground = new Bitmap[1];
         findAndHookConstructor("com.snapchat.android.model.Mediabryo", lpparam.classLoader, findClass("com.snapchat.android.model.Mediabryo$a", lpparam.classLoader), new XC_MethodHook() {
             @Override
@@ -204,575 +215,51 @@ public class PaintTools {
                     } else {
                         paint.setMaskFilter(oldMF);
                     }
-                    if (easterEgg) {
-                        int[] rainbow = getRainbowColors();
-                        Shader shader = new LinearGradient(0, 0, 0, 720, rainbow, null, Shader.TileMode.MIRROR);
+                    if (useShader) {
                         Matrix matrix = new Matrix();
-                        matrix.setRotate(90);
                         shader.setLocalMatrix(matrix);
                         paint.setShader(shader);
                     }
                 }
             }
         });
+
+        findAndHookMethod("com.snapchat.android.analytics.AnalyticsEvents", lpparam.classLoader, "i", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                try{
+                    outerOptionsLayout.setVisibility(View.VISIBLE);
+                }catch (NullPointerException ignore){
+                    //This method is being called on every button press, before the ColorPickerView constructor is called for the first time
+                    //Therefore the first press after the capture will throw a NPE
+                }
+            }
+        });
+        once = false;
         XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.ColorPickerView", lpparam.classLoader, Context.class, AttributeSet.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
-                View colorpickerview = (View) getObjectField(param.thisObject, "h");
-                if (colorpickerview == null) {
-                    Logger.log("colorPickerView-launched -- colorpickerview = null", true);
-                } else {
-                    Logger.log("colorPickerView-launched -- colorpickerview = NOT null", true);
+                if (!once){
+                    View colorpickerview = (View) getObjectField(param.thisObject, "h");
+                    outerOptionsLayout = new RelativeLayout(HookMethods.SnapContext);
+                    final GridView innerOptionsView = new GridView(HookMethods.SnapContext);
+                    innerOptionsView.setAdapter(new OptionsAdapter(HookMethods.SnapContext, mResources));
+                    innerOptionsView.setNumColumns(5);
+                    innerOptionsView.setHorizontalSpacing(px(2.0f));
+                    innerOptionsView.setVerticalSpacing(px(5.0f));
+                    innerOptionsView.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
+                    innerOptionsView.setPadding(0,px(7.5f), px(1.0f), px(7.5f));
+                    final RelativeLayout.LayoutParams outerOptionsLayoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    outerOptionsLayoutParams.leftMargin = px(75.0f);
+                    outerOptionsLayoutParams.rightMargin = px(25.0f);
+                    outerOptionsLayout.setVisibility(View.VISIBLE);
+                    outerOptionsLayout.setBackgroundDrawable(mResources.getDrawable(R.drawable.drawingbackground));
+                    outerOptionsLayout.addView(innerOptionsView, GridLayout.LayoutParams.MATCH_PARENT, GridLayout.LayoutParams.MATCH_PARENT);
+                    ((RelativeLayout)colorpickerview.getParent().getParent()).addView(outerOptionsLayout, outerOptionsLayoutParams);
+                    once = true;
                 }
-                final ImageButton eraserbutton = new ImageButton(context);
-                eraserbutton.setBackgroundColor(0);
-                eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser));
-                eraserbutton.setScaleX((float) 0.325);
-                eraserbutton.setScaleY((float) 0.325);
-                eraserbutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        type = DrawingType.DEFAULT;
-                        shouldErase = true;
-                        shouldBlur = false;
-                        eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser_clicked));
-                    }
-                });
-                RelativeLayout.LayoutParams paramsErase = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                paramsErase.topMargin = HookMethods.px(-5.0f);
-                paramsErase.rightMargin = HookMethods.px(5.0f);
-                paramsErase.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-                final ImageButton colorpicker = new ImageButton(context);
-                colorpicker.setBackgroundColor(0);
-                colorpicker.setImageDrawable(modRes.getDrawable(R.drawable.colorpicker));
-                colorpicker.setScaleX((float) 0.325);
-                colorpicker.setScaleY((float) 0.325);
-                colorpicker.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        Toast.makeText(context, "EasterEgg found!", Toast.LENGTH_SHORT).show();
-                        easterEgg = true;
-                        return true;
-                    }
-                });
-                colorpicker.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser));
-                        easterEgg = false;
-                        shouldErase = false;
-                        shouldBlur = false;
-
-                        ColorPickerDialog colorPickerDialog = new ColorPickerDialog(context, color, new ColorPickerDialog.OnColorSelectedListener() {
-
-                            @Override
-                            public void onColorSelected(int n) {
-                                // TODO Auto-generated method stub
-                                color = n;
-                                if (!colorList.contains(n)) {
-                                    colorList.add(n);
-                                }
-                            }
-                        });
-                        colorPickerDialog.setTitle("Select stroke color");
-                        colorPickerDialog.show();
-                    }
-                });
-                RelativeLayout.LayoutParams paramsPicker = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                paramsPicker.topMargin = HookMethods.px(-40.0f);
-                paramsPicker.rightMargin = HookMethods.px(5.0f);
-                paramsPicker.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-                final ImageButton widthpicker = new ImageButton(context);
-                widthpicker.setBackgroundColor(0);
-                widthpicker.setImageDrawable(modRes.getDrawable(R.drawable.width));
-                widthpicker.setScaleX((float) 0.325);
-                widthpicker.setScaleY((float) 0.325);
-                widthpicker.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                        LinearLayout linearLayout = new LinearLayout(context);
-                        linearLayout.setOrientation(LinearLayout.VERTICAL);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-                        final TextView tv = new TextView(context);
-                        tv.setText("Currently selected width: " + width);
-                        final SeekBar seekBar2 = new SeekBar(context);
-                        seekBar2.setMax(30);
-                        seekBar2.setProgress(width);
-                        seekBar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                            public void onProgressChanged(SeekBar seekBar2, int n, boolean bl) {
-                                if (n == 0) {
-                                    n = n + 1;
-                                }
-                                tv.setText("Currently selected width: " + n);
-                            }
-
-                            @Override
-                            public void onStartTrackingTouch(SeekBar arg0) {
-                                // TODO Auto-generated method stub
-
-                            }
-
-                            @Override
-                            public void onStopTrackingTouch(SeekBar arg0) {
-                                // TODO Auto-generated method stub
-
-                            }
-
-                        });
-                        builder.setNeutralButton(Common.dialog_default, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                width = 2;
-                            }
-                        });
-                        builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                width = seekBar2.getProgress();
-                                if (width == 0) {
-                                    width = width + 1;
-                                }
-                            }
-                        });
-                        linearLayout.addView(tv, params);
-                        linearLayout.addView(seekBar2, params);
-                        builder.setView(linearLayout);
-                        builder.show();
-                    }
-                });
-                RelativeLayout.LayoutParams paramsWidth = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                paramsWidth.topMargin = HookMethods.px(-40.0f);
-                paramsWidth.rightMargin = HookMethods.px(40.0f);
-                paramsWidth.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-                final ImageButton alphabutton = new ImageButton(context);
-                alphabutton.setBackgroundColor(0);
-                alphabutton.setImageDrawable(modRes.getDrawable(R.drawable.opacity));
-                alphabutton.getDrawable().setDither(true);
-                alphabutton.setScaleX((float) 0.325);
-                alphabutton.setScaleY((float) 0.325);
-                alphabutton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                        LinearLayout linearLayout = new LinearLayout(context);
-                        linearLayout.setOrientation(LinearLayout.VERTICAL);
-                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-                        final TextView tv = new TextView(context);
-                        tv.setText("Currently selected transparency: " + alpha);
-                        final SeekBar seekBar2 = new SeekBar(context);
-                        seekBar2.setMax(255);
-                        seekBar2.setProgress(alpha);
-                        seekBar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                            public void onProgressChanged(SeekBar seekBar2, int n, boolean bl) {
-                                int m = n + 1;
-                                tv.setText("Currently selected transparency: " + m);
-                            }
-
-                            @Override
-                            public void onStartTrackingTouch(SeekBar arg0) {
-                                // TODO Auto-generated method stub
-
-                            }
-
-                            @Override
-                            public void onStopTrackingTouch(SeekBar arg0) {
-                                // TODO Auto-generated method stub
-
-                            }
-
-                        });
-                        builder.setNeutralButton(Common.dialog_default, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                alpha = 255;
-                            }
-                        });
-                        builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                alpha = seekBar2.getProgress();
-                            }
-                        });
-                        linearLayout.addView(tv, params);
-                        linearLayout.addView(seekBar2, params);
-                        builder.setView(linearLayout);
-                        builder.show();
-                    }
-                });
-                RelativeLayout.LayoutParams paramsAlpha = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                paramsAlpha.topMargin = HookMethods.px(-5.0f);
-                paramsAlpha.rightMargin = HookMethods.px(40.0f);
-                paramsAlpha.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-                final ImageButton hexinput = new ImageButton(context);
-                hexinput.setBackgroundColor(0);
-                hexinput.setImageDrawable(modRes.getDrawable(R.drawable.hashtag));
-                hexinput.setScaleX((float) 0.325);
-                hexinput.setScaleY((float) 0.325);
-                hexinput.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser));
-                                                    easterEgg = false;
-                                                    shouldErase = false;
-
-                                                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                                    builder.setTitle("Enter HEX color - #AARRGGBB");
-                                                    LinearLayout linearLayout = new LinearLayout(context);
-                                                    linearLayout.setOrientation(LinearLayout.VERTICAL);
-
-                                                    final EditText eText = new EditText(context);
-                                                    //eText.setKeyListener(DigitsKeyListener.getInstance("0123456789ABCDEF"));
-                                                    //eText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
-                                                    eText.addTextChangedListener(new TextWatcher() {
-                                                        @Override
-                                                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-                                                        }
-
-                                                        @Override
-                                                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                                                        }
-
-                                                        //Right after the text is changed
-                                                        @Override
-                                                        public void afterTextChanged(Editable s) {
-                                                            //Store the text on a String
-                                                            String text = s.toString();
-
-                                                            //Get the length of the String
-                                                            int length = s.length();
-
-                /*If the String length is bigger than zero and it's not
-                composed only by the following characters: A to F and/or 0 to 9 */
-                                                            if (!text.matches("[a-fA-F0-9]+") && length > 0) {
-                                                                //Delete the last character
-                                                                s.delete(length - 1, length);
-                                                            }
-                                                        }
-                                                    });
-                                                    eText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
-                                                    linearLayout.addView(eText);
-                                                    builder.setView(linearLayout);
-                                                    builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
-                                                                @Override
-                                                                public void onClick(DialogInterface dialog, int which) {
-                                                                    //Create and initialize the int 'color' with the white color.
-                                                                    int typedColor = 0xFFFFFFFF;
-
-                                                                    try {
-                                                                        //Get the text at the EditText field and save it in a String
-                                                                        String colorValue = eText.getText().toString();
-
-                                    /*Convert the String into a Color ARGB hexadecimal integer.*/
-                                                                        typedColor = Integer.parseInt(colorValue.substring(2), 16) + (Integer.parseInt(colorValue.substring(0, 2), 16) << 24);
-                                                                        color = typedColor;
-                                                                        alpha = Color.alpha(color);
-                                                                        if (!colorList.contains(typedColor)) {
-                                                                            colorList.add(typedColor);
-                                                                        }
-                                                                        //Toast.makeText(context, colorValue, Toast.LENGTH_SHORT).show();
-                                                                        Toast toast = Toast.makeText(context, "           ", Toast.LENGTH_LONG);
-                                                                        TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
-                                                                        View view = toast.getView();
-                                                                        view.setBackgroundColor(typedColor);
-                                                                        v.setTextColor(typedColor);
-                                                                        toast.show();
-                                                                    } catch (Exception e) //Something went wrong while parsing the String into an Integer
-                                                                    {
-                                                                        //Reset the EditText field to white
-                                                                        //Display a toast message
-                                                                        Toast.makeText(context, "You must enter a valid HEX color in AARRGGBB format", Toast.LENGTH_SHORT).show();
-                                                                    }
-
-                                                                }
-
-                                                            }
-                                                    );
-                                                    builder.setNegativeButton(Common.dialog_cancel, new DialogInterface.OnClickListener()
-
-                                                            {
-                                                                @Override
-                                                                public void onClick(DialogInterface dialog, int which) {
-                                                                    // TODO Auto-generated method stub
-
-                                                                }
-                                                            }
-
-                                                    );
-                                                    builder.show();
-                                                }
-                                            }
-
-                );
-                RelativeLayout.LayoutParams paramsHex = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                paramsHex.topMargin = HookMethods.px(30.0f);
-                paramsHex.rightMargin = HookMethods.px(40.0f);
-                paramsHex.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-                final ImageButton colorhistory = new ImageButton(context);
-                colorhistory.setBackgroundColor(0);
-                colorhistory.setImageDrawable(modRes.getDrawable(R.drawable.history));
-                colorhistory.setScaleX((float) 0.325);
-                colorhistory.setScaleY((float) 0.325);
-                colorhistory.setOnClickListener(new View.OnClickListener()
-
-                                                {
-                                                    @Override
-                                                    public void onClick(View v) {
-                                                        eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser));
-                                                        easterEgg = false;
-                                                        shouldErase = false;
-                                                        shouldBlur = false;
-
-                                                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                                        SpannableStringBuilder spanBuilder = new SpannableStringBuilder();
-                                                        String size;
-                                                        if (colorList.size() == 0) {
-                                                            size = "Empty";
-                                                        } else {
-                                                            size = String.valueOf(colorList.size());
-                                                        }
-                                                        builder.setTitle("Color History - Size: " + size);
-                                                        LinearLayout linearLayout = new LinearLayout(context);
-                                                        LinearLayout.LayoutParams paramColors = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                                                        linearLayout.setOrientation(LinearLayout.VERTICAL);
-                                                        linearLayout.setGravity(Gravity.CENTER);
-                                                        TextView colors = new TextView(context);
-                                                        colors.setMaxLines(20);
-                                                        colors.setVerticalScrollBarEnabled(true);
-                                                        //colors.setScrollBarStyle();
-                                                        colors.setMovementMethod(new ScrollingMovementMethod());
-                                                        int i = 0;
-                                                        for (Iterator<Integer> it = colorList.iterator(); it.hasNext(); i++) {
-                                                            Integer s = it.next();
-                                                            if (colors.getText().equals("")) {
-                                                                //colors.setText(i + ": " + s);
-                                                                int ii = i + 1;
-                                                                String hexColor = String.format("#%08X", (0xFFFFFFFF & s));
-                                                                String first = ii + ": " + hexColor + "  -";
-                                                                String second = "-  " + hexColor;
-                                                                SpannableString firstSpannable = new SpannableString(first);
-                                                                SpannableString secondSpannable = new SpannableString(second);
-                                                                firstSpannable.setSpan(new BackgroundColorSpan(s), 0, first.length(), 0);
-                                                                firstSpannable.setSpan(new ForegroundColorSpan(Color.BLACK), 0, first.length(), 0);
-                                                                secondSpannable.setSpan(new BackgroundColorSpan(s), 0, second.length(), 0);
-                                                                secondSpannable.setSpan(new ForegroundColorSpan(Color.WHITE), 0, second.length(), 0);
-                                                                spanBuilder.append(firstSpannable);
-                                                                spanBuilder.append(secondSpannable);
-                                                                colors.setText(spanBuilder, TextView.BufferType.SPANNABLE);
-                                                            } else {
-                                                                //colors.setText(colors.getText() + "\n"+ i + ": " + s);
-                                                                int ii = i + 1;
-                                                                String hexColor = String.format("#%08X", (0xFFFFFFFF & s));
-                                                                String first = "\n" + ii + ": " + hexColor + "  -";
-                                                                String second = "-  " + hexColor;
-                                                                SpannableString firstSpannable = new SpannableString(first);
-                                                                SpannableString secondSpannable = new SpannableString(second);
-                                                                firstSpannable.setSpan(new BackgroundColorSpan(s), 0, first.length(), 0);
-                                                                firstSpannable.setSpan(new ForegroundColorSpan(Color.BLACK), 0, first.length(), 0);
-                                                                secondSpannable.setSpan(new BackgroundColorSpan(s), 0, second.length(), 0);
-                                                                secondSpannable.setSpan(new ForegroundColorSpan(Color.WHITE), 0, second.length(), 0);
-                                                                spanBuilder.append(firstSpannable);
-                                                                spanBuilder.append(secondSpannable);
-                                                                colors.setText(spanBuilder, TextView.BufferType.SPANNABLE);
-                                                            }
-                                                        }
-                                                        colors.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20.0f);
-                                                        linearLayout.addView(colors, paramColors);
-                                                        builder.setView(linearLayout);
-                                                        builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
-                                                                    @Override
-                                                                    public void onClick(DialogInterface dialog, int which) {
-                                                                    }
-                                                                }
-                                                        );
-                                                        builder.show();
-                                                    }
-                                                }
-
-                );
-                RelativeLayout.LayoutParams paramsHistory = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                paramsHistory.topMargin = HookMethods.px(30.0f);
-                paramsHistory.rightMargin = HookMethods.px(5.0f);
-                paramsHistory.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-                final ImageButton shape = new ImageButton(context);
-                shape.setBackgroundColor(0);
-                shape.setImageDrawable(modRes.getDrawable(R.drawable.shape));
-                shape.setScaleX((float) 0.325);
-                shape.setScaleY((float) 0.325);
-                shape.setOnClickListener(new View.OnClickListener() {
-                                             @Override
-                                             public void onClick(View v) {
-                                                 eraserbutton.setImageDrawable(modRes.getDrawable(R.drawable.eraser));
-                                                 shouldErase = false;
-                                                 shouldBlur = false;
-                                                 final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                                 builder.setTitle("Choose shape type");
-                                                 LinearLayout linearLayout = new LinearLayout(context);
-                                                 linearLayout.setOrientation(LinearLayout.VERTICAL);
-
-                                                 final Button rectangle = new Button(context);
-                                                 final Button circle = new Button(context);
-                                                 final Button star = new Button(context);
-                                                 final Button line = new Button(context);
-                                                 final Button default_btn = new Button(context);
-                                                 switch (type){
-                                                     case RECTANGLE:
-                                                         rectangle.setTextColor(Color.GREEN);
-                                                         circle.setTextColor(Color.BLACK);
-                                                         star.setTextColor(Color.BLACK);
-                                                         line.setTextColor(Color.BLACK);
-                                                         default_btn.setTextColor(Color.BLACK);
-                                                         break;
-                                                     case CIRCLE:
-                                                         rectangle.setTextColor(Color.BLACK);
-                                                         circle.setTextColor(Color.GREEN);
-                                                         star.setTextColor(Color.BLACK);
-                                                         line.setTextColor(Color.BLACK);
-                                                         default_btn.setTextColor(Color.BLACK);
-                                                         break;
-                                                     case STAR:
-                                                         rectangle.setTextColor(Color.BLACK);
-                                                         circle.setTextColor(Color.BLACK);
-                                                         star.setTextColor(Color.GREEN);
-                                                         line.setTextColor(Color.BLACK);
-                                                         default_btn.setTextColor(Color.BLACK);
-                                                         break;
-                                                     case LINE:
-                                                         rectangle.setTextColor(Color.BLACK);
-                                                         circle.setTextColor(Color.BLACK);
-                                                         star.setTextColor(Color.BLACK);
-                                                         line.setTextColor(Color.GREEN);
-                                                         default_btn.setTextColor(Color.BLACK);
-                                                         break;
-                                                     case DEFAULT:
-                                                         rectangle.setTextColor(Color.BLACK);
-                                                         circle.setTextColor(Color.BLACK);
-                                                         star.setTextColor(Color.BLACK);
-                                                         line.setTextColor(Color.BLACK);
-                                                         default_btn.setTextColor(Color.GREEN);
-                                                         break;
-                                                     default:
-                                                         break;
-                                                 }
-                                                 rectangle.setText("Rectangle");
-                                                 rectangle.setOnClickListener(new View.OnClickListener() {
-                                                     public void onClick(View view) {
-                                                         type = DrawingType.RECTANGLE;
-                                                         rectangle.setTextColor(Color.GREEN);
-                                                         circle.setTextColor(Color.BLACK);
-                                                         star.setTextColor(Color.BLACK);
-                                                         line.setTextColor(Color.BLACK);
-                                                         default_btn.setTextColor(Color.BLACK);
-                                                         builder.create().cancel();
-                                                     }
-                                                 });
-
-                                                 circle.setText("Circle");
-                                                 circle.setOnClickListener(new View.OnClickListener() {
-                                                     public void onClick(View view) {
-                                                         type = DrawingType.CIRCLE;
-                                                         rectangle.setTextColor(Color.BLACK);
-                                                         circle.setTextColor(Color.GREEN);
-                                                         star.setTextColor(Color.BLACK);
-                                                         line.setTextColor(Color.BLACK);
-                                                         default_btn.setTextColor(Color.BLACK);
-                                                     }
-                                                 });
-                                                 line.setText("Line");
-                                                 line.setOnClickListener(new View.OnClickListener() {
-                                                     public void onClick(View view) {
-                                                         type = DrawingType.LINE;
-                                                         rectangle.setTextColor(Color.BLACK);
-                                                         circle.setTextColor(Color.BLACK);
-                                                         star.setTextColor(Color.BLACK);
-                                                         line.setTextColor(Color.GREEN);
-                                                         default_btn.setTextColor(Color.BLACK);
-                                                     }
-                                                 });
-                                                 star.setText("Star");
-                                                 star.setOnClickListener(new View.OnClickListener() {
-                                                     public void onClick(View view) {
-                                                         type = DrawingType.STAR;
-                                                         rectangle.setTextColor(Color.BLACK);
-                                                         circle.setTextColor(Color.BLACK);
-                                                         star.setTextColor(Color.GREEN);
-                                                         line.setTextColor(Color.BLACK);
-                                                         default_btn.setTextColor(Color.BLACK);
-                                                     }
-                                                 });
-                                                 default_btn.setText("Default");
-                                                 default_btn.setOnClickListener(new View.OnClickListener() {
-                                                     public void onClick(View view) {
-                                                         rectangle.setTextColor(Color.BLACK);
-                                                         circle.setTextColor(Color.BLACK);
-                                                         star.setTextColor(Color.BLACK);
-                                                         line.setTextColor(Color.BLACK);
-                                                         default_btn.setTextColor(Color.GREEN);
-                                                         type = DrawingType.DEFAULT;
-                                                     }
-                                                 });
-                                                 linearLayout.addView(rectangle);
-                                                 linearLayout.addView(circle);
-                                                 linearLayout.addView(line);
-                                                 linearLayout.addView(star);
-                                                 linearLayout.addView(default_btn);
-                                                 builder.setView(linearLayout);
-                                                 builder.setNegativeButton(Common.dialog_cancel, new DialogInterface.OnClickListener() {
-                                                     @Override
-                                                     public void onClick(DialogInterface dialog, int which) {
-                                                         // TODO Auto-generated method stub
-
-                                                     }
-                                                 });
-                                                 builder.show();
-                                             }
-                                         }
-
-                );
-                RelativeLayout.LayoutParams paramsShape = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                paramsShape.topMargin = HookMethods.px(-40.0f);
-                paramsShape.rightMargin = HookMethods.px(75.0f);
-                paramsShape.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-                final ImageButton hide = new ImageButton(context);
-                hide.setBackgroundColor(0);
-                hide.setImageDrawable(modRes.getDrawable(R.drawable.blur));
-                hide.setScaleX((float) 0.325);
-                hide.setScaleY((float) 0.325);
-                hide.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        type = DrawingType.DEFAULT;
-                        shouldErase = false;
-                        shouldBlur = true;
-                    }
-                });
-
-            RelativeLayout.LayoutParams paramsHide = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            paramsHide.topMargin=HookMethods.px(-5.0f);
-            paramsHide.rightMargin=HookMethods.px(75.0f);
-            paramsHide.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-
-
-                ((RelativeLayout)colorpickerview.getParent().getParent()).addView(alphabutton, paramsAlpha);
-            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(eraserbutton, paramsErase);
-            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(colorpicker, paramsPicker);
-            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(widthpicker, paramsWidth);
-            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(colorhistory, paramsHistory);
-            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(hexinput, paramsHex);
-            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(shape, paramsShape);
-            ((RelativeLayout)colorpickerview.getParent().getParent()).addView(hide, paramsHide);
-        }
+            }
         });
-
         findAndHookMethod("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, "setColor", int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -793,6 +280,10 @@ public class PaintTools {
         });
 
     }
+    public static int px(float f) {
+        return Math.round((f * HookMethods.SnapContext.getResources().getDisplayMetrics().density));
+    }
+
 
     private static int[] getRainbowColors() {
         return new int[]{
@@ -802,5 +293,583 @@ public class PaintTools {
                 Color.BLUE,
                 Color.rgb(111, 74, 207)
         };
+    }
+    private static class OptionsAdapter extends BaseAdapter {
+        String[] options = {"alpha", "eraser", "color", "width", "history", "hex", "shape", "blur" , "gradient", "hide"};
+        Context context;
+        XModuleResources mRes;
+        int [] optionImageId = {R.drawable.alpha, R.drawable.eraser, R.drawable.colorpicker, R.drawable.width, R.drawable.history, R.drawable.hashtag, R.drawable.shape, R.drawable.blur, R.drawable.bg_gradient, R.drawable.hide};
+        private static LayoutInflater inflater=null;
+
+        public OptionsAdapter(Activity snapContext, XModuleResources mRes) {
+            this.context = snapContext;
+            this.mRes = mRes;
+            inflater = ( LayoutInflater ) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+
+        @Override
+        public int getCount() {
+            return options.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return position;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        public class Holder
+        {
+            TextView tv;
+            ImageView img;
+        }
+
+        @Override
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            Holder holder=new Holder();
+            View rowView;
+            final int[] colorsGrad = new int[]{Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE};
+            final int[] currentItem = {2};
+
+            rowView = inflater.inflate(mRes.getLayout(R.layout.optionlayout), null);
+            holder.tv=(TextView) rowView.findViewById(mRes.getIdentifier("description", "id", "com.marz.snapprefs"));
+            holder.img=(ImageView) rowView.findViewById(mRes.getIdentifier("textIcon", "id", "com.marz.snapprefs"));
+
+            holder.tv.setText(options[position]);
+            holder.img.setImageDrawable(mRes.getDrawable(optionImageId[position]));
+
+            rowView.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    // TODO Auto-generated method stub
+                    switch (position) {
+                        case 0: { //alpha
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            LinearLayout linearLayout = new LinearLayout(context);
+                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+                            final TextView tv = new TextView(context);
+                            tv.setText("Currently selected transparency: " + alpha);
+                            final SeekBar seekBar2 = new SeekBar(context);
+                            seekBar2.setMax(255);
+                            seekBar2.setProgress(alpha);
+                            seekBar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                                public void onProgressChanged(SeekBar seekBar2, int n, boolean bl) {
+                                    int m = n + 1;
+                                    tv.setText("Currently selected transparency: " + m);
+                                }
+
+                                @Override
+                                public void onStartTrackingTouch(SeekBar arg0) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                                @Override
+                                public void onStopTrackingTouch(SeekBar arg0) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                            });
+                            builder.setNeutralButton(Common.dialog_default, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    alpha = 255;
+                                }
+                            });
+                            builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    alpha = seekBar2.getProgress();
+                                }
+                            });
+                            linearLayout.addView(tv, params);
+                            linearLayout.addView(seekBar2, params);
+                            builder.setView(linearLayout);
+                            builder.show();
+                            return;
+                        }
+                        case 1: {//eraser
+                            type = DrawingType.DEFAULT;
+                            shouldErase = true;
+                            shouldBlur = false;
+                            return;
+                        }
+                        case 2: {//color
+                            useShader = false;
+                            shouldErase = false;
+                            shouldBlur = false;
+
+                            ColorPickerDialog colorPickerDialog = new ColorPickerDialog(context, color, new ColorPickerDialog.OnColorSelectedListener() {
+
+                                @Override
+                                public void onColorSelected(int n) {
+                                    // TODO Auto-generated method stub
+                                    color = n;
+                                    if (!colorList.contains(n)) {
+                                        colorList.add(n);
+                                    }
+                                }
+                            });
+                            colorPickerDialog.setTitle("Select stroke color");
+                            colorPickerDialog.show();
+                            return;
+                        }
+                        case 3: {//width
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            LinearLayout linearLayout = new LinearLayout(context);
+                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+                            final TextView tv = new TextView(context);
+                            tv.setText("Currently selected width: " + width);
+                            final SeekBar seekBar2 = new SeekBar(context);
+                            seekBar2.setMax(30);
+                            seekBar2.setProgress(width);
+                            seekBar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                                public void onProgressChanged(SeekBar seekBar2, int n, boolean bl) {
+                                    if (n == 0) {
+                                        n = n + 1;
+                                    }
+                                    tv.setText("Currently selected width: " + n);
+                                }
+
+                                @Override
+                                public void onStartTrackingTouch(SeekBar arg0) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                                @Override
+                                public void onStopTrackingTouch(SeekBar arg0) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                            });
+                            builder.setNeutralButton(Common.dialog_default, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    width = 2;
+                                }
+                            });
+                            builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    width = seekBar2.getProgress();
+                                    if (width == 0) {
+                                        width = width + 1;
+                                    }
+                                }
+                            });
+                            linearLayout.addView(tv, params);
+                            linearLayout.addView(seekBar2, params);
+                            builder.setView(linearLayout);
+                            builder.show();
+                            return;
+                        }
+                        case 4: {//history
+                            useShader = false;
+                            shouldErase = false;
+                            shouldBlur = false;
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            SpannableStringBuilder spanBuilder = new SpannableStringBuilder();
+                            String size;
+                            if (colorList.size() == 0) {
+                                size = "Empty";
+                            } else {
+                                size = String.valueOf(colorList.size());
+                            }
+                            builder.setTitle("Color History - Size: " + size);
+                            LinearLayout linearLayout = new LinearLayout(context);
+                            LinearLayout.LayoutParams paramColors = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+                            linearLayout.setGravity(Gravity.CENTER);
+                            TextView colors = new TextView(context);
+                            colors.setMaxLines(20);
+                            colors.setVerticalScrollBarEnabled(true);
+                            //colors.setScrollBarStyle();
+                            colors.setMovementMethod(new ScrollingMovementMethod());
+                            int i = 0;
+                            for (Iterator<Integer> it = colorList.iterator(); it.hasNext(); i++) {
+                                Integer s = it.next();
+                                if (colors.getText().equals("")) {
+                                    //colors.setText(i + ": " + s);
+                                    int ii = i + 1;
+                                    String hexColor = String.format("#%08X", (0xFFFFFFFF & s));
+                                    String first = ii + ": " + hexColor + "  -";
+                                    String second = "-  " + hexColor;
+                                    SpannableString firstSpannable = new SpannableString(first);
+                                    SpannableString secondSpannable = new SpannableString(second);
+                                    firstSpannable.setSpan(new BackgroundColorSpan(s), 0, first.length(), 0);
+                                    firstSpannable.setSpan(new ForegroundColorSpan(Color.BLACK), 0, first.length(), 0);
+                                    secondSpannable.setSpan(new BackgroundColorSpan(s), 0, second.length(), 0);
+                                    secondSpannable.setSpan(new ForegroundColorSpan(Color.WHITE), 0, second.length(), 0);
+                                    spanBuilder.append(firstSpannable);
+                                    spanBuilder.append(secondSpannable);
+                                    colors.setText(spanBuilder, TextView.BufferType.SPANNABLE);
+                                } else {
+                                    //colors.setText(colors.getText() + "\n"+ i + ": " + s);
+                                    int ii = i + 1;
+                                    String hexColor = String.format("#%08X", (0xFFFFFFFF & s));
+                                    String first = "\n" + ii + ": " + hexColor + "  -";
+                                    String second = "-  " + hexColor;
+                                    SpannableString firstSpannable = new SpannableString(first);
+                                    SpannableString secondSpannable = new SpannableString(second);
+                                    firstSpannable.setSpan(new BackgroundColorSpan(s), 0, first.length(), 0);
+                                    firstSpannable.setSpan(new ForegroundColorSpan(Color.BLACK), 0, first.length(), 0);
+                                    secondSpannable.setSpan(new BackgroundColorSpan(s), 0, second.length(), 0);
+                                    secondSpannable.setSpan(new ForegroundColorSpan(Color.WHITE), 0, second.length(), 0);
+                                    spanBuilder.append(firstSpannable);
+                                    spanBuilder.append(secondSpannable);
+                                    colors.setText(spanBuilder, TextView.BufferType.SPANNABLE);
+                                }
+                            }
+                            colors.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20.0f);
+                            linearLayout.addView(colors, paramColors);
+                            builder.setView(linearLayout);
+                            builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    }
+                            );
+                            builder.show();
+                            return;
+                        }
+                        case 5: {//hex
+                            useShader = false;
+                            shouldErase = false;
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setTitle("Enter HEX color - #AARRGGBB");
+                            LinearLayout linearLayout = new LinearLayout(context);
+                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+
+                            final EditText eText = new EditText(context);
+                            //eText.setKeyListener(DigitsKeyListener.getInstance("0123456789ABCDEF"));
+                            //eText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
+                            eText.addTextChangedListener(new TextWatcher() {
+                                @Override
+                                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                                }
+
+                                @Override
+                                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                                }
+
+                                //Right after the text is changed
+                                @Override
+                                public void afterTextChanged(Editable s) {
+                                    //Store the text on a String
+                                    String text = s.toString();
+
+                                    //Get the length of the String
+                                    int length = s.length();
+
+                                    //*If the String length is bigger than zero and it's not composed only by the following characters: A to F and/or 0 to 9 *//*
+                                    if (!text.matches("[a-fA-F0-9]+") && length > 0) {
+                                        //Delete the last character
+                                        s.delete(length - 1, length);
+                                    }
+                                }
+                            });
+                            eText.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+                            linearLayout.addView(eText);
+                            builder.setView(linearLayout);
+                            builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            //Create and initialize the int 'color' with the white color.
+                                            int typedColor = 0xFFFFFFFF;
+
+                                            try {
+                                                //Get the text at the EditText field and save it in a String
+                                                String colorValue = eText.getText().toString();
+
+                                                /*Convert the String into a Color ARGB hexadecimal integer.*/
+                                                typedColor = Integer.parseInt(colorValue.substring(2), 16) + (Integer.parseInt(colorValue.substring(0, 2), 16) << 24);
+                                                color = typedColor;
+                                                alpha = Color.alpha(color);
+                                                if (!colorList.contains(typedColor)) {
+                                                    colorList.add(typedColor);
+                                                }
+                                                //Toast.makeText(context, colorValue, Toast.LENGTH_SHORT).show();
+                                                Toast toast = Toast.makeText(context, "           ", Toast.LENGTH_LONG);
+                                                TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+                                                View view = toast.getView();
+                                                view.setBackgroundColor(typedColor);
+                                                v.setTextColor(typedColor);
+                                                toast.show();
+                                            } catch (Exception e) //Something went wrong while parsing the String into an Integer
+                                            {
+                                                //Reset the EditText field to white
+                                                //Display a toast message
+                                                Toast.makeText(context, "You must enter a valid HEX color in AARRGGBB format", Toast.LENGTH_SHORT).show();
+                                            }
+
+                                        }
+
+                                    }
+                            );
+                            builder.setNegativeButton(Common.dialog_cancel, new DialogInterface.OnClickListener()
+
+                                    {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // TODO Auto-generated method stub
+
+                                        }
+                                    }
+
+                            );
+                            builder.show();
+                            return;
+                        }
+                        case 6: {//shape
+                            shouldErase = false;
+                            shouldBlur = false;
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setTitle("Choose shape type");
+                            LinearLayout linearLayout = new LinearLayout(context);
+                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+
+                            final Button rectangle = new Button(context);
+                            final Button circle = new Button(context);
+                            final Button star = new Button(context);
+                            final Button line = new Button(context);
+                            final Button default_btn = new Button(context);
+                            switch (type){
+                                case RECTANGLE:
+                                    rectangle.setTextColor(Color.GREEN);
+                                    circle.setTextColor(Color.BLACK);
+                                    star.setTextColor(Color.BLACK);
+                                    line.setTextColor(Color.BLACK);
+                                    default_btn.setTextColor(Color.BLACK);
+                                    break;
+                                case CIRCLE:
+                                    rectangle.setTextColor(Color.BLACK);
+                                    circle.setTextColor(Color.GREEN);
+                                    star.setTextColor(Color.BLACK);
+                                    line.setTextColor(Color.BLACK);
+                                    default_btn.setTextColor(Color.BLACK);
+                                    break;
+                                case STAR:
+                                    rectangle.setTextColor(Color.BLACK);
+                                    circle.setTextColor(Color.BLACK);
+                                    star.setTextColor(Color.GREEN);
+                                    line.setTextColor(Color.BLACK);
+                                    default_btn.setTextColor(Color.BLACK);
+                                    break;
+                                case LINE:
+                                    rectangle.setTextColor(Color.BLACK);
+                                    circle.setTextColor(Color.BLACK);
+                                    star.setTextColor(Color.BLACK);
+                                    line.setTextColor(Color.GREEN);
+                                    default_btn.setTextColor(Color.BLACK);
+                                    break;
+                                case DEFAULT:
+                                    rectangle.setTextColor(Color.BLACK);
+                                    circle.setTextColor(Color.BLACK);
+                                    star.setTextColor(Color.BLACK);
+                                    line.setTextColor(Color.BLACK);
+                                    default_btn.setTextColor(Color.GREEN);
+                                    break;
+                                default:
+                                    break;
+                            }
+                            rectangle.setText("Rectangle");
+                            rectangle.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View view) {
+                                    type = DrawingType.RECTANGLE;
+                                    rectangle.setTextColor(Color.GREEN);
+                                    circle.setTextColor(Color.BLACK);
+                                    star.setTextColor(Color.BLACK);
+                                    line.setTextColor(Color.BLACK);
+                                    default_btn.setTextColor(Color.BLACK);
+                                    builder.create().cancel();
+                                }
+                            });
+
+                            circle.setText("Circle");
+                            circle.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View view) {
+                                    type = DrawingType.CIRCLE;
+                                    rectangle.setTextColor(Color.BLACK);
+                                    circle.setTextColor(Color.GREEN);
+                                    star.setTextColor(Color.BLACK);
+                                    line.setTextColor(Color.BLACK);
+                                    default_btn.setTextColor(Color.BLACK);
+                                }
+                            });
+                            line.setText("Line");
+                            line.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View view) {
+                                    type = DrawingType.LINE;
+                                    rectangle.setTextColor(Color.BLACK);
+                                    circle.setTextColor(Color.BLACK);
+                                    star.setTextColor(Color.BLACK);
+                                    line.setTextColor(Color.GREEN);
+                                    default_btn.setTextColor(Color.BLACK);
+                                }
+                            });
+                            star.setText("Star");
+                            star.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View view) {
+                                    type = DrawingType.STAR;
+                                    rectangle.setTextColor(Color.BLACK);
+                                    circle.setTextColor(Color.BLACK);
+                                    star.setTextColor(Color.GREEN);
+                                    line.setTextColor(Color.BLACK);
+                                    default_btn.setTextColor(Color.BLACK);
+                                }
+                            });
+                            default_btn.setText("Default");
+                            default_btn.setOnClickListener(new View.OnClickListener() {
+                                public void onClick(View view) {
+                                    rectangle.setTextColor(Color.BLACK);
+                                    circle.setTextColor(Color.BLACK);
+                                    star.setTextColor(Color.BLACK);
+                                    line.setTextColor(Color.BLACK);
+                                    default_btn.setTextColor(Color.GREEN);
+                                    type = DrawingType.DEFAULT;
+                                }
+                            });
+                            linearLayout.addView(rectangle);
+                            linearLayout.addView(circle);
+                            linearLayout.addView(line);
+                            linearLayout.addView(star);
+                            linearLayout.addView(default_btn);
+                            builder.setView(linearLayout);
+                            builder.setNegativeButton(Common.dialog_cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // TODO Auto-generated method stub
+
+                                }
+                            });
+                            builder.show();
+                            return;
+                        }
+                        case 7: {//blur
+                            type = DrawingType.DEFAULT;
+                            shouldErase = false;
+                            shouldBlur = true;
+                            return;
+                        }
+                        case 8: {//gradient
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setTitle("Drawing Gradient");
+                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                }
+                            });
+                            LinearLayout rootLayout = new LinearLayout(context);
+                            LinearLayout.LayoutParams rootParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            rootLayout.addView(inflater.inflate(HookMethods.modRes.getLayout(R.layout.gradient_layout), null), rootParams);
+                            final RadioGroup orientation = (RadioGroup) rootLayout.findViewById(R.id.orientation);
+                            final LinearLayout listLayout = (LinearLayout) rootLayout.findViewById(R.id.itemLayout);
+                            final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT);
+
+                            for (int i = 1; i <= 5; i++) {
+                                Button btn = new Button(context);
+                                btn.setId(i);
+                                final int id_ = btn.getId();
+                                btn.setText("Color: " + id_);
+                                btn.setBackgroundColor(colorsGrad[i - 1]);
+                                listLayout.addView(btn, params);
+                                final Button btn1 = ((Button) listLayout.findViewById(id_));
+                                btn1.setOnClickListener(new View.OnClickListener() {
+                                    public void onClick(View view) {
+                                        ColorPickerDialog colorPickerDialog = new ColorPickerDialog(context, colorsGrad[id_-1], new ColorPickerDialog.OnColorSelectedListener() {
+                                            @Override
+                                            public void onColorSelected(int color) {
+                                                // TODO Auto-generated method stub
+                                                colorsGrad[id_-1] = color;
+                                                btn1.setBackgroundColor(colorsGrad[id_-1]);
+                                            }
+                                        });
+                                        colorPickerDialog.setTitle("Color: " + id_);
+                                        colorPickerDialog.show();
+                                    }
+                                });
+                                if (btn1.getId() <= currentItem[0]) {
+                                    btn1.setVisibility(View.VISIBLE);
+                                } else {
+                                    btn1.setVisibility(View.GONE);
+                                }
+                            }
+                            Button add = (Button) rootLayout.findViewById(R.id.add);
+                            add.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (currentItem[0] < 5) {
+                                        currentItem[0]++;
+                                        listLayout.findViewById(currentItem[0]).setVisibility(View.VISIBLE);
+                                    } else {
+                                        Toast.makeText(context, "You cannot add more than 5 colors", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            Button remove = (Button) rootLayout.findViewById(R.id.remove);
+                            remove.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (currentItem[0] > 2) {
+                                        listLayout.findViewById(currentItem[0]).setVisibility(View.GONE);
+                                        currentItem[0]--;
+                                    } else {
+                                        Toast.makeText(context, "You cannot have less than 2 colors", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            builder.setView(rootLayout);
+                            builder.setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    final int[] usedColors = new int[currentItem[0]];
+                                    System.arraycopy(colorsGrad, 0, usedColors, 0, currentItem[0]);
+                                    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+                                    Display display = wm.getDefaultDisplay();
+                                    Point size = new Point();
+                                    display.getSize(size);
+                                    Shader textShader = null;
+                                    int checkedID = orientation.getCheckedRadioButtonId();
+                                    if(checkedID == R.id.horizontal){
+                                        textShader = new LinearGradient(0, 0, size.x, 0, usedColors, null, Shader.TileMode.CLAMP);
+                                    } else if(checkedID == R.id.vertical){
+                                        textShader = new LinearGradient(0, 0, 0, size.y, usedColors, null, Shader.TileMode.CLAMP);
+                                    }
+                                    shader = textShader;
+                                    useShader = true;
+                                }
+                                });
+                            builder.show();
+                            return;
+                        }
+                        case 9: {//hide
+                            outerOptionsLayout.setVisibility(View.GONE);
+                            return;
+                        }
+                        default:
+                            return;
+                    }
+                }
+            });
+
+            return rowView;
+        }
     }
 }
