@@ -154,10 +154,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         return Math.round((f * SnapContext.getResources().getDisplayMetrics().density));
     }
 
-    public static int pxC(float f, Context ctx) {
-        return Math.round((f * ctx.getResources().getDisplayMetrics().density));
-    }
-
     static void refreshPreferences() {
         prefs = new XSharedPreferences(new File(
                 Environment.getDataDirectory(), "data/"
@@ -425,6 +421,14 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                     Logger.log("SECOND_MAX_VIDEO_DURATION set over 10 failed :(", true);
                     Logger.log(t.toString());
                 } /*For viewing longer videos?*/
+                //Better quality images
+                final Class<?> snapMediaUtils = findClass("com.snapchat.android.util.SnapMediaUtils", lpparam.classLoader);
+                XposedHelpers.setStaticIntField(snapMediaUtils, "IGNORED_COMPRESSION_VALUE", 100);
+                XposedHelpers.setStaticIntField(snapMediaUtils, "RAW_THUMBNAIL_ENCODING_QUALITY", 100);
+                final Class<?> profileImageUtils = findClass("com.snapchat.android.util.profileimages.ProfileImageUtils", lpparam.classLoader);
+                XposedHelpers.setStaticIntField(profileImageUtils, "COMPRESSION_QUALITY", 100);
+                final Class<?> snapImageBryo = findClass(Obfuscator.save.SNAPIMAGEBRYO_CLASS, lpparam.classLoader);
+                XposedHelpers.setStaticIntField(snapImageBryo, "JPEG_ENCODING_QUALITY", 100);
 
                 XC_MethodHook initHook = new XC_MethodHook() {
                     @Override
