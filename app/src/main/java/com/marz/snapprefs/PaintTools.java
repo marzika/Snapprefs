@@ -298,7 +298,7 @@ public class PaintTools {
         String[] options = {"alpha", "eraser", "color", "width", "history", "hex", "shape", "blur" , "gradient", "hide"};
         Context context;
         XModuleResources mRes;
-        int [] optionImageId = {R.drawable.alpha, R.drawable.eraser, R.drawable.colorpicker, R.drawable.width, R.drawable.history, R.drawable.hashtag, R.drawable.shape, R.drawable.blur, R.drawable.bg_gradient, R.drawable.hide};
+        int [] optionImageId = {R.drawable.alpha, R.drawable.eraser, R.drawable.colorpicker, R.drawable.width, R.drawable.history, R.drawable.hashtag, R.drawable.shape, R.drawable.blur, R.drawable.draw_gradient, R.drawable.hide};
         private static LayoutInflater inflater=null;
 
         public OptionsAdapter(Activity snapContext, XModuleResources mRes) {
