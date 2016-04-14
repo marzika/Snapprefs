@@ -248,4 +248,11 @@ public class Obfuscator {
         public static final String SHOW_LENS = "a";
         public static final String RECORDING_VIDEO = "c";
     }
+
+    public class stories {
+        public static final String RECENTSTORY_CLASS = "JM";
+        public static final String ALLSTORY_CLASS = "Jy";
+        public static final String LIVESTORY_CLASS = "Ps";
+        public static final String DISCOVERSTORY_CLASS = "Fl";
+    }
 }

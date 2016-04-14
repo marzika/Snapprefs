@@ -5,11 +5,11 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
+import android.content.res.XResources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.ContactsContract;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
@@ -54,9 +54,7 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
-import static de.robv.android.xposed.XposedHelpers.getAdditionalStaticField;
 import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
-import static de.robv.android.xposed.XposedHelpers.setAdditionalStaticField;
 import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
 
@@ -106,10 +104,17 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static boolean mDiscoverSnap = false;
     public static boolean mDiscoverUI = false;
     public static boolean mCustomSticker = false;
+    public static boolean mHideLive = false;
+    public static boolean mHidePeople = false;
     public static boolean mReplay = false;
     public static boolean mStealth = false;
     public static boolean mTyping = false;
     public static int mLicense = 0;
+    public static Activity SnapContext;
+    public static String MODULE_PATH = null;
+    public static boolean mColours;
+    public static boolean mLocation;
+    public static ClassLoader classLoader;
     static XSharedPreferences prefs;
     static XSharedPreferences license;
     static boolean selectStory;
@@ -127,26 +132,21 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     static Typeface defTypeface;
     static boolean haveDefTypeface;
     static XModuleResources modRes;
-    static Activity SnapContext;
     static Context context;
     static int counter = 0;
     private static XModuleResources mResources;
     private static int snapchatVersion;
-    public static String MODULE_PATH = null;
     private static boolean fullCaption;
     private static boolean selectAll;
     private static boolean hideBf;
     private static boolean hideRecent;
     private static boolean shouldAddGhost;
     private static boolean shouldAddVFilters;
-    public static boolean mColours;
-    public static boolean mLocation;
     private static boolean mTimerCounter;
     private static boolean mChatAutoSave;
     private static boolean mChatImageSave;
     private static boolean mIntegration;
     private static InitPackageResourcesParam resParam;
-    public static ClassLoader classLoader;
     Class CaptionEditText;
     boolean latest = false;
 
@@ -191,6 +191,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mDiscoverSnap = prefs.getBoolean("pref_key_discover", false);
         mDiscoverUI = prefs.getBoolean("pref_key_discover_ui", false);
         mCustomSticker = prefs.getBoolean("pref_key_sticker", false);
+        mHideLive = prefs.getBoolean("pref_key_hidelive", false);
+        mHidePeople = prefs.getBoolean("pref_key_hidepeople", false);
         mReplay = prefs.getBoolean("pref_key_replay", false);
         mStealth = prefs.getBoolean("pref_key_viewed", false);
         mTyping = prefs.getBoolean("pref_key_typing", false);
@@ -323,6 +325,19 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public void handleInitPackageResources(InitPackageResourcesParam resparam) throws Throwable {
         if (!resparam.packageName.equals(Common.PACKAGE_SNAP))
             return;
+        int name = R.id.name;
+        int checkBox = R.id.checkBox;
+        int friend_item = R.layout.friend_item;
+        XModuleResources modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
+        FriendListDialog.name = XResources.getFakeResId(modRes, name);
+        resparam.res.setReplacement(FriendListDialog.name, modRes.fwd(name));
+
+        FriendListDialog.checkBox = XResources.getFakeResId(modRes, checkBox);
+        resparam.res.setReplacement(FriendListDialog.checkBox, modRes.fwd(checkBox));
+
+        FriendListDialog.friend_item = XResources.getFakeResId(modRes, checkBox);
+        resparam.res.setReplacement(FriendListDialog.friend_item, modRes.fwd(friend_item));
+
         mSavePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
         mCustomFilterLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/Filters";
         refreshPreferences();
@@ -333,6 +348,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         }
         if (mIntegration) {
             HookedLayouts.addShareIcon(resparam);
+        }
+        if (HookMethods.mHidePeople) {
+            Stories.addSnapprefsBtn(resparam, mResources);
         }
         HookedLayouts.fullScreenFilter(resparam);
     }
@@ -445,43 +463,46 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         } else {
                             Toast.makeText(context, "VisualFilter files are missing, download them!", Toast.LENGTH_SHORT).show();
                         }
+                        if (HookMethods.mHideLive || HookMethods.mHidePeople) {
+                            Stories.initStories(lpparam);
+                        }
                         if(shouldAddGhost){
                             HookedLayouts.initVisiblity(lpparam);
                         }
-                        if (mMultiFilterBoolean == true) {
+                        if (mMultiFilterBoolean) {
                             MultiFilter.initMultiFilter(lpparam, mResources, SnapContext);
                         }
-                        if (mDiscoverSnap == true) {
+                        if (mDiscoverSnap) {
                             DataSaving.blockDsnap(lpparam);
                         }
                         if (mStoryPreload){
                             DataSaving.blockStoryPreLoad(lpparam);
                         }
-                        if (mDiscoverUI == true) {
+                        if (mDiscoverUI) {
                             DataSaving.blockFromUi(lpparam);
                         }
-                        if (mSpeed == true) {
+                        if (mSpeed) {
                             Spoofing.initSpeed(lpparam, SnapContext);
                         }
-                        if (mLocation == true) {
+                        if (mLocation) {
                             Spoofing.initLocation(lpparam, SnapContext);
                         }
-                        if (mWeather == true) {
+                        if (mWeather) {
                             Spoofing.initWeather(lpparam, SnapContext);
                         }
-                        if (mPaintTools == true) {
+                        if (mPaintTools) {
                             PaintTools.initPaint(lpparam, mResources);
                         }
-                        if (mTimerCounter == true) {
+                        if (mTimerCounter) {
                             Misc.initTimer(lpparam, mResources);
                         }
-                        if (mChatAutoSave == true) {
+                        if (mChatAutoSave) {
                             Chat.initTextSave(lpparam, mResources);
                         }
-                        if (mChatImageSave == true) {
+                        if (mChatImageSave) {
                             Chat.initImageSave(lpparam, mResources);
                         }
-                        if (mIntegration == true) {
+                        if (mIntegration) {
                             HookedLayouts.initIntegration(lpparam, mResources);
                         }
                         getEditText(lpparam);
@@ -493,7 +514,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                                 Logger.log("StateBuilder.setScreenshotCount set to 0L", true);
                             }
                         });
-                        if (mCustomSticker == true) {
+                        if (mCustomSticker) {
                             Stickers.initStickers(lpparam, modRes, SnapContext);
                         }
                     }
@@ -658,6 +679,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("mDiscoverSnap: " + mDiscoverSnap);
         logging("mDiscoverUI: " + mDiscoverUI);
         logging("mCustomSticker: " + mCustomSticker);
+        logging("mHideLive: " + mHideLive);
+        logging("mHidePeople: " + mHidePeople);
         logging("mReplay: " + mReplay);
         logging("mStealth: " + mStealth);
         logging("mTyping: " + mTyping);

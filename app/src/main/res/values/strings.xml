@@ -17,6 +17,16 @@
 
     <string name="hidebf_text">Hide Best-Friends</string>
     <string name="hidebf_summary">Hides your Best-Friends from you</string>
+
+    <string name="hidelive_text">Hide Live stories</string>
+    <string name="hidelive_summary">Hides the Live stories section on the Stories screen</string>
+    <string name="hidepeople_text">Hide People from Stories</string>
+    <string name="hidepeople_summary">Enables the option to hide certain people\'s stories</string>
+    <string name="showfavs_text">Show Favourites</string>
+    <string name="showfavs_summary">Shows only the Favourites on the Stories screen</string>
+    <string name="favsontop_text">Favourites on Top</string>
+    <string name="favsontop_summary">Displays the Favourites as first</string>
+
     <string name="hiderecent_text">Hide Recents</string>
     <string name="hiderecent_summary">Hides people who you recently sent a snap to</string>
 

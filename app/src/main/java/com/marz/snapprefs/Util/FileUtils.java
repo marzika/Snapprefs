@@ -57,6 +57,8 @@ public class FileUtils {
                 aBuffer += aDataRow + "\n";
             }
             myReader.close();
+        } catch (FileNotFoundException e) {
+            Logger.log("FILE NOT FOUND - ARE YOU SURE YOU CREATED IT?", true);
         } catch (Exception e) {
             Logger.log("INSTALL HANDLEEXTERNALSTORAGE TO FIX THE ISSUE -- FileUtils: File SDread failed " + e.toString(), true);
         }
