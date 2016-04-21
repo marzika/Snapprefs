@@ -66,6 +66,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static final int SAVE_AUTO = 0;
     public static final int SAVE_S2S = 1;
     public static final int DO_NOT_SAVE = 2;
+    public static final int SAVE_BUTTON = 3;
     // Length of toasts
     public static final int TOAST_LENGTH_SHORT = 0;
     public static final int TOAST_LENGTH_LONG = 1;
@@ -698,7 +699,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 
         logging("----------------------- SAVING SETTINGS -----------------------");
         logging("Preferences have changed:");
-        String[] saveModes = {"SAVE_AUTO", "SAVE_S2S", "DO_NOT_SAVE"};
+        String[] saveModes = {"SAVE_AUTO", "SAVE_S2S", "DO_NOT_SAVE", "SAVE_BUTTON"};
         logging("~ mModeSnapImage: " + saveModes[mModeSnapImage]);
         logging("~ mModeSnapVideo: " + saveModes[mModeSnapVideo]);
         logging("~ mModeStoryImage: " + saveModes[mModeStoryImage]);

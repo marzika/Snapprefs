@@ -115,6 +115,8 @@ public class Obfuscator {
         public static final String VIDEOSNAPRENDERER_SHOW = "c";
         //View Instance in VideoSnapRenderer
         public static final String VIDEOSNAPRENDERER_VAR_VIEW = "c";
+        public static final String IMAGESNAPRENDERER_SETVIEW = "a";
+        public static final String VIDEOSNAPRENDERER_SETVIEW = "a";
 
     }
     //Data-saving
