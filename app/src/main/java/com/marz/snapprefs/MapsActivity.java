@@ -38,8 +38,8 @@ public class MapsActivity extends Activity {
 
             @Override
             public void onMapLongClick(LatLng location) {
-                FileUtils.writeToSDFile(String.valueOf(location.latitude), "latitude");
-                FileUtils.writeToSDFile(String.valueOf(location.longitude), "longitude");
+                FileUtils.writeToSDFolder(String.valueOf(location.latitude), "latitude");
+                FileUtils.writeToSDFolder(String.valueOf(location.longitude), "longitude");
                 Toast.makeText(MapsActivity.this, "Spoofing location for " + location.toString(), Toast.LENGTH_SHORT).show();
             }
         });

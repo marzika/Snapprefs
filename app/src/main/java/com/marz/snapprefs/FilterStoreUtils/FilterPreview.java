@@ -99,7 +99,7 @@ public class FilterPreview extends Activity {
             @Override
             public void onClick(View arg0) {
 
-                //FileUtils.writeToSDFile(imgPath, "filterSettings");       //TODO somehow dynamically changing the file name in the filter loading method doesnt work.
+                //FileUtils.writeToSDFolder(imgPath, "filterSettings");       //TODO somehow dynamically changing the file name in the filter loading method doesnt work.
 
                 String filtPath = Environment.getExternalStorageDirectory().toString() + "/Snapprefs/Filters";
 

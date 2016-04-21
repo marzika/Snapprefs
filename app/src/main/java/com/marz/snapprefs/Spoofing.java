@@ -34,8 +34,8 @@ public class Spoofing {
         findAndHookMethod(Obfuscator.spoofing.LOCATION_CLASS, lpparam.classLoader, Obfuscator.spoofing.LOCATION_GETLOCATION, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                String rawlatitude = FileUtils.readFromSDFile("latitude");
-                String rawlongitude = FileUtils.readFromSDFile("longitude");
+                String rawlatitude = FileUtils.readFromSDFolder("latitude");
+                String rawlongitude = FileUtils.readFromSDFolder("longitude");
                 float mLatitude = Float.valueOf(rawlatitude);
                 float mLongitude = Float.valueOf(rawlongitude);
                 Location fakedLocation = new Location(LocationManager.GPS_PROVIDER);
