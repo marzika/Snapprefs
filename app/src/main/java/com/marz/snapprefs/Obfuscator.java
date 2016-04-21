@@ -255,4 +255,21 @@ public class Obfuscator {
         public static final String LIVESTORY_CLASS = "Ps";
         public static final String DISCOVERSTORY_CLASS = "Fl";
     }
+
+    public class groups {
+        public static final String STORY_CLASS = "Ly";
+        public static final String STORYARRAY_CLASS = "OI";
+        public static final String STORYARRAY_METHOD = "a";
+        public static final String STORYSECTION_CLASS = "IE";
+        public static final String INTERFACE = "II";
+        public static final String GETFRINEDMANAGER_METHOD = "e";
+        public static final String GETUSERNAME_METHOD = "g";
+    }
+
+    public class bus {
+        public static final String UPDATEEVENT_CLASS = "YN";
+        public static final String GETBUS_CLASS = "Xy";
+        public static final String GETBUS_METHOD = "a";
+        public static final String BUS_POST = "a";
+    }
 }

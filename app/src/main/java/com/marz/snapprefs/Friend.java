@@ -1,6 +1,7 @@
 package com.marz.snapprefs;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * Created by MARZ on 2016. 04. 14..
@@ -41,5 +42,12 @@ public class Friend implements Serializable {
 
     public void setSelected(boolean isSelected) {
         this.isSelected = isSelected;
+    }
+
+    public static class friendComparator implements Comparator<Friend> {
+        @Override
+        public int compare(Friend o1, Friend o2) {
+            return o1.getName().compareTo(o2.getName());
+        }
     }
 }

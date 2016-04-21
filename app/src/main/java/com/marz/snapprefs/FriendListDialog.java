@@ -47,7 +47,7 @@ public class FriendListDialog extends DialogFragment {
                                     }
                                 }
                                 Toast.makeText(HookMethods.SnapContext, "Restart the app to see changes", Toast.LENGTH_SHORT).show();
-                                FileUtils.writeToSDFile(selected, "blockedstories");
+                                FileUtils.writeToSDFolder(selected, "blockedstories");
                             }
                         }
                 )

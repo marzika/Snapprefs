@@ -328,6 +328,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         int name = R.id.name;
         int checkBox = R.id.checkBox;
         int friend_item = R.layout.friend_item;
+        int group_item = R.layout.group_item;
+
         XModuleResources modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
         FriendListDialog.name = XResources.getFakeResId(modRes, name);
         resparam.res.setReplacement(FriendListDialog.name, modRes.fwd(name));
@@ -337,6 +339,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 
         FriendListDialog.friend_item = XResources.getFakeResId(modRes, checkBox);
         resparam.res.setReplacement(FriendListDialog.friend_item, modRes.fwd(friend_item));
+
+        GroupDialog.group_item = XResources.getFakeResId(modRes, group_item);
+        resparam.res.setReplacement(GroupDialog.group_item, modRes.fwd(group_item));
 
         mSavePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
         mCustomFilterLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/Filters";
@@ -466,6 +471,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         if (HookMethods.mHideLive || HookMethods.mHidePeople) {
                             Stories.initStories(lpparam);
                         }
+                        Groups.initGroups(lpparam);
                         if(shouldAddGhost){
                             HookedLayouts.initVisiblity(lpparam);
                         }
