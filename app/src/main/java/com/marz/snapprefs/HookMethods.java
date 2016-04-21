@@ -110,6 +110,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static boolean mReplay = false;
     public static boolean mStealth = false;
     public static boolean mTyping = false;
+    public static boolean mUnlimGroups = false;
     public static int mLicense = 0;
     public static Activity SnapContext;
     public static String MODULE_PATH = null;
@@ -197,6 +198,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mReplay = prefs.getBoolean("pref_key_replay", false);
         mStealth = prefs.getBoolean("pref_key_viewed", false);
         mTyping = prefs.getBoolean("pref_key_typing", false);
+        mUnlimGroups = prefs.getBoolean("pref_key_groups_unlim", false);
         mConfirmationID = prefs.getString("confirmation_id", "");
         debug = prefs.getBoolean("pref_key_debug", false);
         mDeviceID = prefs.getString("device_id", null);
@@ -692,6 +694,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("mReplay: " + mReplay);
         logging("mStealth: " + mStealth);
         logging("mTyping: " + mTyping);
+        logging("mUnlimGroups: " + mUnlimGroups);
         logging("mColours: " + mColours);
         logging("*****Debugging: " + debug + " *****");
         logging("mLicense: " + mLicense);

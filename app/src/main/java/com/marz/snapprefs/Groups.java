@@ -3,12 +3,14 @@ package com.marz.snapprefs;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.graphics.Color;
 import android.os.Environment;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
 import com.marz.snapprefs.Util.FileUtils;
+import com.marz.snapprefs.Util.NotificationUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -158,6 +160,14 @@ public class Groups {
                 ArrayList<String> users = new ArrayList<>(Arrays.asList(groupData));
                 users.remove(0);
                 Group currentGroup = new Group(name, users);
+                if (numGroups == 3 && HookMethods.mLicense == 0) {
+                    NotificationUtils.showMessage("You cannot have more than 3 groups as a free user", Color.RED, NotificationUtils.LENGHT_SHORT, HookMethods.classLoader);
+                    return;
+                }
+                if (HookMethods.mLicense != 0 && HookMethods.mUnlimGroups == false) {
+                    NotificationUtils.showMessage("You disabled the option to have more than 3 groups", Color.RED, NotificationUtils.LENGHT_SHORT, HookMethods.classLoader);
+                    return;
+                }
                 if (!groups.contains(currentGroup)) {
                     groups.add(currentGroup);
                     numGroups++; //add limit for Free users
