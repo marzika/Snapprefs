@@ -12,6 +12,7 @@ import com.marz.snapprefs.Util.FileUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -83,10 +84,11 @@ public class Stories {
                 friendList.add(new Friend(username, false));
             }
         }
+        Collections.sort(friendList, new Friend.friendComparator());
     }
 
     private static void readBlockedList() {
-        String read = FileUtils.readFromSDFile("blockedstories").replaceAll("\n", "");
+        String read = FileUtils.readFromSDFolder("blockedstories").replaceAll("\n", "");
         if (!read.equals("0")) {
             peopleToHide = Arrays.asList(read.split(";"));
         }
