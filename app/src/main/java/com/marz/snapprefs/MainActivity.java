@@ -1,41 +1,64 @@
 package com.marz.snapprefs;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.os.Environment;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
-import android.text.Html;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
-import com.marz.snapprefs.FilterStoreUtils.TabsFragmentActivity;
+import com.marz.snapprefs.Tabs.BuyTabFragment;
+import com.marz.snapprefs.Tabs.DataTabFragment;
+import com.marz.snapprefs.Tabs.DeluxeTabFragment;
+import com.marz.snapprefs.Tabs.FiltersTabFragment;
+import com.marz.snapprefs.Tabs.GeneralTabFragment;
+import com.marz.snapprefs.Tabs.MainTabFragment;
+import com.marz.snapprefs.Tabs.SavingTabFragment;
+import com.marz.snapprefs.Tabs.SharingTabFragment;
+import com.marz.snapprefs.Tabs.SpoofingTabFragment;
+import com.marz.snapprefs.Tabs.TextTabFragment;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.UUID;
 
 import de.cketti.library.changelog.ChangeLog;
 
+public class MainActivity extends AppCompatActivity {
+    public static final String PREF_KEY_SAVE_LOCATION = "pref_key_save_location";
+    public static final String PREF_KEY_HIDE_LOCATION = "pref_key_hide_location";
+    private static final int REQUEST_CHOOSE_DIR = 1;
+    private static final int REQUEST_HIDE_DIR = 2;
+    DrawerLayout mDrawerLayout;
+    NavigationView mNavigationView;
+    FragmentManager mFragmentManager;
+    FragmentTransaction mFragmentTransaction;
+    HashMap<Integer, Fragment> cache = new HashMap<>();
+    private SharedPreferences sharedPreferences;
+    private ArrayList<MenuItem> items = new ArrayList<>();
 
-public class MainActivity extends Activity {
-
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#00a650"));
-        final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
 
+        final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
         final String tmDevice, tmSerial, androidId;
         tmDevice = "" + tm.getDeviceId();
         tmSerial = "" + tm.getSimSerialNumber();
@@ -49,131 +72,167 @@ public class MainActivity extends Activity {
         if (cl.isFirstRun()) {
             cl.getLogDialog().show();
         }
-        //getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsOld()).commit();
-        //PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.activity_main);
-        getActionBar().setDisplayShowCustomEnabled(true);
-        getActionBar().setCustomView(R.layout.abs);
-        getActionBar().setBackgroundDrawable(colorDrawable);
-        Button settings = (Button) findViewById(R.id.settings);
-        Button filterStore = (Button) findViewById(R.id.filterStore);
-        Button reedem = (Button) findViewById(R.id.reedem);
-        Button donate = (Button) findViewById(R.id.donate);
-        Button about = (Button) findViewById(R.id.about);
-        Button legal = (Button) findViewById(R.id.legal);
-        Button visual = (Button) findViewById(R.id.visualbtn);
-        TextView SC_text = (TextView) findViewById(R.id.SC_text);
-        SC_text.setPaintFlags(SC_text.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-        settings.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-                getFragmentManager().beginTransaction().replace(R.id.frame_layout, new SettingsOld()).addToBackStack("preferences").commit();
-                PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.preferences, false);
-            }
-        });
-        filterStore.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), TabsFragmentActivity.class);
-                startActivity(intent);
-            }
-        });
-        visual.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), VisualActivity.class);
-                startActivity(intent);
-            }
-        });
-        reedem.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), Reedem.class);
-                startActivity(intent);
-            }
-        });
-        about.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-                new AlertDialog.Builder(context)
-                        .setTitle("About")
-                        .setMessage("Thanks to: \n" + getResources().getString(R.string.pref_thanks_summary) + "\n\nVersion: " + BuildConfig.VERSION_NAME + "\n\nSupported version: " + Obfuscator.SUPPORTED_VERSION_CODENAME)
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                return;
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-            }
-        });
-        legal.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-                new AlertDialog.Builder(context)
-                        .setTitle("Legal")
-                        .setMessage(Html.fromHtml("<b>Snapprefs is licensed under GNU GPLv3.</b><br><br><b>Used libraries - License:</b><br><small>ckChangeLog - Apache License 2.0<br>ColorPicker for Android - Apache Lic. 2.0<br>DirChooser - Apache License 2.0<br>mp4parser - Free License<br></small><br><b>Module is based on:</b><br><small>Keepchat - GNU GPLv3<br >Snapshare - GNU GPLv3</small>"))
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                return;
-                            }
-                        })
-                        .setNegativeButton("Apache Lic. 2.0", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                try {
-                                    Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.apache.org/licenses/LICENSE-2.0"));
-                                    startActivity(myIntent);
-                                } catch (ActivityNotFoundException e) {
-                                    Toast.makeText(getApplicationContext(), "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
-                                    e.printStackTrace();
-                                }
-                            }
-                        })
-                        .setNeutralButton("GNU GPLv3", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                try {
-                                    Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.gnu.org/licenses/gpl-3.0.html"));
-                                    startActivity(myIntent);
-                                } catch (ActivityNotFoundException e) {
-                                    Toast.makeText(getApplicationContext(), "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
-                                    e.printStackTrace();
-                                }
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-            }
-        });
-        donate.setOnClickListener(new Button.OnClickListener() {
-            public void onClick(View v) {
-                new AlertDialog.Builder(context)
-                        .setTitle("Donate")
-                        .setMessage("Donations are highly appreciated and it helps to keep the motivation going! If you feel like I deserve some coffee/beer, you can donate on PayPal by clicking the 'Donate' button below.\n\nNOTE: Donations will not unlock paid features, for them check the Remove Ads page")
-                        .setPositiveButton("Donate", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                try {
-                                    Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SL45E99ZBUUCQ"));
-                                    startActivity(myIntent);
-                                } catch (ActivityNotFoundException e) {
-                                    Toast.makeText(getApplicationContext(), "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
-                                    e.printStackTrace();
-                                }
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                return;
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-            }
-        });
         AdView mAdView = (AdView) findViewById(R.id.adView);
         if (readLicense(deviceId, confirmationID) == 1 || readLicense(deviceId, confirmationID) == 2) {
             mAdView.destroy();
             mAdView.setVisibility(View.GONE);
         } else {
             AdRequest adRequest = new AdRequest.Builder()
-                    .addTestDevice("75466CD74A6342D488B5B5EA749E1265")
+                    .addTestDevice("4874476DA9EEB44071D24FAB8B3BA420")
                     .build();
             mAdView.loadAd(adRequest);
             mAdView.setVisibility(View.VISIBLE);
         }
+
+        /**
+         *Setup the DrawerLayout and NavigationView
+         */
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        mNavigationView = (NavigationView) findViewById(R.id.fuckyou);
+        if (readLicense(deviceId, confirmationID) == 1 || readLicense(deviceId, confirmationID) == 2) {
+            mNavigationView.getMenu().getItem(1).getSubMenu().getItem(1).setEnabled(true);
+            LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mDrawerLayout.getLayoutParams();
+            lp.setMargins(0, 0, 0, 0);
+            mDrawerLayout.setLayoutParams(lp);
+        }
+        /**
+         * Lets inflate the very first fragment
+         * Here , we are inflating the MainTabFragment as the first Fragment
+         */
+
+        mFragmentManager = getSupportFragmentManager();
+//        mFragmentTransaction = mFragmentManager.beginTransaction();
+//        mFragmentTransaction.replace(R.id.containerView,new MainTabFragment()).commit();
+        mFragmentManager.beginTransaction().replace(R.id.containerView, getForId(R.id.nav_item_main)).commit();
+        mNavigationView.getMenu().getItem(0).setCheckable(true);
+        mNavigationView.getMenu().getItem(0).setChecked(true);
+        items.add(mNavigationView.getMenu().getItem(0));
+        /**
+         * Setup click events on the Navigation View Items.
+         */
+
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                mDrawerLayout.closeDrawers();
+                menuItem.setCheckable(true);
+                menuItem.setChecked(true);
+                Iterator<MenuItem> it = items.iterator();
+                while (it.hasNext())
+                {
+                    MenuItem item = it.next();
+                    if(!item.equals(menuItem)){
+                        item.setChecked(false);
+                    }
+                }
+                items.add(menuItem);
+                mFragmentManager.beginTransaction().replace(R.id.containerView,getForId(menuItem.getItemId())).commit();
+                return false;
+            }
+
+        });
+
+        /**
+         * Setup Drawer Toggle of the Toolbar
+         */
+
+        android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
+        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout, toolbar,R.string.app_name,
+                R.string.app_name);
+
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        mDrawerToggle.syncState();
+    }
+
+    public Fragment getForId(int id) {
+        if (cache.get(id) == null) {
+            switch (id) {
+                case R.id.nav_item_buy:
+                    cache.put(id, new BuyTabFragment());
+                    break;
+                case R.id.nav_item_main:
+                    cache.put(id, new MainTabFragment());
+                    break;
+                case R.id.nav_item_deluxe:
+                    cache.put(id, new DeluxeTabFragment());
+                    break;
+                case R.id.nav_item_general:
+                    cache.put(id, new GeneralTabFragment());
+                    break;
+                case R.id.nav_item_saving:
+                    cache.put(id, new SavingTabFragment());
+                    break;
+                case R.id.nav_item_text:
+                    cache.put(id, new TextTabFragment());
+                    break;
+                case R.id.nav_item_spoofing:
+                    cache.put(id, new SpoofingTabFragment());
+                    break;
+                case R.id.nav_item_sharing:
+                    cache.put(id, new SharingTabFragment());
+                    break;
+                case R.id.nav_item_data:
+                    cache.put(id, new DataTabFragment());
+                    break;
+                case R.id.nav_item_filters:
+                    cache.put(id, new FiltersTabFragment());
+                    break;
+            }
+        }
+        return cache.get(id);
+    }
+    // Receives the result of the DirectoryChooserActivity
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CHOOSE_DIR && resultCode == Activity.RESULT_OK) {
+                String newLocation = data.getData().toString().substring(7);
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(PREF_KEY_SAVE_LOCATION, newLocation);
+                editor.apply();
+
+                //Preference pref = PreferenceFragmentCompat.findPreference(PREF_KEY_SAVE_LOCATION);
+                //pref.setSummary(newLocation);
+            }
+        if (requestCode == REQUEST_HIDE_DIR && resultCode == Activity.RESULT_OK) {
+                String newHiddenLocation =  data.getData().toString().substring(7);
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString(PREF_KEY_HIDE_LOCATION, "Last hidden: " + newHiddenLocation);
+                editor.apply();
+
+                writeNoMediaFile(newHiddenLocation);
+        }
+    }
+    /**
+     * @param directoryPath The full path to the directory to place the .nomedia file
+     * @return Returns true if the file was successfully written or appears to already exist
+     */
+    public boolean writeNoMediaFile(String directoryPath) {
+        String storageState = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(storageState)) {
+            try {
+                File noMedia = new File(directoryPath, ".nomedia");
+                if (noMedia.exists()) {
+                    return true;
+                }
+                FileOutputStream noMediaOutStream = new FileOutputStream(noMedia);
+                noMediaOutStream.write(0);
+                noMediaOutStream.close();
+            } catch (Exception e) {
+                return false;
+            }
+        } else {
+            return false;
+        }
+        return true;
     }
 
     public int readLicense(String deviceID, String confirmationID) {

@@ -1,6 +1,5 @@
 package com.marz.snapprefs.Settings;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -31,7 +30,7 @@ public class MiscSettings extends PreferenceFragmentCompat {
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 PackageManager packageManager = getActivity().getPackageManager();
                 int state = (Boolean) newValue ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-                ComponentName aliasName = new ComponentName(getActivity(), "com.marz.snapprefs.MainActivity2-Alias");
+                ComponentName aliasName = new ComponentName(getActivity(), "com.marz.snapprefs.MainActivity-Alias");
                 packageManager.setComponentEnabledSetting(aliasName, state, PackageManager.DONT_KILL_APP);
                 return true;
             }

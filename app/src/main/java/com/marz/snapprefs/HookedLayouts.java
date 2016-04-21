@@ -89,7 +89,7 @@ public class HookedLayouts {
                         //Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage("com.marz.snapprefs");
                         Intent launchIntent = new Intent(Intent.ACTION_MAIN);
                         launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        launchIntent.setComponent(new ComponentName("com.marz.snapprefs","com.marz.snapprefs.MainActivity2"));
+                        launchIntent.setComponent(new ComponentName("com.marz.snapprefs", "com.marz.snapprefs.MainActivity"));
                         HookMethods.context.startActivity(launchIntent);
                     }
                 });
@@ -293,11 +293,11 @@ public class HookedLayouts {
     }
 
     private static class OptionsAdapter extends BaseAdapter {
+        private static LayoutInflater inflater = null;
         String[] options = {"Text Color", "Text Size", "Text Transparency", "Text Gradient","Text Alignment", "Text Style", "Text Font", "Background Color", "Background Transparency", "Background Gradient", "Reset"};
         Context context;
         XModuleResources mRes;
         int [] optionImageId = {R.drawable.text_color, R.drawable.text_size, R.drawable.text_transparency, R.drawable.text_gradient, R.drawable.text_alignment, R.drawable.text_style, R.drawable.text_font, R.drawable.bg_color, R.drawable.bg_transparency, R.drawable.bg_gradient, R.drawable.reset};
-        private static LayoutInflater inflater=null;
 
         public OptionsAdapter(Activity snapContext, XModuleResources mRes) {
             this.context = snapContext;
@@ -318,12 +318,6 @@ public class HookedLayouts {
         @Override
         public long getItemId(int position) {
             return position;
-        }
-
-        public class Holder
-        {
-            TextView tv;
-            ImageView img;
         }
 
         @Override
@@ -856,6 +850,11 @@ public class HookedLayouts {
             });
 
             return rowView;
+        }
+
+        public class Holder {
+            TextView tv;
+            ImageView img;
         }
     }
 }

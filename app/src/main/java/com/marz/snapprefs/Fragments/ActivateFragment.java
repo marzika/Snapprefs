@@ -1,7 +1,6 @@
 package com.marz.snapprefs.Fragments;
 
 import android.app.AlertDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,13 +18,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.marz.snapprefs.BuildConfig;
-import com.marz.snapprefs.MainActivity2;
-import com.marz.snapprefs.Obfuscator;
 import com.marz.snapprefs.R;
 
 import org.apache.http.HttpResponse;

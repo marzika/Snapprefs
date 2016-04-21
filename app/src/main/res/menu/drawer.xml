@@ -2,54 +2,57 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
 
-
-<item android:title="Main Menu"
-    android:id="@+id/nav_item_main"
-    android:icon="@drawable/main" />
-<item android:title="Premium / Deluxe"
-        android:id="@+id/nav_item_deluxe_section">
+    <item
+        android:id="@+id/nav_item_main"
+        android:icon="@drawable/main"
+        android:title="Main Menu" />
+    <item
+        android:id="@+id/nav_item_deluxe_section"
+        android:title="Premium / Deluxe">
         <menu>
             <item
-                android:title="Buy / Activate membership"
                 android:id="@+id/nav_item_buy"
-                android:icon="@drawable/premium_buy"/>
+                android:icon="@drawable/premium_buy"
+                android:title="Buy / Activate membership" />
             <item
-                android:title="Premium &amp; Deluxe settings"
                 android:id="@+id/nav_item_deluxe"
-                android:icon="@drawable/premium"/>
+                android:enabled="false"
+                android:icon="@drawable/premium"
+                android:title="Premium &amp; Deluxe settings" />
         </menu>
 </item>
-<item android:title="Settings"
-    android:id="@+id/nav_item_settings">
+    <item
+        android:id="@+id/nav_item_settings"
+        android:title="Settings">
     <menu>
         <item
-            android:title="General"
             android:id="@+id/nav_item_general"
-            android:icon="@drawable/general"/>
+            android:icon="@drawable/general"
+            android:title="General" />
         <item
-            android:title="Saving"
             android:id="@+id/nav_item_saving"
-            android:icon="@drawable/save"/>
+            android:icon="@drawable/save"
+            android:title="Saving" />
         <item
-            android:title="Text customization"
             android:id="@+id/nav_item_text"
-            android:icon="@drawable/text"/>
+            android:icon="@drawable/text"
+            android:title="Text customization" />
         <item
-            android:title="Spoofing"
             android:id="@+id/nav_item_spoofing"
-            android:icon="@drawable/spoofing"/>
+            android:icon="@drawable/spoofing"
+            android:title="Spoofing" />
         <item
-            android:title="Sharing"
             android:id="@+id/nav_item_sharing"
-            android:icon="@drawable/share"/>
+            android:icon="@drawable/share"
+            android:title="Sharing" />
         <item
-            android:title="Data saving"
             android:id="@+id/nav_item_data"
-            android:icon="@drawable/data_save"/>
+            android:icon="@drawable/data_save"
+            android:title="Data saving" />
         <item
-            android:title="Visual Filters / Filters"
             android:id="@+id/nav_item_filters"
-            android:icon="@drawable/filter"/>
+            android:icon="@drawable/filter"
+            android:title="Visual Filters / Filters" />
     </menu>
 </item>
 </menu>

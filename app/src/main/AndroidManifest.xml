@@ -29,12 +29,12 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     -->
     <application
-        tools:replace="theme"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap = "true"
-        android:theme="@style/Snapprefs_Theme">
+        android:theme="@style/Snapprefs_Theme"
+        tools:replace="theme">
         <activity
             android:name=".ReceiveMediaActivity"
             android:excludeFromRecents="true"
@@ -55,7 +55,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.marz.snapprefs.MainActivity2"
+            android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/Snapprefs_Theme">
             <intent-filter>
@@ -64,21 +64,21 @@
             </intent-filter>
         </activity>
         <activity
-            android:exported="true"
             android:name=".PickerActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.NoDisplay"
-            android:excludeFromRecents="true">
+            android:theme="@android:style/Theme.NoDisplay">
             <intent-filter>
                 <action android:name="android.intent.action.RUN" />
             </intent-filter>
         </activity>
         <activity-alias
-            android:enabled="true"
             android:name="com.marz.snapprefs.MainActivity2-Alias"
-            android:label="@string/app_name"
+            android:enabled="true"
             android:icon="@drawable/ic_launcher"
-            android:targetActivity="com.marz.snapprefs.MainActivity2">
+            android:label="@string/app_name"
+            android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -109,12 +109,6 @@
             android:name=".MapsActivity"
             android:exported="true"
             android:label="@string/title_activity_maps" />
-        <activity
-            android:name=".Reedem"
-            android:label="@string/title_activity_redeem"></activity>
-        <activity
-            android:name=".MainActivity"
-            android:label="MainActivity2"></activity>
         <activity
             android:name=".VisualActivity"
             android:label="@string/title_activity_visual"></activity>
