@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,12 +17,17 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.marz.snapprefs.Tabs.BuyTabFragment;
 import com.marz.snapprefs.Tabs.DataTabFragment;
 import com.marz.snapprefs.Tabs.DeluxeTabFragment;
@@ -34,9 +41,16 @@ import com.marz.snapprefs.Tabs.TextTabFragment;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 
 import de.cketti.library.changelog.ChangeLog;
@@ -44,15 +58,51 @@ import de.cketti.library.changelog.ChangeLog;
 public class MainActivity extends AppCompatActivity {
     public static final String PREF_KEY_SAVE_LOCATION = "pref_key_save_location";
     public static final String PREF_KEY_HIDE_LOCATION = "pref_key_hide_location";
+    protected static final int MSG_REGISTER_WITH_GCM = 101;
+    protected static final int MSG_REGISTER_WEB_SERVER = 102;
+    protected static final int MSG_REGISTER_WEB_SERVER_SUCCESS = 103;
+    protected static final int MSG_REGISTER_WEB_SERVER_FAILURE = 104;
     private static final int REQUEST_CHOOSE_DIR = 1;
     private static final int REQUEST_HIDE_DIR = 2;
+    // Resgistration Id from GCM
+    private static final String PREF_GCM_REG_ID = "PREF_GCM_REG_ID";
+    // Your project number and web server url. Please change below.
+    private static final String GCM_SENDER_ID = "410204387699";
+    private static final String WEB_SERVER_URL = "http://snapprefs.com/gcm/register_user.php";
+    private static final int ACTION_PLAY_SERVICES_DIALOG = 100;
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     FragmentManager mFragmentManager;
     FragmentTransaction mFragmentTransaction;
     HashMap<Integer, Fragment> cache = new HashMap<>();
+    GoogleCloudMessaging gcm;
+    Handler handler = new Handler() {
+        public void handleMessage(android.os.Message msg) {
+            switch (msg.what) {
+                case MSG_REGISTER_WITH_GCM:
+                    new GCMRegistrationTask().execute();
+                    break;
+                case MSG_REGISTER_WEB_SERVER:
+                    new WebServerRegistrationTask().execute();
+                    break;
+                case MSG_REGISTER_WEB_SERVER_SUCCESS:
+                    /*Toast.makeText(getApplicationContext(),
+                            "registered with web server", Toast.LENGTH_LONG).show();*/
+                    break;
+                case MSG_REGISTER_WEB_SERVER_FAILURE:
+                    Toast.makeText(getApplicationContext(),
+                            "registration with web server failed",
+                            Toast.LENGTH_LONG).show();
+                    break;
+            }
+        }
+
+        ;
+    };
     private SharedPreferences sharedPreferences;
     private ArrayList<MenuItem> items = new ArrayList<>();
+    private SharedPreferences prefs;
+    private String gcmRegId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +121,18 @@ public class MainActivity extends AppCompatActivity {
         ChangeLog cl = new ChangeLog(context);
         if (cl.isFirstRun()) {
             cl.getLogDialog().show();
+        }
+        if (isGoogelPlayInstalled()) {
+            gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
+
+            // Read saved registration id from shared preferences.
+            gcmRegId = getSharedPreferences().getString(PREF_GCM_REG_ID, "");
+
+            if (TextUtils.isEmpty(gcmRegId)) {
+                handler.sendEmptyMessage(MSG_REGISTER_WITH_GCM);
+            } else {
+                //Toast.makeText(getApplicationContext(), "Already registered with GCM", Toast.LENGTH_SHORT).show();
+            }
         }
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -186,6 +248,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return cache.get(id);
     }
+
     // Receives the result of the DirectoryChooserActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -211,6 +274,7 @@ public class MainActivity extends AppCompatActivity {
                 writeNoMediaFile(newHiddenLocation);
         }
     }
+
     /**
      * @param directoryPath The full path to the directory to place the .nomedia file
      * @return Returns true if the file was successfully written or appears to already exist
@@ -255,5 +319,135 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
         String returned = prefs.getString(key, null);
         return returned;
+    }
+
+    private SharedPreferences getSharedPreferences() {
+        if (prefs == null) {
+            prefs = getApplicationContext().getSharedPreferences(
+                    "com.marz.snapprefs_preferences", Context.MODE_PRIVATE);
+        }
+        return prefs;
+    }
+
+    public void saveInSharedPref(String result) {
+        // TODO Auto-generated method stub
+        SharedPreferences.Editor editor = getSharedPreferences().edit();
+        editor.putString(PREF_GCM_REG_ID, result);
+        editor.commit();
+    }
+
+    private boolean isGoogelPlayInstalled() {
+        int resultCode = GooglePlayServicesUtil
+                .isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        ACTION_PLAY_SERVICES_DIALOG).show();
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        "Google Play Service is not installed",
+                        Toast.LENGTH_SHORT).show();
+                finish();
+            }
+            return false;
+        }
+        return true;
+
+    }
+
+    private class GCMRegistrationTask extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... params) {
+            // TODO Auto-generated method stub
+            if (gcm == null && isGoogelPlayInstalled()) {
+                gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
+            }
+            try {
+                gcmRegId = gcm.register(GCM_SENDER_ID);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            return gcmRegId;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (result != null) {
+                /*Toast.makeText(getApplicationContext(), "registered with GCM: " + result,
+                        Toast.LENGTH_LONG).show();*/
+                saveInSharedPref(result);
+                handler.sendEmptyMessage(MSG_REGISTER_WEB_SERVER);
+            }
+        }
+
+    }
+
+    private class WebServerRegistrationTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            URL url = null;
+            try {
+                url = new URL(WEB_SERVER_URL);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                handler.sendEmptyMessage(MSG_REGISTER_WEB_SERVER_FAILURE);
+            }
+            Map<String, String> dataMap = new HashMap<String, String>();
+            dataMap.put("regId", gcmRegId);
+
+            StringBuilder postBody = new StringBuilder();
+            Iterator iterator = dataMap.entrySet().iterator();
+
+            while (iterator.hasNext()) {
+                Map.Entry param = (Map.Entry) iterator.next();
+                postBody.append(param.getKey()).append('=')
+                        .append(param.getValue());
+                if (iterator.hasNext()) {
+                    postBody.append('&');
+                }
+            }
+            String body = postBody.toString();
+            byte[] bytes = body.getBytes();
+
+            HttpURLConnection conn = null;
+            try {
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(true);
+                conn.setUseCaches(false);
+                conn.setFixedLengthStreamingMode(bytes.length);
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type",
+                        "application/x-www-form-urlencoded;charset=UTF-8");
+
+                OutputStream out = conn.getOutputStream();
+                out.write(bytes);
+                out.close();
+
+                int status = conn.getResponseCode();
+                if (status == 200) {
+                    // Request success
+                    handler.sendEmptyMessage(MSG_REGISTER_WEB_SERVER_SUCCESS);
+                } else {
+                    throw new IOException("Request failed with error code "
+                            + status);
+                }
+            } catch (ProtocolException pe) {
+                pe.printStackTrace();
+                handler.sendEmptyMessage(MSG_REGISTER_WEB_SERVER_FAILURE);
+            } catch (IOException io) {
+                io.printStackTrace();
+                handler.sendEmptyMessage(MSG_REGISTER_WEB_SERVER_FAILURE);
+            } finally {
+                if (conn != null) {
+                    conn.disconnect();
+                }
+            }
+
+            return null;
+        }
     }
 }

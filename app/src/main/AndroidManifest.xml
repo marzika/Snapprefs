@@ -16,6 +16,16 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- For vibrating device -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- For receiving GCM messages -->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <!-- For protecting GCM messages so that only your app can receive them -->
+    <permission
+        android:name="com.marz.snapprefs.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="com.marz.snapprefs.permission.C2D_MESSAGE" />
     <!--
  The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but are recommended.
@@ -129,6 +139,23 @@
             android:name="com.nononsenseapps.filepicker.FilePickerActivity"
             android:label="@string/app_name"
             android:theme="@style/FilePickerTheme"></activity>
+        <!-- For receiving GCM message and registration success -->
+        <receiver
+            android:name=".GCMBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <category android:name="com.marz.snapprefs" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".GCMIntentService" />
+        <!-- make sure to add google-play-services_lib from  project properties->android->library-->
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
 </manifest>
