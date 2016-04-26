@@ -22,3 +22,8 @@ build/
 .idea/misc.xml
 .idea/modules.xml
 .idea/scopes/scope_settings.xml
+/.idea
+/app/.idea
+app/app.iml
+.idea/vcs.xml
+.idea/
