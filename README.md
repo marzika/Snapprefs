@@ -8,33 +8,20 @@ Snapprefs is a project which offers enhanced features for Snapchat throught the 
 
 Current features are:
 
--Hiding best friends
-
--Hiding recents
-
--Screenshot detection bypass for chat messages, images and videos
-
--Unlimited caption text
-
--Text
-
---Color(HSV)
-
---Alignment(left, center, right)
-
---Size(1-250)
-
---Style(bold, italic, bold and italic, normal)
-
---Rainbow text(makes each letter separatedly colored)
-
--Background
-
---Color(HSV)
-
---Opacity(0%-100%)
-
--Caption opacity customization
+- Hiding best friends
+- Hiding recents
+- Screenshot detection bypass for chat messages, images and videos
+- Unlimited caption text
+- Text
+  - Color(HSV)
+  - Alignment(left, center, right)
+  - Size(1-250)
+  - Style(bold, italic, bold and italic, normal)
+  - Rainbow text(makes each letter separatedly colored)
+- Background
+  - Color(HSV)
+  - Opacity(0%-100%)
+- Caption opacity customization
 
 Credits
 -------
