@@ -21,6 +21,7 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
@@ -138,14 +139,18 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.activity_main);
         AdView mAdView = (AdView) findViewById(R.id.adView);
+        TextView pugs = (TextView) findViewById(R.id.pugs);
         if (readLicense(deviceId, confirmationID) == 1 || readLicense(deviceId, confirmationID) == 2) {
             mAdView.destroy();
+            pugs.setVisibility(View.GONE);
             mAdView.setVisibility(View.GONE);
         } else {
             AdRequest adRequest = new AdRequest.Builder()
                     .addTestDevice("4874476DA9EEB44071D24FAB8B3BA420")
                     .build();
             mAdView.loadAd(adRequest);
+            pugs.setVisibility(View.VISIBLE);
+            pugs.setText("\uD83D\uDC36" + " " + pugs.getText() + " " + "\uD83D\uDC36");
             mAdView.setVisibility(View.VISIBLE);
         }
 

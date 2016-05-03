@@ -1,126 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="@dimen/default_gap">
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Redeem ID:"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/black" />
-
-    <EditText
-        android:id="@+id/confirmationID"
+    <ScrollView
+        android:id="@+id/scrollView5"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/default_gap"
-        android:gravity="center_vertical|center_horizontal"
-        android:hint="Type here your redeem ID"
-        android:inputType="textNoSuggestions|textVisiblePassword"
-        android:maxLength="20"
-        android:textColor="@color/black" />
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/default_gap"
-        android:text="Device ID:"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/black" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/deviceID"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/default_gap"
-        android:gravity="center_vertical|center_horizontal"
-        android:lines="1"
-        android:maxLines="1"
-        android:text="DEFAULT"
-        android:textColor="#52010101" />
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Redeem ID:"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/black" />
 
-    <Button
-        android:id="@+id/submit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/default_gap_2x"
-        android:text="Redeem license" />
+            <EditText
+                android:id="@+id/confirmationID"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/default_gap"
+                android:gravity="center_vertical|center_horizontal"
+                android:hint="Type here your redeem ID"
+                android:inputType="textNoSuggestions|textVisiblePassword"
+                android:maxLength="20"
+                android:textColor="@color/black" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/default_gap_2x"
-        android:text="Your license status is:"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/default_gap"
+                android:text="Device ID:"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/black" />
 
-    <TextView
-        android:id="@+id/errorTV"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_vertical|center_horizontal"
-        android:text=""
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="#ff0000"
-        android:textIsSelectable="false"
-        android:textSize="@dimen/text_size_default" />
+            <TextView
+                android:id="@+id/deviceID"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/default_gap"
+                android:gravity="center_vertical|center_horizontal"
+                android:lines="1"
+                android:maxLines="1"
+                android:text="DEFAULT"
+                android:textColor="#52010101" />
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="Click here to buy a license"
-        android:visibility="gone" />
-    <EditText
-        android:id="@+id/username"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/default_gap"
-        android:gravity="center_vertical|center_horizontal"
-        android:hint="Type here your username"
-        android:inputType="textNoSuggestions|textVisiblePassword"
-        android:maxLength="20"
-        android:textColor="@color/black" />
+            <Button
+                android:id="@+id/submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/default_gap_2x"
+                android:text="Redeem license" />
 
-    <TextView
-        android:id="@+id/god_desc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/default_gap"
-        android:text="Your privacy is key to us, that's why only your username's SHA256 hash is sent to the server."
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/black" />
-    <Button
-        android:id="@+id/god"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center_vertical|center_horizontal"
-        android:text="Click here to apply for GOD mode"
-        android:visibility="gone" />
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/default_gap_2x"
+                android:text="Your license status is:"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center|bottom"
-        android:visibility="gone"
-        ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-6910530129073042/7440988016"></com.google.android.gms.ads.AdView>
+            <TextView
+                android:id="@+id/errorTV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_vertical|center_horizontal"
+                android:text=""
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#ff0000"
+                android:textIsSelectable="false"
+                android:textSize="@dimen/text_size_default" />
+
+            <Button
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="Click here to buy a license"
+                android:visibility="gone" />
+
+            <EditText
+                android:id="@+id/username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/default_gap"
+                android:gravity="center_vertical|center_horizontal"
+                android:hint="Type here your username"
+                android:inputType="textNoSuggestions|textVisiblePassword"
+                android:maxLength="20"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/god_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/default_gap"
+                android:text="Your privacy is key to us, that's why only your username's SHA256 hash is sent to the server."
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/black" />
+
+            <Button
+                android:id="@+id/god"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="Click here to apply for GOD mode"
+                android:visibility="gone" />
+        </LinearLayout>
+    </ScrollView>
+
 </LinearLayout>

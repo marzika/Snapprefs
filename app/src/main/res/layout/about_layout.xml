@@ -1,105 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ads="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <FrameLayout
-        android:id="@+id/frame_layout"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:id="@+id/scrollView4"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal">
+        android:layout_centerHorizontal="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="@dimen/default_gap_3x">
+            android:layout_marginTop="@dimen/default_gap_3x"
+            android:orientation="vertical">
 
             <TextView
+                android:id="@+id/thanks_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Huge thanks to:"
-                android:id="@+id/thanks_title"
                 android:layout_gravity="center"
+                android:text="Huge thanks to:"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/black" />
 
             <TextView
+                android:id="@+id/thanks_desc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/pref_thanks_summary"
-                android:id="@+id/thanks_desc"
-                android:layout_marginTop="@dimen/default_gap"
-                android:layout_margin="@dimen/default_gap"
                 android:layout_gravity="center"
-                android:gravity="center" />
+                android:layout_margin="@dimen/default_gap"
+                android:layout_marginTop="@dimen/default_gap"
+                android:gravity="center"
+                android:text="@string/pref_thanks_summary"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <TextView
+                android:id="@+id/legal_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="Legal"
-                android:id="@+id/legal_title"
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/default_gap_3x"
+                android:text="Legal"
+                android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/black" />
 
             <TextView
+                android:id="@+id/legal_desc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/licenses"
-                android:id="@+id/legal_desc"
-                android:layout_margin="@dimen/default_gap"
                 android:layout_gravity="center"
-                android:gravity="center" />
+                android:layout_margin="@dimen/default_gap"
+                android:gravity="center"
+                android:text="@string/licenses"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_margin="@dimen/default_gap">
+                android:layout_margin="@dimen/default_gap"
+                android:orientation="horizontal">
 
                 <Button
-                    style="@style/Widget.AppCompat.Button"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:text="GPLv3"
                     android:id="@+id/GPL"
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:singleLine="false" />
+                    android:singleLine="false"
+                    android:text="GPLv3" />
 
                 <Button
-                    style="@style/Widget.AppCompat.Button"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Apache 2.0"
                     android:id="@+id/apache"
-                    android:layout_weight="1" />
-                <Button
                     style="@style/Widget.AppCompat.Button"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="MPL 2.0"
+                    android:layout_weight="1"
+                    android:text="Apache 2.0" />
+                <Button
                     android:id="@+id/mpl2"
-                    android:layout_weight="1" />
+                    style="@style/Widget.AppCompat.Button"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="MPL 2.0" />
             </LinearLayout>
 
         </LinearLayout>
-    </FrameLayout>
-
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center|bottom"
-        android:visibility="visible"
-        ads:adSize="BANNER"
-        ads:adUnitId="ca-app-pub-6910530129073042/7440988016"/>
+    </ScrollView>
 
 </RelativeLayout>

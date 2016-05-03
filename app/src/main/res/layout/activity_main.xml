@@ -49,6 +49,20 @@
             app:menu="@menu/drawer" />
         </android.support.v4.widget.DrawerLayout>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/pugs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="bottom|center"
+        android:layout_marginBottom="10sp"
+        android:text="AdBlockers hurt pugs."
+        android:textAllCaps="true"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:textColor="#d50000" />
+
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
         android:layout_width="wrap_content"
@@ -59,4 +73,5 @@
         android:visibility="visible"
         ads:adSize="BANNER"
         ads:adUnitId="ca-app-pub-6910530129073042/7440988016" />
+
 </FrameLayout>
