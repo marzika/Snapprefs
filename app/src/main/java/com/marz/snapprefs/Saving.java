@@ -113,6 +113,7 @@ public class Saving {
     private static XModuleResources mResources;
     private static GestureModel gestureModel;
     private static Class<?> storySnap;
+    private static List savedStoryID = new ArrayList<String>();
     private static int screenHeight;
     private static long storyTimestamp;
 
@@ -205,8 +206,8 @@ public class Saving {
                         saveLayout.bringToFront();
                         saveBtn.setVisibility(View.VISIBLE);
                         saveBtn.bringToFront();
-                        saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
                     }
+                    saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
                 }
             });
             /**
@@ -425,7 +426,7 @@ public class Saving {
             findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass(Obfuscator.save.SNAPVIEW_SHOW_FIRST, lpparam.classLoader), new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    //receivedSnap = param.args[0];
+                    receivedSnap = param.args[0];
                     viewingSnap = true;
                     currentViewingSnap++;
                     Logger.log("Starting to view a story", true);
@@ -543,6 +544,8 @@ public class Saving {
             sender = (String) getObjectField(receivedSnap, "mSender");
         } catch (NullPointerException ignore) {
         }
+        String filename = "";
+        String id = "";
         if (sender == null) { //This means its a story
             //Class<?> storySnap = findClass(Obfuscator.save.STORYSNAP_CLASS, snapCL);
             try {
@@ -552,14 +555,14 @@ public class Saving {
             }
             snapType = SnapType.STORY;
             lastSnapType = SnapType.STORY;
+            id = (String) getObjectField(storySnap.cast(receivedSnap), "mMediaId");
             //timestamp = new Date((Long) getObjectField(storySnap.cast(receivedSnap), "mExpirationTimestamp"));
-            timestamp = new Date();
         } else {
             snapType = SnapType.SNAP;
             lastSnapType = SnapType.SNAP;
-            timestamp = new Date((Long) callMethod(receivedSnap, Obfuscator.save.SNAP_GETTIMESTAMP)); //Gettimestamp-Snap
         }
-        String filename = sender + "_" + dateFormat.format(timestamp);
+        timestamp = new Date((Long) callMethod(receivedSnap, Obfuscator.save.SNAP_GETTIMESTAMP)); //Gettimestamp-Snap
+        filename = sender + "_" + dateFormat.format(timestamp);
         try {
             image = mImage;
             video = mVideo;
@@ -569,9 +572,6 @@ public class Saving {
             case VIDEO: {
                 Logger.log("Video " + snapType.name + " opened");
                 int saveMode = (snapType == SnapType.SNAP ? mModeSnapVideo : mModeStoryVideo);
-                //if (saveMode == SAVE_S2S) {
-                //    saveMode = SAVE_AUTO;
-                //}
                 if (saveMode == DO_NOT_SAVE) {
                     Logger.log("Mode: don't save");
                 } else if (saveMode == SAVE_S2S) {
@@ -579,6 +579,7 @@ public class Saving {
                     gestureModel = new GestureModel(receivedSnap, screenHeight, MediaType.GESTUREDVIDEO);
                 } else if (saveMode == SAVE_AUTO) {
                     Logger.log("Mode: auto save");
+                    savedStoryID.add(id);
                     gestureModel = null;
                     saveSnap(snapType, MediaType.VIDEO, context, image, video, filename, sender);
                 }
@@ -587,15 +588,13 @@ public class Saving {
             case IMAGE: {
                 Logger.log("Image " + snapType.name + " opened");
                 int saveMode = (snapType == SnapType.SNAP ? mModeSnapImage : mModeStoryImage);
-                //if (saveMode == SAVE_S2S) {
-                //    saveMode = SAVE_AUTO;
-                //}
                 if (saveMode == DO_NOT_SAVE) {
                     Logger.log("Mode: don't save");
                 } else if (saveMode == SAVE_S2S) {
                     Logger.log("Mode: sweep to save");
                     gestureModel = new GestureModel(receivedSnap, screenHeight, MediaType.GESTUREDIMAGE);
                 } else if (saveMode == SAVE_AUTO) {
+                    savedStoryID.add(id);
                     Logger.log("Mode: auto save");
                     gestureModel = null;
                     saveSnap(snapType, MediaType.IMAGE, context, image, video, filename, sender);
@@ -604,13 +603,11 @@ public class Saving {
             }
             case IMAGE_OVERLAY: {
                 int saveMode = (snapType == SnapType.SNAP ? mModeSnapVideo : mModeStoryVideo);
-                //if (saveMode == SAVE_S2S) {
-                //    saveMode = SAVE_AUTO;
-                //}
                 if (saveMode == DO_NOT_SAVE) {
                 } else if (saveMode == SAVE_S2S) {
                     gestureModel = new GestureModel(receivedSnap, screenHeight, MediaType.GESTUREDOVERLAY);
                 } else if (saveMode == SAVE_AUTO) {
+                    savedStoryID.add(id);
                     gestureModel = null;
                     saveSnap(snapType, MediaType.IMAGE_OVERLAY, context, image, video, filename, sender);
                 }
@@ -771,8 +768,6 @@ public class Saving {
         mModeSnapVideo = prefs.getInt("pref_key_snaps_videos", mModeSnapVideo);
         mModeStoryImage = prefs.getInt("pref_key_stories_images", mModeStoryImage);
         mModeStoryVideo = prefs.getInt("pref_key_stories_videos", mModeStoryVideo);
-        if (mModeStoryVideo == SAVE_AUTO)
-            mModeStoryVideo = SAVE_S2S;
         mTimerMinimum = prefs.getInt("pref_key_timer_minimum", mTimerMinimum);
         mToastEnabled = prefs.getBoolean("pref_key_toasts_checkbox", mToastEnabled);
         mToastLength = prefs.getInt("pref_key_toasts_duration", mToastLength);
