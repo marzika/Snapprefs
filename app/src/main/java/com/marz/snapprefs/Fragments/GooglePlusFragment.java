@@ -1,36 +1,26 @@
-package com.marz.snapprefs.FilterStoreUtils;
+package com.marz.snapprefs.Fragments;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.marz.snapprefs.R;
+import com.marz.snapprefs.Util.DownloadFilterAsync;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-
-
-/**
- * @author mwho
- */
-public class Tab3Fragment extends Fragment {
+public class GooglePlusFragment extends Fragment {
     public static Context context1;
     /**
      * (non-Javadoc)
@@ -52,11 +42,15 @@ public class Tab3Fragment extends Fragment {
             // the view hierarchy; it would just never be used.
             return null;
         }
-        View v = (View) inflater.inflate(R.layout.tab4_layout, container, false);
+        View v = (View) inflater.inflate(R.layout.gplus_layout, container, false);
         browser = (WebView) v.findViewById(R.id.webview);
         browser.setWebViewClient(new MyBrowser());
         browser.getSettings().setLoadsImagesAutomatically(true);
         browser.getSettings().setJavaScriptEnabled(true);
+        browser.getSettings().setAppCacheMaxSize(1024 * 1024 * 8);
+        browser.getSettings().setAppCachePath(Environment.getDataDirectory() + "/data/com.marz.snapprefs/cache/");
+        browser.getSettings().setAppCacheEnabled(true);
+        browser.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
         browser.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
         if (savedInstanceState == null) {
             browser.loadUrl("https://plus.google.com/communities/111884042638955665569");
@@ -83,37 +77,6 @@ public class Tab3Fragment extends Fragment {
         this.registerForContextMenu(browser);
 
         return v;
-    }
-
-
-    public String saveImage(String strurl, String filen) {
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-
-        StrictMode.setThreadPolicy(policy);
-        String filepath = null;
-        try {
-            URL wallpaperURL = new URL(strurl);
-            URLConnection connection = wallpaperURL.openConnection();
-            InputStream inputStream = new BufferedInputStream(wallpaperURL.openStream(), 10240);
-            File filterDir = new File(Environment.getExternalStorageDirectory().toString() + "/Snapprefs");
-            File saveFile = new File(filterDir, filen);
-            FileOutputStream outputStream = new FileOutputStream(saveFile);
-
-            byte buffer[] = new byte[1024];
-            int dataSize;
-            int loadedSize = 0;
-            while ((dataSize = inputStream.read(buffer)) != -1) {
-                loadedSize += dataSize;
-                //publishProgress(loadedSize);
-                outputStream.write(buffer, 0, dataSize);
-            }
-            filepath = saveFile.getAbsolutePath();
-            outputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-
-        }
-        return filepath;
     }
 
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -147,19 +110,9 @@ public class Tab3Fragment extends Fragment {
                             .setPositiveButton("Save",
                                     new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
-                                            SendfeedbackJob job = new SendfeedbackJob();
+                                            DownloadFilterAsync job = new DownloadFilterAsync();
                                             job.execute(imageUrl, userInput.getText().toString() + ".png");
                                             context1 = context;
-                                            //String locSave = saveImage(imageUrl, userInput.getText().toString());
-                                            /*
-                                            if(locSave != null){
-                                                Toast toast = Toast.makeText(context, locSave, Toast.LENGTH_LONG);
-                                                toast.show();
-                                            }else{
-                                                Toast toast = Toast.makeText(context, "null " + locSave, Toast.LENGTH_LONG);
-                                                toast.show();
-                                            }
-                                            */
                                             Toast toast = Toast.makeText(context, "Attempting Save...", Toast.LENGTH_LONG);
                                             toast.show();
                                             dialog.dismiss();
@@ -195,7 +148,7 @@ public class Tab3Fragment extends Fragment {
     }
 }
 
-class MyBrowser2 extends WebViewClient {
+class MyBrowser extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         view.loadUrl(url);

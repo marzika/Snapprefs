@@ -11,10 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.marz.snapprefs.Fragments.AboutFragment;
+import com.marz.snapprefs.Fragments.DownloadedFiltersFragment;
 import com.marz.snapprefs.Fragments.FilterFragment;
-import com.marz.snapprefs.Fragments.SupportFragment;
-import com.marz.snapprefs.Fragments.MainFragment;
+import com.marz.snapprefs.Fragments.GooglePlusFragment;
 import com.marz.snapprefs.Fragments.VisualFragment;
 import com.marz.snapprefs.R;
 
@@ -22,7 +21,7 @@ public class FiltersTabFragment extends Fragment {
 
     public static TabLayout tabLayout;
     public static ViewPager viewPager;
-    public static int int_items = 2;
+    public static int int_items = 4;
 
     @Nullable
     @Override
@@ -71,7 +70,12 @@ public class FiltersTabFragment extends Fragment {
         {
             switch (position){
                 case 0 : return new VisualFragment();
-                case 1 : return new FilterFragment();
+                case 1:
+                    return new DownloadedFiltersFragment();
+                case 2:
+                    return new FilterFragment();
+                case 3:
+                    return new GooglePlusFragment();
             }
             return null;
         }
@@ -94,7 +98,11 @@ public class FiltersTabFragment extends Fragment {
                 case 0 :
                     return "Visual";
                 case 1 :
-                    return "Filters";
+                    return "My Filters";
+                case 2:
+                    return "Reddit Filters";
+                case 3:
+                    return "G+ filters";
             }
             return null;
         }

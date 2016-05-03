@@ -4,6 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/filter_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5sp"
+        android:gravity="center_horizontal"
+        android:text="If you are downloading a Filter from an other source place it into /sdcard/Snapprefs/Filters/, requests can be made on G+"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
     <Button
         android:id="@+id/reload"
         android:layout_width="match_parent"

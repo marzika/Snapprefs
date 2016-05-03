@@ -1,16 +1,17 @@
-package com.marz.snapprefs.FilterStoreUtils;
+package com.marz.snapprefs.Util;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.marz.snapprefs.Logger;
+import com.marz.snapprefs.Fragments.DownloadedFiltersFragment;
 import com.marz.snapprefs.R;
 
 import java.io.File;
@@ -93,43 +94,32 @@ public class FilterPreview extends Activity {
     }
 
     public void addListenerOnButton() {
-        button = (Button) findViewById(R.id.change_filter);
+        button = (Button) findViewById(R.id.delete_filter);
         button.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-
-                //FileUtils.writeToSDFolder(imgPath, "filterSettings");       //TODO somehow dynamically changing the file name in the filter loading method doesnt work.
-
-                String filtPath = Environment.getExternalStorageDirectory().toString() + "/Snapprefs/Filters";
-
-                File temp = new File(filtPath + "/temp_fullscreen_filter.png");
-
-                File from = new File(imgPath);
-
-                File temp2 = new File(imgPath);
-
-                File to = new File(filtPath + "/fullscreen_filter.png");
-
-                to.renameTo(temp);
-                from.renameTo(to);
-                temp.renameTo(temp2);
-                //String path=filtPath + "/fullscreen_filter.png";//it contain your path of image..im using a temp string..
-                //String filename=path.substring(path.lastIndexOf("/")+1);
-
-                // to.renameTo(temp);
-
-                // to.renameTo(new File(filtPath + "/" + to.getName().substring(0, to.getName().length()-4) + ".png"));
-                Logger.log("renamed");
-
-                //from.renameTo(new File(filtPath + "/fullscreen_filter.png"));
-
-                Toast.makeText(getApplicationContext(), "Set! Restart Snapchat",
-                        Toast.LENGTH_LONG).show();
-
-                Tab1Fragment.toReload = true;
+                final File toDelete = new File(imgPath);
+                AlertDialog.Builder builder = new AlertDialog.Builder(FilterPreview.this);
+                builder.setMessage("Are you sure, that you want to delete " + toDelete.getName() + " ?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        FileUtils.deleteSDFile(toDelete);
+                        Toast.makeText(getApplication(), "Succesfully deleted " + toDelete.getName(), Toast.LENGTH_SHORT).show();
+                        dialog.cancel();
+                        DownloadedFiltersFragment.buttonReload.performClick();
+                        finish();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
             }
-
         });
 
     }

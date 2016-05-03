@@ -130,10 +130,7 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:theme="@android:style/Theme.Translucent" />
         <activity
-            android:name=".FilterStoreUtils.TabsFragmentActivity"
-            android:label="Filter Store"></activity>
-        <activity
-            android:name=".FilterStoreUtils.FilterPreview"
+            android:name=".Util.FilterPreview"
             android:label="Filter Preview"></activity>
         <activity
             android:name="com.nononsenseapps.filepicker.FilePickerActivity"

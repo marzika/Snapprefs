@@ -1,8 +1,11 @@
-package com.marz.snapprefs.FilterStoreUtils;
+package com.marz.snapprefs.Util;
 
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.widget.Toast;
+
+import com.marz.snapprefs.Fragments.DownloadedFiltersFragment;
+import com.marz.snapprefs.Fragments.GooglePlusFragment;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -11,7 +14,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class SendfeedbackJob extends AsyncTask<String, Void, String> {
+public class DownloadFilterAsync extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String[] params) {
@@ -43,8 +46,8 @@ public class SendfeedbackJob extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String message) {
         //process message
-        Toast toast = Toast.makeText(Tab2Fragment.context1, message, Toast.LENGTH_LONG);
+        Toast toast = Toast.makeText(GooglePlusFragment.context1, message, Toast.LENGTH_LONG);
         toast.show();
-        //if(message != null)
+        DownloadedFiltersFragment.buttonReload.performClick();
     }
 }
