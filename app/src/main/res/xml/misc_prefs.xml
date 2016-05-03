@@ -21,6 +21,13 @@
         android:summaryOff="@string/pref_paint_cb_summary_off"
         android:summaryOn="@string/pref_paint_cb_summary_on"
         android:title="@string/pref_paint_cb_title" />
+    <com.marz.snapprefs.BetterListPreference
+        android:defaultValue="@string/pref_forcenavbar_default"
+        android:dialogTitle="@string/pref_forcenavbar_title"
+        android:entries="@array/pref_forcenavbar_entries"
+        android:entryValues="@array/pref_forcenavbar_values"
+        android:key="pref_key_forcenavbar"
+        android:title="@string/pref_forcenavbar_title" />
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_key_timercounter"

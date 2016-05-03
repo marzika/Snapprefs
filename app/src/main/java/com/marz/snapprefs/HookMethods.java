@@ -80,6 +80,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static int mModeStoryVideo = SAVE_AUTO;
     public static int mToastLength = TOAST_LENGTH_LONG;
     public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
+    public static int mForceNavbar = 0;
     public static boolean mCustomFilterBoolean = false;
     public static boolean mPaintTools = true;
     public static boolean mMultiFilterBoolean = true;
@@ -199,6 +200,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mStealth = prefs.getBoolean("pref_key_viewed", false);
         mTyping = prefs.getBoolean("pref_key_typing", false);
         mUnlimGroups = prefs.getBoolean("pref_key_groups_unlim", false);
+        mForceNavbar = prefs.getInt("pref_key_forcenavbar", 0);
         mConfirmationID = prefs.getString("confirmation_id", "");
         debug = prefs.getBoolean("pref_key_debug", false);
         mDeviceID = prefs.getString("device_id", null);
@@ -515,6 +517,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         if (mIntegration) {
                             HookedLayouts.initIntegration(lpparam, mResources);
                         }
+                        Misc.forceNavBar(lpparam, mForceNavbar);
                         getEditText(lpparam);
                         findAndHookMethod(Obfuscator.save.SCREENSHOTDETECTOR_CLASS, lpparam.classLoader, Obfuscator.save.SCREENSHOTDETECTOR_RUN, LinkedHashMap.class, XC_MethodReplacement.DO_NOTHING);
                         findAndHookMethod(Obfuscator.save.SNAPSTATEMESSAGE_CLASS, lpparam.classLoader, Obfuscator.save.SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT, Long.class, new XC_MethodHook() {
@@ -695,6 +698,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("mStealth: " + mStealth);
         logging("mTyping: " + mTyping);
         logging("mUnlimGroups: " + mUnlimGroups);
+        logging("mForceNavbar: " + mForceNavbar);
         logging("mColours: " + mColours);
         logging("*****Debugging: " + debug + " *****");
         logging("mLicense: " + mLicense);

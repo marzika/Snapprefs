@@ -274,4 +274,9 @@ public class Obfuscator {
         public static final String GETBUS_METHOD = "a";
         public static final String BUS_POST = "a";
     }
+
+    public class navbar {
+        public static final String FORCENAVBAR_CLASS = "Un";
+        public static final String FORCENAVBAR_METHOD = "a";
+    }
 }

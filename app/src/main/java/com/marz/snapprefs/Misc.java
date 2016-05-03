@@ -9,9 +9,11 @@ import android.os.SystemClock;
 import android.view.View;
 
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
-import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
+
+import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 
 public class Misc {
     static void initTimer(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes) {
@@ -34,5 +36,13 @@ public class Misc {
                 }
             }
         });
+    }
+
+    static void forceNavBar(final XC_LoadPackage.LoadPackageParam lpparam, int mode) {
+        if (mode == 1) {
+            findAndHookMethod(Obfuscator.navbar.FORCENAVBAR_CLASS, lpparam.classLoader, Obfuscator.navbar.FORCENAVBAR_METHOD, XC_MethodReplacement.returnConstant(true));
+        } else if (mode == 2) {
+            findAndHookMethod(Obfuscator.navbar.FORCENAVBAR_CLASS, lpparam.classLoader, Obfuscator.navbar.FORCENAVBAR_METHOD, XC_MethodReplacement.returnConstant(false));
+        }
     }
 }

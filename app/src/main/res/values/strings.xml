@@ -138,6 +138,18 @@
     <string name="pref_save_sent_snaps_summary_on">Sent snaps will be saved</string>
     <string name="pref_save_sent_snaps_summary_off">Sent snaps won\'t be saved</string>
 
+    <string-array name="pref_forcenavbar_entries">
+        <item>Force Navbar padding to hide</item>
+        <item>Force Navbar padding to show</item>
+        <item>Do nothing</item>
+    </string-array>
+
+    <string-array name="pref_forcenavbar_values" translatable="false">
+        <item>2</item>
+        <item>1</item>
+        <item>0</item>
+    </string-array>
+
     <string-array name="pref_save_mode_entries">
         <item>Save automatically</item>
         <item>Sweep to save</item>
@@ -168,6 +180,7 @@
     <string name="pref_video_looping_summary_off">Videos will play once</string>
     <string name="pref_video_looping_summary_on">Videos will be looped for as long as you want</string>
     <string name="pref_timer_minimum_title">Minimum timer duration</string>
+    <string name="pref_forcenavbar_default" translatable="false">0</string>
     <string name="pref_timer_minimum_default_value" translatable="false">0</string>
     <string-array name="pref_timer_minimum_entries">
         <item>Disabled</item>
@@ -215,6 +228,7 @@
     <string name="pref_vibration_summary_on">Vibration is enabled. Soft vibration means success, hard vibration means error.</string>
     <string name="pref_vibration_summary_off">Vibration is disabled</string>
     <string name="pref_toasts_duration_title">Toast duration</string>
+    <string name="pref_forcenavbar_title">Force Navbar padding</string>
     <string name="pref_toasts_duration_default_value" translatable="false">0</string>
     <string-array name="pref_toasts_duration_entries">
         <item>Short</item>
