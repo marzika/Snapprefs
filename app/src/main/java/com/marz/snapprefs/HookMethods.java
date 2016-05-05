@@ -335,7 +335,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         int friend_item = R.layout.friend_item;
         int group_item = R.layout.group_item;
 
-        XModuleResources modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
+        modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
+
         FriendListDialog.name = XResources.getFakeResId(modRes, name);
         resparam.res.setReplacement(FriendListDialog.name, modRes.fwd(name));
 
@@ -352,7 +353,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mCustomFilterLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/Filters";
         refreshPreferences();
         resParam = resparam;
-        modRes = XModuleResources.createInstance(MODULE_PATH, resparam.res);
+
         if (shouldAddGhost) {
             HookedLayouts.addIcons(resparam, mResources);
         }
