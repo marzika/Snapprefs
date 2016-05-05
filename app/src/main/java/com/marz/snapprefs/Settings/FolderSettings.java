@@ -104,6 +104,10 @@ public class FolderSettings extends PreferenceFragmentCompat implements SharedPr
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Preference preference = findPreference(key);
-        preference.setSummary(sharedPreferences.getString(key, ""));
+        try {
+            preference.setSummary(sharedPreferences.getString(key, ""));
+        } catch (ClassCastException ignore) {
+            //boolean cannot be cast to String
+        }
     }
 }
