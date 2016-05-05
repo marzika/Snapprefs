@@ -84,7 +84,7 @@
             </intent-filter>
         </activity>
         <activity-alias
-            android:name="com.marz.snapprefs.MainActivity2-Alias"
+            android:name="com.marz.snapprefs.MainActivity-Alias"
             android:enabled="true"
             android:icon="@drawable/ic_launcher"
             android:label="@string/app_name"
