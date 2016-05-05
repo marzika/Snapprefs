@@ -130,6 +130,9 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
             android:theme="@android:style/Theme.Translucent" />
         <activity
+            android:name=".Util.DownloadedFilterPreview"
+            android:label="Filter Preview"></activity>
+        <activity
             android:name=".Util.FilterPreview"
             android:label="Filter Preview"></activity>
         <activity

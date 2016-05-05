@@ -1,10 +1,12 @@
 package com.marz.snapprefs.Fragments;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +18,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.R;
+import com.marz.snapprefs.Util.DownloadedFilterPreview;
 import com.marz.snapprefs.Util.DrawableManager;
+import com.marz.snapprefs.Util.FilterPreview;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -42,7 +47,7 @@ public class FilterFragment extends Fragment {
     private ArrayList<RedditFilter> filters = new ArrayList<>();
     private boolean loading = false;
     private String after = null;
-    private File filtersDir = new File(Environment.getExternalStorageDirectory() + "/Snapprefs/Filters/");
+    public static File filtersDir = new File(Environment.getExternalStorageDirectory() + "/Snapprefs/Filters/");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -72,10 +77,16 @@ public class FilterFragment extends Fragment {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (filters.get(position).downloaded) return;
+                /*if (filters.get(position).downloaded) return;
                 System.out.println(filters.get(position).url);
                 new SaveFilter(filters.get(position)).execute();
                 ((ViewHolder) view.getTag()).title.setBackgroundColor(getResources().getColor(R.color.primary));
+                */
+                Intent i = new Intent(getActivity(), FilterPreview.class);
+                RedditFilter rf = (RedditFilter) parent.getItemAtPosition(position);
+                i.putExtra("imagePath", "" + rf.url);
+                i.putExtra("imageId", "" + rf.id);
+                startActivity(i);
             }
         });
         return v;

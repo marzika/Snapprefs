@@ -19,7 +19,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.marz.snapprefs.R;
-import com.marz.snapprefs.Util.FilterPreview;
+import com.marz.snapprefs.Util.DownloadedFilterPreview;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class DownloadedFiltersFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
-            Intent i = new Intent(getActivity(), FilterPreview.class);
+            Intent i = new Intent(getActivity(), DownloadedFilterPreview.class);
             i.putExtra("imagePath", "" + (String) parent.getItemAtPosition(position));
             startActivity(i);
 

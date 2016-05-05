@@ -1,10 +1,9 @@
 package com.marz.snapprefs.Util;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.graphics.Bitmap;
+import android.app.ProgressDialog;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,116 +11,115 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Fragments.DownloadedFiltersFragment;
+import com.marz.snapprefs.Fragments.FilterFragment;
 import com.marz.snapprefs.R;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 
 /**
- * Created by daltonding on 9/30/15.
+ * Created by Marcell on 2016.05.05..
  */
 public class FilterPreview extends Activity {
 
     Button button;
     ImageView image;
     String imgPath;
+    String imgId;
     Activity fp;
+    ProgressDialog progress;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.preview_filter);
+        progress = ProgressDialog.show(FilterPreview.this, "Loading", "Please wait", true);
 
         image = (ImageView) findViewById(R.id.filterpreview);
 
-        if (getIntent().hasExtra("imagePath")) {
+        if (getIntent().hasExtra("imagePath") && getIntent().hasExtra("imageId")) {
             imgPath = getIntent().getStringExtra("imagePath");
-
-            try {
-                Bitmap bm = decodeSampledBitmapFromUri(imgPath, 600,
-                        1067);
-
-                image.setImageBitmap(bm);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            imgId = getIntent().getStringExtra("imageId");
+            imgPath = imgPath + ".png";
+            DrawableManager.fetchDrawableOnThread(imgPath, image);
 
             fp = this;
 
             addListenerOnButton();
         }
+        progress.dismiss();
 
-    }
-
-    public Bitmap decodeSampledBitmapFromUri(String path, int reqWidth,
-                                             int reqHeight) {
-
-        Bitmap bm = null;
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path, options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth,
-                reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        bm = BitmapFactory.decodeFile(path, options);
-
-
-        return bm;
-    }
-
-    public int calculateInSampleSize(
-
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-            if (width > height) {
-                inSampleSize = Math.round((float) height
-                        / (float) reqHeight);
-            } else {
-                inSampleSize = Math.round((float) width / (float) reqWidth);
-            }
-        }
-
-        return inSampleSize;
     }
 
     public void addListenerOnButton() {
-        button = (Button) findViewById(R.id.delete_filter);
+        button = (Button) findViewById(R.id.filter_button);
+        button.setText("Save Filter");
         button.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-                final File toDelete = new File(imgPath);
-                AlertDialog.Builder builder = new AlertDialog.Builder(FilterPreview.this);
-                builder.setMessage("Are you sure, that you want to delete " + toDelete.getName() + " ?");
-                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        FileUtils.deleteSDFile(toDelete);
-                        Toast.makeText(getApplication(), "Succesfully deleted " + toDelete.getName(), Toast.LENGTH_SHORT).show();
-                        dialog.cancel();
-                        DownloadedFiltersFragment.buttonReload.performClick();
-                        finish();
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-                builder.show();
+                new SaveFilter(imgPath, imgId).execute();
             }
         });
 
+    }
+    class SaveFilter extends AsyncTask<Void, Void, Boolean> {
+        String path;
+        String id;
+
+        public SaveFilter(String path, String id) {
+            this.path = path;
+            this.id = id;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progress.setMessage("Downloading filter");
+            progress.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                DefaultHttpClient httpClient = new DefaultHttpClient();
+                HttpGet request = new HttpGet(path);
+                HttpResponse response = httpClient.execute(request);
+                InputStream input = response.getEntity().getContent();
+                File f = new File(FilterFragment.filtersDir, id + ".png");
+                FileOutputStream output = new FileOutputStream(f);
+                try {
+                    byte[] buffer = new byte[4096];
+                    int read;
+
+                    while ((read = input.read(buffer)) != -1) {
+                        output.write(buffer, 0, read);
+                    }
+                    output.flush();
+                } finally {
+                    output.close();
+                    input.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            progress.dismiss();
+            if (result)
+                Toast.makeText(FilterPreview.this, "Saved succesfully", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(FilterPreview.this, "Failed to download filter!", Toast.LENGTH_LONG).show();
+            DownloadedFiltersFragment.buttonReload.performClick();
+        }
     }
 
 
