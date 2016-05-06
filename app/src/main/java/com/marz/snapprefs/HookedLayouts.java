@@ -16,6 +16,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.TypedValue;
@@ -693,7 +694,12 @@ public class HookedLayouts {
                             AlertDialog.Builder builder = new AlertDialog.Builder(HookMethods.SnapContext);
                             SeekBar seekBar = new SeekBar(HookMethods.SnapContext);
                             seekBar.setMax(255);
-                            seekBar.setProgress((int) HookMethods.editText.getBackground().getAlpha());
+                            int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+                            if (currentapiVersion >= Build.VERSION_CODES.KITKAT){
+                                seekBar.setProgress((int) HookMethods.editText.getBackground().getAlpha());
+                            } else {
+                                seekBar.setProgress(255);
+                            }
                             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                                 public void onProgressChanged(SeekBar seekBar3, int n, boolean bl) {
                                     HookMethods.editText.getBackground().setAlpha(n);
