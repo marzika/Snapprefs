@@ -19,6 +19,14 @@
             android:layout_gravity="center"
             android:text="Delete Filter" />
 
+        <CheckBox
+            android:id="@+id/enableVisual"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text=""
+            android:visibility="gone" />
+
         <ImageView
             android:id="@+id/filterpreview"
             android:layout_width="wrap_content"
@@ -26,5 +34,14 @@
             android:layout_gravity="top|center_horizontal"
             android:adjustViewBounds="true"
             android:scaleType="centerInside" />
+        <ImageView
+            android:id="@+id/originalpreview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:adjustViewBounds="true"
+            android:visibility="gone"
+            android:scaleType="centerInside"
+            android:paddingTop="15dp" />
     </LinearLayout>
 </ScrollView>

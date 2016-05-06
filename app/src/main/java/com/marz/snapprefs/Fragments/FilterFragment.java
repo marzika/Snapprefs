@@ -86,6 +86,7 @@ public class FilterFragment extends Fragment {
                 RedditFilter rf = (RedditFilter) parent.getItemAtPosition(position);
                 i.putExtra("imagePath", "" + rf.url);
                 i.putExtra("imageId", "" + rf.id);
+                i.putExtra("visual", false);
                 startActivity(i);
             }
         });

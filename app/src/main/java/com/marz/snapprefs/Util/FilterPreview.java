@@ -2,16 +2,20 @@ package com.marz.snapprefs.Util;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.graphics.BitmapFactory;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Fragments.DownloadedFiltersFragment;
 import com.marz.snapprefs.Fragments.FilterFragment;
+import com.marz.snapprefs.Fragments.VisualFragment;
 import com.marz.snapprefs.R;
 
 import org.apache.http.HttpResponse;
@@ -28,9 +32,12 @@ import java.io.InputStream;
 public class FilterPreview extends Activity {
 
     Button button;
+    CheckBox checkBox;
     ImageView image;
     String imgPath;
     String imgId;
+    boolean visual;
+    boolean enabled;
     Activity fp;
     ProgressDialog progress;
 
@@ -41,23 +48,38 @@ public class FilterPreview extends Activity {
         progress = ProgressDialog.show(FilterPreview.this, "Loading", "Please wait", true);
 
         image = (ImageView) findViewById(R.id.filterpreview);
+        ImageView original = (ImageView) findViewById(R.id.originalpreview);
 
-        if (getIntent().hasExtra("imagePath") && getIntent().hasExtra("imageId")) {
+        if (getIntent().hasExtra("imagePath") && getIntent().hasExtra("imageId") && getIntent().hasExtra("visual")) {
             imgPath = getIntent().getStringExtra("imagePath");
             imgId = getIntent().getStringExtra("imageId");
-            imgPath = imgPath + ".png";
+            visual = getIntent().getBooleanExtra("visual", false);
+            if(!visual){
+                imgPath = imgPath + ".png";
+                original.setVisibility(View.GONE);
+            } else {
+                enabled = getIntent().getBooleanExtra("enabled", false);
+                DrawableManager.fetchDrawableOnThread("http://snapprefs.com/original.jpg", original);
+                original.setVisibility(View.VISIBLE);
+            }
             DrawableManager.fetchDrawableOnThread(imgPath, image);
 
             fp = this;
 
-            addListenerOnButton();
+            addListeners();
         }
         progress.dismiss();
 
     }
 
-    public void addListenerOnButton() {
+    public void addListeners() {
         button = (Button) findViewById(R.id.filter_button);
+        checkBox = (CheckBox) findViewById(R.id.enableVisual);
+
+        checkBox.setEnabled(true);
+        checkBox.setText(imgId);
+        checkBox.setChecked(enabled);
+
         button.setText("Save Filter");
         button.setOnClickListener(new View.OnClickListener() {
 
@@ -66,6 +88,22 @@ public class FilterPreview extends Activity {
                 new SaveFilter(imgPath, imgId).execute();
             }
         });
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                if(imgId.equals("1997")) imgId = "F"+imgId;
+                editor.putBoolean(imgId, checkBox.isChecked());
+                editor.commit();
+                VisualFragment.refreshPreferences();
+                VisualFragment.addFilters();
+            }
+        });
+        if(visual){
+            button.setVisibility(View.GONE);
+            checkBox.setVisibility(View.VISIBLE);
+        }
 
     }
     class SaveFilter extends AsyncTask<Void, Void, Boolean> {
