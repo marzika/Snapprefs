@@ -146,7 +146,7 @@ public class Groups {
             groupFolder.mkdir();
         }
         File[] groupFiles = groupFolder.listFiles();
-        if (groupFiles.length == 0) {
+        if (groupFiles == null || groupFiles.length == 0) {
             groups.clear();
             return;
         }
