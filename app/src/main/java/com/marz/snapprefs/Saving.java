@@ -187,9 +187,11 @@ public class Saving {
         int saveModeVideo = (lastSnapType == SnapType.SNAP ? mModeSnapVideo : mModeStoryVideo);
         int saveModeImage = (lastSnapType == SnapType.SNAP ? mModeSnapImage : mModeStoryImage);
         if (saveModeImage == SAVE_BUTTON) {
+            findAndHookMethod(Obfuscator.save.SWIPEUPARROWVIEW_CLASS, lpparam.classLoader, Obfuscator.save.SWIPEUPARROWVIEW_SETONCLICK, android.view.View.OnClickListener.class, XC_MethodReplacement.DO_NOTHING);
             findAndHookMethod(Obfuscator.save.IMAGESNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.IMAGESNAPRENDERER_SETVIEW, ViewGroup.class, addButton);//Image
         }
         if (saveModeVideo == SAVE_BUTTON) {
+            findAndHookMethod(Obfuscator.save.SWIPEUPARROWVIEW_CLASS, lpparam.classLoader, Obfuscator.save.SWIPEUPARROWVIEW_SETONCLICK, android.view.View.OnClickListener.class, XC_MethodReplacement.DO_NOTHING);
             findAndHookMethod(Obfuscator.save.VIDEOSNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.VIDEOSNAPRENDERER_SETVIEW, ViewGroup.class, addButton);//Video
         }
 

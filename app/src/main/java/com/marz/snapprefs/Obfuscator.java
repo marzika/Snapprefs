@@ -117,6 +117,10 @@ public class Obfuscator {
         public static final String VIDEOSNAPRENDERER_VAR_VIEW = "c";
         public static final String IMAGESNAPRENDERER_SETVIEW = "a";
         public static final String VIDEOSNAPRENDERER_SETVIEW = "a";
+        //SwipeUpArrowView is the View containing the Chat element of the Friend's story screen
+        public static final String SWIPEUPARROWVIEW_CLASS = "com.snapchat.android.ui.SwipeUpArrowView";
+        //SwipeUpArrowView.setLongFormAreaOnClickListener
+        public static final String SWIPEUPARROWVIEW_SETONCLICK = "setLongFormAreaOnClickListener";
 
     }
     //Data-saving
