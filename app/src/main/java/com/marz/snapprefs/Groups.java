@@ -77,6 +77,7 @@ public class Groups {
                         @Override
                         public void onClick(View v) {
                             FragmentTransaction ft = HookMethods.SnapContext.getFragmentManager().beginTransaction();
+                            //ft.setCustomAnimations(R.anim.fade, R.anim.fade); #85(?)
                             Fragment prev = HookMethods.SnapContext.getFragmentManager().findFragmentByTag("dialog");
                             if (prev != null) {
                                 ft.remove(prev);
@@ -140,7 +141,7 @@ public class Groups {
         Collections.sort(friendList, new Friend.friendComparator());
     }
 
-    private static void readGroups() {
+    public static void readGroups() {
         File groupFolder = groupsDir;
         if (!groupFolder.exists()) {
             groupFolder.mkdir();
