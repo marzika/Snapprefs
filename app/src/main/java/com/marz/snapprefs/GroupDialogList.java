@@ -112,6 +112,7 @@ public class GroupDialogList extends DialogFragment {
                         } else {
                             Toast.makeText(HookMethods.SnapContext, "Name is empty", Toast.LENGTH_SHORT).show();
                         }
+                        Groups.readGroups();
                     }
                 });
                 adialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {

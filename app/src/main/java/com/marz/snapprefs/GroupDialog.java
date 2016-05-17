@@ -16,7 +16,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Util.NotificationUtils;
+
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -54,7 +58,8 @@ public class GroupDialog extends DialogFragment {
         v.setLayoutParams(linearparams);
 
         final File[] files = Groups.groupsDir.listFiles();
-        final int N = files.length; // total number of textviews to add
+        Arrays.sort(files);
+        final int N = Groups.groups.size(); // total number of textviews to add
         for (int i = 0; i < N; i++) {
             // create a new textview
             final TextView rowTextView = new TextView(HookMethods.context);
@@ -80,6 +85,7 @@ public class GroupDialog extends DialogFragment {
 
                     // Create and show the dialog.
                     DialogFragment newFragment = GroupDialogList.newInstance((String) rowTextView.getText());
+                    Groups.readGroups();
                     GroupDialogList.setGroup(Groups.groups.get(id_));
                     newFragment.show(ft, "dialog");
                     Groups.sendStoriesUpdateEvent();
@@ -89,12 +95,22 @@ public class GroupDialog extends DialogFragment {
         Button add = new Button(HookMethods.SnapContext);
         add.setText("Add new Group");
         add.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        v.addView(add);
+        boolean shouldShowAdd = true;
+        if (Groups.groups.size() == 3 && HookMethods.mLicense == 0) {
+            shouldShowAdd = false;
+        }
+        if (HookMethods.mLicense != 0 && HookMethods.mUnlimGroups == false) {
+            shouldShowAdd = false;
+        }
+        if(shouldShowAdd){
+            v.addView(add);
+        }
 
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FragmentTransaction ft = HookMethods.SnapContext.getFragmentManager().beginTransaction();
+                //ft.setCustomAnimations(R.anim.fade, R.anim.fade); #85(?)
                 Fragment prev = HookMethods.SnapContext.getFragmentManager().findFragmentByTag("dialog_group");
                 if (prev != null) {
                     ft.remove(prev);
