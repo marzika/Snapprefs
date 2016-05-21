@@ -4,7 +4,11 @@ Overview
 -------
 Snapprefs is a project which offers enhanced features for Snapchat throught the [Xposed framework](http://forum.xda-developers.com/showthread.php?t=1574401).
 
-[Snapprefs XDA](http://forum.xda-developers.com/xposed/modules/app-snapprefs-ultimate-snapchat-utility-t2947254)
+[Want to translate Snapprefs into your native language?](http://osl2hw5.oneskyapp.com/collaboration/project?id=154335)
+
+[Snapprefs on XDA-Developers](http://forum.xda-developers.com/xposed/modules/app-snapprefs-ultimate-snapchat-utility-t2947254)
+
+Want to be up to date with our Projects? [Visit our website!](http://snapprefs.com)
 
 Current features are:
 
