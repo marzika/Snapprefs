@@ -2,6 +2,8 @@ package com.marz.snapprefs;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
@@ -10,6 +12,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
@@ -152,6 +155,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     private static InitPackageResourcesParam resParam;
     Class CaptionEditText;
     boolean latest = false;
+    static boolean acceptedToU = false;
 
     public static int px(float f) {
         return Math.round((f * SnapContext.getResources().getDisplayMetrics().density));
@@ -249,6 +253,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         } else {
             shouldAddGhost = false;
         }
+
+        acceptedToU = prefs.getBoolean("acceptedToU", false);
     }
 
     static void logging(String message) {
@@ -395,6 +401,17 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 refreshPreferences();
                 printSettings();
+                if(!acceptedToU){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                            .setTitle("ToU and Privacy Policy")
+                            .setMessage("You haven't accepted our Terms of Use and Privacy. Please read it carefully and accept it, otherwise you will not be able to use our product. Open the settings app to do that.")
+                            .setIcon(android.R.drawable.ic_dialog_alert);
+                    builder.setCancelable(false);
+                    final AlertDialog dialog = builder.create();
+                    dialog.setCanceledOnTouchOutside(false);
+                    dialog.show();
+                    return;
+                }
                 if (mLicense == 1 || mLicense == 2) {
 
                     if (mReplay == true) {

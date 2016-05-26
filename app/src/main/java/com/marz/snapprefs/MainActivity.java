@@ -1,9 +1,12 @@
 package com.marz.snapprefs;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -14,12 +17,16 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -104,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<MenuItem> items = new ArrayList<>();
     private SharedPreferences prefs;
     private String gcmRegId;
+    private boolean acceptedToU = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +131,64 @@ public class MainActivity extends AppCompatActivity {
         if (cl.isFirstRun()) {
             cl.getLogDialog().show();
         }
-        if (isGoogelPlayInstalled()) {
+        final SharedPreferences prefs = context.getSharedPreferences("com.marz.snapprefs_preferences", Context.MODE_WORLD_READABLE);
+        acceptedToU = prefs.getBoolean("acceptedToU", false);
+        if(!acceptedToU){
+            AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                    .setTitle("ToU and Privacy Policy")
+                    .setView(R.layout.tos)
+                    .setMessage("You haven't accepted our Terms of Use and Privacy. Please read it carefully and accept it, otherwise you will not be able to use our product.")
+                    .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putBoolean("acceptedToU", true);
+                            editor.apply();
+                            Toast.makeText(MainActivity.this, "You accepted the Terms of Use and Privacy Policy", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert);
+            builder.setCancelable(false);
+            final AlertDialog dialog = builder.create();
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
+
+            Button privacypolicy = (Button) dialog.findViewById(R.id.privacypolicy);
+            Button tou = (Button) dialog.findViewById(R.id.tou);
+            CheckBox accepted = (CheckBox) dialog.findViewById(R.id.readandaccepted);
+
+            privacypolicy.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://snapprefs.com/wp/privacy-policy/"));
+                        startActivity(myIntent);
+                    } catch (ActivityNotFoundException e) {
+                        Toast.makeText(MainActivity.this, "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
+                        e.printStackTrace();
+                    }
+                }
+            });
+            tou.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://snapprefs.com/wp/terms-of-use/"));
+                        startActivity(myIntent);
+                    } catch (ActivityNotFoundException e) {
+                        Toast.makeText(MainActivity.this, "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
+                        e.printStackTrace();
+                    }
+                }
+            });
+            dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(false);
+            accepted.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    dialog.getButton(DialogInterface.BUTTON_POSITIVE).setEnabled(b);
+                }
+            });
+        }
+        if (isGooglePlayInstalled()) {
             gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
 
             // Read saved registration id from shared preferences.
@@ -341,7 +406,7 @@ public class MainActivity extends AppCompatActivity {
         editor.commit();
     }
 
-    private boolean isGoogelPlayInstalled() {
+    private boolean isGooglePlayInstalled() {
         int resultCode = GooglePlayServicesUtil
                 .isGooglePlayServicesAvailable(this);
         if (resultCode != ConnectionResult.SUCCESS) {
@@ -365,7 +430,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(Void... params) {
             // TODO Auto-generated method stub
-            if (gcm == null && isGoogelPlayInstalled()) {
+            if (gcm == null && isGooglePlayInstalled()) {
                 gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
             }
             try {
