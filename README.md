@@ -1,5 +1,7 @@
 Snapprefs
 =========
+[![Build Status](http://104.41.139.34:8080/job/SNAPPREFS/badge/icon)](http://104.41.139.34:8080/job/SNAPPREFS/) [![Join the chat at https://gitter.im/marzika/Snapprefs](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marzika/Snapprefs/?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Overview
 -------
 Snapprefs is a project which offers enhanced features for Snapchat throught the [Xposed framework](http://forum.xda-developers.com/showthread.php?t=1574401).
@@ -104,6 +106,10 @@ Installation
 1. Reboot
 1. Customize the options
 1. Kill Snapchat after enabling/disabling options 
+
+Latest automatic builds (provided by Dopeland):
+-------
+[Available as Jenkins artifacts](http://104.41.139.34:8080/job/SNAPPREFS/lastSuccessfulBuild/artifact/app/build/outputs/apk/)
 
 License
 -------
