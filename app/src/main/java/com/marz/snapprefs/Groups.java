@@ -127,7 +127,7 @@ public class Groups {
     }
 
     public static void readFriendList(ClassLoader classLoader, Group selectedGroup) {
-        final Object friendManager = callStaticMethod(findClass("com.snapchat.android.model.FriendManager", classLoader), Obfuscator.groups.GETFRINEDMANAGER_METHOD);
+        final Object friendManager = callStaticMethod(findClass("com.snapchat.android.model.FriendManager", classLoader), Obfuscator.groups.GETFRIENDMANAGER_METHOD);
         List friends = (List) XposedHelpers.getObjectField(XposedHelpers.getObjectField(friendManager, "mOutgoingFriendsListMap"), "mList");
         friendList.clear();
         for (int i = 0; i <= friends.size() - 1; i++) {

@@ -65,6 +65,8 @@ public class Stories {
                         f.remove(i);
                     } else if (o.getClass() == discoverStory) {
                         //discover
+                    } else {
+                        Logger.log("Found an unexpected entry at stories TYPE: " + o.getClass().getCanonicalName());
                     }
                 }
                 XposedHelpers.setObjectField(param.thisObject, "f", f);
