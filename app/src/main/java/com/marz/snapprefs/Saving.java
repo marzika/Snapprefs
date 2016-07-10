@@ -394,7 +394,7 @@ public class Saving {
                 findAndHookMethod("com.snapchat.android.ui.StoryTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
             if (mLoopingVids == true) {
-                findAndHookMethod("com.snapchat.android.ui.TextureVideoView", lpparam.classLoader, "start", new XC_MethodHook() {
+                findAndHookMethod("com.snapchat.opera.shared.view.TextureVideoView", lpparam.classLoader, "start", new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         callMethod(param.thisObject, "setLooping", true);
@@ -464,7 +464,7 @@ public class Saving {
             /**
              * Sets the Snap as Screenshotted, so we constantly return false to it.
              */
-            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass(Obfuscator.save.STORYVIEW_SHOW_FIRST, lpparam.classLoader), findClass(Obfuscator.save.STORYVIEW_SHOW_SECOND, lpparam.classLoader), new XC_MethodHook() {
+            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass(Obfuscator.save.STORYVIEW_SHOW_FIRST, lpparam.classLoader), findClass(Obfuscator.save.STORYVIEW_SHOW_SECOND, lpparam.classLoader), findClass(Obfuscator.save.STORYVIEW_SHOW_THIRD, lpparam.classLoader), new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     if (param.args[0] != null) {
@@ -475,7 +475,7 @@ public class Saving {
                 }
             });
 
-            final Class<?> TextureVideoView = findClass("com.snapchat.android.ui.TextureVideoView", lpparam.classLoader);
+            final Class<?> TextureVideoView = findClass("com.snapchat.opera.shared.view.TextureVideoView", lpparam.classLoader);
             findAndHookMethod(Obfuscator.save.VIDEOSNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.VIDEOSNAPRENDERER_SHOW, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {

@@ -139,7 +139,7 @@ public class VisualFilters {
                 param.setResult(param.thisObject == param.args[0]);
             }
         });
-        //change getName method of filters
+        //change getName method of filters - DOESN'T EXIST
         findAndHookMethod(Obfuscator.visualfilters.FILTERSLOADER_CLASS, lpparam.classLoader, "a", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {

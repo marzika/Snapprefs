@@ -39,35 +39,36 @@ public class Obfuscator {
     public class save {
 
         //User class
-        public static final String USER_CLASS = "LZ"; //+
+        public static final String USER_CLASS = "VU"; //+
         //ReceivedSnap class
-        public static final String RECEIVEDSNAP_CLASS = "LB"; //+
+        public static final String RECEIVEDSNAP_CLASS = "Vt"; //+
         // ReceivedSnap.getCanonicalDisplayTime()
         public static final String RECEIVEDSNAP_DISPLAYTIME = "G";
         //StorySnap class
-        public static final String STORYSNAP_CLASS = "LR"; //+
+        public static final String STORYSNAP_CLASS = "VK"; //+
         //SnapView class
         public static final String SNAPVIEW_CLASS = "com.snapchat.android.ui.snapview.SnapView";
         //SnapView.show(ReceivedSnap, ChronologicalSnapProvider, Booleans(?))
         public static final String SNAPVIEW_SHOW = "b"; // prev. a
+        public static final String STORYVIEW_SHOW_FIRST = "aea";
+        public static final String STORYVIEW_SHOW_SECOND = "Vn";
+        public static final String STORYVIEW_SHOW_THIRD = "adW";
         //First param of SnapView.show -> bdl, avf
-        public static final String SNAPVIEW_SHOW_FIRST = "Sp";
-        public static final String STORYVIEW_SHOW_FIRST = "Sp";
-        public static final String STORYVIEW_SHOW_SECOND = "Lw";
+        public static final String SNAPVIEW_SHOW_FIRST = "aea";
         //Second param of SnapView.show -> asz, alr
-        public static final String SNAPVIEW_SHOW_SECOND = "Lw";
+        public static final String SNAPVIEW_SHOW_SECOND = "Vn";
         //Third param of SnapView.show -> agd, abp
-        public static final String SNAPVIEW_SHOW_THIRD = "CG";
+        public static final String SNAPVIEW_SHOW_THIRD = "HQ";
         //Fourth param of SnapView.show -> agd, abp
-        public static final String SNAPVIEW_SHOW_FOURTH = "CI";
-        //SnapView.hide(SnapViewEventAnalytics.EndReason)
+        public static final String SNAPVIEW_SHOW_FOURTH = "HS";
+        //SnapView.hide(SnapViewEventAnalytics.EndReason)->(rm)
         public static final String SNAPVIEW_HIDE = "a";
         //SnapPreviewFragment class
         public static final String SNAPPREVIEWFRAGMENT_CLASS = "com.snapchat.android.preview.SnapPreviewFragment";
         //ImageResourceView class
         public static final String IMAGERESOURCEVIEW_CLASS = "com.snapchat.android.ui.ImageResourceView";
         //imageResource instance variable name in ui.ImageResourceView
-        public static final String IMAGERESOURCEVIEW_VAR_IMAGERESOURCE = "c"; // KM
+        public static final String IMAGERESOURCEVIEW_VAR_IMAGERESOURCE = "b"; // KM
         //LandingPageActivity class
         public static final String LANDINGPAGEACTIVITY_CLASS = "com.snapchat.android.LandingPageActivity";
         //Snap class
@@ -76,50 +77,50 @@ public class Obfuscator {
         public static final String SNAP_ISSCREENSHOTTED = "at";
         //public static final String SNAP_ISSCREENSHOTTED2 = "au";
         //Snap.getTimestamp()
-        public static final String SNAP_GETTIMESTAMP = "W";
+        public static final String SNAP_GETTIMESTAMP = "S";
         //EndReason class
-        public static final String ENDREASON_CLASS = "com.snapchat.android.analytics.SnapViewEventAnalytics.EndReason";
+        public static final String ENDREASON_CLASS = "rm";
         //ImageResource -> Aw prev. avg, apz --  mIsSavedByRecipient:Z
         //ChatMedia instance variable name in ImageResource
         public static final String IMAGERESOURCE_VAR_CHATMEDIA = "c";
         //.model.chat.Chat -> zV.2
         //Chat.getTimeStamp()
-        public static final String CHAT_GETTIMESTAMP = "W";
+        public static final String CHAT_GETTIMESTAMP = "S";
         //.model.chat.StatefulChatFeedItem
         //StatefulChatFeedItem.getSender()
-        public static final String STATEFULCHATFEEDITEM_GETSENDER = "j";
+        public static final String STATEFULCHATFEEDITEM_GETSENDER = "i";
         //ScreenshotDetector class -> datetaken
         public static final String SCREENSHOTDETECTOR_CLASS = "OB"; //+
         //ScreenshotDetector.run(List)
         public static final String SCREENSHOTDETECTOR_RUN = "a";
         //SnapStateMessage class
-        public static final String SNAPSTATEMESSAGE_CLASS = "aei"; //+
+        public static final String SNAPSTATEMESSAGE_CLASS = "auW"; //+
         //SnapStateMessage.setScreenshotCount(Long)
         public static final String SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT = "b";
         //SentSnap Bitmap class
-        public static final String SENT_CLASS = "Li"; //+
+        public static final String SENT_CLASS = "UW"; //+
         //SentSnap Bitmap method
         public static final String SENT_METHOD = "a";
         //ImagesnapRenderer
-        public static final String IMAGESNAPRENDERER_CLASS = "Og"; //+
+        public static final String IMAGESNAPRENDERER_CLASS = "YI"; //+
         //ImagesnapRenderer.start()
         public static final String IMAGESNAPRENDERER_START = "c";
         //ImageView instance in ImageSnapRenderer
-        public static final String IMAGESNAPRENDERER_VAR_IMAGEVIEW = "h";
+        public static final String IMAGESNAPRENDERER_VAR_IMAGEVIEW = "a";//AspectMaintainedImageView!!
         //SnapImageBryo - JPEG_ENCODING_QUALITY
-        public static final String SNAPIMAGEBRYO_CLASS = "LK";
+        public static final String SNAPIMAGEBRYO_CLASS = "VC";
         //VideoSnapRenderer.start()
-        public static final String VIDEOSNAPRENDERER_CLASS = "Oj";
+        public static final String VIDEOSNAPRENDERER_CLASS = "YK";
         //VideoSnapRenderer.show()
         public static final String VIDEOSNAPRENDERER_SHOW = "c";
         //View Instance in VideoSnapRenderer
-        public static final String VIDEOSNAPRENDERER_VAR_VIEW = "c";
+        public static final String VIDEOSNAPRENDERER_VAR_VIEW = "d";
         public static final String IMAGESNAPRENDERER_SETVIEW = "a";
         public static final String VIDEOSNAPRENDERER_SETVIEW = "a";
         //SwipeUpArrowView is the View containing the Chat element of the Friend's story screen
-        public static final String SWIPEUPARROWVIEW_CLASS = "com.snapchat.android.ui.SwipeUpArrowView";
+        public static final String SWIPEUPARROWVIEW_CLASS = "com.snapchat.opera.view.ArrowView";//?
         //SwipeUpArrowView.setLongFormAreaOnClickListener
-        public static final String SWIPEUPARROWVIEW_SETONCLICK = "setLongFormAreaOnClickListener";
+        public static final String SWIPEUPARROWVIEW_SETONCLICK = "setTouchAreaOnClickListener";//?
 
     }
     //Data-saving

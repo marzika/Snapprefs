@@ -26,6 +26,9 @@
     <style name="MaterialDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="colorAccent">#4CAF50</item>
     </style>
+    <style name="AppCompatDialog" parent="Theme.AppCompat.Light">
+        <item name="colorAccent">#4CAF50</item>
+    </style>
     <style name="TopPanel">
         <item name="android:background">@color/green</item>
         <item name="android:layout_width">fill_parent</item>

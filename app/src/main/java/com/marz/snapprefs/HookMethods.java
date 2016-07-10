@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.view.ContextThemeWrapper;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
@@ -402,15 +403,15 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 refreshPreferences();
                 printSettings();
                 if(!acceptedToU){
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                    AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.AppCompatDialog))
                             .setTitle("ToU and Privacy Policy")
                             .setMessage("You haven't accepted our Terms of Use and Privacy. Please read it carefully and accept it, otherwise you will not be able to use our product. Open the settings app to do that.")
                             .setIcon(android.R.drawable.ic_dialog_alert);
                     builder.setCancelable(false);
                     final AlertDialog dialog = builder.create();
                     dialog.setCanceledOnTouchOutside(false);
-                    dialog.show();
-                    return;
+                    //dialog.show();
+                    //return;
                 }
                 if (mLicense == 1 || mLicense == 2) {
 
@@ -480,6 +481,13 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                         SnapContext = (Activity) param.thisObject;
+                        boolean isNull;
+                        if(SnapContext==null){
+                            isNull=true;
+                        } else {
+                            isNull=false;
+                        }
+                        Logger.log("SNAPCONTEXT, NULL? - "+isNull, true);
                         prefs.reload();
                         refreshPreferences();
                         //SNAPPREFS
