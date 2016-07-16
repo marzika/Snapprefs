@@ -127,10 +127,10 @@ public class HookedLayouts {
                 final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("camera_take_snap_button", "id", Common.PACKAGE_SNAP)).getLayoutParams());
                 layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                layoutParams.bottomMargin = HookMethods.px(65.0f);
+                layoutParams.bottomMargin = HookMethods.px(75.0f);
                 upload = new ImageButton(HookMethods.SnapContext);
                 upload.setBackgroundColor(0);
-                Drawable uploadimg = HookMethods.SnapContext.getResources().getDrawable(+0x7f020024); //aa_chat_camera_upload - 0x7f020024
+                Drawable uploadimg = HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.sharing.UPLOAD_ICON.substring(2), 16));
                 //upload.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
                 upload.setImageDrawable(uploadimg);
                 upload.setScaleX((float) 0.55);

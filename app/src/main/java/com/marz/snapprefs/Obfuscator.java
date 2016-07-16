@@ -184,6 +184,8 @@ public class Obfuscator {
         public static final String BUSPROVIDER_CLASS = "bey";
         //BussProvider.returnBus()
         public static final String BUSPROVIDER_RETURNBUS = "a";
+        //aa_chat_camera_upload
+        public static final String UPLOAD_ICON = "0x7f020022";
     }
     public class lens {
         //ScheduledLensesProvider class
