@@ -12,7 +12,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.AlertDialog;
+import android.app.AlertDialog;
 import android.support.v7.view.ContextThemeWrapper;
 import android.text.InputFilter;
 import android.util.Log;
@@ -402,17 +402,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 refreshPreferences();
                 printSettings();
-                if(!acceptedToU){
-                    AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(context, R.style.AppCompatDialog))
-                            .setTitle("ToU and Privacy Policy")
-                            .setMessage("You haven't accepted our Terms of Use and Privacy. Please read it carefully and accept it, otherwise you will not be able to use our product. Open the settings app to do that.")
-                            .setIcon(android.R.drawable.ic_dialog_alert);
-                    builder.setCancelable(false);
-                    final AlertDialog dialog = builder.create();
-                    dialog.setCanceledOnTouchOutside(false);
-                    //dialog.show();
-                    //return;
-                }
                 if (mLicense == 1 || mLicense == 2) {
 
                     if (mReplay == true) {
@@ -425,62 +414,22 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         Premium.initViewed(lpparam, modRes, SnapContext);
                     }
                 }
-        /*findAndHookMethod("com.snapchat.android.Timber", lpparam.classLoader, "c", String.class, String.class, Object[].class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Logger.log("TIMBER: " + param.args[0] + " : " + param.args[1], true);
-            }
-        });*/
-                //Showing lenses or not
-                findAndHookMethod(Obfuscator.icons.ICON_HANDLER_CLASS, lpparam.classLoader, Obfuscator.icons.SHOW_LENS, boolean.class, boolean.class, new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        if((boolean)param.args[0]){
-                            HookedLayouts.upload.setVisibility(View.INVISIBLE);
-                        } else {
-                            HookedLayouts.upload.setVisibility(View.VISIBLE);
-                        }
-                    }
-                });
-                //Recording of video ended
-                findAndHookMethod(Obfuscator.icons.ICON_HANDLER_CLASS, lpparam.classLoader, Obfuscator.icons.RECORDING_VIDEO, boolean.class, new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        HookedLayouts.upload.setVisibility(View.VISIBLE);
-                    }
-                });
-                for (String s : Obfuscator.ROOTDETECTOR_METHODS) {
-                    findAndHookMethod(Obfuscator.ROOTDETECTOR_CLASS, lpparam.classLoader, s, XC_MethodReplacement.returnConstant(false));
-                    Logger.log("ROOTCHECK: " + s, true);
-                }
-                findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        param.args[0] = 120000;
-                    }
-                });
-
-                final Class<?> receivedSnapClass = findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
-                try {
-                    XposedHelpers.setStaticIntField(receivedSnapClass, "SECOND_MAX_VIDEO_DURATION", 99999);
-                    Logger.log("SECOND_MAX_VIDEO_DURATION set over 10", true);
-                } catch (Throwable t) {
-                    Logger.log("SECOND_MAX_VIDEO_DURATION set over 10 failed :(", true);
-                    Logger.log(t.toString());
-                } /*For viewing longer videos?*/
-                //Better quality images
-                final Class<?> snapMediaUtils = findClass("com.snapchat.android.util.SnapMediaUtils", lpparam.classLoader);
-                XposedHelpers.setStaticIntField(snapMediaUtils, "IGNORED_COMPRESSION_VALUE", 100);
-                XposedHelpers.setStaticIntField(snapMediaUtils, "RAW_THUMBNAIL_ENCODING_QUALITY", 100);
-                final Class<?> profileImageUtils = findClass("com.snapchat.android.util.profileimages.ProfileImageUtils", lpparam.classLoader);
-                XposedHelpers.setStaticIntField(profileImageUtils, "COMPRESSION_QUALITY", 100);
-                final Class<?> snapImageBryo = findClass(Obfuscator.save.SNAPIMAGEBRYO_CLASS, lpparam.classLoader);
-                XposedHelpers.setStaticIntField(snapImageBryo, "JPEG_ENCODING_QUALITY", 100);
 
                 XC_MethodHook initHook = new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                         SnapContext = (Activity) param.thisObject;
+                        if(!acceptedToU){//new ContextThemeWrapper(context.createPackageContext("com.marz.snapprefs", Context.CONTEXT_IGNORE_SECURITY), R.style.AppCompatDialog)
+                            AlertDialog.Builder builder = new AlertDialog.Builder(SnapContext)
+                                    .setTitle("ToU and Privacy Policy")
+                                    .setMessage("You haven't accepted our Terms of Use and Privacy. Please read it carefully and accept it, otherwise you will not be able to use our product. Open the settings app to do that.")
+                                    .setIcon(android.R.drawable.ic_dialog_alert);
+                            builder.setCancelable(false);
+                            final AlertDialog dialog = builder.create();
+                            dialog.setCanceledOnTouchOutside(false);
+                            dialog.show();
+                            return;
+                        }
                         boolean isNull;
                         if(SnapContext==null){
                             isNull=true;
@@ -561,6 +510,60 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 
                 findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, initHook);
                 findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onResume", initHook);
+
+        /*findAndHookMethod("com.snapchat.android.Timber", lpparam.classLoader, "c", String.class, String.class, Object[].class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Logger.log("TIMBER: " + param.args[0] + " : " + param.args[1], true);
+            }
+        });*/
+                //Showing lenses or not
+                findAndHookMethod(Obfuscator.icons.ICON_HANDLER_CLASS, lpparam.classLoader, Obfuscator.icons.SHOW_LENS, boolean.class, boolean.class, new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        if((boolean)param.args[0]){
+                            HookedLayouts.upload.setVisibility(View.INVISIBLE);
+                        } else {
+                            HookedLayouts.upload.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+                //Recording of video ended
+                findAndHookMethod(Obfuscator.icons.ICON_HANDLER_CLASS, lpparam.classLoader, Obfuscator.icons.RECORDING_VIDEO, boolean.class, new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        HookedLayouts.upload.setVisibility(View.VISIBLE);
+                    }
+                });
+                for (String s : Obfuscator.ROOTDETECTOR_METHODS) {
+                    findAndHookMethod(Obfuscator.ROOTDETECTOR_CLASS, lpparam.classLoader, s, XC_MethodReplacement.returnConstant(false));
+                    Logger.log("ROOTCHECK: " + s, true);
+                }
+                findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        param.args[0] = 120000;
+                    }
+                });
+
+                final Class<?> receivedSnapClass = findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
+                try {
+                    XposedHelpers.setStaticIntField(receivedSnapClass, "SECOND_MAX_VIDEO_DURATION", 99999);
+                    Logger.log("SECOND_MAX_VIDEO_DURATION set over 10", true);
+                } catch (Throwable t) {
+                    Logger.log("SECOND_MAX_VIDEO_DURATION set over 10 failed :(", true);
+                    Logger.log(t.toString());
+                } /*For viewing longer videos?*/
+                //Better quality images
+                final Class<?> snapMediaUtils = findClass("com.snapchat.android.util.SnapMediaUtils", lpparam.classLoader);
+                XposedHelpers.setStaticIntField(snapMediaUtils, "IGNORED_COMPRESSION_VALUE", 100);
+                XposedHelpers.setStaticIntField(snapMediaUtils, "RAW_THUMBNAIL_ENCODING_QUALITY", 100);
+                final Class<?> profileImageUtils = findClass("com.snapchat.android.util.profileimages.ProfileImageUtils", lpparam.classLoader);
+                XposedHelpers.setStaticIntField(profileImageUtils, "COMPRESSION_QUALITY", 100);
+                final Class<?> snapImageBryo = findClass(Obfuscator.save.SNAPIMAGEBRYO_CLASS, lpparam.classLoader);
+                XposedHelpers.setStaticIntField(snapImageBryo, "JPEG_ENCODING_QUALITY", 100);
+
+
 
                 // VanillaCaptionEditText was moved from an inner-class to a separate class in 8.1.0
                 String vanillaCaptionEditTextClassName = "com.snapchat.android.ui.caption.VanillaCaptionEditText";
