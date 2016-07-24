@@ -35,7 +35,6 @@ public class Obfuscator {
         return versionCode >= SUPPORTED_VERSION_CODE;
     }
 
-    //SAVING
     public class save {
 
         //User class
@@ -68,7 +67,7 @@ public class Obfuscator {
         //ImageResourceView class
         public static final String IMAGERESOURCEVIEW_CLASS = "com.snapchat.android.ui.ImageResourceView";
         //imageResource instance variable name in ui.ImageResourceView
-        public static final String IMAGERESOURCEVIEW_VAR_IMAGERESOURCE = "b"; // KM
+        public static final String IMAGERESOURCEVIEW_VAR_IMAGERESOURCE = "b";
         //LandingPageActivity class
         public static final String LANDINGPAGEACTIVITY_CLASS = "com.snapchat.android.LandingPageActivity";
         //Snap class
@@ -90,19 +89,19 @@ public class Obfuscator {
         //StatefulChatFeedItem.getSender()
         public static final String STATEFULCHATFEEDITEM_GETSENDER = "i";
         //ScreenshotDetector class -> datetaken
-        public static final String SCREENSHOTDETECTOR_CLASS = "OB"; //+
+        public static final String SCREENSHOTDETECTOR_CLASS = "Zm";
         //ScreenshotDetector.run(List)
         public static final String SCREENSHOTDETECTOR_RUN = "a";
         //SnapStateMessage class
-        public static final String SNAPSTATEMESSAGE_CLASS = "auW"; //+
+        public static final String SNAPSTATEMESSAGE_CLASS = "auW";
         //SnapStateMessage.setScreenshotCount(Long)
         public static final String SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT = "b";
         //SentSnap Bitmap class
-        public static final String SENT_CLASS = "UW"; //+
+        public static final String SENT_CLASS = "UW";
         //SentSnap Bitmap method
         public static final String SENT_METHOD = "a";
         //ImagesnapRenderer
-        public static final String IMAGESNAPRENDERER_CLASS = "YI"; //+
+        public static final String IMAGESNAPRENDERER_CLASS = "YI";
         //ImagesnapRenderer.start()
         public static final String IMAGESNAPRENDERER_START = "c";
         //ImageView instance in ImageSnapRenderer
@@ -123,7 +122,6 @@ public class Obfuscator {
         public static final String SWIPEUPARROWVIEW_SETONCLICK = "setTouchAreaOnClickListener";//?
 
     }
-    //Data-saving
     public class datasaving {
         public static final String DSNAPDOWNLOADER_CLASS = "KL";
         public static final String DSNAPDOWNLOADER_DOWNLOADSNAP = "a";
@@ -137,7 +135,6 @@ public class Obfuscator {
         public static final String STORYPRELOAD_CLASS = "aaF";
         public static final String STORYPRELOAD_METHOD = "H_";
     }
-    //Spoofing
     public class spoofing {
         //SpeedometerView class
         public static final String SPEEDOMETERVIEW_CLASS = "adL";
@@ -149,7 +146,6 @@ public class Obfuscator {
         public static final String WEATHER_FIRST = "avT";
         public static final String BATTERY_FILTER = "UQ";
     }
-    //Select-All
     public class select {
         //SendToFragment class
         public static final String SENDTOFRAGMENT_CLASS = "com.snapchat.android.fragments.sendto.SendToFragment";
@@ -172,7 +168,6 @@ public class Obfuscator {
         //PostToVenue class
         public static final String POSTTOVENUE_CLASS = "Vp";
     }
-
     public class sharing {
         //cameraStateEvent class
         public static final String CAMERASTATEEVENT_CLASS = "ajd";
@@ -256,7 +251,6 @@ public class Obfuscator {
         public static final String SHOW_LENS = "a";
         public static final String RECORDING_VIDEO = "h";
     }
-
     public class stories {
         public static final String RECENTSTORY_CLASS = "Qp";
         public static final String ALLSTORY_CLASS = "PT";
@@ -264,7 +258,6 @@ public class Obfuscator {
         public static final String DISCOVERSTORY_CLASS = "Le";
         //public static final String DISCOVERSTORY_CLASS = "aay"; new story type "featured?" TODO: look into it
     }
-
     public class groups {
         public static final String STORY_CLASS = "Vp";
         public static final String STORYARRAY_CLASS = "Zx";
@@ -274,16 +267,17 @@ public class Obfuscator {
         public static final String GETFRIENDMANAGER_METHOD = "e";
         public static final String GETUSERNAME_METHOD = "g";
     }
-
     public class bus {
         public static final String UPDATEEVENT_CLASS = "Ds";
         public static final String GETBUS_CLASS = "RX";
         public static final String GETBUS_METHOD = "a";
         public static final String BUS_POST = "a";
     }
-
     public class navbar {
         public static final String FORCENAVBAR_CLASS = "SM";
         public static final String FORCENAVBAR_METHOD = "a";
+    }
+    public class paint{
+        public static final String LEGACYCANVASVIEW_A = "BZ";
     }
 }

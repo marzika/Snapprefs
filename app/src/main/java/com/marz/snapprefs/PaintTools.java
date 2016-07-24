@@ -108,7 +108,7 @@ public class PaintTools {
             }
         });
         //it's not normally method onMove but i made it work like that xD (normally it just sets start of drawing)
-        XposedHelpers.findAndHookMethod("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, "a", float.class, float.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod(Obfuscator.paint.LEGACYCANVASVIEW_A, lpparam.classLoader, "a", float.class, float.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
                 if (type == DrawingType.DEFAULT || type == null) return;
@@ -146,7 +146,7 @@ public class PaintTools {
                 methodHookParam.setResult(null);
             }
         });
-        XposedHelpers.findAndHookMethod("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, "a", Canvas.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod(Obfuscator.paint.LEGACYCANVASVIEW_A, lpparam.classLoader, "a", Canvas.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
                 DrawingType dType = (DrawingType) XposedHelpers.getAdditionalInstanceField(methodHookParam.thisObject, TYPE);
@@ -179,7 +179,7 @@ public class PaintTools {
             }
         });
         Class<?> legacyCanvasView = findClass("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader);
-        XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView$a", lpparam.classLoader, int.class, float.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookConstructor(Obfuscator.paint.LEGACYCANVASVIEW_A, lpparam.classLoader, int.class, float.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 Logger.log("CanvasView - ORIGINAL, setColor: " + param.args[0] + " setStrokeWidth: " + param.args[1], true);
