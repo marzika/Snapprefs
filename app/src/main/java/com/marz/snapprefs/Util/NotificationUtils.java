@@ -34,17 +34,18 @@ public class NotificationUtils {
     public static void showMessage(String string, String title, int color, int textColor, int duration, int icon, ClassLoader classLoader) {
         Object aVar = null;
         Object a = XposedHelpers.callStaticMethod(XposedHelpers.findClass(Obfuscator.notification.NOTIFICATION_CLASS_1, classLoader), "a");
-        Object CHAT_V2 = XposedHelpers.getStaticObjectField(XposedHelpers.findClass("com.snapchat.android.util.debug.FeatureFlagManager$FeatureFlag", classLoader), "CHAT_V2");
-        if ((boolean) (XposedHelpers.callStaticMethod(XposedHelpers.findClass("com.snapchat.android.util.debug.FeatureFlagManager", classLoader), "b", new Class[]{XposedHelpers.findClass("com.snapchat.android.util.debug.FeatureFlagManager$FeatureFlag", classLoader)}, CHAT_V2))) {
+        //Object CHAT_V2 = XposedHelpers.getStaticObjectField(XposedHelpers.findClass("com.snapchat.android.util.debug.FeatureFlagManager$FeatureFlag", classLoader), "CHAT_V2");
+        //if ((boolean) (XposedHelpers.callStaticMethod(XposedHelpers.findClass("com.snapchat.android.util.debug.FeatureFlagManager", classLoader), "b", new Class[]{XposedHelpers.findClass("com.snapchat.android.util.debug.FeatureFlagManager$FeatureFlag", classLoader)}, CHAT_V2))) {
             if (XposedHelpers.getObjectField(a, "c") != null) {
                 aVar = XposedHelpers.callMethod(XposedHelpers.getObjectField(a, "b"), "get", XposedHelpers.getObjectField(a, "c"));
             }
             if (aVar == null) {
-                aVar = XposedHelpers.callMethod(a, "b");
+                //aVar = XposedHelpers.callMethod(a, "b");
+                aVar=XposedHelpers.newInstance(XposedHelpers.findClass("vz$a", classLoader), XposedHelpers.getObjectField(a, "c"));
             }
-        } else {
-            aVar = XposedHelpers.callMethod(a, "b");
-        }
+        //} else {
+        //    aVar = XposedHelpers.callMethod(a, "b");
+        //}
         Object xu = XposedHelpers.newInstance(XposedHelpers.findClass(Obfuscator.notification.NOTIFICATION_CLASS_2, classLoader), new Class[]{String.class, String.class, int.class}, string, XposedHelpers.getObjectField(aVar, "a"), color);
         XposedHelpers.setObjectField(xu, "alternateNotificationPanel", null);
         XposedHelpers.setBooleanField(xu, "hideTitleBar", true);
