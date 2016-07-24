@@ -26,7 +26,7 @@
     <style name="MaterialDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="colorAccent">#4CAF50</item>
     </style>
-    <style name="AppCompatDialog" parent="Theme.AppCompat.Light">
+    <style name="AppCompatDialog" parent="Theme.AppCompat.Dialog.Alert">
         <item name="colorAccent">#4CAF50</item>
     </style>
     <style name="TopPanel">
