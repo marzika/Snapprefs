@@ -120,7 +120,8 @@ public class Obfuscator {
         public static final String SWIPEUPARROWVIEW_CLASS = "com.snapchat.opera.view.ArrowView";//?
         //SwipeUpArrowView.setLongFormAreaOnClickListener
         public static final String SWIPEUPARROWVIEW_SETONCLICK = "setTouchAreaOnClickListener";//?
-
+        //stories_mystoryoverlaysave_icon
+        public static final String STORIES_MYOVERLAYSAVE_ICON = "0x7f02030e";
     }
     public class datasaving {
         public static final String DSNAPDOWNLOADER_CLASS = "KL";

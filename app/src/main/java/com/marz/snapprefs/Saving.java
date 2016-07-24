@@ -158,7 +158,7 @@ public class Saving {
                 saveLayout.setPadding(0, 0, HookMethods.px(5), HookMethods.px(5));
                 saveBtn = new ImageButton(HookMethods.SnapContext);
                 saveBtn.setBackgroundColor(0);
-                Drawable saveImg = HookMethods.SnapContext.getResources().getDrawable(+0x7f02029f); //stories_mystoryoverlaysave_icon
+                Drawable saveImg = HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.save.STORIES_MYOVERLAYSAVE_ICON.substring(2), 16)); //stories_mystoryoverlaysave_icon
                 saveBtn.setImageDrawable(saveImg);
                 saveBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -431,6 +431,12 @@ public class Saving {
                     receivedSnap = param.args[0];
                     viewingSnap = true;
                     currentViewingSnap++;
+                    if (saveLayout != null && saveBtn != null) {
+                        saveLayout.setVisibility(View.VISIBLE);
+                        saveLayout.bringToFront();
+                        saveBtn.setVisibility(View.VISIBLE);
+                        saveBtn.bringToFront();
+                    }
                     Logger.log("Starting to view a story", true);
                 }
             });
