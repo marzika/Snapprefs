@@ -31,7 +31,7 @@ public class GCMIntentService extends IntentService {
 
             // read extras as sent from server
             String message = extras.getString("message");
-            if(message.isEmpty()) return;
+            if(message == null || message.isEmpty()) return;
             sendNotification(message);
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
