@@ -414,6 +414,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         Premium.initViewed(lpparam, modRes, SnapContext);
                     }
                 }
+                prefs.reload();
+                refreshPreferences();
 
                 XC_MethodHook initHook = new XC_MethodHook() {
                     @Override
