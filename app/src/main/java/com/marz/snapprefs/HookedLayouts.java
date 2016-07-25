@@ -68,7 +68,7 @@ public class HookedLayouts {
         findAndHookMethod("com.snapchat.android.fragments.addfriends.ProfileFragment", lpparam.classLoader, "onCreateView", LayoutInflater.class, ViewGroup.class, Bundle.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                TableLayout navigation = (TableLayout) ((LinearLayout) XposedHelpers.getObjectField(param.thisObject, "z")).getChildAt(0);
+                TableLayout navigation = (TableLayout) ((LinearLayout) XposedHelpers.getObjectField(param.thisObject, "C")).getChildAt(0);
                 ImageView orig = (ImageView) ((TableRow) navigation.getChildAt(0)).getChildAt(0);
                 TextView orig1 = (TextView) ((TableRow) navigation.getChildAt(0)).getChildAt(1);
                 TableRow row = new TableRow(navigation.getContext());
@@ -289,7 +289,7 @@ public class HookedLayouts {
                 outerOptionsLayout.setVisibility(View.GONE);
             }
         };
-        findAndHookMethod("com.snapchat.android.analytics.ui.EmojiPickerAnalytics", lpparam.classLoader, "a", hideLayout);
+        findAndHookMethod("com.snapchat.android.analytics.ui.StickerPickerAnalytics", lpparam.classLoader, "a", hideLayout);
         findAndHookMethod("com.snapchat.android.ui.caption.SnapCaptionView", lpparam.classLoader, "a", boolean.class, hideLayout);
     }
 
