@@ -356,8 +356,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         GroupDialog.group_item = XResources.getFakeResId(modRes, group_item);
         resparam.res.setReplacement(GroupDialog.group_item, modRes.fwd(group_item));
 
-        mSavePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
-        mCustomFilterLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/Filters";
+        //mSavePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
+        //mCustomFilterLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/Filters";
         refreshPreferences();
         resParam = resparam;
 
@@ -447,7 +447,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         Lens.initLens(lpparam, mResources, SnapContext);
                         File vfilters = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/VisualFilters/xpro_map.png");
                         if (vfilters.exists()) {
-                            VisualFilters.initVisualFilters(lpparam);
+                            //VisualFilters.initVisualFilters(lpparam);
+                            Logger.log("Skipping VisualFilters", true);
                         } else {
                             Toast.makeText(context, "VisualFilter files are missing, download them!", Toast.LENGTH_SHORT).show();
                         }
