@@ -4,7 +4,9 @@ import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.res.XModuleResources;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -36,7 +38,7 @@ public class Stories {
         findAndHookMethod("com.snapchat.android.fragments.stories.StoriesFragment", lpparam.classLoader, "D", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                ArrayList f = (ArrayList) XposedHelpers.getObjectField(param.thisObject, "f");
+                ArrayList f = (ArrayList) XposedHelpers.getObjectField(param.thisObject, Obfuscator.stories.STORYLIST);
                 Class<?> recentStory = XposedHelpers.findClass(Obfuscator.stories.RECENTSTORY_CLASS, lpparam.classLoader);
                 Class<?> allStory = XposedHelpers.findClass(Obfuscator.stories.ALLSTORY_CLASS, lpparam.classLoader);
                 Class<?> liveStory = XposedHelpers.findClass(Obfuscator.stories.LIVESTORY_CLASS, lpparam.classLoader);
@@ -45,7 +47,7 @@ public class Stories {
                 for (int i = f.size() - 1; i >= 0; i--) {
                     Object o = f.get(i);
                     if (o.getClass() == recentStory && HookMethods.mHidePeople) {
-                        String username = (String) XposedHelpers.callMethod(o, "i");
+                        String username = (String) XposedHelpers.callMethod(o, "b");
                         for (String person : peopleToHide) {
                             if (username.equals(person)) {
                                 Logger.log("removing from recents" + username);
@@ -53,7 +55,7 @@ public class Stories {
                             }
                         }
                     } else if (o.getClass() == allStory && HookMethods.mHidePeople) {
-                        Object friend = XposedHelpers.callMethod(o, "f");
+                        Object friend = XposedHelpers.callMethod(o, "h");
                         String username = (String) XposedHelpers.callMethod(friend, "g");
                         for (String person : peopleToHide) {
                             if (username.equals(person)) {
@@ -69,7 +71,7 @@ public class Stories {
                         Logger.log("Found an unexpected entry at stories TYPE: " + o.getClass().getCanonicalName());
                     }
                 }
-                XposedHelpers.setObjectField(param.thisObject, "f", f);
+                XposedHelpers.setObjectField(param.thisObject, Obfuscator.stories.STORYLIST, f);
             }
         });
     }
@@ -100,13 +102,16 @@ public class Stories {
         try {
             resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "stories", new XC_LayoutInflated() {
                 public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
-                    final RelativeLayout relativeLayout = (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("top_panel", "id", Common.PACKAGE_SNAP));
+                    final FrameLayout relativeLayout = (FrameLayout) liparam.view.findViewById(liparam.res.getIdentifier("top_panel", "id", Common.PACKAGE_SNAP));
                     final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("myfriends_action_bar_search_button", "id", Common.PACKAGE_SNAP)).getLayoutParams());
-                    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                    layoutParams.topMargin = HookMethods.px(8.0f);
-                    layoutParams.rightMargin = HookMethods.px(115.0f);
+                    final FrameLayout.LayoutParams layoutParams2 = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.RIGHT);
+                    //layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                    layoutParams2.topMargin = HookMethods.px(8.0f);
+                    layoutParams2.rightMargin = HookMethods.px(115.0f);
                     final ImageView spbtn = new ImageView(HookMethods.SnapContext);
                     spbtn.setImageDrawable(mResources.getDrawable(R.drawable.story_filter));
+                    spbtn.setScaleX(0.75f);
+                    spbtn.setScaleY(0.75f);
                     Logger.log("Adding Snapprefs button to story section");
                     spbtn.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -128,7 +133,7 @@ public class Stories {
                     HookMethods.SnapContext.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            relativeLayout.addView(spbtn, layoutParams);
+                            relativeLayout.addView(spbtn, layoutParams2);
                         }
                     });
                 }

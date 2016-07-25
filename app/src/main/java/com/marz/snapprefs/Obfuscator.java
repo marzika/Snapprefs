@@ -257,6 +257,7 @@ public class Obfuscator {
         public static final String ALLSTORY_CLASS = "PT";
         public static final String LIVESTORY_CLASS = "aaF";
         public static final String DISCOVERSTORY_CLASS = "Le";
+        public static final String STORYLIST = "g";
         //public static final String DISCOVERSTORY_CLASS = "aay"; new story type "featured?" TODO: look into it
     }
     public class groups {
