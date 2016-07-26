@@ -101,7 +101,7 @@ public class PaintTools {
         XposedHelpers.findAndHookMethod("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, "a", float.class, float.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Object i = XposedHelpers.getObjectField(param.thisObject, "i");
+                Object i = XposedHelpers.getObjectField(param.thisObject, "j");
                 if (i != null && type != null && type != DrawingType.DEFAULT) {//only if there is object being drawn
                     XposedHelpers.callMethod(i, "a", param.args[0], param.args[1]);
                 }
@@ -766,6 +766,8 @@ public class PaintTools {
                             return;
                         }
                         case 8: {//gradient
+                            shouldErase = false;
+                            shouldBlur = false;
                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
                             builder.setTitle("Drawing Gradient");
                             builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
