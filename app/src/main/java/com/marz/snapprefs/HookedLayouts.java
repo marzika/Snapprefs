@@ -201,7 +201,7 @@ public class HookedLayouts {
                         } else {
                             outerOptionsLayout.setVisibility(View.GONE);
                             shouldHideOptions = true;
-                            Toast.makeText(HookMethods.context, "Your caption is missing", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(HookMethods.SnapContext, "Your caption is missing", Toast.LENGTH_SHORT).show();
                             HookMethods.logging("SnapPrefs: Not displaying Options - HookMethods.editText empty");
                         }
                     }
