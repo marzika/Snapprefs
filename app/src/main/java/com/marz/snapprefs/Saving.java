@@ -313,7 +313,7 @@ public class Saving {
              * Method which gets called to prepare an image for sending (before selecting contacts).
              * We check whether it's an image or a video and save it.
              */
-            findAndHookMethod(Obfuscator.save.SNAPPREVIEWFRAGMENT_CLASS, lpparam.classLoader, "o", new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.SNAPPREVIEWFRAGMENT_CLASS, lpparam.classLoader, "l", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     refreshPreferences();
