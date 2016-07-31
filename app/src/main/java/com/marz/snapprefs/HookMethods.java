@@ -452,7 +452,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         } else {
                             Toast.makeText(context, "VisualFilter files are missing, download them!", Toast.LENGTH_SHORT).show();
                         }
-                        if (HookMethods.mHideLive || HookMethods.mHidePeople) {
+                        if (HookMethods.mHideLive || HookMethods.mHidePeople || HookMethods.mDiscoverUI) {
                             Stories.initStories(lpparam);
                         }
                         Groups.initGroups(lpparam);
