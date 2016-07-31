@@ -65,8 +65,8 @@ public class Stories {
                         }
                     } else if (o.getClass() == liveStory && HookMethods.mHideLive) {
                         f.remove(i);
-                    } else if (o.getClass() == discoverStory) {
-                        //discover
+                    } else if (o.getClass() == discoverStory && HookMethods.mDiscoverUI) {
+                        f.remove(i);
                     } else {
                         Logger.log("Found an unexpected entry at stories TYPE: " + o.getClass().getCanonicalName());
                     }

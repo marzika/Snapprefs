@@ -10,6 +10,7 @@ import com.marz.snapprefs.Util.NotificationUtils;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
@@ -25,6 +26,7 @@ public class DataSaving {
             Class<?> DynamicByteBuffer = findClass(Obfuscator.datasaving.DYNAMICBYTEBUFFER_CLASS, lpparam.classLoader);
             Class<?> NetworkResult = findClass(Obfuscator.datasaving.NETWORKRESULT_CLASS, lpparam.classLoader);
             findAndHookMethod(Obfuscator.datasaving.DSNAPDOWNLOADER_CLASS, lpparam.classLoader, Obfuscator.datasaving.DSNAPDOWNLOADER_DOWNLOADSNAP, DownloadRequest, DynamicByteBuffer, NetworkResult, XC_MethodReplacement.DO_NOTHING);
+            findAndHookMethod(Obfuscator.datasaving.DSNAPDOWNLOAD_CLASS, lpparam.classLoader, "a", String.class, XposedHelpers.findClass(Obfuscator.datasaving.DSNAPDOWNLOAD_PARAM, lpparam.classLoader), XC_MethodReplacement.DO_NOTHING);
         } catch (Throwable t) {
             Logger.log("Error while blocking DSnap Downloading", true);
             Logger.log(t.toString());
@@ -33,9 +35,10 @@ public class DataSaving {
 
     static void blockFromUi(final XC_LoadPackage.LoadPackageParam lpparam) {
         try {
-            Class<?> ChannelPage = findClass("com.snapchat.android.discover.model.ChannelPage", lpparam.classLoader);
+            //Class<?> ChannelPage = findClass("com.snapchat.android.discover.model.ChannelPage", lpparam.classLoader);
             //findAndHookMethod("afh", lpparam.classLoader, "a", ChannelPage, boolean.class, XC_MethodReplacement.returnConstant(false));
-            findAndHookMethod(Obfuscator.datasaving.CHANNELDOWNLOADER_CLASS, lpparam.classLoader, Obfuscator.datasaving.CHANNELDOWNLOADER_START, Cursor.class, XC_MethodReplacement.returnConstant(null));
+            findAndHookMethod(Obfuscator.datasaving.DSNAPINTRODOWNLOAD_CLASS, lpparam.classLoader, "a", String.class, XposedHelpers.findClass(Obfuscator.datasaving.DSNAPDOWNLOAD_PARAM, lpparam.classLoader), XC_MethodReplacement.DO_NOTHING);
+            //findAndHookMethod(Obfuscator.datasaving.CHANNELDOWNLOADER_CLASS, lpparam.classLoader, Obfuscator.datasaving.CHANNELDOWNLOADER_START, Cursor.class, XC_MethodReplacement.returnConstant(null));
         } catch (Throwable t) {
             Logger.log("Error while blocking Channel Intro Download", true);
             Logger.log(t.toString());

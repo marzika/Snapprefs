@@ -129,8 +129,9 @@ public class Obfuscator {
         public static final String DOWNLOADREQUEST_CLASS = "com.snapchat.android.networkmanager.DownloadRequest";
         public static final String DYNAMICBYTEBUFFER_CLASS = "aku";
         public static final String NETWORKRESULT_CLASS = "Ae";
-        public static final String CHANNELDOWNLOADER_CLASS = "FC"; // TODO: find it
-        public static final String CHANNELDOWNLOADER_START = "b";
+        public static final String DSNAPDOWNLOAD_CLASS = "KP$a";
+        public static final String DSNAPDOWNLOAD_PARAM = "mp";
+        public static final String DSNAPINTRODOWNLOAD_CLASS = "LR$1";
         public static final String LIVESTORYPRELOAD_CLASS = "ZO";
         public static final String LIVESTORYPRELOAD_METHOD = "H_";
         public static final String STORYPRELOAD_CLASS = "aaF";
