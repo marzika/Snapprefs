@@ -50,7 +50,7 @@ public class HookSendList {
                 selectAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean set) {
-                        Object hopefullySendToAdapter = getObjectField(param.thisObject, "e");
+                        Object hopefullySendToAdapter = getObjectField(param.thisObject, "f");
                         Logger.log("SELECTALL: We have the ArrayAdapter", true);
                         final String adaptersType = getParameterTypes(new Object[]{hopefullySendToAdapter})[0].getCanonicalName();
                         final boolean isSendToAdapter = adaptersType.equals(Obfuscator.select.SENDTOADAPTER_CLASS);
@@ -81,6 +81,8 @@ public class HookSendList {
                                         else
                                             StoryList.remove(thingToAdd);
                                     } else if (types[i].getCanonicalName().equals(Obfuscator.select.POSTTOVENUE_CLASS) && HookMethods.selectVenue == true) {
+                                        String mStoryId = (String) getObjectField(thingToAdd, "mStoryId");
+                                        if(getObjectField(thingToAdd, "mStoryId").equals("edit") || mStoryId.contains("group_")) continue;
                                         if (set)
                                             StoryList.add(thingToAdd);
                                         else
