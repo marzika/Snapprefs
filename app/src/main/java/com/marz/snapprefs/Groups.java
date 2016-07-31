@@ -69,7 +69,7 @@ public class Groups {
             protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
                 Object element = callMethod(XposedHelpers.getObjectField(param.thisObject, "f"), "get", param.args[1]);
                 if (XposedHelpers.getAdditionalInstanceField(element, "editGroups") != null) {
-                    CheckBox k = (CheckBox) XposedHelpers.getObjectField(param.args[0], "k");
+                    CheckBox k = (CheckBox) XposedHelpers.getObjectField(param.args[0], "j");
                     k.setVisibility(View.GONE);
                     k.setOnCheckedChangeListener(null);
                     k.setOnClickListener(null);
@@ -99,7 +99,7 @@ public class Groups {
                 }
                 //Here change this color if you want
 //                ((View) XposedHelpers.getObjectField(param.args[0], "a")).setBackgroundColor(0xFF66FA77);
-                final CheckBox check = (CheckBox) XposedHelpers.getObjectField(param.args[0], "k");
+                final CheckBox check = (CheckBox) XposedHelpers.getObjectField(param.args[0], "j");
                 if (!checks.containsKey(group.name)) {
                     checks.put(group.name, false);
                 } else {
@@ -115,7 +115,7 @@ public class Groups {
                         for (String user : group.users) {
                             for (Object ii : f) {
                                 if (Friend.isInstance(ii) && ((String) XposedHelpers.getObjectField(ii, "mUsername")).equalsIgnoreCase(user)) {
-                                    callMethod(XposedHelpers.getObjectField(param.thisObject, "k"), "a", new Class[]{int.class, findClass(Obfuscator.groups.INTERFACE, lpparam.classLoader), boolean.class}, callMethod(param.args[0], "e"), ii, isChecked);
+                                    callMethod(XposedHelpers.getObjectField(param.thisObject, "k"), "a", new Class[]{int.class, findClass(Obfuscator.groups.INTERFACE, lpparam.classLoader), boolean.class}, callMethod(param.args[0], "d"), ii, isChecked);
                                     break;
                                 }
                             }
