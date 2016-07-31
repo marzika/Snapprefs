@@ -39,10 +39,15 @@ public class Stories {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 ArrayList f = (ArrayList) XposedHelpers.getObjectField(param.thisObject, Obfuscator.stories.STORYLIST);
+                List<Class> types = new ArrayList<Class>();
                 Class<?> recentStory = XposedHelpers.findClass(Obfuscator.stories.RECENTSTORY_CLASS, lpparam.classLoader);
                 Class<?> allStory = XposedHelpers.findClass(Obfuscator.stories.ALLSTORY_CLASS, lpparam.classLoader);
                 Class<?> liveStory = XposedHelpers.findClass(Obfuscator.stories.LIVESTORY_CLASS, lpparam.classLoader);
                 Class<?> discoverStory = XposedHelpers.findClass(Obfuscator.stories.DISCOVERSTORY_CLASS, lpparam.classLoader);
+                types.add(recentStory);
+                types.add(allStory);
+                types.add(liveStory);
+                types.add(discoverStory);
 
                 for (int i = f.size() - 1; i >= 0; i--) {
                     Object o = f.get(i);
@@ -67,7 +72,7 @@ public class Stories {
                         f.remove(i);
                     } else if (o.getClass() == discoverStory && HookMethods.mDiscoverUI) {
                         f.remove(i);
-                    } else {
+                    } else if (!types.contains(o.getClass())){
                         Logger.log("Found an unexpected entry at stories TYPE: " + o.getClass().getCanonicalName());
                     }
                 }
