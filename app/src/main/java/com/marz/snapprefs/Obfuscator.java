@@ -197,6 +197,8 @@ public class Obfuscator {
         public static final String ASSETREADER_A_CLASS = "TB$a";//TODO: not right, they changed it to byte[]
         //read()
         public static final String ASSETREADER_READ = "a";
+        //SVG class
+        public static final String SVG_CLASS = "gZ";
     }
     public class filters {
         //FilterLoader class
