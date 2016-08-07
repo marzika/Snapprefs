@@ -1,6 +1,6 @@
 Snapprefs
 =========
-[![Build Status](http://104.41.139.34:8080/job/SNAPPREFS/badge/icon)](http://40.121.8.149:8080/job/SNAPPREFS/) [![Join the chat at https://gitter.im/marzika/Snapprefs](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marzika/Snapprefs/?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](http://13.92.242.101:8080/job/SNAPPREFS/badge/icon)](http://13.92.242.101:8080/job/SNAPPREFS/) [![Join the chat at https://gitter.im/marzika/Snapprefs](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marzika/Snapprefs/?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Overview
 -------
@@ -109,7 +109,7 @@ Installation
 
 Latest automatic builds (provided by Dopeland):
 -------
-[Available as Jenkins artifacts](http://104.41.139.34:8080/job/SNAPPREFS/lastSuccessfulBuild/artifact/app/build/outputs/apk/)
+[Available as Jenkins artifacts](http://13.92.242.101:8080/job/SNAPPREFS/lastSuccessfulBuild/artifact/app/build/outputs/apk/)
 
 License
 -------
