@@ -224,7 +224,8 @@ public class Obfuscator {
         public static final String GREYSCALE_CLASS = "afJ";
         public static final String ADDFILTER_CLASS = "afK";
         public static final String ADDFILTER_PARAM = "afH";
-        public static final String ADDER_3_PARAM = "SK$3"; //TODO: find this
+        public static final String ADDER_3_PARAM = "afn"; //TODO: find this
+        public static final String ADDER_CLASS = "afi"; //TODO: find this
         public static final String ADDER_PARAM = "afr";
         public static final String SNAPCHAPTUREDEVENT_CLASS = "ajD";
     }

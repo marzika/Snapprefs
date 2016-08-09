@@ -420,11 +420,13 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 XC_MethodHook initHook = new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        prefs.reload();
+                        refreshPreferences();
                         SnapContext = (Activity) param.thisObject;
                         if(!acceptedToU){//new ContextThemeWrapper(context.createPackageContext("com.marz.snapprefs", Context.CONTEXT_IGNORE_SECURITY), R.style.AppCompatDialog)
                             AlertDialog.Builder builder = new AlertDialog.Builder(SnapContext)
                                     .setTitle("ToU and Privacy Policy")
-                                    .setMessage("You haven't accepted our Terms of Use and Privacy. Please read it carefully and accept it, otherwise you will not be able to use our product. Open the settings app to do that.")
+                                    .setMessage("You haven't accepted our Terms of Use and Privacy. Please read it carefully and accept it, otherwise you will not be able to use our product. Open the Snapprefs app to do that.")
                                     .setIcon(android.R.drawable.ic_dialog_alert);
                             builder.setCancelable(false);
                             final AlertDialog dialog = builder.create();
@@ -447,8 +449,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         Lens.initLens(lpparam, mResources, SnapContext);
                         File vfilters = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/VisualFilters/xpro_map.png");
                         if (vfilters.exists()) {
-                            //VisualFilters.initVisualFilters(lpparam);
-                            Logger.log("Skipping VisualFilters", true);
+                            VisualFilters.initVisualFilters(lpparam);
                         } else {
                             Toast.makeText(context, "VisualFilter files are missing, download them!", Toast.LENGTH_SHORT).show();
                         }
