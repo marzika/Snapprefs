@@ -208,6 +208,8 @@ public class Saving {
                         saveLayout.bringToFront();
                         saveBtn.setVisibility(View.VISIBLE);
                         saveBtn.bringToFront();
+                        saveLayout.invalidate();
+                        saveBtn.invalidate();
                     }
                     saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
                 }
@@ -439,6 +441,15 @@ public class Saving {
                     }
                     Logger.log("Starting to view a story", true);
                 }
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    if (saveLayout != null && saveBtn != null) {
+                        saveLayout.setVisibility(View.VISIBLE);
+                        saveLayout.bringToFront();
+                        saveBtn.setVisibility(View.VISIBLE);
+                        saveBtn.bringToFront();
+                    }
+                }
             });
             /**
              * We hook SnapView.a to determine wether we have stopped viewing the Snap.
@@ -514,7 +525,9 @@ public class Saving {
                         saveLayout.bringToFront();
                         saveBtn.setVisibility(View.VISIBLE);
                         saveBtn.bringToFront();
-                        saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
+                        saveLayout.invalidate();
+                        saveBtn.invalidate();
+                        saveReceivedSnap(snapContext, receivedSnap, MediaType.VIDEO);
                     }
                 }
             });
