@@ -546,7 +546,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        param.args[0] = 120000;
+                        param.args[0] = 12000000;
                     }
                 });
 
