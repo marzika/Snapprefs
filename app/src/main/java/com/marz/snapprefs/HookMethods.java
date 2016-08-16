@@ -568,7 +568,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 XposedHelpers.setStaticIntField(snapImageBryo, "JPEG_ENCODING_QUALITY", 100);
 
 
-
+                if(Common.CAPTION_UNLIMITED_VANILLA){
+                    findAndHookMethod("com.snapchat.android.ui.caption.CaptionEditText", lpparam.classLoader, "n", XC_MethodReplacement.DO_NOTHING);
+                }
                 // VanillaCaptionEditText was moved from an inner-class to a separate class in 8.1.0
                 String vanillaCaptionEditTextClassName = "com.snapchat.android.ui.caption.VanillaCaptionEditText";
                 hookAllConstructors(findClass(vanillaCaptionEditTextClassName, lpparam.classLoader), new XC_MethodHook() {
@@ -579,7 +581,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                             EditText vanillaCaptionEditText = (EditText) param.thisObject;
                             // Set single lines mode to false
                             vanillaCaptionEditText.setSingleLine(false);
-
+                            vanillaCaptionEditText.setFilters(new InputFilter[0]);
                             // Remove actionDone IME option, by only setting flagNoExtractUi
                             vanillaCaptionEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
                             // Remove listener hiding keyboard when enter is pressed by setting the listener to null
