@@ -770,8 +770,7 @@ public class Saving {
         if (mediaType == MediaType.IMAGE) {
             if (imageFile.exists()) {
                 Logger.log("Image already exists");
-                //showToast(context, mResources.getString(R.string.image_exists));
-                NotificationUtils.showMessage(mResources.getString(R.string.image_exists), Color.rgb(255,0,0), NotificationUtils.LENGHT_LONG, lpparam2.classLoader);
+                if(HookMethods.mToastEnabled) NotificationUtils.showMessage(mResources.getString(R.string.image_exists), Color.rgb(255,0,0), NotificationUtils.LENGHT_LONG, lpparam2.classLoader);
                 vibrate(context, false);
                 return;
             }
@@ -780,7 +779,7 @@ public class Saving {
             if (mOverlays == true) {
                 if (overlayFile.exists()) {
                     Logger.log("VideoOverlay already exists");
-                    NotificationUtils.showMessage(mResources.getString(R.string.image_exists), Color.rgb(255, 0, 0), NotificationUtils.LENGHT_LONG, lpparam2.classLoader);
+                    if(HookMethods.mToastEnabled) NotificationUtils.showMessage(mResources.getString(R.string.image_exists), Color.rgb(255, 0, 0), NotificationUtils.LENGHT_LONG, lpparam2.classLoader);
                     vibrate(context, false);
                     return;
                 }
@@ -790,7 +789,7 @@ public class Saving {
             if (videoFile.exists()) {
                 Logger.log("Video already exists");
                 vibrate(context, false);
-                NotificationUtils.showMessage(mResources.getString(R.string.video_exists), Color.rgb(255, 0, 0), NotificationUtils.LENGHT_LONG, lpparam2.classLoader);
+                if(HookMethods.mToastEnabled) NotificationUtils.showMessage(mResources.getString(R.string.video_exists), Color.rgb(255, 0, 0), NotificationUtils.LENGHT_LONG, lpparam2.classLoader);
                 return;
             }
             new saveVideoTask().execute(video, videoFile, context);
@@ -996,7 +995,7 @@ public class Saving {
                 message = "Error while saving";
                 color = Color.rgb(255, 0, 0);
             }
-            NotificationUtils.showMessage(message, color, getToastLength(), lpparam2.classLoader);
+            if(HookMethods.mToastEnabled) NotificationUtils.showMessage(message, color, getToastLength(), lpparam2.classLoader);
         }
     }
 
@@ -1037,7 +1036,7 @@ public class Saving {
                 message = "Error while saving";
                 color = Color.rgb(255, 0, 0);
             }
-            NotificationUtils.showMessage(message, color, getToastLength(), lpparam2.classLoader);
+            if(HookMethods.mToastEnabled) NotificationUtils.showMessage(message, color, getToastLength(), lpparam2.classLoader);
         }
     }
 
@@ -1088,7 +1087,7 @@ public class Saving {
                 message = "Error while saving";
                 color = Color.rgb(255, 0, 0);
             }
-            NotificationUtils.showMessage(message, color, getToastLength(), lpparam2.classLoader);
+            if(HookMethods.mToastEnabled) NotificationUtils.showMessage(message, color, getToastLength(), lpparam2.classLoader);
         }
     }
 }
