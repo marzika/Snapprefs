@@ -523,20 +523,19 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 final Class<?> receivedSnapClass = findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
                 try {
                     XposedHelpers.setStaticIntField(receivedSnapClass, "SECOND_MAX_VIDEO_DURATION", 99999);
-                    Logger.log("SECOND_MAX_VIDEO_DURATION set over 10", true);
+                    //Better quality images
+                    final Class<?> snapMediaUtils = findClass("com.snapchat.android.util.SnapMediaUtils", lpparam.classLoader);
+                    XposedHelpers.setStaticIntField(snapMediaUtils, "IGNORED_COMPRESSION_VALUE", 100);
+                    XposedHelpers.setStaticIntField(snapMediaUtils, "RAW_THUMBNAIL_ENCODING_QUALITY", 100);
+                    final Class<?> profileImageUtils = findClass("com.snapchat.android.util.profileimages.ProfileImageUtils", lpparam.classLoader);
+                    XposedHelpers.setStaticIntField(profileImageUtils, "COMPRESSION_QUALITY", 100);
+                    final Class<?> snapImageBryo = findClass(Obfuscator.save.SNAPIMAGEBRYO_CLASS, lpparam.classLoader);
+                    XposedHelpers.setStaticIntField(snapImageBryo, "JPEG_ENCODING_QUALITY", 100);
+                    Logger.log("Setting static fields", true);
                 } catch (Throwable t) {
-                    Logger.log("SECOND_MAX_VIDEO_DURATION set over 10 failed :(", true);
+                    Logger.log("Setting static fields failed :(", true);
                     Logger.log(t.toString());
                 } /*For viewing longer videos?*/
-                //Better quality images
-                final Class<?> snapMediaUtils = findClass("com.snapchat.android.util.SnapMediaUtils", lpparam.classLoader);
-                XposedHelpers.setStaticIntField(snapMediaUtils, "IGNORED_COMPRESSION_VALUE", 100);
-                XposedHelpers.setStaticIntField(snapMediaUtils, "RAW_THUMBNAIL_ENCODING_QUALITY", 100);
-                final Class<?> profileImageUtils = findClass("com.snapchat.android.util.profileimages.ProfileImageUtils", lpparam.classLoader);
-                XposedHelpers.setStaticIntField(profileImageUtils, "COMPRESSION_QUALITY", 100);
-                final Class<?> snapImageBryo = findClass(Obfuscator.save.SNAPIMAGEBRYO_CLASS, lpparam.classLoader);
-                XposedHelpers.setStaticIntField(snapImageBryo, "JPEG_ENCODING_QUALITY", 100);
-
 
                 if(Common.CAPTION_UNLIMITED_VANILLA){
                     findAndHookMethod("com.snapchat.android.ui.caption.CaptionEditText", lpparam.classLoader, "n", XC_MethodReplacement.DO_NOTHING);
