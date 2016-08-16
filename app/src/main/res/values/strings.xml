@@ -52,7 +52,7 @@
     <string name="sharing">Sharing settings</string>
     <string name="spoofing">Spoofing settings</string>
     <string name="pref_text_title">Caption customization</string>
-    <string name="pref_text_summary">Enable countless text and background custimaztion of captions</string>
+    <string name="pref_text_summary">Enable countless text and background custimazation of captions</string>
     <string name="pref_speed_title">Speed spoofing</string>
     <string name="pref_speed_value_title">Current set speed:</string>
     <string name="pref_speed_summary_on">Enabled speed spoofing</string>
