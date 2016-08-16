@@ -25,7 +25,7 @@ public class ViewDataAdapter extends RecyclerView.Adapter<ViewDataAdapter.ViewHo
     public LayoutInflater inflater = null;
 
     public ViewDataAdapter(List<Friend> friends, Context snapContext) {
-        this.friendList = friends;
+        friendList = friends;
         this.context = snapContext;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }

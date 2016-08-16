@@ -46,7 +46,7 @@ public class ColorPickerDialog extends AlertDialog {
     }
 
     public interface OnColorSelectedListener {
-        public void onColorSelected(int color);
+        void onColorSelected(int color);
     }
 
 }

@@ -76,7 +76,7 @@ public class VisualFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.filter_layout,null);
         mActivity = getActivity();
-        mContext = (Context) getActivity();
+        mContext = getActivity();
         File f = new File(destination);
         if (!f.exists()) {
             f.mkdir();

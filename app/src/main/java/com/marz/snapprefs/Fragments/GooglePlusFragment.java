@@ -42,7 +42,7 @@ public class GooglePlusFragment extends Fragment {
             // the view hierarchy; it would just never be used.
             return null;
         }
-        View v = (View) inflater.inflate(R.layout.gplus_layout, container, false);
+        View v = inflater.inflate(R.layout.gplus_layout, container, false);
         browser = (WebView) v.findViewById(R.id.webview);
         browser.setWebViewClient(new MyBrowser());
         browser.getSettings().setLoadsImagesAutomatically(true);

@@ -240,10 +240,10 @@ public class ColorPicker extends View {
         int centerX = width / 2;
         int centerY = height / 2;
 
-        innerPadding = (int) (paramInnerPadding * width / 100);
-        outerPadding = (int) (paramOuterPadding * width / 100);
-        arrowPointerSize = (int) (paramArrowPointerSize * width / 100);
-        valueSliderWidth = (int) (paramValueSliderWidth * width / 100);
+        innerPadding = paramInnerPadding * width / 100;
+        outerPadding = paramOuterPadding * width / 100;
+        arrowPointerSize = paramArrowPointerSize * width / 100;
+        valueSliderWidth = paramValueSliderWidth * width / 100;
 
         outerWheelRadius = width / 2 - outerPadding - arrowPointerSize;
         innerWheelRadius = outerWheelRadius - valueSliderWidth;

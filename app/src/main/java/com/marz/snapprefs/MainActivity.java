@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        ;
     };
     private SharedPreferences sharedPreferences;
     private ArrayList<MenuItem> items = new ArrayList<>();

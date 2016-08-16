@@ -37,7 +37,7 @@ public class DownloadedFiltersFragment extends Fragment {
         public void onItemClick(AdapterView<?> parent, View view, int position,
                                 long id) {
             Intent i = new Intent(getActivity(), DownloadedFilterPreview.class);
-            i.putExtra("imagePath", "" + (String) parent.getItemAtPosition(position));
+            i.putExtra("imagePath", "" + parent.getItemAtPosition(position));
             startActivity(i);
 
         }
