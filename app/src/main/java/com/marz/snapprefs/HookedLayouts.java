@@ -113,7 +113,7 @@ public class HookedLayouts {
 
             @Override
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
-                View battery = (View) liparam.view.findViewById(liparam.res.getIdentifier("battery_icon", "id", "com.snapchat.android"));
+                View battery = liparam.view.findViewById(liparam.res.getIdentifier("battery_icon", "id", "com.snapchat.android"));
                 battery.setLayoutParams(batteryLayoutParams);
                 battery.setPadding(0, 0, 0, 0);
                 Logger.log("fullScreenFilter", true);
@@ -259,7 +259,7 @@ public class HookedLayouts {
                 HookMethods.SnapContext.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (HookMethods.mColours == true) {
+                        if (HookMethods.mTextTools == true) {
                             relativeLayout.addView(textButton, layoutParams);
                             relativeLayout.addView(outerOptionsLayout, outerOptionsLayoutParams);
                         }
@@ -393,7 +393,7 @@ public class HookedLayouts {
                                 }
                             });
                             builder.setPositiveButton(Common.dialog_done, null);
-                            builder.setView((View) seekBar);
+                            builder.setView(seekBar);
                             builder.show();
                             return;
                         }
@@ -426,7 +426,7 @@ public class HookedLayouts {
                                 }
                             });
                             builder.setPositiveButton(Common.dialog_done, null);
-                            builder.setView((View) seekBar);
+                            builder.setView(seekBar);
                             builder.show();
                             return;
                         }
@@ -555,10 +555,10 @@ public class HookedLayouts {
                                     HookMethods.editText.setGravity(Gravity.RIGHT);
                                 }
                             });
-                            linearLayout.addView((View) button_left);
-                            linearLayout.addView((View) button_center);
-                            linearLayout.addView((View) button_right);
-                            builder.setView((View) linearLayout);
+                            linearLayout.addView(button_left);
+                            linearLayout.addView(button_center);
+                            linearLayout.addView(button_right);
+                            builder.setView(linearLayout);
                             builder.setPositiveButton(Common.dialog_done, null);
                             builder.show();
                             return;
@@ -596,11 +596,11 @@ public class HookedLayouts {
                                     HookMethods.editText.setTypeface(null, Typeface.NORMAL);
                                 }
                             });
-                            linearLayout.addView((View) button_bold);
-                            linearLayout.addView((View) button_italic);
-                            linearLayout.addView((View) button_bolditalic);
-                            linearLayout.addView((View) button_normal);
-                            builder.setView((View) linearLayout);
+                            linearLayout.addView(button_bold);
+                            linearLayout.addView(button_italic);
+                            linearLayout.addView(button_bolditalic);
+                            linearLayout.addView(button_normal);
+                            builder.setView(linearLayout);
                             builder.setPositiveButton(Common.dialog_done, null);
                             builder.show();
                             return;
@@ -696,7 +696,7 @@ public class HookedLayouts {
                             seekBar.setMax(255);
                             int currentapiVersion = android.os.Build.VERSION.SDK_INT;
                             if (currentapiVersion >= Build.VERSION_CODES.KITKAT){
-                                seekBar.setProgress((int) HookMethods.editText.getBackground().getAlpha());
+                                seekBar.setProgress(HookMethods.editText.getBackground().getAlpha());
                             } else {
                                 seekBar.setProgress(255);
                             }
@@ -725,7 +725,7 @@ public class HookedLayouts {
                                 }
                             });
                             builder.setPositiveButton(Common.dialog_done, null);
-                            builder.setView((View) seekBar);
+                            builder.setView(seekBar);
                             builder.show();
                             return;
                         }

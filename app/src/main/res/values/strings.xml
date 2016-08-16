@@ -42,17 +42,6 @@
     <string name="selectvenue_text">Including Local Venues</string>
     <string name="selectvenue_text_summary">Includes Local Venues to the Select-All function</string>
 
-    <string name="rainbow_text">Rainbow text</string>
-    <string name="rainbow_text_summary">Makes each letter separately colored</string>
-    <string name="txtcolour_text">Text colour customizations</string>
-    <string name="txtstyle_text">Custom text styles</string>
-    <string name="txtstyle_text_summary">Enables bold, italic and both styles</string>
-    <string name="txtgravity_text">Text gravity</string>
-    <string name="txtgravity_text_summary">Enables changes to the alignment of the text</string>
-    <string name="bgcolour_text">Background colour customization</string>
-    <string name="bg_transparency_text">Background opacity customization</string>
-    <string name="size_text">Text-size customization</string>
-    <string name="transparency_text">Caption opacity customization</string>
     <string name="debug_text">Debug mode</string>
     <string name="pref_update_title">To get the latest updates</string>
     <string name="pref_update_summary">Add \'snapprefs\' on Snapchat</string>
@@ -62,6 +51,8 @@
     <string name="saving">Saving settings</string>
     <string name="sharing">Sharing settings</string>
     <string name="spoofing">Spoofing settings</string>
+    <string name="pref_text_title">Caption customization</string>
+    <string name="pref_text_summary">Enable countless text and background custimaztion of captions</string>
     <string name="pref_speed_title">Speed spoofing</string>
     <string name="pref_speed_value_title">Current set speed:</string>
     <string name="pref_speed_summary_on">Enabled speed spoofing</string>

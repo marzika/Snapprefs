@@ -21,7 +21,7 @@ public class TextTabFragment extends Fragment {
 
     public static TabLayout tabLayout;
     public static ViewPager viewPager;
-    public static int int_items = 2;
+    public static int int_items = 1;
 
     @Nullable
     @Override
@@ -70,7 +70,6 @@ public class TextTabFragment extends Fragment {
         {
             switch (position){
                 case 0 : return new BaseSettings().setPreferenceId(R.xml.text_prefs);
-                case 1 : return new BaseSettings().setPreferenceId(R.xml.caption_prefs);
             }
             return null;
         }
@@ -92,8 +91,6 @@ public class TextTabFragment extends Fragment {
             switch (position){
                 case 0 :
                     return "Text";
-                case 1 :
-                    return "Unlimited captions";
             }
             return null;
         }

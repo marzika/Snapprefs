@@ -119,21 +119,13 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static int mLicense = 0;
     public static Activity SnapContext;
     public static String MODULE_PATH = null;
-    public static boolean mColours;
     public static boolean mLocation;
     public static ClassLoader classLoader;
     static XSharedPreferences prefs;
     static XSharedPreferences license;
     static boolean selectStory;
     static boolean selectVenue;
-    static boolean txtcolours;
-    static boolean bgcolours;
-    static boolean size;
-    static boolean transparency;
-    static boolean rainbow;
-    static boolean bg_transparency;
-    static boolean txtstyle;
-    static boolean txtgravity;
+    static boolean mTextTools;
     static boolean debug;
     static EditText editText;
     static Typeface defTypeface;
@@ -169,20 +161,12 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 + "_preferences" + ".xml"));
         prefs.reload();
         prefs.makeWorldReadable();
-        fullCaption = prefs.getBoolean("pref_key_fulltext", false);
         selectAll = prefs.getBoolean("pref_key_selectall", false);
         selectStory = prefs.getBoolean("pref_key_selectstory", false);
         selectVenue = prefs.getBoolean("pref_key_selectvenue", false);
         hideBf = prefs.getBoolean("pref_key_hidebf", false);
         hideRecent = prefs.getBoolean("pref_key_hiderecent", false);
-        txtcolours = prefs.getBoolean("pref_key_txtcolour", false);
-        bgcolours = prefs.getBoolean("pref_key_bgcolour", false);
-        size = prefs.getBoolean("pref_key_size", false);
-        transparency = prefs.getBoolean("pref_key_size", false);
-        rainbow = prefs.getBoolean("pref_key_rainbow", false);
-        bg_transparency = prefs.getBoolean("pref_key_bg_transparency", false);
-        txtstyle = prefs.getBoolean("pref_key_txtstyle", false);
-        txtgravity = prefs.getBoolean("pref_key_txtgravity", false);
+        mTextTools = prefs.getBoolean("pref_key_text", false);
         mPaintTools = prefs.getBoolean("pref_key_paint_checkbox", mPaintTools);
         mTimerCounter = prefs.getBoolean("pref_key_timercounter", true);
         mChatAutoSave = prefs.getBoolean("pref_key_save_chat_text", true);
@@ -243,17 +227,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         Common.CHECK_SIZE = !prefs.getBoolean("pref_size_disabled", !Common.CHECK_SIZE);
         Common.TIMBER = prefs.getBoolean("pref_timber", Common.TIMBER);
 
-        if (txtcolours == true || bgcolours == true || size == true || rainbow == true || bg_transparency == true || txtstyle == true || txtgravity == true) {
-            mColours = true;
-        } else {
-            mColours = false;
-        }
-
-        if (mSpeed || mColours || mLocation || mWeather) {
-            shouldAddGhost = true;
-        } else {
-            shouldAddGhost = false;
-        }
+        shouldAddGhost = mSpeed || mTextTools || mLocation || mWeather;
 
         acceptedToU = prefs.getBoolean("acceptedToU", false);
     }
@@ -383,7 +357,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
             XposedUtils.log("----------------- SNAPPREFS HOOKED -----------------", false);
             Object activityThread = callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
             context = (Context) callMethod(activityThread, "getSystemContext");
-            classLoader = (ClassLoader) lpparam.classLoader;
+            classLoader = lpparam.classLoader;
 
             PackageInfo piSnapChat = context.getPackageManager().getPackageInfo(lpparam.packageName, 0);
             XposedUtils.log("SnapChat Version: " + piSnapChat.versionName + " (" + piSnapChat.versionCode + ")", false);
@@ -435,11 +409,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                             return;
                         }
                         boolean isNull;
-                        if(SnapContext==null){
-                            isNull=true;
-                        } else {
-                            isNull=false;
-                        }
+                        isNull = SnapContext == null;
                         Logger.log("SNAPCONTEXT, NULL? - "+isNull, true);
                         prefs.reload();
                         refreshPreferences();
@@ -696,21 +666,13 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         Logger.log("\nTo see the advanced output enable debugging mode in the Support tab", true);
 
         logging("\n~~~~~~~~~~~~ SNAPPREFS SETTINGS");
-        logging("FullCaption: " + fullCaption);
         logging("SelectAll: " + selectAll);
         logging("SelectStory: " + selectStory);
         logging("SelectVenue: " + selectVenue);
         logging("HideBF: " + hideBf);
         logging("HideRecent: " + hideRecent);
         logging("ShouldAddGhost: " + shouldAddGhost);
-        logging("TxtColours: " + txtcolours);
-        logging("BgColours: " + bgcolours);
-        logging("Size: " + size);
-        logging("Transparency: " + transparency);
-        logging("Rainbow: " + rainbow);
-        logging("Background Transparency: " + bg_transparency);
-        logging("TextStyle: " + txtstyle);
-        logging("TextGravity: " + txtgravity);
+        logging("mTextTools: " + mTextTools);
         logging("mTimerCounter: " + mTimerCounter);
         logging("mChatAutoSave: " + mChatAutoSave);
         logging("mChatImageSave: " + mChatImageSave);
@@ -734,7 +696,6 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("mTyping: " + mTyping);
         logging("mUnlimGroups: " + mUnlimGroups);
         logging("mForceNavbar: " + mForceNavbar);
-        logging("mColours: " + mColours);
         logging("*****Debugging: " + debug + " *****");
         logging("mLicense: " + mLicense);
         logging("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
