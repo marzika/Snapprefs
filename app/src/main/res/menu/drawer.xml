@@ -6,9 +6,7 @@
         android:id="@+id/nav_item_main"
         android:icon="@drawable/main"
         android:title="Main Menu" />
-    <item
-        android:id="@+id/nav_item_deluxe_section"
-        android:title="Premium / Deluxe">
+    <item android:title="Premium / Deluxe">
         <menu>
             <item
                 android:id="@+id/nav_item_buy"
@@ -21,9 +19,7 @@
                 android:title="Premium &amp; Deluxe settings" />
         </menu>
 </item>
-    <item
-        android:id="@+id/nav_item_settings"
-        android:title="Settings">
+    <item android:title="Settings">
     <menu>
         <item
             android:id="@+id/nav_item_general"

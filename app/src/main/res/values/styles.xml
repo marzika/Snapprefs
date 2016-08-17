@@ -29,23 +29,6 @@
     <style name="AppCompatDialog" parent="Theme.AppCompat.Dialog.Alert">
         <item name="colorAccent">#4CAF50</item>
     </style>
-    <style name="TopPanel">
-        <item name="android:background">@color/green</item>
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">48.0dip</item>
-        <item name="android:layout_alignParentTop">true</item>
-    </style>
-
-    <style name="settings_checkbox">
-        <item name="android:background">@drawable/settings_button_selector</item>
-        <item name="android:layout_width">@dimen/checkbox_size</item>
-        <item name="android:layout_height">@dimen/checkbox_size</item>
-        <item name="android:layout_marginRight">@dimen/default_gap_half</item>
-        <item name="android:checked">true</item>
-        <item name="android:button">@null</item>
-        <item name="android:layout_alignParentRight">true</item>
-        <item name="android:layout_centerInParent">true</item>
-    </style>
 
     <style name="listViewPrefs" parent="@android:style/Widget.ListView">
         <item name="android:background">@color/white</item>
