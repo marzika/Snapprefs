@@ -6,6 +6,7 @@
     android:padding="@dimen/default_gap">
 
     <ScrollView
+        android:id="@+id/scrollView6"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -15,6 +16,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/premium_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -24,6 +26,7 @@
                 android:textColor="@color/black" />
 
             <TextView
+                android:id="@+id/premium_desc"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -46,6 +49,7 @@
                 android:src="@drawable/buy" />
 
             <TextView
+                android:id="@+id/deluxe_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -55,6 +59,7 @@
                 android:textColor="@color/black" />
 
             <TextView
+                android:id="@+id/deluxe_desc"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
