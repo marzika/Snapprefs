@@ -519,6 +519,13 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         param.args[0] = 12000000;
                     }
                 });
+                findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxFileSize", long.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        Logger.log("setMaxFileSize: " + param.args[0].toString(), true); //1730151
+                        param.args[0] = 5190453;//5190453
+                    }
+                });
 
                 final Class<?> receivedSnapClass = findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
                 try {
