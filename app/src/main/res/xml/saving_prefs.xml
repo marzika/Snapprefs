@@ -2,35 +2,11 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <com.marz.snapprefs.BetterListPreference
         android:defaultValue="@string/pref_save_snapchats_default"
-        android:dialogTitle="@string/pref_save_snaps_images"
+        android:dialogTitle="@string/pref_save_snaps"
         android:entries="@array/pref_save_mode_entries"
         android:entryValues="@array/pref_save_mode_values"
-        android:key="pref_key_snaps_images"
-        android:title="@string/pref_save_snaps_images" />
-
-    <com.marz.snapprefs.BetterListPreference
-        android:defaultValue="@string/pref_save_snapchats_default"
-        android:dialogTitle="@string/pref_save_snaps_videos"
-        android:entries="@array/pref_save_mode_entries"
-        android:entryValues="@array/pref_save_mode_values"
-        android:key="pref_key_snaps_videos"
-        android:title="@string/pref_save_snaps_videos" />
-
-    <com.marz.snapprefs.BetterListPreference
-        android:defaultValue="@string/pref_save_snapchats_default"
-        android:dialogTitle="@string/pref_save_stories_images"
-        android:entries="@array/pref_save_mode_entries"
-        android:entryValues="@array/pref_save_mode_values"
-        android:key="pref_key_stories_images"
-        android:title="@string/pref_save_stories_images" />
-
-    <com.marz.snapprefs.BetterListPreference
-        android:defaultValue="@string/pref_save_snapchats_default"
-        android:dialogTitle="@string/pref_save_stories_videos"
-        android:entries="@array/pref_save_mode_entries"
-        android:entryValues="@array/pref_save_mode_values"
-        android:key="pref_key_stories_videos"
-        android:title="@string/pref_save_stories_videos" />
+        android:key="pref_key_save"
+        android:title="@string/pref_save_snaps" />
     <!--<CheckBoxPreference
         android:defaultValue="false"
         android:key="pref_key_overlay"

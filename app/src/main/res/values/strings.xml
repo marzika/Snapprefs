@@ -128,6 +128,7 @@
     <string name="pref_save_sent_snaps_title">Sent snaps</string>
     <string name="pref_save_sent_snaps_summary_on">Sent snaps will be saved</string>
     <string name="pref_save_sent_snaps_summary_off">Sent snaps won\'t be saved</string>
+    <string name="pref_save_snaps">Save mode</string>
 
     <string-array name="pref_forcenavbar_entries">
         <item>Force Navbar padding to hide</item>
@@ -142,16 +143,14 @@
     </string-array>
 
     <string-array name="pref_save_mode_entries">
-        <item>Save automatically</item>
-        <item>Sweep to save</item>
         <item>Save Button</item>
+        <item>Sweep to save</item>
         <item>Don\'t save</item>
     </string-array>
 
     <string-array name="pref_save_mode_values" translatable="false">
         <item>0</item>
         <item>1</item>
-        <item>3</item>
         <item>2</item>
     </string-array>
 

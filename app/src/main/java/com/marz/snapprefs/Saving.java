@@ -56,10 +56,10 @@ public class Saving {
 
     public static final String SNAPCHAT_PACKAGE_NAME = "com.snapchat.android";
     // Modes for saving Snapchats
-    public static final int SAVE_AUTO = 0;
+    public static final int SAVE_AUTO = 1337;
     public static final int SAVE_S2S = 1;
     public static final int DO_NOT_SAVE = 2;
-    public static final int SAVE_BUTTON = 3;
+    public static final int SAVE_BUTTON = 0;
     // Length of toasts
     public static final int TOAST_LENGTH_SHORT = 0;
     public static final int TOAST_LENGTH_LONG = 1;
@@ -71,10 +71,7 @@ public class Saving {
     public static int currentViewingSnap = -1;
     public static int currentSavingSnap = -1;
     // Preferences and their default values
-    public static int mModeSnapImage = SAVE_AUTO;
-    public static int mModeSnapVideo = SAVE_AUTO;
-    public static int mModeStoryImage = SAVE_AUTO;
-    public static int mModeStoryVideo = SAVE_AUTO;
+    public static int mModeSave = SAVE_BUTTON;
     public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
     public static boolean mTimerUnlimited = true;
     public static boolean mHideTimerStory = false;
@@ -154,49 +151,8 @@ public class Saving {
 
         if (mSCResources == null) mSCResources = snapContext.getResources();
         refreshPreferences();
-        XC_MethodHook addButton = new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                saveLayout = new RelativeLayout(HookMethods.SnapContext);
-                FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.RIGHT);
-                saveLayout.setPadding(0, 0, HookMethods.px(5), HookMethods.px(5));
-                saveBtn = new ImageButton(HookMethods.SnapContext);
-                saveBtn.setBackgroundColor(0);
-                Drawable saveImg = HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.save.STORIES_MYOVERLAYSAVE_ICON.substring(2), 16)); //stories_mystoryoverlaysave_icon
-                saveBtn.setImageDrawable(saveImg);
-                saveBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Snap toSave = snapsMap.get(snapsMap.size() - 1);
-                        if (toSave.getMediaType() == MediaType.IMAGE) {
-                            mImage = toSave.getImage();
-                            saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDIMAGE);
-                        } else if (toSave.getMediaType() == MediaType.VIDEO) {
-                            mVideo = toSave.getVideo();
-                            saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDVIDEO);
-                        } else if (toSave.getMediaType() == MediaType.IMAGE_OVERLAY) {
-                            mImage = toSave.getImage();
-                            saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDOVERLAY);
-                        }
-                    }
-                });
-                saveLayout.addView(saveBtn);
-                ViewGroup vG = (ViewGroup) param.args[0];
-                vG.addView(saveLayout, layoutParams);
-                saveBtn.setVisibility(View.VISIBLE);
-                saveLayout.setVisibility(View.VISIBLE);
-                saveLayout.bringToFront();
-            }
-        };
-        int saveModeVideo = (lastSnapType == SnapType.SNAP ? mModeSnapVideo : mModeStoryVideo);
-        int saveModeImage = (lastSnapType == SnapType.SNAP ? mModeSnapImage : mModeStoryImage);
-        if (saveModeImage == SAVE_BUTTON) {
+        if (lastSnapType == SnapType.STORY && mModeSave == SAVE_BUTTON) {
             findAndHookMethod(Obfuscator.save.SWIPEUPARROWVIEW_CLASS, lpparam.classLoader, Obfuscator.save.SWIPEUPARROWVIEW_SETONCLICK, android.view.View.OnClickListener.class, XC_MethodReplacement.DO_NOTHING);
-            //findAndHookMethod(Obfuscator.save.IMAGESNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.IMAGESNAPRENDERER_SETVIEW, ViewGroup.class, addButton);//Image
-        }
-        if (saveModeVideo == SAVE_BUTTON) {
-            findAndHookMethod(Obfuscator.save.SWIPEUPARROWVIEW_CLASS, lpparam.classLoader, Obfuscator.save.SWIPEUPARROWVIEW_SETONCLICK, android.view.View.OnClickListener.class, XC_MethodReplacement.DO_NOTHING);
-            //findAndHookMethod(Obfuscator.save.VIDEOSNAPRENDERER_CLASS, lpparam.classLoader, Obfuscator.save.VIDEOSNAPRENDERER_SETVIEW, ViewGroup.class, addButton);//Video
         }
         try {
             storySnap = findClass(Obfuscator.save.STORYSNAP_CLASS, lpparam.classLoader);
@@ -206,21 +162,23 @@ public class Saving {
                     ImageView imageview = (ImageView) getObjectField(param.thisObject, Obfuscator.save.IMAGESNAPRENDERER_VAR_IMAGEVIEW);
                     mImage = ((BitmapDrawable) imageview.getDrawable()).getBitmap();
                     newSaveMethod(null, mImage, false);
-                    if (saveLayoutSnap != null && saveBtnSnap != null) {
-                        saveLayoutSnap.setVisibility(View.VISIBLE);
-                        saveLayoutSnap.bringToFront();
-                        saveBtnSnap.setVisibility(View.VISIBLE);
-                        saveBtnSnap.bringToFront();
-                        saveLayoutSnap.invalidate();
-                        saveBtnSnap.invalidate();
-                    }
-                    if (saveLayout != null && saveBtn != null) {
-                        saveLayout.setVisibility(View.VISIBLE);
-                        saveLayout.bringToFront();
-                        saveBtn.setVisibility(View.VISIBLE);
-                        saveBtn.bringToFront();
-                        saveLayout.invalidate();
-                        saveBtn.invalidate();
+                    if(mModeSave == SAVE_BUTTON) {
+                        if (saveLayoutSnap != null && saveBtnSnap != null) {
+                            saveLayoutSnap.setVisibility(View.VISIBLE);
+                            saveLayoutSnap.bringToFront();
+                            saveBtnSnap.setVisibility(View.VISIBLE);
+                            saveBtnSnap.bringToFront();
+                            saveLayoutSnap.invalidate();
+                            saveBtnSnap.invalidate();
+                        }
+                        if (saveLayout != null && saveBtn != null) {
+                            saveLayout.setVisibility(View.VISIBLE);
+                            saveLayout.bringToFront();
+                            saveBtn.setVisibility(View.VISIBLE);
+                            saveBtn.bringToFront();
+                            saveLayout.invalidate();
+                            saveBtn.invalidate();
+                        }
                     }
                     saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
                 }
@@ -239,51 +197,53 @@ public class Saving {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     viewingSnap = true;
                     currentViewingSnap++;
-                    ViewGroup vG = (ViewGroup) getObjectField(param.thisObject, "d");
-                    saveLayoutSnap = new RelativeLayout(HookMethods.SnapContext);
-                    FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.RIGHT);
-                    saveLayoutSnap.setPadding(0, 0, HookMethods.px(5), HookMethods.px(5));
-                    saveBtnSnap = new ImageButton(HookMethods.SnapContext);
-                    saveBtnSnap.setBackgroundColor(0);
-                    Drawable saveImg = HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.save.STORIES_MYOVERLAYSAVE_ICON.substring(2), 16)); //stories_mystoryoverlaysave_icon
-                    saveBtnSnap.setImageDrawable(saveImg);
-                    saveBtnSnap.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Snap toSave = snapsMap.get(snapsMap.size() - 1);
-                            if (toSave.getMediaType() == MediaType.IMAGE) {
-                                mImage = toSave.getImage();
-                                saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDIMAGE);
-                            } else if (toSave.getMediaType() == MediaType.VIDEO) {
-                                mVideo = toSave.getVideo();
-                                saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDVIDEO);
-                            } else if (toSave.getMediaType() == MediaType.IMAGE_OVERLAY) {
-                                mImage = toSave.getImage();
-                                saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDOVERLAY);
+                    if(mModeSave == SAVE_BUTTON) {
+                        ViewGroup vG = (ViewGroup) getObjectField(param.thisObject, "d");
+                        saveLayoutSnap = new RelativeLayout(HookMethods.SnapContext);
+                        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.RIGHT);
+                        saveLayoutSnap.setPadding(0, 0, HookMethods.px(5), HookMethods.px(5));
+                        saveBtnSnap = new ImageButton(HookMethods.SnapContext);
+                        saveBtnSnap.setBackgroundColor(0);
+                        Drawable saveImg = HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.save.STORIES_MYOVERLAYSAVE_ICON.substring(2), 16)); //stories_mystoryoverlaysave_icon
+                        saveBtnSnap.setImageDrawable(saveImg);
+                        saveBtnSnap.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Snap toSave = snapsMap.get(snapsMap.size() - 1);
+                                if (toSave.getMediaType() == MediaType.IMAGE) {
+                                    mImage = toSave.getImage();
+                                    saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDIMAGE);
+                                } else if (toSave.getMediaType() == MediaType.VIDEO) {
+                                    mVideo = toSave.getVideo();
+                                    saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDVIDEO);
+                                } else if (toSave.getMediaType() == MediaType.IMAGE_OVERLAY) {
+                                    mImage = toSave.getImage();
+                                    saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDOVERLAY);
+                                }
                             }
-                        }
-                    });
-                    saveLayoutSnap.addView(saveBtnSnap);
-                    ViewGroup vGpar = (ViewGroup) vG.getParent();
-                    vGpar.addView(saveLayoutSnap, layoutParams);
-                    saveBtnSnap.setVisibility(View.VISIBLE);
-                    saveLayoutSnap.setVisibility(View.VISIBLE);
-                    saveLayoutSnap.bringToFront();
-                    if (saveLayoutSnap != null && saveBtnSnap != null) {
+                        });
+                        saveLayoutSnap.addView(saveBtnSnap);
+                        ViewGroup vGpar = (ViewGroup) vG.getParent();
+                        vGpar.addView(saveLayoutSnap, layoutParams);
+                        saveBtnSnap.setVisibility(View.VISIBLE);
                         saveLayoutSnap.setVisibility(View.VISIBLE);
                         saveLayoutSnap.bringToFront();
-                        saveBtnSnap.setVisibility(View.VISIBLE);
-                        saveBtnSnap.bringToFront();
-                        saveLayoutSnap.invalidate();
-                        saveBtnSnap.invalidate();
-                    }
-                    if (saveLayout != null && saveBtn != null) {
-                        saveLayout.setVisibility(View.VISIBLE);
-                        saveLayout.bringToFront();
-                        saveBtn.setVisibility(View.VISIBLE);
-                        saveBtn.bringToFront();
-                        saveBtn.invalidate();
-                        saveLayout.invalidate();
+                        if (saveLayoutSnap != null && saveBtnSnap != null) {
+                            saveLayoutSnap.setVisibility(View.VISIBLE);
+                            saveLayoutSnap.bringToFront();
+                            saveBtnSnap.setVisibility(View.VISIBLE);
+                            saveBtnSnap.bringToFront();
+                            saveLayoutSnap.invalidate();
+                            saveBtnSnap.invalidate();
+                        }
+                        if (saveLayout != null && saveBtn != null) {
+                            saveLayout.setVisibility(View.VISIBLE);
+                            saveLayout.bringToFront();
+                            saveBtn.setVisibility(View.VISIBLE);
+                            saveBtn.bringToFront();
+                            saveBtn.invalidate();
+                            saveLayout.invalidate();
+                        }
                     }
                     saveReceivedSnap(snapContext, receivedSnap, MediaType.IMAGE);
                     //Logger.log("Starting to view a snap, plus viewingSnap: " + viewingSnap, true);
@@ -484,49 +444,51 @@ public class Saving {
                     receivedSnap = param.args[0];
                     viewingSnap = true;
                     currentViewingSnap++;
-                    ViewGroup vG = (ViewGroup) getObjectField(param.thisObject, "g");
-                    saveLayout = new RelativeLayout(HookMethods.SnapContext);
-                    FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.RIGHT);
-                    saveLayout.setPadding(0, 0, HookMethods.px(5), HookMethods.px(5));
-                    saveBtn = new ImageButton(HookMethods.SnapContext);
-                    saveBtn.setBackgroundColor(0);
-                    Drawable saveImg = HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.save.STORIES_MYOVERLAYSAVE_ICON.substring(2), 16)); //stories_mystoryoverlaysave_icon
-                    saveBtn.setImageDrawable(saveImg);
-                    saveBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Snap toSave = snapsMap.get(snapsMap.size() - 1);
-                            if (toSave.getMediaType() == MediaType.IMAGE) {
-                                mImage = toSave.getImage();
-                                saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDIMAGE);
-                            } else if (toSave.getMediaType() == MediaType.VIDEO) {
-                                mVideo = toSave.getVideo();
-                                saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDVIDEO);
-                            } else if (toSave.getMediaType() == MediaType.IMAGE_OVERLAY) {
-                                mImage = toSave.getImage();
-                                saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDOVERLAY);
+                    if(mModeSave == SAVE_BUTTON){
+                        ViewGroup vG = (ViewGroup) getObjectField(param.thisObject, "g");
+                        saveLayout = new RelativeLayout(HookMethods.SnapContext);
+                        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.RIGHT);
+                        saveLayout.setPadding(0, 0, HookMethods.px(5), HookMethods.px(5));
+                        saveBtn = new ImageButton(HookMethods.SnapContext);
+                        saveBtn.setBackgroundColor(0);
+                        Drawable saveImg = HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.save.STORIES_MYOVERLAYSAVE_ICON.substring(2), 16)); //stories_mystoryoverlaysave_icon
+                        saveBtn.setImageDrawable(saveImg);
+                        saveBtn.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Snap toSave = snapsMap.get(snapsMap.size() - 1);
+                                if (toSave.getMediaType() == MediaType.IMAGE) {
+                                    mImage = toSave.getImage();
+                                    saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDIMAGE);
+                                } else if (toSave.getMediaType() == MediaType.VIDEO) {
+                                    mVideo = toSave.getVideo();
+                                    saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDVIDEO);
+                                } else if (toSave.getMediaType() == MediaType.IMAGE_OVERLAY) {
+                                    mImage = toSave.getImage();
+                                    saveReceivedSnap(snapContext, receivedSnap, MediaType.GESTUREDOVERLAY);
+                                }
                             }
-                        }
-                    });
-                    saveLayout.addView(saveBtn);
-                    ViewGroup vGpar = (ViewGroup) vG.getParent();
-                    vGpar.addView(saveLayout, layoutParams);
-                    saveBtn.setVisibility(View.VISIBLE);
-                    saveLayout.setVisibility(View.VISIBLE);
-                    saveLayout.bringToFront();
-                    if (saveLayout != null && saveBtn != null) {
+                        });
+                        saveLayout.addView(saveBtn);
+                        ViewGroup vGpar = (ViewGroup) vG.getParent();
+                        vGpar.addView(saveLayout, layoutParams);
+                        saveBtn.setVisibility(View.VISIBLE);
                         saveLayout.setVisibility(View.VISIBLE);
                         saveLayout.bringToFront();
-                        saveBtn.setVisibility(View.VISIBLE);
-                        saveBtn.bringToFront();
-                        saveBtn.invalidate();
-                        saveLayout.invalidate();
+                        if (saveLayout != null && saveBtn != null) {
+                            saveLayout.setVisibility(View.VISIBLE);
+                            saveLayout.bringToFront();
+                            saveBtn.setVisibility(View.VISIBLE);
+                            saveBtn.bringToFront();
+                            saveBtn.invalidate();
+                            saveLayout.invalidate();
+                        }
                     }
                     Logger.log("Starting to view a story", true);
                 }
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    if (saveLayout != null && saveBtn != null) {
+                    if (mModeSave == SAVE_BUTTON && saveLayout != null && saveBtn != null) {
                         ViewGroup sLP = (ViewGroup) saveLayout.getParent();
                         sLP.bringToFront();
                         sLP.setVisibility(View.VISIBLE);
@@ -691,7 +653,7 @@ public class Saving {
         switch (mediaType) {
             case VIDEO: {
                 Logger.log("Video " + snapType.name + " opened");
-                int saveMode = (snapType == SnapType.SNAP ? mModeSnapVideo : mModeStoryVideo);
+                int saveMode = mModeSave;
                 if (saveMode == DO_NOT_SAVE) {
                     Logger.log("Mode: don't save");
                 } else if (saveMode == SAVE_S2S) {
@@ -707,7 +669,7 @@ public class Saving {
             }
             case IMAGE: {
                 Logger.log("Image " + snapType.name + " opened");
-                int saveMode = (snapType == SnapType.SNAP ? mModeSnapImage : mModeStoryImage);
+                int saveMode = mModeSave;
                 if (saveMode == DO_NOT_SAVE) {
                     Logger.log("Mode: don't save");
                 } else if (saveMode == SAVE_S2S) {
@@ -722,7 +684,7 @@ public class Saving {
                 break;
             }
             case IMAGE_OVERLAY: {
-                int saveMode = (snapType == SnapType.SNAP ? mModeSnapVideo : mModeStoryVideo);
+                int saveMode = mModeSave;
                 if (saveMode == DO_NOT_SAVE) {
                 } else if (saveMode == SAVE_S2S) {
                     gestureModel = new GestureModel(receivedSnap, screenHeight, MediaType.GESTUREDOVERLAY);
@@ -883,10 +845,7 @@ public class Saving {
                 + "_preferences" + ".xml"));
         prefs.reload();
 
-        mModeSnapImage = prefs.getInt("pref_key_snaps_images", mModeSnapImage);
-        mModeSnapVideo = prefs.getInt("pref_key_snaps_videos", mModeSnapVideo);
-        mModeStoryImage = prefs.getInt("pref_key_stories_images", mModeStoryImage);
-        mModeStoryVideo = prefs.getInt("pref_key_stories_videos", mModeStoryVideo);
+        mModeSave = prefs.getInt("pref_key_save", mModeSave);
         mTimerMinimum = prefs.getInt("pref_key_timer_minimum", mTimerMinimum);
         mToastEnabled = prefs.getBoolean("pref_key_toasts_checkbox", mToastEnabled);
         mToastLength = prefs.getInt("pref_key_toasts_duration", mToastLength);

@@ -67,10 +67,9 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 
     public static final String SNAPCHAT_PACKAGE_NAME = "com.snapchat.android";
     // Modes for saving Snapchats
-    public static final int SAVE_AUTO = 0;
     public static final int SAVE_S2S = 1;
     public static final int DO_NOT_SAVE = 2;
-    public static final int SAVE_BUTTON = 3;
+    public static final int SAVE_BUTTON = 0;
     // Length of toasts
     public static final int TOAST_LENGTH_SHORT = 0;
     public static final int TOAST_LENGTH_LONG = 1;
@@ -78,10 +77,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static final int TIMER_MINIMUM_DISABLED = 0;
     private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
     // Preferences and their default values
-    public static int mModeSnapImage = SAVE_AUTO;
-    public static int mModeSnapVideo = SAVE_AUTO;
-    public static int mModeStoryImage = SAVE_AUTO;
-    public static int mModeStoryVideo = SAVE_AUTO;
+    public static int mModeSave = SAVE_BUTTON;
     public static int mToastLength = TOAST_LENGTH_LONG;
     public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
     public static int mForceNavbar = 0;
@@ -197,10 +193,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 
         //SAVING
 
-        mModeSnapImage = prefs.getInt("pref_key_snaps_images", mModeSnapImage);
-        mModeSnapVideo = prefs.getInt("pref_key_snaps_videos", mModeSnapVideo);
-        mModeStoryImage = prefs.getInt("pref_key_stories_images", mModeStoryImage);
-        mModeStoryVideo = prefs.getInt("pref_key_stories_videos", mModeStoryVideo);
+        mModeSave = prefs.getInt("pref_key_save", mModeSave);
         mTimerMinimum = prefs.getInt("pref_key_timer_minimum", mTimerMinimum);
         mToastEnabled = prefs.getBoolean("pref_key_toasts_checkbox", mToastEnabled);
         mVibrationEnabled = prefs.getBoolean("pref_key_vibration_checkbox", mVibrationEnabled);
@@ -521,8 +514,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 });
                 findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxFileSize", long.class, new XC_MethodHook() {
                     @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        Logger.log("setMaxFileSize: " + param.args[0].toString(), true); //1730151
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {//1730151
                         param.args[0] = 5190453;//5190453
                     }
                 });
@@ -709,11 +701,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 
         logging("----------------------- SAVING SETTINGS -----------------------");
         logging("Preferences have changed:");
-        String[] saveModes = {"SAVE_AUTO", "SAVE_S2S", "DO_NOT_SAVE", "SAVE_BUTTON"};
-        logging("~ mModeSnapImage: " + saveModes[mModeSnapImage]);
-        logging("~ mModeSnapVideo: " + saveModes[mModeSnapVideo]);
-        logging("~ mModeStoryImage: " + saveModes[mModeStoryImage]);
-        logging("~ mModeStoryVideo: " + saveModes[mModeStoryVideo]);
+        String[] saveModes = {"SAVE_BUTTON", "SAVE_S2S", "DO_NOT_SAVE"};
+        logging("~ mModeSave: " + saveModes[mModeSave]);
         logging("~ mOverlays: " + mOverlays);
         logging("~ mTimerMinimum: " + mTimerMinimum);
         logging("~ mToastEnabled: " + mToastEnabled);
