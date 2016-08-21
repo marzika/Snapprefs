@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
     <release
+        version="2.0.0 beta"
+        versioncode="25">
+        <change>Updated for 9.31.1.0</change>
+        <change>Materialized settings application</change>
+        <change>Added Save Button for Images and Videos</change>
+        <change>Improved image quality for pictures</change>
+        <change>Added Live Story hiding</change>
+        <change>Added Groups</change>
+        <change>Lifted maximum Video Size to 5.3 MBs</change>
+        <change>Removed Autosave for Snaps and Stories</change>
+        <change>Added Chat Autosave</change>
+        <change>New Caption customization UI</change>
+        <change>Added Gradient for Text and Background</change>
+        <change>New Paint Tools UI</change>
+        <change>Added Story Preload blocking</change>
+        <change>Added selective Story hiding</change>
+        <change>Added manual NavBar forcing</change>
+        <change>Added shortcut from Snapchat's dropdown menu to Snapprefs</change>
+        <change>Added native Snapchat Notifications</change>
+        <change>Saving speed improvements</change>
+        <change>Added hiding from launchers</change>
+        <change>Added video length counter</change>
+    </release>
+    <release
         version="1.6.5"
         versioncode="24">
         <change>Updated for 9.21.1.0</change>
