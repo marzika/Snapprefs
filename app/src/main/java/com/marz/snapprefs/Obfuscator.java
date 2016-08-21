@@ -246,6 +246,7 @@ public class Obfuscator {
         public static final String MESSAGEVIEWHOLDER_VAR2 = "d";
         public static final String MESSAGEVIEWHOLDER_ISSAVED = "ax_";
         public static final String MESSAGEVIEWHOLDER_SAVE = "x";
+        public static final String CHATLAYOUT_CLASS = "Nd";
     }
     public class notification {
         public static final String NOTIFICATION_CLASS_1 = "vz";

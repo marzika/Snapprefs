@@ -1,12 +1,28 @@
 package com.marz.snapprefs;
 
+import android.content.Context;
 import android.content.res.XModuleResources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
+import android.net.Uri;
+import android.view.Gravity;
+import android.view.TextureView;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.lang.reflect.Field;
+import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -49,8 +65,15 @@ public class Chat {
                 chatMediaArr[0] = param.args[0];
             }
         });
-        final Class<?> imageResourceViewClass = findClass(Obfuscator.save.IMAGERESOURCEVIEW_CLASS, lpparam.classLoader);
-        hookAllConstructors(imageResourceViewClass, new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.chat.CHATLAYOUT_CLASS, lpparam.classLoader, "a", ViewGroup.class, int.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+               List chatMediaList = (List) getObjectField(param.thisObject, "a");
+               chatMediaArr[0] = chatMediaList.get((int) param.args[1]);
+            }
+        });
+        final Class<?> PhotoViewClass = findClass("uk.co.senab.photoview.PhotoView", lpparam.classLoader);
+        hookAllConstructors(PhotoViewClass, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
                 final ImageView imageView = (ImageView) param.thisObject;
@@ -62,13 +85,9 @@ public class Chat {
 
                         Bitmap chatImage = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
                         Logger.log("We have the chat image", true);
-                        Object imageResource = getObjectField(param.thisObject, Obfuscator.save.IMAGERESOURCEVIEW_VAR_IMAGERESOURCE);
-                        Logger.log("We have the imageResource", true);
-                        //Object chatMedia = getObjectField(imageResource, Obfuscator.save.IMAGERESOURCE_VAR_CHATMEDIA); // in ImageResource
                         Object chatMedia = chatMediaArr[0];
                         Logger.log("We have the chatMedia", true);
                         Long timestamp = (Long) callMethod(chatMedia, Obfuscator.save.CHAT_GETTIMESTAMP); // model.chat.Chat
-                        //Long timestamp = 0L;
                         Logger.log("We have the timestamp " + timestamp.toString(), true);
                         String sender = (String) callMethod(chatMedia, Obfuscator.save.STATEFULCHATFEEDITEM_GETSENDER); //in StatefulChatFeedItem
                         Logger.log("We have the sender " + sender, true);
@@ -79,6 +98,55 @@ public class Chat {
                         return true;
                     }
                 });
+            }
+        });
+        final Class<?> TextureVideoView = findClass("com.snapchat.opera.shared.view.TextureVideoView", lpparam.classLoader);
+        final Class<?> CenterCropTextureVideoView = findClass("com.snapchat.android.ui.chat.ChatVideoFullScreenView", lpparam.classLoader);
+        hookAllConstructors(CenterCropTextureVideoView, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                final FrameLayout frameLayout = (FrameLayout) param.thisObject;
+                RelativeLayout saveLayoutSnap = new RelativeLayout(HookMethods.SnapContext);
+                FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM | Gravity.RIGHT);
+                saveLayoutSnap.setPadding(0, 0, HookMethods.px(5), HookMethods.px(30));
+                ImageButton saveBtnSnap = new ImageButton((Context) param.args[0]);
+                saveBtnSnap.setBackgroundColor(0);
+                Drawable saveImg = HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.save.STORIES_MYOVERLAYSAVE_ICON.substring(2), 16)); //stories_mystoryoverlaysave_icon
+                saveBtnSnap.setImageDrawable(saveImg);
+                saveBtnSnap.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Logger.log("----------------------- SNAPPREFS ------------------------", false);
+                        Logger.log("Button press on chat video detected");
+                        Object textureVideoView = getObjectField(param.thisObject, "b");
+                        Uri mUri = null;
+                        FileInputStream video = null;
+                        try {
+                            Field mUriField = TextureVideoView.getDeclaredField("b");
+                            mUriField.setAccessible(true);
+                            mUri = (Uri) mUriField.get(textureVideoView);
+                            Logger.log("We have the chat video url: " + mUri.toString(), true);
+                            video = new FileInputStream(Uri.parse(mUri.toString()).getPath());
+                        } catch (Exception e) {
+                            Logger.log("Error while saving the Chat image:",true);
+                            e.printStackTrace();
+                        }
+                        Object chatMedia = chatMediaArr[0];
+                        Logger.log("We have the chatMedia", true);
+                        Long timestamp = (Long) callMethod(chatMedia, Obfuscator.save.CHAT_GETTIMESTAMP); // model.chat.Chat
+                        Logger.log("We have the timestamp " + timestamp.toString(), true);
+                        String sender = (String) callMethod(chatMedia, Obfuscator.save.STATEFULCHATFEEDITEM_GETSENDER); //in StatefulChatFeedItem
+                        Logger.log("We have the sender " + sender, true);
+                        String filename = sender + "_" + dateFormat.format(timestamp);
+                        Logger.log("We have the file name " + filename, true);
+                        Saving.saveSnap(Saving.SnapType.CHAT, Saving.MediaType.VIDEO, (Context) param.args[0], null, video, filename, sender);
+                    }
+                });
+                saveLayoutSnap.addView(saveBtnSnap);
+                frameLayout.addView(saveLayoutSnap, layoutParams);
+                saveBtnSnap.setVisibility(View.VISIBLE);
+                saveLayoutSnap.setVisibility(View.VISIBLE);
+                saveLayoutSnap.bringToFront();
             }
         });
 

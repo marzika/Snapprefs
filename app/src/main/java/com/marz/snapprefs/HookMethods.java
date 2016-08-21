@@ -2,8 +2,6 @@ package com.marz.snapprefs;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
@@ -13,7 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.AlertDialog;
-import android.support.v7.view.ContextThemeWrapper;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
@@ -139,7 +136,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     private static boolean shouldAddVFilters;
     private static boolean mTimerCounter;
     private static boolean mChatAutoSave;
-    private static boolean mChatImageSave;
+    private static boolean mChatMediaSave;
     private static boolean mIntegration;
     private static InitPackageResourcesParam resParam;
     Class CaptionEditText;
@@ -166,7 +163,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         mPaintTools = prefs.getBoolean("pref_key_paint_checkbox", mPaintTools);
         mTimerCounter = prefs.getBoolean("pref_key_timercounter", true);
         mChatAutoSave = prefs.getBoolean("pref_key_save_chat_text", true);
-        mChatImageSave = prefs.getBoolean("pref_key_save_chat_image", true);
+        mChatMediaSave = prefs.getBoolean("pref_key_save_chat_image", true);
         mIntegration = prefs.getBoolean("pref_key_integration", true);
         mCustomFilterBoolean = prefs.getBoolean("pref_key_custom_filter_checkbox", mCustomFilterBoolean);
         mMultiFilterBoolean = prefs.getBoolean("pref_key_multi_filter_checkbox", mMultiFilterBoolean);
@@ -453,7 +450,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                         if (mChatAutoSave) {
                             Chat.initTextSave(lpparam, mResources);
                         }
-                        if (mChatImageSave) {
+                        if (mChatMediaSave) {
                             Chat.initImageSave(lpparam, mResources);
                         }
                         if (mIntegration) {
@@ -673,7 +670,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("mTextTools: " + mTextTools);
         logging("mTimerCounter: " + mTimerCounter);
         logging("mChatAutoSave: " + mChatAutoSave);
-        logging("mChatImageSave: " + mChatImageSave);
+        logging("mChatMediaSave: " + mChatMediaSave);
         logging("mIntegration: " + mIntegration);
         logging("mPaintTools: " + mPaintTools);
         logging("CustomFilters: " + mCustomFilterBoolean);
