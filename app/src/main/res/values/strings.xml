@@ -354,8 +354,8 @@
     <string name="pref_paint_cb_title">Enable Paint Tools</string>
     <string name="pref_timercounter_cb_summary">When enabled your taken video\'s length will be shown on the recording button during recording.</string>
     <string name="pref_timercounter_cb_title">Enable Timer Counter</string>
-    <string name="pref_save_chat_image_title">Enable Chat image saving</string>
-    <string name="pref_save_chat_image_summary">When enabled long press on the image to save it</string>
+    <string name="pref_save_chat_image_title">Enable Chat media saving</string>
+    <string name="pref_save_chat_image_summary">When enabled long press on the image when opened to save it, for  videos use the button.</string>
     <string name="pref_save_chat_text_title">Enable Chat text auto-save</string>
     <string name="pref_save_chat_text_summary">When enabled sent/received Chats gets saved automatically</string>
     <string name="pref_save_integration_title">Enable Snapchat integration</string>
