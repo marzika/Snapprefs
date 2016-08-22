@@ -496,7 +496,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 findAndHookMethod(Obfuscator.icons.ICON_HANDLER_CLASS, lpparam.classLoader, Obfuscator.icons.RECORDING_VIDEO, boolean.class, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        HookedLayouts.upload.setVisibility(View.VISIBLE);
+                    	if (HookedLayouts.upload != null)
+                            HookedLayouts.upload.setVisibility(View.VISIBLE);
                     }
                 });
                 for (String s : Obfuscator.ROOTDETECTOR_METHODS) {
