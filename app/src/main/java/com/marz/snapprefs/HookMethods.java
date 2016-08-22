@@ -485,10 +485,12 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
                 findAndHookMethod(Obfuscator.icons.ICON_HANDLER_CLASS, lpparam.classLoader, Obfuscator.icons.SHOW_LENS, boolean.class, boolean.class, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        if((boolean)param.args[0]){
-                            HookedLayouts.upload.setVisibility(View.INVISIBLE);
-                        } else {
-                            HookedLayouts.upload.setVisibility(View.VISIBLE);
+                        if (HookedLayouts.upload != null) {
+                            if((boolean)param.args[0]){
+                                HookedLayouts.upload.setVisibility(View.INVISIBLE);
+                            } else {
+                                HookedLayouts.upload.setVisibility(View.VISIBLE);
+                            }
                         }
                     }
                 });
