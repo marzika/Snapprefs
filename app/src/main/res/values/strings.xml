@@ -146,12 +146,14 @@
         <item>Save Button</item>
         <item>Sweep to save</item>
         <item>Don\'t save</item>
+        <item>Auto Save</item>
     </string-array>
 
     <string-array name="pref_save_mode_values" translatable="false">
         <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
     </string-array>
 
     <!-- Viewing settings -->

@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.XModuleResources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Point;
@@ -28,6 +30,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -154,6 +157,70 @@ public class HookedLayouts {
             }
         });
     }
+
+    public static void addSaveButtons( XC_InitPackageResources.InitPackageResourcesParam resparam,
+                                       final XModuleResources mResources, final Context localContext
+    ) {
+        Logger.log("Adding Save Buttons");
+        final FrameLayout.LayoutParams layoutParams =
+                new FrameLayout.LayoutParams( FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
+                                              Gravity.BOTTOM | Gravity.START );
+
+        final Bitmap saveImg = BitmapFactory.decodeResource( mResources, R.mipmap.snap_button );
+
+        resparam.res.hookLayout( Common.PACKAGE_SNAP, "layout", "view_story_snap", new XC_LayoutInflated()
+        {
+            @Override
+            public void handleLayoutInflated( LayoutInflatedParam liparam )
+                    throws Throwable {
+                final FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(
+                        liparam.res.getIdentifier( "snap_container", "id", Common.PACKAGE_SNAP )
+                ).getParent();
+
+                ImageButton saveBtn = new ImageButton( localContext );
+                saveBtn.setLayoutParams( layoutParams );
+                saveBtn.setBackgroundColor( 0 );
+                saveBtn.setImageBitmap( saveImg );
+
+                frameLayout.addView( saveBtn );
+
+                saveBtn.setOnClickListener( new View.OnClickListener()
+                {
+                    @Override public void onClick( View v ) {
+                        Logger.printTitle( "Performing Button Save" );
+                        Saving.saveSnapButtonPress();
+                    }
+                } );
+            }
+        } );
+
+        resparam.res.hookLayout( Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated()
+        {
+            @Override
+            public void handleLayoutInflated( LayoutInflatedParam liparam )
+                    throws Throwable {
+                final FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(
+                        liparam.res.getIdentifier( "snap_container", "id", Common.PACKAGE_SNAP )
+                ).getParent();
+
+                ImageButton saveBtn = new ImageButton( localContext );
+                saveBtn.setLayoutParams( layoutParams );
+                saveBtn.setBackgroundColor( 0 );
+                saveBtn.setImageBitmap( saveImg );
+
+                frameLayout.addView( saveBtn );
+
+                saveBtn.setOnClickListener( new View.OnClickListener()
+                {
+                    @Override public void onClick( View v ) {
+                        Logger.printTitle( "Performing Button Save" );
+                        Saving.saveSnapButtonPress();
+                    }
+                } );
+            }
+        } );
+    }
+
     public static void addIcons(XC_InitPackageResources.InitPackageResourcesParam resparam, final XModuleResources mResources) {
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "snap_preview", new XC_LayoutInflated() {
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {

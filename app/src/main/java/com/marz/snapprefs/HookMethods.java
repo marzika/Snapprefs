@@ -67,6 +67,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static final int SAVE_S2S = 1;
     public static final int DO_NOT_SAVE = 2;
     public static final int SAVE_BUTTON = 0;
+    public static final int SAVE_AUTO = 3;
     // Length of toasts
     public static final int TOAST_LENGTH_SHORT = 0;
     public static final int TOAST_LENGTH_LONG = 1;
@@ -74,7 +75,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     public static final int TIMER_MINIMUM_DISABLED = 0;
     private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
     // Preferences and their default values
-    public static int mModeSave = SAVE_BUTTON;
+    public static int mModeSave = SAVE_AUTO;
     public static int mToastLength = TOAST_LENGTH_LONG;
     public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
     public static int mForceNavbar = 0;
@@ -324,6 +325,14 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         //mCustomFilterLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/Filters";
         refreshPreferences();
         resParam = resparam;
+
+        Object activityThread = callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
+        Context localContext = (Context) callMethod(activityThread, "getSystemContext");
+
+        // TODO Set up removal of button when mode is changed
+        // Currently requires snapchat to restart to remove the button
+        if( mModeSave == SAVE_BUTTON )
+            HookedLayouts.addSaveButtons( resparam, mResources, localContext );
 
         if (shouldAddGhost) {
             HookedLayouts.addIcons(resparam, mResources);
@@ -698,7 +707,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 
         logging("----------------------- SAVING SETTINGS -----------------------");
         logging("Preferences have changed:");
-        String[] saveModes = {"SAVE_BUTTON", "SAVE_S2S", "DO_NOT_SAVE"};
+        String[] saveModes = {"SAVE_BUTTON", "SAVE_S2S", "DO_NOT_SAVE", "SAVE_AUTO"};
         logging("~ mModeSave: " + saveModes[mModeSave]);
         logging("~ mOverlays: " + mOverlays);
         logging("~ mTimerMinimum: " + mTimerMinimum);
