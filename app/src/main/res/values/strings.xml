@@ -128,7 +128,8 @@
     <string name="pref_save_sent_snaps_title">Sent snaps</string>
     <string name="pref_save_sent_snaps_summary_on">Sent snaps will be saved</string>
     <string name="pref_save_sent_snaps_summary_off">Sent snaps won\'t be saved</string>
-    <string name="pref_save_snaps">Save mode</string>
+    <string name="pref_save_snaps">Snap save mode</string>
+    <string name="pref_save_story">Story save mode</string>
 
     <string-array name="pref_forcenavbar_entries">
         <item>Force Navbar padding to hide</item>

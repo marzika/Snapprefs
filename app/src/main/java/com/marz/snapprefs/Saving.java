@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Vibrator;
+import android.view.View;
 import android.widget.Toast;
 
 import com.marz.snapprefs.SnapData.FlagState;
@@ -61,6 +62,7 @@ public class Saving
     private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
     // Preferences and their default values
     public static int mModeSave = SAVE_AUTO;
+    public static int mModeStory = SAVE_BUTTON;
     public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
     public static boolean mTimerUnlimited = true;
     public static boolean mHideTimerStory = false;
@@ -368,14 +370,13 @@ public class Saving
 
             try {
                 handleSave( relativeContext, currentSnapData );
-            } catch( Exception e )
-            {
+            } catch ( Exception e ) {
                 Logger.printFinalMessage( "Exception saving snap" );
 
                 if ( HookMethods.mToastEnabled ) {
                     NotificationUtils.showMessage(
                             "Code exception saving snap",
-                            Color.rgb( 200, 70, 70),
+                            Color.rgb( 200, 70, 70 ),
                             getToastLength(),
                             lpparam2.classLoader );
                 }
@@ -385,7 +386,7 @@ public class Saving
             if ( HookMethods.mToastEnabled ) {
                 NotificationUtils.showMessage(
                         "No SnapData to save",
-                        Color.rgb( 200, 70, 70),
+                        Color.rgb( 200, 70, 70 ),
                         getToastLength(),
                         lpparam2.classLoader );
             }
@@ -435,11 +436,13 @@ public class Saving
 
         snapData.setHeader( mId, mKey, strSender, strTimestamp, snapType );
 
-        if ( mModeSave != SAVE_BUTTON )
+        if ( shouldSave( snapData ) )
             handleSave( context, snapData );
         else {
             currentSnapData = snapData;
             relativeContext = context;
+
+            Logger.printFinalMessage( "Set to BUTTON saving - Awaiting press" );
         }
     }
 
@@ -543,8 +546,10 @@ public class Saving
         Logger.printMessage( "Successfully attached payload" );
 
         // If set to button saving, do not save
-        if ( mModeSave != SAVE_BUTTON )
+        if ( shouldSave( snapData ) )
             handleSave( context, snapData );
+        else
+            Logger.printFinalMessage( "Set to BUTTON saving - Awaiting press" );
     }
 
     /**
@@ -585,7 +590,7 @@ public class Saving
         Bitmap bmp = (Bitmap) param.args[ 0 ];
 
         if ( bmp == null ) {
-            Logger.printFinalMessage( "Tried to attatch Null Bitmap" );
+            Logger.printFinalMessage( "Tried to attach Null Bitmap" );
             return;
         }
 
@@ -595,12 +600,26 @@ public class Saving
         snapData.setPayload( bmp );
         Logger.printMessage( "Successfully attached payload" );
 
-        if ( mModeSave != SAVE_BUTTON )
+        if ( shouldSave( snapData ) )
             handleSave( context, snapData );
+        else
+            Logger.printFinalMessage( "Set to BUTTON saving - Awaiting press" );
+    }
+
+    private static boolean shouldSave( SnapData snapData ) {
+        if ( snapData.getSnapType() == SnapType.SNAP &&
+                mModeSave == SAVE_BUTTON )
+            return false;
+        else if ( snapData.getSnapType() == SnapType.STORY &&
+                mModeStory == SAVE_BUTTON )
+            return false;
+
+        return true;
     }
 
     /**
      * Used to perform a save on a completed snapData object
+     *
      * @param context
      * @param snapData
      * @throws Exception
@@ -630,7 +649,7 @@ public class Saving
                     if ( HookMethods.mToastEnabled ) {
                         NotificationUtils.showMessage(
                                 snapData.getMediaType().typeName + " saved",
-                                Color.rgb( 70, 200, 70),
+                                Color.rgb( 70, 200, 70 ),
                                 getToastLength(),
                                 lpparam2.classLoader );
                     }
@@ -649,7 +668,7 @@ public class Saving
                     if ( HookMethods.mToastEnabled ) {
                         NotificationUtils.showMessage(
                                 "Failed saving " + snapData.getMediaType().typeName,
-                                Color.rgb( 200, 70, 70),
+                                Color.rgb( 200, 70, 70 ),
                                 getToastLength(),
                                 lpparam2.classLoader );
                     }
@@ -663,19 +682,19 @@ public class Saving
                     if ( HookMethods.mToastEnabled ) {
                         NotificationUtils.showMessage(
                                 snapData.getMediaType().typeName + " already exists",
-                                Color.rgb( 70, 200, 70),
+                                Color.rgb( 70, 200, 70 ),
                                 getToastLength(),
                                 lpparam2.classLoader );
                     }
-                    
+
                     Logger.printMessage( "Wiping payload and adding SAVED flag" );
 
                     // Wipe the payload to save memory
                     // Also assigns the SAVED flag to the snap
                     snapData.wipePayload();
 
-                    Logger.printFinalMessage( snapData.getMediaType().typeName + " already exists" );
-                    return;
+                    Logger.printFinalMessage(
+                            snapData.getMediaType().typeName + " already exists" );
                 }
             }
         }
@@ -683,6 +702,7 @@ public class Saving
 
     /**
      * Check if the snapData has already been handled
+     *
      * @param snapData
      * @param flagState - Assign a flagstate to include (E.G PAYLOAD/HEADER)
      * @return True if contains any of the flags
@@ -698,6 +718,7 @@ public class Saving
 
     /**
      * If printFlags is true, will print the snapData's flag list
+     *
      * @param snapData
      */
     private static void printFlags( SnapData snapData ) {
@@ -718,6 +739,7 @@ public class Saving
 
     /**
      * Perform a save on the snapData
+     *
      * @param context
      * @param snapData
      * @return
@@ -788,6 +810,7 @@ public class Saving
 
     /**
      * Perform a direct save of a snap
+     *
      * @param snapType
      * @param mediaType
      * @param context
@@ -800,7 +823,7 @@ public class Saving
      */
     public static SaveResponse saveSnap( SnapType snapType, MediaType mediaType, Context context,
                                          Bitmap image, FileInputStream video, String filename,
-                                         String sender ) throws Exception{
+                                         String sender ) throws Exception {
         File directory;
 
         try {
@@ -979,6 +1002,7 @@ public class Saving
         prefs.reload();
 
         mModeSave = prefs.getInt( "pref_key_save", mModeSave );
+        mModeStory = prefs.getInt( "pref_key_save_story", mModeStory );
         mTimerMinimum = prefs.getInt( "pref_key_timer_minimum", mTimerMinimum );
         mToastEnabled = prefs.getBoolean( "pref_key_toasts_checkbox", mToastEnabled );
         mToastLength = prefs.getInt( "pref_key_toasts_duration", mToastLength );
@@ -993,6 +1017,14 @@ public class Saving
         mHideTimerStory = prefs.getBoolean( "pref_key_timer_story_hide", mHideTimerStory );
         mLoopingVids = prefs.getBoolean( "pref_key_looping_video", mLoopingVids );
         mHideTimer = prefs.getBoolean( "pref_key_timer_hide", mHideTimer );
+
+        if ( HookedLayouts.saveSnapButton != null )
+            HookedLayouts.saveSnapButton.setVisibility(
+                    mModeSave == SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE );
+
+        if ( HookedLayouts.saveStoryButton != null )
+            HookedLayouts.saveStoryButton.setVisibility(
+                    mModeStory == SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE );
     }
 
     public enum SnapType

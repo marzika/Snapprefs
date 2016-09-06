@@ -76,6 +76,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
     private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
     // Preferences and their default values
     public static int mModeSave = SAVE_AUTO;
+    public static int mModeStory = SAVE_BUTTON;
     public static int mToastLength = TOAST_LENGTH_LONG;
     public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
     public static int mForceNavbar = 0;
@@ -192,6 +193,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         //SAVING
 
         mModeSave = prefs.getInt("pref_key_save", mModeSave);
+        mModeStory = prefs.getInt("pref_key_save_story", mModeStory);
         mTimerMinimum = prefs.getInt("pref_key_timer_minimum", mTimerMinimum);
         mToastEnabled = prefs.getBoolean("pref_key_toasts_checkbox", mToastEnabled);
         mVibrationEnabled = prefs.getBoolean("pref_key_vibration_checkbox", mVibrationEnabled);
@@ -331,8 +333,8 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
 
         // TODO Set up removal of button when mode is changed
         // Currently requires snapchat to restart to remove the button
-        if( mModeSave == SAVE_BUTTON )
-            HookedLayouts.addSaveButtons( resparam, mResources, localContext );
+        HookedLayouts.addSaveButtons( resparam, mResources, localContext, mModeSave == SAVE_BUTTON,
+                                      mModeStory == SAVE_BUTTON );
 
         if (shouldAddGhost) {
             HookedLayouts.addIcons(resparam, mResources);
