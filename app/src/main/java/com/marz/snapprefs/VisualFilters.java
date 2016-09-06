@@ -337,7 +337,7 @@ public class VisualFilters {
         try
         {
             Bitmap filtered = gpuImage.getBitmapWithFilterApplied();
-            
+
             int[] pixels = new int[filtered.getHeight() * filtered.getWidth()];
             filtered.getPixels(pixels, 0, filtered.getWidth(), 0, 0, filtered.getWidth(), filtered.getHeight());
             result.setPixels(pixels, 0, filtered.getWidth(), 0, 0, filtered.getWidth(), filtered.getHeight());

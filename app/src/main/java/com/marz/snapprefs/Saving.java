@@ -7,23 +7,19 @@ import android.content.res.XModuleResources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Vibrator;
 import android.view.View;
 import android.widget.Toast;
 
 import com.marz.snapprefs.SnapData.FlagState;
 import com.marz.snapprefs.Util.NotificationUtils;
+import com.marz.snapprefs.Util.SavingUtils;
+import com.marz.snapprefs.Util.SavingUtils.AsyncSaveSnapData;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,7 +27,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -93,6 +88,8 @@ public class Saving
     private static boolean printFlags = true;
     private static SnapData currentSnapData;
     private static Context relativeContext;
+    //TODO implement user selected save mode
+    private static boolean asyncSaveMode = true;
 
     static void initSaving( final XC_LoadPackage.LoadPackageParam lpparam,
                             final XModuleResources modRes, final Context snapContext ) {
@@ -369,7 +366,12 @@ public class Saving
             Logger.printMessage( "MediaType: " + currentSnapData.getMediaType() );
 
             try {
-                handleSave( relativeContext, currentSnapData );
+                //handleSave( relativeContext, currentSnapData );
+
+                if( asyncSaveMode )
+                    new AsyncSaveSnapData().execute( relativeContext, currentSnapData );
+                else
+                    handleSave( relativeContext, currentSnapData );
             } catch ( Exception e ) {
                 Logger.printFinalMessage( "Exception saving snap" );
 
@@ -377,7 +379,7 @@ public class Saving
                     NotificationUtils.showMessage(
                             "Code exception saving snap",
                             Color.rgb( 200, 70, 70 ),
-                            getToastLength(),
+                            SavingUtils.getToastLength(),
                             lpparam2.classLoader );
                 }
             }
@@ -387,7 +389,7 @@ public class Saving
                 NotificationUtils.showMessage(
                         "No SnapData to save",
                         Color.rgb( 200, 70, 70 ),
-                        getToastLength(),
+                        SavingUtils.getToastLength(),
                         lpparam2.classLoader );
             }
         }
@@ -436,9 +438,12 @@ public class Saving
 
         snapData.setHeader( mId, mKey, strSender, strTimestamp, snapType );
 
-        if ( shouldSave( snapData ) )
-            handleSave( context, snapData );
-        else {
+        if ( shouldSave( snapData ) ) {
+            if( asyncSaveMode)
+                new AsyncSaveSnapData().execute( context, snapData );
+            else
+                handleSave( context, snapData );
+        } else {
             currentSnapData = snapData;
             relativeContext = context;
 
@@ -546,9 +551,12 @@ public class Saving
         Logger.printMessage( "Successfully attached payload" );
 
         // If set to button saving, do not save
-        if ( shouldSave( snapData ) )
-            handleSave( context, snapData );
-        else
+        if ( shouldSave( snapData ) ) {
+            if( asyncSaveMode)
+                new AsyncSaveSnapData().execute( context, snapData );
+            else
+                handleSave( context, snapData );
+        } else
             Logger.printFinalMessage( "Set to BUTTON saving - Awaiting press" );
     }
 
@@ -600,9 +608,12 @@ public class Saving
         snapData.setPayload( bmp );
         Logger.printMessage( "Successfully attached payload" );
 
-        if ( shouldSave( snapData ) )
-            handleSave( context, snapData );
-        else
+        if ( shouldSave( snapData ) ) {
+            if( asyncSaveMode )
+                new AsyncSaveSnapData().execute( context, snapData );
+            else
+                handleSave( context, snapData );
+        } else
             Logger.printFinalMessage( "Set to BUTTON saving - Awaiting press" );
     }
 
@@ -618,13 +629,28 @@ public class Saving
     }
 
     /**
+     * Check if the snapData has already been handled
+     *
+     * @param snapData
+     * @param flagState - Assign a flagstate to include (E.G PAYLOAD/HEADER)
+     * @return True if contains any of the flags
+     */
+    private static boolean scanForExisting( SnapData snapData, FlagState flagState ) {
+        //TODO Remove the FAILED flag to retry saving snaps after failure occurs
+        return ( snapData.getFlags().contains( flagState ) ||
+                snapData.getFlags().contains( FlagState.COMPLETED ) ||
+                snapData.getFlags().contains( FlagState.SAVED ) ) &&
+                !snapData.getFlags().contains( FlagState.FAILED );
+    }
+
+    /**
      * Used to perform a save on a completed snapData object
      *
      * @param context
      * @param snapData
      * @throws Exception
      */
-    private static void handleSave( Context context, SnapData snapData ) throws Exception {
+    public static void handleSave( Context context, SnapData snapData ) throws Exception {
         // Ensure snapData is ready for saving
         if ( snapData.getFlags().contains( FlagState.COMPLETED ) ) {
             Logger.printMessage( "Saving Snap" );
@@ -650,7 +676,7 @@ public class Saving
                         NotificationUtils.showMessage(
                                 snapData.getMediaType().typeName + " saved",
                                 Color.rgb( 70, 200, 70 ),
-                                getToastLength(),
+                                SavingUtils.getToastLength(),
                                 lpparam2.classLoader );
                     }
 
@@ -669,7 +695,7 @@ public class Saving
                         NotificationUtils.showMessage(
                                 "Failed saving " + snapData.getMediaType().typeName,
                                 Color.rgb( 200, 70, 70 ),
-                                getToastLength(),
+                                SavingUtils.getToastLength(),
                                 lpparam2.classLoader );
                     }
 
@@ -683,7 +709,7 @@ public class Saving
                         NotificationUtils.showMessage(
                                 snapData.getMediaType().typeName + " already exists",
                                 Color.rgb( 70, 200, 70 ),
-                                getToastLength(),
+                                SavingUtils.getToastLength(),
                                 lpparam2.classLoader );
                     }
 
@@ -698,21 +724,6 @@ public class Saving
                 }
             }
         }
-    }
-
-    /**
-     * Check if the snapData has already been handled
-     *
-     * @param snapData
-     * @param flagState - Assign a flagstate to include (E.G PAYLOAD/HEADER)
-     * @return True if contains any of the flags
-     */
-    private static boolean scanForExisting( SnapData snapData, FlagState flagState ) {
-        //TODO Remove the FAILED flag to retry saving snaps after failure occurs
-        return ( snapData.getFlags().contains( flagState ) ||
-                snapData.getFlags().contains( FlagState.COMPLETED ) ||
-                snapData.getFlags().contains( FlagState.SAVED ) ) &&
-                !snapData.getFlags().contains( FlagState.FAILED );
     }
 
 
@@ -837,25 +848,15 @@ public class Saving
             File imageFile = new File( directory, filename + MediaType.IMAGE.fileExtension );
             if ( imageFile.exists() ) {
                 Logger.printMessage( "Image already exists: " + filename );
-                vibrate( context, false );
+                SavingUtils.vibrate( context, false );
                 return SaveResponse.EXISTING;
             }
 
             // the following code is somewhat redundant as it defeats the point of an async task
             // Perform an async save of the JPG
-            AsyncTask<Object, Void, Boolean> task =
-                    new saveImageJPGTask().execute( imageFile, image, context );
-
-            try {
-                // Wait for the JPG to save and report the state
-                return task.get() ? SaveResponse.SUCCESS : SaveResponse.FAILED;
-            } catch ( InterruptedException e ) {
-                Logger.printMessage( "Interrupted Exception" );
-                return SaveResponse.FAILED;
-            } catch ( ExecutionException e ) {
-                Logger.printMessage( "Execution Exception: " + e.getMessage() );
-                return SaveResponse.FAILED;
-            }
+            return SavingUtils.saveJPG( imageFile, image, context ) ?
+                    SaveResponse.SUCCESS :
+                    SaveResponse.FAILED;
         } else if ( mediaType == MediaType.IMAGE_OVERLAY ) {
             File overlayFile =
                     new File( directory, filename + "_overlay" + MediaType.IMAGE.fileExtension );
@@ -863,56 +864,36 @@ public class Saving
             if ( mOverlays ) {
                 if ( overlayFile.exists() ) {
                     Logger.printMessage( "VideoOverlay already exists" );
-                    vibrate( context, false );
+                    SavingUtils.vibrate( context, false );
                     return SaveResponse.SUCCESS;
                 }
 
                 // the following code is somewhat redundant as it defeats the point of an async task
                 // Perform an async save of the PNG
-                AsyncTask<Object, Void, Boolean> task =
-                        new saveImagePNGTask().execute( overlayFile, image, context );
-
-                try {
-                    // Wait for the JPG to save and report the state
-                    return task.get() ? SaveResponse.SUCCESS : SaveResponse.FAILED;
-                } catch ( InterruptedException e ) {
-                    Logger.log( "Interrupted Exception" );
-                    return SaveResponse.FAILED;
-                } catch ( ExecutionException e ) {
-                    Logger.log( "Execution Exception: " + e.getMessage() );
-                    return SaveResponse.FAILED;
-                }
+                return SavingUtils.savePNG( overlayFile, image, context ) ?
+                        SaveResponse.SUCCESS :
+                        SaveResponse.FAILED;
             }
         } else if ( mediaType == MediaType.VIDEO ) {
             File videoFile = new File( directory, filename + MediaType.VIDEO.fileExtension );
 
             if ( videoFile.exists() ) {
                 Logger.printMessage( "Video already exists" );
-                vibrate( context, false );
+                SavingUtils.vibrate( context, false );
                 return SaveResponse.EXISTING;
             }
 
             // the following code is somewhat redundant as it defeats the point of an async task
             // Perform an async save of the PNG
-            AsyncTask<Object, Void, Boolean> task =
-                    new saveVideoTask().execute( video, videoFile, context );
-
-            try {
-                // Wait for the MP4 to save and report the state
-                return task.get() ? SaveResponse.SUCCESS : SaveResponse.FAILED;
-            } catch ( InterruptedException e ) {
-                Logger.printMessage( "Interrupted Exception" );
-                return SaveResponse.FAILED;
-            } catch ( ExecutionException e ) {
-                Logger.printMessage( "Execution Exception: " + e.getMessage() );
-                return SaveResponse.FAILED;
-            }
+            return SavingUtils.saveVideo( videoFile, video, context ) ?
+                    SaveResponse.SUCCESS :
+                    SaveResponse.FAILED;
         }
 
         return SaveResponse.FAILED;
     }
 
-    private static File createFileDir( String category, String sender ) throws IOException {
+    public static File createFileDir( String category, String sender ) throws IOException {
         File directory = new File( mSavePath );
 
         if ( mSortByCategory || ( mSortByUsername && sender == null ) ) {
@@ -928,69 +909,6 @@ public class Saving
         }
 
         return directory;
-    }
-
-    /*
-     * Tells the media scanner to scan the newly added image or video so that it
-     * shows up in the gallery without a reboot. And shows a Toast message where
-     * the media was saved.
-     * @param context Current context
-     * @param filePath File to be scanned by the media scanner
-     */
-    private static void runMediaScanner( Context context, String... mediaPath ) {
-        try {
-            Logger.printMessage( "MediaScanner started" );
-            MediaScannerConnection.scanFile( context, mediaPath, null,
-                                             new MediaScannerConnection.OnScanCompletedListener()
-                                             {
-                                                 public void onScanCompleted( String path,
-                                                                              Uri uri ) {
-                                                     Logger.log( "MediaScanner scanned file: " +
-                                                                         uri.toString() );
-                                                 }
-                                             } );
-        } catch ( Exception e ) {
-            Logger.printMessage( "Error occurred while trying to run MediaScanner" );
-        }
-    }
-
-    private static int getToastLength() {
-        if ( mToastLength == TOAST_LENGTH_SHORT ) {
-            return NotificationUtils.LENGHT_SHORT;
-        } else {
-            return NotificationUtils.LENGHT_LONG;
-        }
-    }
-
-    private static void vibrate( Context context, boolean success ) {
-        if ( mVibrationEnabled ) {
-            if ( success ) {
-                Vibrator v = (Vibrator) context.getSystemService( Context.VIBRATOR_SERVICE );
-                v.vibrate( genVibratorPattern( 0.7f, 400 ), -1 );
-            } else {
-                Vibrator v = (Vibrator) context.getSystemService( Context.VIBRATOR_SERVICE );
-                v.vibrate( genVibratorPattern( 1.0f, 700 ), -1 );
-            }
-        }
-    }
-
-    //http://stackoverflow.com/questions/20808479/algorithm-for-generating-vibration-patterns-ranging-in-intensity-in-android/20821575#20821575
-    // intensity 0-1
-    // duration mS
-    public static long[] genVibratorPattern( float intensity, long duration ) {
-        float dutyCycle = Math.abs( ( intensity * 2.0f ) - 1.0f );
-        long hWidth = (long) ( dutyCycle * ( duration - 1 ) ) + 1;
-        long lWidth = dutyCycle == 1.0f ? 0 : 1;
-
-        int pulseCount = (int) ( 2.0f * ( (float) duration / (float) ( hWidth + lWidth ) ) );
-        long[] pattern = new long[ pulseCount ];
-
-        for ( int i = 0; i < pulseCount; i++ ) {
-            pattern[ i ] = intensity < 0.5f ? ( i % 2 == 0 ? hWidth : lWidth ) :
-                    ( i % 2 == 0 ? lWidth : hWidth );
-        }
-
-        return pattern;
     }
 
     static void refreshPreferences() {
@@ -1034,8 +952,8 @@ public class Saving
         SENT( "sent", "/SentSnaps" ),
         CHAT( "chat", "/Chat" );
 
-        private final String name;
-        private final String subdir;
+        public final String name;
+        public final String subdir;
 
         SnapType( String name, String subdir ) {
             this.name = name;
@@ -1054,123 +972,12 @@ public class Saving
         IMAGE_OVERLAY( ".png", "Overlay" ),
         VIDEO( ".mp4", "Video" );
 
-        private final String fileExtension;
-        private final String typeName;
+        public final String fileExtension;
+        public final String typeName;
 
         MediaType( String fileExtension, String typeName ) {
             this.fileExtension = fileExtension;
             this.typeName = typeName;
-        }
-    }
-
-    public static class saveImageJPGTask extends AsyncTask<Object, Void, Boolean>
-    {
-        @Override
-        protected Boolean doInBackground( Object... params ) {
-            if ( params[ 1 ] == null ) {
-                Logger.printMessage( "Background JPG - Passed Null Image" );
-                return false;
-            }
-
-            Boolean success;
-            File fileToSave = (File) params[ 0 ];
-
-            Bitmap bmp = (Bitmap) params[ 1 ];
-            Context context = (Context) params[ 2 ];
-
-            try {
-                FileOutputStream out = new FileOutputStream( fileToSave );
-
-                bmp.compress( Bitmap.CompressFormat.JPEG, 100, out );
-                out.flush();
-                out.close();
-                vibrate( context, true );
-                runMediaScanner( context, fileToSave.getAbsolutePath() );
-
-                success = true;
-            } catch ( Exception e ) {
-                Logger.printMessage( "Exception while saving an image: " + e.getMessage() );
-                vibrate( context, false );
-                success = false;
-            }
-
-            return success;
-        }
-    }
-
-    public static class saveImagePNGTask extends AsyncTask<Object, Void, Boolean>
-    {
-        @Override
-        protected Boolean doInBackground( Object... params ) {
-            if ( params[ 1 ] == null ) {
-                Logger.printMessage( "Background PNG - Passed Null Image" );
-                return false;
-            }
-
-            Boolean success;
-            File fileToSave = (File) params[ 0 ];
-            Bitmap bmp = (Bitmap) params[ 1 ];
-            Context context = (Context) params[ 2 ];
-
-            try {
-                FileOutputStream out = new FileOutputStream( fileToSave );
-                bmp.compress( Bitmap.CompressFormat.PNG, 100, out );
-                out.flush();
-                out.close();
-                vibrate( context, true );
-                runMediaScanner( context, fileToSave.getAbsolutePath() );
-
-                success = true;
-            } catch ( Exception e ) {
-                Logger.printMessage( "Exception while saving an image" );
-                vibrate( context, false );
-                success = false;
-            }
-            return success;
-        }
-    }
-
-    public static class saveVideoTask extends AsyncTask<Object, Void, Boolean>
-    {
-        @Override
-        protected Boolean doInBackground( Object... params ) {
-            if ( params[ 0 ] == null ) {
-                Logger.printMessage( "Background VIDEO - Passed Null Video" );
-                return false;
-            }
-
-            Boolean success;
-
-            File fileToSave = (File) params[ 1 ];
-            Context context = (Context) params[ 2 ];
-
-            try {
-                // Use bufferedinputstreams for faster saving - Probably unecessary
-                BufferedInputStream inputStream =
-                        new BufferedInputStream( (FileInputStream) params[ 0 ] );
-                BufferedOutputStream outputStream =
-                        new BufferedOutputStream( new FileOutputStream( fileToSave ) );
-
-                // General disk cluster size for higher efficiency
-                byte[] buffer = new byte[ 8192 ];
-                int read;
-                while ( ( read = inputStream.read( buffer ) ) > 0 )
-                    outputStream.write( buffer, 0, read );
-
-                outputStream.flush();
-                inputStream.close();
-                outputStream.close();
-
-                vibrate( context, true );
-                runMediaScanner( context, fileToSave.getAbsolutePath() );
-                success = true;
-            } catch ( Exception e ) {
-                Logger.printMessage( "Exception while saving a video" );
-                vibrate( context, false );
-                success = false;
-            }
-
-            return success;
         }
     }
 }
