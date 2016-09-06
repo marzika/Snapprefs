@@ -235,7 +235,7 @@ public class Saving
                         if ( snapImagebryo.isInstance( mediabryo ) ) {
                             Logger.log( "The sent snap is an Image", true );
                             //Bitmap sentimg = (Bitmap) callMethod(mediabryo, "e", mediabryo);
-                            //TODO Test spamguard
+                            //TODO Replace with updated system
                             if ( spamGuardSet.contains( sentImage ) )
                                 return;
                             else
@@ -667,6 +667,12 @@ public class Saving
                                 getToastLength(),
                                 lpparam2.classLoader );
                     }
+                    
+                    Logger.printMessage( "Wiping payload and adding SAVED flag" );
+
+                    // Wipe the payload to save memory
+                    // Also assigns the SAVED flag to the snap
+                    snapData.wipePayload();
 
                     Logger.printFinalMessage( snapData.getMediaType().typeName + " already exists" );
                     return;
@@ -683,10 +689,10 @@ public class Saving
      */
     private static boolean scanForExisting( SnapData snapData, FlagState flagState ) {
         //TODO Remove the FAILED flag to retry saving snaps after failure occurs
-        return snapData.getFlags().contains( flagState ) ||
+        return ( snapData.getFlags().contains( flagState ) ||
                 snapData.getFlags().contains( FlagState.COMPLETED ) ||
-                snapData.getFlags().contains( FlagState.SAVED ) ||
-                snapData.getFlags().contains( FlagState.FAILED );
+                snapData.getFlags().contains( FlagState.SAVED ) ) &&
+                !snapData.getFlags().contains( FlagState.FAILED );
     }
 
 
