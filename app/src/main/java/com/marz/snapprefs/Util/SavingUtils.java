@@ -162,22 +162,4 @@ public abstract class SavingUtils
             return NotificationUtils.LENGHT_LONG;
         }
     }
-
-    public static class AsyncSaveSnapData extends AsyncTask<Object, Void, Boolean>
-    {
-        @Override protected Boolean doInBackground( Object... params ) {
-            Context context = (Context) params[0];
-            SnapData snapData = (SnapData) params[1];
-
-            Logger.printMessage( "Performing ASYNC save" );
-
-            try {
-                Saving.handleSave( context, snapData );
-            } catch( Exception e )
-            {
-                Logger.log("Exception performing AsyncSave ", e);
-            }
-            return null;
-        }
-    }
 }

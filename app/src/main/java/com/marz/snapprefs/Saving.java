@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
@@ -16,7 +17,6 @@ import android.widget.Toast;
 import com.marz.snapprefs.SnapData.FlagState;
 import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.SavingUtils;
-import com.marz.snapprefs.Util.SavingUtils.AsyncSaveSnapData;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -978,6 +978,24 @@ public class Saving
         MediaType( String fileExtension, String typeName ) {
             this.fileExtension = fileExtension;
             this.typeName = typeName;
+        }
+    }
+
+    public static class AsyncSaveSnapData extends AsyncTask<Object, Void, Boolean>
+    {
+        @Override protected Boolean doInBackground( Object... params ) {
+            Context context = (Context) params[0];
+            SnapData snapData = (SnapData) params[1];
+
+            Logger.printMessage( "Performing ASYNC save" );
+
+            try {
+                Saving.handleSave( context, snapData );
+            } catch( Exception e )
+            {
+                Logger.log("Exception performing AsyncSave ", e);
+            }
+            return null;
         }
     }
 }
