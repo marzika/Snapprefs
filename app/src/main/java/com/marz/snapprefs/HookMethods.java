@@ -223,6 +223,15 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         shouldAddGhost = mSpeed || mTextTools || mLocation || mWeather;
 
         acceptedToU = prefs.getBoolean("acceptedToU", false);
+
+
+        if ( HookedLayouts.saveSnapButton != null )
+            HookedLayouts.saveSnapButton.setVisibility(
+                    mModeSave == SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE );
+
+        if ( HookedLayouts.saveStoryButton != null )
+            HookedLayouts.saveStoryButton.setVisibility(
+                    mModeStory == SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE );
     }
 
     static void logging(String message) {
@@ -711,6 +720,7 @@ public class HookMethods implements IXposedHookInitPackageResources, IXposedHook
         logging("Preferences have changed:");
         String[] saveModes = {"SAVE_BUTTON", "SAVE_S2S", "DO_NOT_SAVE", "SAVE_AUTO"};
         logging("~ mModeSave: " + saveModes[mModeSave]);
+        logging("~ mModeStory: " + saveModes[mModeSave]);
         logging("~ mOverlays: " + mOverlays);
         logging("~ mTimerMinimum: " + mTimerMinimum);
         logging("~ mToastEnabled: " + mToastEnabled);

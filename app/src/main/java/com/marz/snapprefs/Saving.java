@@ -43,7 +43,6 @@ import static de.robv.android.xposed.XposedHelpers.getObjectField;
 
 public class Saving
 {
-
     //public static final String SNAPCHAT_PACKAGE_NAME = "com.snapchat.android";
     // Modes for saving Snapchats
     public static final int SAVE_AUTO = 3;
@@ -101,6 +100,7 @@ public class Saving
 
 
         try {
+            //TODO Set up Sweep2Save - IMPORTANT -
             ClassLoader cl = lpparam.classLoader;
 
             /**

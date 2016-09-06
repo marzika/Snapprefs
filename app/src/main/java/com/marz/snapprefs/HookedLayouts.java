@@ -204,6 +204,7 @@ public class HookedLayouts
                 saveStoryButton.setLayoutParams( layoutParams );
                 saveStoryButton.setBackgroundColor( 0 );
                 saveStoryButton.setImageBitmap( saveImg );
+                saveStoryButton.setAlpha( 0.8f );
                 saveStoryButton.setVisibility( mModeSave ? View.VISIBLE : View.INVISIBLE );
 
                 frameLayout.addView( saveStoryButton );
@@ -230,6 +231,7 @@ public class HookedLayouts
                 saveSnapButton = new ImageButton( localContext );
                 saveSnapButton.setLayoutParams( layoutParams );
                 saveSnapButton.setBackgroundColor( 0 );
+                saveSnapButton.setAlpha( 0.8f );
                 saveSnapButton.setImageBitmap( saveImg );
                 saveSnapButton.setVisibility( mModeStory ? View.VISIBLE : View.INVISIBLE );
 
