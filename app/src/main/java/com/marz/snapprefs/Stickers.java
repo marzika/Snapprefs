@@ -173,6 +173,11 @@ public class Stickers {
                         String url = Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/" + str;
                         Logger.log("Sdcard path: " + url, true);
                         File file = new File(url);
+
+                        if( !file.exists() ) {
+                            Logger.log( "Error loading STICKERS file: " + str );
+                            return;
+                        }
                         InputStream is = null;
                         is = new BufferedInputStream(new FileInputStream(file));
                         param.setResult(is);

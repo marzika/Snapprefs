@@ -334,10 +334,18 @@ public class VisualFilters {
         GPUImage gpuImage = new GPUImage(context);
         gpuImage.setImage(source);
         gpuImage.setFilter(type.getFilter());
-        Bitmap filtered = gpuImage.getBitmapWithFilterApplied();
-        int[] pixels = new int[filtered.getHeight() * filtered.getWidth()];
-        filtered.getPixels(pixels, 0, filtered.getWidth(), 0, 0, filtered.getWidth(), filtered.getHeight());
-        result.setPixels(pixels, 0, filtered.getWidth(), 0, 0, filtered.getWidth(), filtered.getHeight());
+        try
+        {
+            Bitmap filtered = gpuImage.getBitmapWithFilterApplied();
+            
+            int[] pixels = new int[filtered.getHeight() * filtered.getWidth()];
+            filtered.getPixels(pixels, 0, filtered.getWidth(), 0, 0, filtered.getWidth(), filtered.getHeight());
+            result.setPixels(pixels, 0, filtered.getWidth(), 0, 0, filtered.getWidth(), filtered.getHeight());
+        } catch( NullPointerException e )
+        {
+            Logger.log("Error loading filter: " + type.toString() );
+            return;
+        }
 //        Canvas canvas = new Canvas(result);
 //
 //        Paint paint = new Paint();

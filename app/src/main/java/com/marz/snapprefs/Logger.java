@@ -58,7 +58,6 @@ public class Logger {
             if (prefix) {
                 message = LOG_TAG + message;
             }
-            Log.d("[SNAPPREFS]", message);
             XposedBridge.log(message);
         }
     }
