@@ -298,12 +298,13 @@ public class HookedLayouts
                                 outerOptionsLayout.setVisibility( View.GONE );
                                 shouldHideOptions = true;
                             }
-                            HookMethods.logging( "SnapPrefs: Displaying Options" );
+                            Logger.log( "SnapPrefs: Displaying Options" );
                         } else {
                             outerOptionsLayout.setVisibility( View.GONE );
                             shouldHideOptions = true;
                             Toast.makeText( HookMethods.SnapContext, "Your caption is missing", Toast.LENGTH_SHORT ).show();
-                            HookMethods.logging( "SnapPrefs: Not displaying Options - HookMethods.editText empty" );
+                            Logger.log( "SnapPrefs: Not displaying Options - HookMethods" +
+                                                   ".editText empty" );
                         }
                     }
                 } );
@@ -322,7 +323,7 @@ public class HookedLayouts
                     @Override
                     public void onClick( View v ) {
                         Dialogs.SpeedDialog( HookMethods.SnapContext );
-                        HookMethods.logging( "SnapPrefs: Displaying SpeedDialog" );
+                        Logger.log( "SnapPrefs: Displaying SpeedDialog" );
                     }
                 } );
                 final RelativeLayout.LayoutParams paramsWeather =
@@ -340,7 +341,7 @@ public class HookedLayouts
                     @Override
                     public void onClick( View v ) {
                         Dialogs.WeatherDialog( HookMethods.SnapContext );
-                        HookMethods.logging( "SnapPrefs: Displaying WeatherDialog" );
+                        Logger.log( "SnapPrefs: Displaying WeatherDialog" );
                     }
                 } );
                 final RelativeLayout.LayoutParams paramsLocation =
@@ -360,24 +361,24 @@ public class HookedLayouts
                         Intent intent = new Intent();
                         intent.setComponent( new ComponentName( "com.marz.snapprefs", "com.marz.snapprefs.MapsActivity" ) );
                         HookMethods.SnapContext.startActivity( intent );
-                        HookMethods.logging( "SnapPrefs: Displaying Map" );
+                        Logger.log( "SnapPrefs: Displaying Map" );
                     }
                 } );
                 HookMethods.SnapContext.runOnUiThread( new Runnable()
                 {
                     @Override
                     public void run() {
-                        if ( HookMethods.mTextTools == true ) {
+                        if ( Preferences.mTextTools == true ) {
                             relativeLayout.addView( textButton, layoutParams );
                             relativeLayout.addView( outerOptionsLayout, outerOptionsLayoutParams );
                         }
-                        if ( HookMethods.mSpeed == true ) {
+                        if ( Preferences.mSpeed == true ) {
                             relativeLayout.addView( speed, paramsSpeed );
                         }
-                        if ( HookMethods.mLocation == true ) {
+                        if ( Preferences.mLocation == true ) {
                             relativeLayout.addView( location, paramsLocation );
                         }
-                        if ( HookMethods.mWeather == true ) {
+                        if ( Preferences.mWeather == true ) {
                             relativeLayout.addView( weather, paramsWeather );
                         }
                     }

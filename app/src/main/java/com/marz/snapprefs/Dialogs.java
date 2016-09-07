@@ -40,7 +40,7 @@ public class Dialogs {
         LinearLayout linearLayout = new LinearLayout(SnapContext);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
 
-        HookMethods.refreshPreferences();
+        Preferences.refreshPreferences();
 
         final EditText eText = new EditText(SnapContext);
         eText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
@@ -78,7 +78,7 @@ public class Dialogs {
         LinearLayout linearLayout = new LinearLayout(SnapContext);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
 
-        HookMethods.refreshPreferences();
+        Preferences.refreshPreferences();
 
         final EditText eText = new EditText(SnapContext);
         eText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);

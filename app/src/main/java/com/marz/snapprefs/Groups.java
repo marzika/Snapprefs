@@ -161,11 +161,11 @@ public class Groups {
                 ArrayList<String> users = new ArrayList<>(Arrays.asList(groupData));
                 users.remove(0);
                 Group currentGroup = new Group(name, users);
-                if (numGroups == 3 && HookMethods.mLicense == 0) {
+                if (numGroups == 3 && Preferences.mLicense == 0) {
                     NotificationUtils.showMessage("You cannot have more than 3 groups as a free user", Color.RED, NotificationUtils.LENGHT_SHORT, HookMethods.classLoader);
                     return;
                 }
-                if (HookMethods.mLicense != 0 && HookMethods.mUnlimGroups == false) {
+                if (Preferences.mLicense != 0 && Preferences.mUnlimGroups == false) {
                     NotificationUtils.showMessage("You disabled the option to have more than 3 groups", Color.RED, NotificationUtils.LENGHT_SHORT, HookMethods.classLoader);
                     return;
                 }

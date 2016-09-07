@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Vibrator;
 
 import com.marz.snapprefs.Logger;
+import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.Saving;
 import com.marz.snapprefs.SnapData;
 
@@ -103,13 +104,16 @@ public abstract class SavingUtils
     }
 
     public static void vibrate( Context context, boolean success ) {
-            if ( success ) {
-                Vibrator v = (Vibrator) context.getSystemService( Context.VIBRATOR_SERVICE );
-                v.vibrate( genVibratorPattern( 0.7f, 400 ), -1 );
-            } else {
-                Vibrator v = (Vibrator) context.getSystemService( Context.VIBRATOR_SERVICE );
-                v.vibrate( genVibratorPattern( 1.0f, 700 ), -1 );
-            }
+        if( !Preferences.mVibrationEnabled )
+            return;
+        
+        if ( success ) {
+            Vibrator v = (Vibrator) context.getSystemService( Context.VIBRATOR_SERVICE );
+            v.vibrate( genVibratorPattern( 0.7f, 400 ), -1 );
+        } else {
+            Vibrator v = (Vibrator) context.getSystemService( Context.VIBRATOR_SERVICE );
+            v.vibrate( genVibratorPattern( 1.0f, 700 ), -1 );
+        }
     }
 
     //http://stackoverflow.com/questions/20808479/algorithm-for-generating-vibration-patterns-ranging-in-intensity-in-android/20821575#20821575
@@ -156,7 +160,7 @@ public abstract class SavingUtils
     }
 
     public static int getToastLength() {
-        if ( Saving.mToastLength == Saving.TOAST_LENGTH_SHORT ) {
+        if ( Preferences.mToastLength == Preferences.TOAST_LENGTH_SHORT ) {
             return NotificationUtils.LENGHT_SHORT;
         } else {
             return NotificationUtils.LENGHT_LONG;

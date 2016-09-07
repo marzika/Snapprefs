@@ -61,7 +61,7 @@ public class Sharing {
         findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                HookMethods.refreshPreferences();
+                Preferences.refreshPreferences();
                 XposedUtils.log("----------------- SNAPSHARE STARTED -----------------", false);
                 final Activity activity = (Activity) param.thisObject;
                 // Get intent, action and MIME type
@@ -201,7 +201,7 @@ public class Sharing {
         XC_MethodHook cameraLoadedHook = new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                HookMethods.refreshPreferences(); // Refresh preferences for captions
+                Preferences.refreshPreferences(); // Refresh preferences for captions
                 if (initializedUri == null) {
                     return; // We don't have an image to send, so don't try to send one
                 }

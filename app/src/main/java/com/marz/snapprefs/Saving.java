@@ -44,39 +44,10 @@ import static de.robv.android.xposed.XposedHelpers.getObjectField;
 public class Saving
 {
     //public static final String SNAPCHAT_PACKAGE_NAME = "com.snapchat.android";
-    // Modes for saving Snapchats
-    public static final int SAVE_AUTO = 3;
-    public static final int DO_NOT_SAVE = 2;
-    public static final int SAVE_BUTTON = 0;
-    // Length of toasts
-    public static final int TOAST_LENGTH_SHORT = 0;
-    public static final int TOAST_LENGTH_LONG = 1;
-    // Minimum timer duration disabled
-    public static final int TIMER_MINIMUM_DISABLED = 0;
-    private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
-    // Preferences and their default values
-    public static int mModeSave = SAVE_AUTO;
-    public static int mModeStory = SAVE_BUTTON;
-    public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
-    public static boolean mTimerUnlimited = true;
-    public static boolean mHideTimerStory = false;
-    public static boolean mLoopingVids = true;
-    public static boolean mHideTimer = false;
-    public static boolean mToastEnabled = true;
-    public static boolean mVibrationEnabled = true;
-    public static int mToastLength = TOAST_LENGTH_LONG;
-    public static String mSavePath =
-            Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
-    public static boolean mSaveSentSnaps = false;
-    public static boolean mSortByCategory = true;
-    public static boolean mSortByUsername = true;
-    public static boolean mDebugging = true;
-    public static boolean mOverlays = true;
     public static Resources mSCResources;
     public static Bitmap sentImage;
     public static Uri videoUri;
     public static XC_LoadPackage.LoadPackageParam lpparam2;
-    static XSharedPreferences prefs;
     private static SimpleDateFormat dateFormat =
             new SimpleDateFormat( "yyyy-MM-dd_HH-mm-ss-SSS", Locale.getDefault() );
     private static SimpleDateFormat dateFormatSent =
@@ -96,7 +67,7 @@ public class Saving
         lpparam2 = lpparam;
 
         if ( mSCResources == null ) mSCResources = snapContext.getResources();
-        refreshPreferences();
+        Preferences.refreshPreferences();
 
 
         try {
@@ -118,7 +89,7 @@ public class Saving
                                             super.afterHookedMethod( param );
 
                                             try {
-                                                if ( mModeSave == DO_NOT_SAVE )
+                                                if ( Preferences.mModeSave == Preferences.DO_NOT_SAVE )
                                                     return;
 
                                                 handleVideoPayload( snapContext, param );
@@ -139,7 +110,7 @@ public class Saving
                 @Override
                 protected void beforeHookedMethod( MethodHookParam param ) throws Throwable {
                     try {
-                        if ( mModeSave == DO_NOT_SAVE )
+                        if ( Preferences.mModeSave == Preferences.DO_NOT_SAVE )
                             return;
 
                         handleImagePayload( snapContext, param );
@@ -159,7 +130,7 @@ public class Saving
                 protected void afterHookedMethod( MethodHookParam param ) throws Throwable {
                     super.afterHookedMethod( param );
 
-                    if ( mModeSave == DO_NOT_SAVE )
+                    if ( Preferences.mModeSave == Preferences.DO_NOT_SAVE )
                         return;
 
                     boolean isBeingViewed = (boolean) param.args[ 0 ];
@@ -212,10 +183,10 @@ public class Saving
             {
                 @Override
                 protected void afterHookedMethod( MethodHookParam param ) throws Throwable {
-                    refreshPreferences();
+                    Preferences.refreshPreferences();
                     Logger.log( "----------------------- SNAPPREFS/Sent Snap ------------------------", false );
 
-                    if ( !mSaveSentSnaps ) {
+                    if ( !Preferences.mSaveSentSnaps ) {
                         Logger.log( "Not saving sent snap" );
                         return;
                     }
@@ -291,24 +262,24 @@ public class Saving
                 protected void afterHookedMethod( MethodHookParam param ) throws Throwable {
                     //Logger.afterHook("RECEIVEDSNAP - DisplayTime");
                     Double currentResult = (Double) param.getResult();
-                    if ( mTimerUnlimited ) {
+                    if ( Preferences.mTimerUnlimited ) {
                         findAndHookMethod( "com.snapchat.android.ui.SnapTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING );
                         param.setResult( (double) 9999.9F );
                     } else {
-                        if ( (double) mTimerMinimum != TIMER_MINIMUM_DISABLED &&
-                                currentResult < (double) mTimerMinimum ) {
-                            param.setResult( (double) mTimerMinimum );
+                        if ( (double) Preferences.mTimerMinimum != Preferences.TIMER_MINIMUM_DISABLED &&
+                                currentResult < (double) Preferences.mTimerMinimum ) {
+                            param.setResult( (double) Preferences.mTimerMinimum );
                         }
                     }
                 }
             } );
-            if ( mHideTimer ) {
+            if ( Preferences.mHideTimer ) {
                 findAndHookMethod( "com.snapchat.android.ui.SnapTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING );
             }
-            if ( mHideTimerStory ) {
+            if ( Preferences.mHideTimerStory ) {
                 findAndHookMethod( "com.snapchat.android.ui.StoryTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING );
             }
-            if ( mLoopingVids ) {
+            if ( Preferences.mLoopingVids ) {
                 findAndHookMethod( "com.snapchat.opera.shared.view.TextureVideoView", lpparam.classLoader, "start", new XC_MethodHook()
                 {
                     @Override
@@ -368,14 +339,14 @@ public class Saving
             try {
                 //handleSave( relativeContext, currentSnapData );
 
-                if( asyncSaveMode )
+                if ( asyncSaveMode )
                     new AsyncSaveSnapData().execute( relativeContext, currentSnapData );
                 else
                     handleSave( relativeContext, currentSnapData );
             } catch ( Exception e ) {
                 Logger.printFinalMessage( "Exception saving snap" );
 
-                if ( HookMethods.mToastEnabled ) {
+                if ( Preferences.mToastEnabled ) {
                     NotificationUtils.showMessage(
                             "Code exception saving snap",
                             Color.rgb( 200, 70, 70 ),
@@ -385,7 +356,7 @@ public class Saving
             }
         } else {
             Logger.printFinalMessage( "No SnapData to save" );
-            if ( HookMethods.mToastEnabled ) {
+            if ( Preferences.mToastEnabled ) {
                 NotificationUtils.showMessage(
                         "No SnapData to save",
                         Color.rgb( 200, 70, 70 ),
@@ -397,6 +368,8 @@ public class Saving
 
     private static void handleSnapHeader( Context context, Object receivedSnap ) throws Exception {
         Logger.printTitle( "Handling SnapData HEADER" );
+        Logger.printMessage( "Header object: " + receivedSnap.getClass().getCanonicalName() );
+
 
         String mId = (String) getObjectField( receivedSnap, "mId" );
         SnapType snapType =
@@ -408,6 +381,8 @@ public class Saving
 
         String mKey = mId;
         String strSender;
+
+        Logger.log( "Suffix: " + getObjectField( receivedSnap, "mCacheKeyInstanceSuffix" ) );
 
         if ( snapType == SnapType.SNAP ) {
             mKey += (String) getObjectField( receivedSnap, "mCacheKeyInstanceSuffix" );
@@ -439,7 +414,7 @@ public class Saving
         snapData.setHeader( mId, mKey, strSender, strTimestamp, snapType );
 
         if ( shouldSave( snapData ) ) {
-            if( asyncSaveMode)
+            if ( asyncSaveMode )
                 new AsyncSaveSnapData().execute( context, snapData );
             else
                 handleSave( context, snapData );
@@ -465,6 +440,8 @@ public class Saving
 
         // Grab the MediaCache - Class: ahJ
         Object mCache = param.args[ 0 ];
+        Object cacheType = getObjectField( mCache, "mCacheType" );
+        Logger.log( "CacheType: " + cacheType );
 
         if ( mCache == null ) {
             Logger.printFinalMessage( "Null Cache passed" );
@@ -552,7 +529,7 @@ public class Saving
 
         // If set to button saving, do not save
         if ( shouldSave( snapData ) ) {
-            if( asyncSaveMode)
+            if ( asyncSaveMode )
                 new AsyncSaveSnapData().execute( context, snapData );
             else
                 handleSave( context, snapData );
@@ -609,7 +586,7 @@ public class Saving
         Logger.printMessage( "Successfully attached payload" );
 
         if ( shouldSave( snapData ) ) {
-            if( asyncSaveMode )
+            if ( asyncSaveMode )
                 new AsyncSaveSnapData().execute( context, snapData );
             else
                 handleSave( context, snapData );
@@ -618,11 +595,14 @@ public class Saving
     }
 
     private static boolean shouldSave( SnapData snapData ) {
+        if( !snapData.getFlags().contains( FlagState.COMPLETED ) )
+            return false;
+
         if ( snapData.getSnapType() == SnapType.SNAP &&
-                mModeSave == SAVE_BUTTON )
+                Preferences.mModeSave == Preferences.SAVE_BUTTON )
             return false;
         else if ( snapData.getSnapType() == SnapType.STORY &&
-                mModeStory == SAVE_BUTTON )
+                Preferences.mModeStory == Preferences.SAVE_BUTTON )
             return false;
 
         return true;
@@ -672,7 +652,7 @@ public class Saving
                         relativeContext = null;
                     }*/
 
-                    if ( HookMethods.mToastEnabled ) {
+                    if ( Preferences.mToastEnabled ) {
                         NotificationUtils.showMessage(
                                 snapData.getMediaType().typeName + " saved",
                                 Color.rgb( 70, 200, 70 ),
@@ -691,9 +671,14 @@ public class Saving
                     // TODO Perform more FAILED handling
                     snapData.getFlags().add( FlagState.FAILED );
 
-                    if ( HookMethods.mToastEnabled ) {
+                    if ( Preferences.mToastEnabled ) {
+                        String message = "Failing saving";
+
+                        if ( snapData.getMediaType() != null )
+                            message += " " + snapData.getMediaType().typeName;
+
                         NotificationUtils.showMessage(
-                                "Failed saving " + snapData.getMediaType().typeName,
+                                message,
                                 Color.rgb( 200, 70, 70 ),
                                 SavingUtils.getToastLength(),
                                 lpparam2.classLoader );
@@ -705,7 +690,7 @@ public class Saving
                     return;
                 }
                 case EXISTING: {
-                    if ( HookMethods.mToastEnabled ) {
+                    if ( Preferences.mToastEnabled ) {
                         NotificationUtils.showMessage(
                                 snapData.getMediaType().typeName + " already exists",
                                 Color.rgb( 70, 200, 70 ),
@@ -758,7 +743,7 @@ public class Saving
      */
     private static SaveResponse saveReceivedSnap( Context context, SnapData snapData ) throws
                                                                                        Exception {
-        if ( mModeSave == DO_NOT_SAVE ) {
+        if ( Preferences.mModeSave == Preferences.DO_NOT_SAVE ) {
             Logger.printMessage( "Mode: don't save" );
             return SaveResponse.FAILED;
         }
@@ -861,7 +846,7 @@ public class Saving
             File overlayFile =
                     new File( directory, filename + "_overlay" + MediaType.IMAGE.fileExtension );
 
-            if ( mOverlays ) {
+            if ( Preferences.mOverlays ) {
                 if ( overlayFile.exists() ) {
                     Logger.printMessage( "VideoOverlay already exists" );
                     SavingUtils.vibrate( context, false );
@@ -894,13 +879,13 @@ public class Saving
     }
 
     public static File createFileDir( String category, String sender ) throws IOException {
-        File directory = new File( mSavePath );
+        File directory = new File( Preferences.mSavePath );
 
-        if ( mSortByCategory || ( mSortByUsername && sender == null ) ) {
+        if ( Preferences.mSortByCategory || ( Preferences.mSortByUsername && sender == null ) ) {
             directory = new File( directory, category );
         }
 
-        if ( mSortByUsername && sender != null ) {
+        if ( Preferences.mSortByUsername && sender != null ) {
             directory = new File( directory, sender );
         }
 
@@ -909,40 +894,6 @@ public class Saving
         }
 
         return directory;
-    }
-
-    static void refreshPreferences() {
-
-        prefs = new XSharedPreferences( new File(
-                Environment.getDataDirectory(), "data/"
-                + PACKAGE_NAME + "/shared_prefs/" + PACKAGE_NAME
-                + "_preferences" + ".xml" ) );
-        prefs.reload();
-
-        mModeSave = prefs.getInt( "pref_key_save", mModeSave );
-        mModeStory = prefs.getInt( "pref_key_save_story", mModeStory );
-        mTimerMinimum = prefs.getInt( "pref_key_timer_minimum", mTimerMinimum );
-        mToastEnabled = prefs.getBoolean( "pref_key_toasts_checkbox", mToastEnabled );
-        mToastLength = prefs.getInt( "pref_key_toasts_duration", mToastLength );
-        mSavePath = prefs.getString( "pref_key_save_location", mSavePath );
-        mVibrationEnabled = prefs.getBoolean( "pref_key_vibration_checkbox", mVibrationEnabled );
-        mSaveSentSnaps = prefs.getBoolean( "pref_key_save_sent_snaps", mSaveSentSnaps );
-        mSortByCategory = prefs.getBoolean( "pref_key_sort_files_mode", mSortByCategory );
-        mSortByUsername = prefs.getBoolean( "pref_key_sort_files_username", mSortByUsername );
-        mOverlays = prefs.getBoolean( "pref_key_overlay", mOverlays );
-        mDebugging = prefs.getBoolean( "pref_key_debug_mode", mDebugging );
-        mTimerUnlimited = prefs.getBoolean( "pref_key_timer_unlimited", mTimerUnlimited );
-        mHideTimerStory = prefs.getBoolean( "pref_key_timer_story_hide", mHideTimerStory );
-        mLoopingVids = prefs.getBoolean( "pref_key_looping_video", mLoopingVids );
-        mHideTimer = prefs.getBoolean( "pref_key_timer_hide", mHideTimer );
-
-        if ( HookedLayouts.saveSnapButton != null )
-            HookedLayouts.saveSnapButton.setVisibility(
-                    mModeSave == SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE );
-
-        if ( HookedLayouts.saveStoryButton != null )
-            HookedLayouts.saveStoryButton.setVisibility(
-                    mModeStory == SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE );
     }
 
     public enum SnapType
@@ -984,16 +935,15 @@ public class Saving
     public static class AsyncSaveSnapData extends AsyncTask<Object, Void, Boolean>
     {
         @Override protected Boolean doInBackground( Object... params ) {
-            Context context = (Context) params[0];
-            SnapData snapData = (SnapData) params[1];
+            Context context = (Context) params[ 0 ];
+            SnapData snapData = (SnapData) params[ 1 ];
 
             Logger.printMessage( "Performing ASYNC save" );
 
             try {
                 Saving.handleSave( context, snapData );
-            } catch( Exception e )
-            {
-                Logger.log("Exception performing AsyncSave ", e);
+            } catch ( Exception e ) {
+                Logger.log( "Exception performing AsyncSave ", e );
             }
             return null;
         }
