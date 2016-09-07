@@ -214,6 +214,9 @@ public class HookedLayouts
                 frameLayout.setOnTouchListener( new View.OnTouchListener()
                 {
                     @Override public boolean onTouch( View v, MotionEvent event ) {
+                        if( Preferences.mModeStory != Preferences.SAVE_S2S )
+                            return false;
+
                         return gestureEvent.onTouch( v, event );
                     }
                 } );
@@ -250,6 +253,9 @@ public class HookedLayouts
                 frameLayout.setOnTouchListener( new View.OnTouchListener()
                 {
                     @Override public boolean onTouch( View v, MotionEvent event ) {
+                        if( Preferences.mModeSave != Preferences.SAVE_S2S )
+                            return false;
+
                         return gestureEvent.onTouch( v, event );
                     }
                 } );
