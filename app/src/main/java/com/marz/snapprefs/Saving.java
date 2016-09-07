@@ -10,8 +10,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.view.View;
 import android.widget.Toast;
 
 import com.marz.snapprefs.SnapData.FlagState;
@@ -32,7 +30,6 @@ import java.util.regex.Pattern;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
-import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
@@ -69,7 +66,6 @@ public class Saving
         if ( mSCResources == null ) mSCResources = snapContext.getResources();
         Preferences.refreshPreferences();
 
-
         try {
             //TODO Set up Sweep2Save - IMPORTANT -
             ClassLoader cl = lpparam.classLoader;
@@ -89,7 +85,8 @@ public class Saving
                                             super.afterHookedMethod( param );
 
                                             try {
-                                                if ( Preferences.mModeSave == Preferences.DO_NOT_SAVE )
+                                                if ( Preferences.mModeSave ==
+                                                        Preferences.DO_NOT_SAVE )
                                                     return;
 
                                                 handleVideoPayload( snapContext, param );
@@ -266,7 +263,8 @@ public class Saving
                         findAndHookMethod( "com.snapchat.android.ui.SnapTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING );
                         param.setResult( (double) 9999.9F );
                     } else {
-                        if ( (double) Preferences.mTimerMinimum != Preferences.TIMER_MINIMUM_DISABLED &&
+                        if ( (double) Preferences.mTimerMinimum !=
+                                Preferences.TIMER_MINIMUM_DISABLED &&
                                 currentResult < (double) Preferences.mTimerMinimum ) {
                             param.setResult( (double) Preferences.mTimerMinimum );
                         }
@@ -327,8 +325,40 @@ public class Saving
         }
     }
 
-    public static void saveSnapButtonPress() {
+    public static void performS2SSave() {
         if ( currentSnapData != null && relativeContext != null ) {
+            if ( currentSnapData.getSnapType() == SnapType.STORY && Preferences.mModeStory !=
+                    Preferences.SAVE_S2S )
+                return;
+            else if ( currentSnapData.getSnapType() == SnapType.SNAP && Preferences.mModeSave !=
+                    Preferences.SAVE_S2S )
+                return;
+
+
+            performManualSnapDataSave();
+        }
+    }
+
+    public static void performButtonSave() {
+        if ( currentSnapData != null && relativeContext != null ) {
+            if ( currentSnapData.getSnapType() == SnapType.STORY && Preferences.mModeStory !=
+                    Preferences.SAVE_BUTTON )
+                return;
+            else if ( currentSnapData.getSnapType() == SnapType.SNAP && Preferences.mModeSave !=
+                    Preferences.SAVE_BUTTON )
+                return;
+
+
+            performManualSnapDataSave();
+        }
+    }
+
+    public static void performManualSnapDataSave() {
+        if ( Preferences.mModeSave == Preferences.DO_NOT_SAVE )
+            return;
+
+        if ( currentSnapData != null && relativeContext != null ) {
+
             Logger.printMessage( "Found SnapData to save" );
             Logger.printMessage( "Key: " + currentSnapData.getmKey() );
             Logger.printMessage( "Sender: " + currentSnapData.getStrSender() );
@@ -338,11 +368,21 @@ public class Saving
 
             try {
                 //handleSave( relativeContext, currentSnapData );
-
-                if ( asyncSaveMode )
-                    new AsyncSaveSnapData().execute( relativeContext, currentSnapData );
-                else
-                    handleSave( relativeContext, currentSnapData );
+                if ( currentSnapData.getFlags().contains( FlagState.COMPLETED ) &&
+                        !currentSnapData.getFlags().contains( FlagState.SAVED ) ) {
+                    if ( asyncSaveMode )
+                        new AsyncSaveSnapData().execute( relativeContext, currentSnapData );
+                    else
+                        handleSave( relativeContext, currentSnapData );
+                } else {
+                    if ( Preferences.mToastEnabled ) {
+                        NotificationUtils.showMessage(
+                                "Snap already saved",
+                                Color.rgb( 70, 200, 70 ),
+                                SavingUtils.getToastLength(),
+                                lpparam2.classLoader );
+                    }
+                }
             } catch ( Exception e ) {
                 Logger.printFinalMessage( "Exception saving snap" );
 
@@ -595,14 +635,16 @@ public class Saving
     }
 
     private static boolean shouldSave( SnapData snapData ) {
-        if( !snapData.getFlags().contains( FlagState.COMPLETED ) )
+        if ( !snapData.getFlags().contains( FlagState.COMPLETED ) )
             return false;
 
         if ( snapData.getSnapType() == SnapType.SNAP &&
-                Preferences.mModeSave == Preferences.SAVE_BUTTON )
+                Preferences.mModeSave == Preferences.SAVE_BUTTON ||
+                Preferences.mModeSave == Preferences.SAVE_S2S )
             return false;
         else if ( snapData.getSnapType() == SnapType.STORY &&
-                Preferences.mModeStory == Preferences.SAVE_BUTTON )
+                Preferences.mModeStory == Preferences.SAVE_BUTTON ||
+                Preferences.mModeStory == Preferences.SAVE_S2S )
             return false;
 
         return true;

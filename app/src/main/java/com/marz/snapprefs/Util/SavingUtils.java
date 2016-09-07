@@ -106,7 +106,7 @@ public abstract class SavingUtils
     public static void vibrate( Context context, boolean success ) {
         if( !Preferences.mVibrationEnabled )
             return;
-        
+
         if ( success ) {
             Vibrator v = (Vibrator) context.getSystemService( Context.VIBRATOR_SERVICE );
             v.vibrate( genVibratorPattern( 0.7f, 400 ), -1 );

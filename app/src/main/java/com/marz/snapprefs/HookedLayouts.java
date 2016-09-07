@@ -25,6 +25,7 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -44,6 +45,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Util.GestureEvent;
 import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.TypefaceUtil;
 
@@ -179,11 +181,11 @@ public class HookedLayouts
         } );
     }
 
-    public static void addSaveButtons( XC_InitPackageResources.InitPackageResourcesParam resparam,
-                                       final XModuleResources mResources, final Context
-                                               localContext, final boolean mModeSave,
-                                       final boolean mModeStory
+    public static void addSaveButtonsAndGestures(
+            XC_InitPackageResources.InitPackageResourcesParam resparam,
+            final XModuleResources mResources, final Context localContext
     ) {
+        final GestureEvent gestureEvent = new GestureEvent();
         Logger.log( "Adding Save Buttons" );
         final FrameLayout.LayoutParams layoutParams =
                 new FrameLayout.LayoutParams( FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
@@ -205,7 +207,16 @@ public class HookedLayouts
                 saveStoryButton.setBackgroundColor( 0 );
                 saveStoryButton.setImageBitmap( saveImg );
                 saveStoryButton.setAlpha( 0.8f );
-                saveStoryButton.setVisibility( mModeSave ? View.VISIBLE : View.INVISIBLE );
+                saveStoryButton.setVisibility( Preferences.mModeStory == Preferences.SAVE_BUTTON ?
+                                                       View.VISIBLE : View.INVISIBLE );
+
+
+                frameLayout.setOnTouchListener( new View.OnTouchListener()
+                {
+                    @Override public boolean onTouch( View v, MotionEvent event ) {
+                        return gestureEvent.onTouch( v, event );
+                    }
+                } );
 
                 frameLayout.addView( saveStoryButton );
 
@@ -213,7 +224,7 @@ public class HookedLayouts
                 {
                     @Override public void onClick( View v ) {
                         Logger.printTitle( "Performing Button Save" );
-                        Saving.saveSnapButtonPress();
+                        Saving.performButtonSave();
                     }
                 } );
             }
@@ -233,15 +244,22 @@ public class HookedLayouts
                 saveSnapButton.setBackgroundColor( 0 );
                 saveSnapButton.setAlpha( 0.8f );
                 saveSnapButton.setImageBitmap( saveImg );
-                saveSnapButton.setVisibility( mModeStory ? View.VISIBLE : View.INVISIBLE );
+                saveSnapButton.setVisibility( Preferences.mModeSave == Preferences.SAVE_BUTTON
+                                                      ? View.VISIBLE : View.INVISIBLE );
 
+                frameLayout.setOnTouchListener( new View.OnTouchListener()
+                {
+                    @Override public boolean onTouch( View v, MotionEvent event ) {
+                        return gestureEvent.onTouch( v, event );
+                    }
+                } );
                 frameLayout.addView( saveSnapButton );
 
                 saveSnapButton.setOnClickListener( new View.OnClickListener()
                 {
                     @Override public void onClick( View v ) {
                         Logger.printTitle( "Performing Button Save" );
-                        Saving.saveSnapButtonPress();
+                        Saving.performButtonSave();
                     }
                 } );
             }
@@ -304,7 +322,7 @@ public class HookedLayouts
                             shouldHideOptions = true;
                             Toast.makeText( HookMethods.SnapContext, "Your caption is missing", Toast.LENGTH_SHORT ).show();
                             Logger.log( "SnapPrefs: Not displaying Options - HookMethods" +
-                                                   ".editText empty" );
+                                                ".editText empty" );
                         }
                     }
                 } );
