@@ -351,7 +351,6 @@ public class Saving {
             Logger.printMessage("MediaType: " + currentSnapData.getMediaType());
 
             try {
-                //handleSave( relativeContext, currentSnapData );
                 if (currentSnapData.hasFlag(FlagState.COMPLETED) &&
                         !currentSnapData.hasFlag(FlagState.SAVED)) {
                     if (asyncSaveMode)
@@ -416,15 +415,16 @@ public class Saving {
         snapData.setHeader(mId, mKey, strSender, strTimestamp, snapType);
 
         if (shouldSave(snapData)) {
-            if (asyncSaveMode)
+            if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED)) {
+                snapData.addFlag(FlagState.PROCESSING);
                 new AsyncSaveSnapData().execute(context, snapData);
+            }
             else
                 handleSave(context, snapData);
         } else {
+            Logger.printFinalMessage("Auto saving disabled");
             currentSnapData = snapData;
             relativeContext = context;
-
-            Logger.printFinalMessage("Set to BUTTON saving - Awaiting press");
         }
     }
 
@@ -529,12 +529,14 @@ public class Saving {
 
         // If set to button saving, do not save
         if (shouldSave(snapData)) {
-            if (asyncSaveMode)
+            if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED)) {
+                snapData.addFlag(FlagState.PROCESSING);
                 new AsyncSaveSnapData().execute(context, snapData);
+            }
             else
                 handleSave(context, snapData);
         } else
-            Logger.printFinalMessage("Set to BUTTON saving - Awaiting press");
+            Logger.printFinalMessage("Auto saving disabled");
     }
 
     /**
@@ -586,8 +588,10 @@ public class Saving {
         Logger.printMessage("Successfully attached payload");
 
         if (shouldSave(snapData)) {
-            if (asyncSaveMode)
+            if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED)) {
+                snapData.addFlag(FlagState.PROCESSING);
                 new AsyncSaveSnapData().execute(context, snapData);
+            }
             else
                 handleSave(context, snapData);
         } else
@@ -619,8 +623,18 @@ public class Saving {
      */
     private static boolean scanForExisting(SnapData snapData, FlagState flagState) {
         //TODO Remove the FAILED flag to retry saving snaps after failure occurs
-        return (snapData.hasFlag(flagState) || snapData.hasFlag(FlagState.SAVED)) &&
-                (!snapData.hasFlag(FlagState.FAILED) || snapData.hasFlag(FlagState.COMPLETED));
+
+        if(snapData.hasFlag(FlagState.SAVED))
+            return true;
+        else if(snapData.hasFlag(flagState))
+            return true;
+        else if(snapData.hasFlag(FlagState.PROCESSING))
+            return true;
+        else
+            return false;
+        /*return !snapData.hasFlag(FlagState.SAVED) ||
+                (snapData.hasFlag(flagState) || snapData.hasFlag(FlagState.SAVED)) &&
+                (!snapData.hasFlag(FlagState.FAILED) || !snapData.hasFlag(FlagState.COMPLETED));*/
     }
 
     /**
@@ -633,10 +647,12 @@ public class Saving {
     public static void handleSave(Context context, SnapData snapData) throws Exception {
         // Ensure snapData is ready for saving
         if (snapData.hasFlag(FlagState.COMPLETED)) {
+            snapData.addFlag(FlagState.PROCESSING);
             Logger.printMessage("Saving Snap");
 
             // Attempt to save the snap
             SaveResponse saveResponse = saveReceivedSnap(context, snapData);
+            snapData.removeFlag(FlagState.PROCESSING);
 
             // Handle the response from the save attempt
             switch (saveResponse) {
@@ -659,7 +675,7 @@ public class Saving {
                     // Assign a FAILED flag to the snap
                     // If the snap fails to save, a force close will likely be necessary
                     // TODO Perform more FAILED handling
-                    snapData.getFlags().add(FlagState.FAILED);
+                    snapData.addFlag(FlagState.FAILED);
 
                     String message = "Failed saving";
 

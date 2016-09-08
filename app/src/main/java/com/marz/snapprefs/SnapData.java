@@ -71,6 +71,12 @@ public class SnapData {
         this.inputStream = null;
     }
 
+    public void setSaved()
+    {
+        flags.clear();
+        flags.add(FlagState.SAVED);
+    }
+
     private void checkForCompletion() {
         if (hasFlag(FlagState.COMPLETED))
             return;
@@ -78,14 +84,10 @@ public class SnapData {
         boolean isComplete =
                 flags.contains(FlagState.HEADER) && flags.contains(FlagState.PAYLOAD);
 
-        if (isComplete)
+        if (isComplete) {
+            flags.clear();
             flags.add(FlagState.COMPLETED);
-    }
-
-    public void setSaved()
-    {
-        flags.remove(FlagState.COMPLETED);
-        flags.add(FlagState.SAVED);
+        }
     }
 
     // ### GETTERS & SETTERS ### \\
@@ -164,6 +166,11 @@ public class SnapData {
 
     public void addFlag(FlagState flag) {
         this.flags.add(flag);
+    }
+
+    public void removeFlag(FlagState flag)
+    {
+        this.flags.remove(flag);
     }
 
     public boolean hasFlag(FlagState flag) {
