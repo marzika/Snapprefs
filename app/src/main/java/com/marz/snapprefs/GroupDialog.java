@@ -96,10 +96,10 @@ public class GroupDialog extends DialogFragment {
         add.setText("Add new Group");
         add.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         boolean shouldShowAdd = true;
-        if (Groups.groups.size() == 3 && HookMethods.mLicense == 0) {
+        if (Groups.groups.size() == 3 && Preferences.mLicense == 0) {
             shouldShowAdd = false;
         }
-        if (HookMethods.mLicense != 0 && HookMethods.mUnlimGroups == false) {
+        if (Preferences.mLicense != 0 && Preferences.mUnlimGroups == false) {
             shouldShowAdd = false;
         }
         if(shouldShowAdd){

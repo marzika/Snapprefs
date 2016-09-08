@@ -89,7 +89,12 @@ public class Chat {
                         String filename = sender + "_" + dateFormat.format(timestamp);
                         Logger.log("We have the file name " + filename, true);
 
-                        Saving.saveSnap(Saving.SnapType.CHAT, Saving.MediaType.IMAGE, imageView.getContext(), chatImage, null, filename, sender);
+                        try {
+                            Saving.saveSnap( Saving.SnapType.CHAT, Saving.MediaType.IMAGE, imageView.getContext(), chatImage, null, filename, sender );
+                        } catch( Exception e )
+                        {
+
+                        }
                         return true;
                     }
                 });
@@ -134,7 +139,13 @@ public class Chat {
                         Logger.log("We have the sender " + sender, true);
                         String filename = sender + "_" + dateFormat.format(timestamp);
                         Logger.log("We have the file name " + filename, true);
-                        Saving.saveSnap(Saving.SnapType.CHAT, Saving.MediaType.VIDEO, (Context) param.args[0], null, video, filename, sender);
+
+                        try {
+                            Saving.saveSnap( Saving.SnapType.CHAT, Saving.MediaType.VIDEO, (Context) param.args[ 0 ], null, video, filename, sender );
+                        } catch( Exception e )
+                        {
+
+                        }
                     }
                 });
                 saveLayoutSnap.addView(saveBtnSnap);

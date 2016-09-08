@@ -18,12 +18,18 @@
  */
 package com.marz.snapprefs;
 
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.marz.snapprefs.Util.StringUtils;
+
 import de.robv.android.xposed.XposedBridge;
 
 public class Logger {
 
     public static final String LOG_TAG = "SnapPrefs: ";
     private static boolean debugging;
+    private static int printWidth = 70;
 
     /**
      * Restrict instantiation of this class, it only contains static methods.
@@ -56,6 +62,38 @@ public class Logger {
         }
     }
 
+    public static void afterHook( String message )
+    {
+        log( "AfterHook: " + message );
+    }
+
+    public static void beforeHook( String message )
+    {
+        log( "BeforeHook: " + message );
+    }
+
+    public static void printTitle( String message )
+    {
+        log( "" );
+        printFilledRow();
+        printMessage( message );
+        printFilledRow();
+    }
+    public static void printMessage( String message )
+    {
+        log( "#" + StringUtils.center( message, printWidth ) + "#" );
+    }
+
+    public static void printFinalMessage( String message )
+    {
+        printMessage( message );
+        printFilledRow();
+    }
+
+    public static void printFilledRow()
+    {
+        log( StringUtils.repeat( "#", printWidth + 2 ) );
+    }
     /**
      * Write debug information to the Xposed Log if enabled.
      *

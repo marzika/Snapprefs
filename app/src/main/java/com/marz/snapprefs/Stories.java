@@ -51,7 +51,7 @@ public class Stories {
 
                 for (int i = f.size() - 1; i >= 0; i--) {
                     Object o = f.get(i);
-                    if (o.getClass() == recentStory && HookMethods.mHidePeople) {
+                    if (o.getClass() == recentStory && Preferences.mHidePeople) {
                         String username = (String) XposedHelpers.callMethod(o, "b");
                         for (String person : peopleToHide) {
                             if (username.equals(person)) {
@@ -59,7 +59,7 @@ public class Stories {
                                 f.remove(i);
                             }
                         }
-                    } else if (o.getClass() == allStory && HookMethods.mHidePeople) {
+                    } else if (o.getClass() == allStory && Preferences.mHidePeople) {
                         Object friend = XposedHelpers.callMethod(o, "h");
                         String username = (String) XposedHelpers.callMethod(friend, "g");
                         for (String person : peopleToHide) {
@@ -68,9 +68,9 @@ public class Stories {
                                 f.remove(i);
                             }
                         }
-                    } else if (o.getClass() == liveStory && HookMethods.mHideLive) {
+                    } else if (o.getClass() == liveStory && Preferences.mHideLive) {
                         f.remove(i);
-                    } else if (o.getClass() == discoverStory && HookMethods.mDiscoverUI) {
+                    } else if (o.getClass() == discoverStory && Preferences.mDiscoverUI) {
                         f.remove(i);
                     } else if (!types.contains(o.getClass())){
                         Logger.log("Found an unexpected entry at stories TYPE: " + o.getClass().getCanonicalName());

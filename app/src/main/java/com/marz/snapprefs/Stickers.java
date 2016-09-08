@@ -70,19 +70,22 @@ public class Stickers {
 
         initEmojiNames();//init unicode-cool name map
         //List single emojis
-        File myFile = new File(Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/");
+        /*File myFile = new File(Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/");
         File[] files = myFile.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String filename) {
                 return filename.endsWith(".svg") && new File(dir, filename.substring(0, filename.lastIndexOf(".")) + ".png").exists();
             }
         });
+
+        if( files == null )
+
         for (File f : files) {
             String s = f.getName().substring(0, f.getName().lastIndexOf("."));
             existing.add(s);
         }
         //This method loads contents of a zip
-        /*XposedHelpers.findAndHookMethod(Obfuscator.stickers.ASSETREADER_CLASS, lpparam.classLoader, Obfuscator.stickers.ASSETREADER_READ, new XC_MethodReplacement() {
+        XposedHelpers.findAndHookMethod(Obfuscator.stickers.ASSETREADER_CLASS, lpparam.classLoader, Obfuscator.stickers.ASSETREADER_READ, new XC_MethodReplacement() {
             @Override
             protected Object replaceHookedMethod(MethodHookParam methodHookParam) throws Throwable {
                 if (XposedHelpers.getBooleanField(methodHookParam.thisObject, "mIsUnzipped"))
@@ -173,6 +176,11 @@ public class Stickers {
                         String url = Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/" + str;
                         Logger.log("Sdcard path: " + url, true);
                         File file = new File(url);
+
+                        if( !file.exists() ) {
+                            Logger.log( "Error loading STICKERS file: " + str );
+                            return;
+                        }
                         InputStream is = null;
                         is = new BufferedInputStream(new FileInputStream(file));
                         param.setResult(is);

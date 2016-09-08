@@ -7,6 +7,13 @@
         android:entryValues="@array/pref_save_mode_values"
         android:key="pref_key_save"
         android:title="@string/pref_save_snaps" />
+    <com.marz.snapprefs.BetterListPreference
+        android:defaultValue="@string/pref_save_snapchats_default"
+        android:dialogTitle="@string/pref_save_story"
+        android:entries="@array/pref_save_mode_entries"
+        android:entryValues="@array/pref_save_mode_values"
+        android:key="pref_key_save_story"
+        android:title="@string/pref_save_story" />
     <!--<CheckBoxPreference
         android:defaultValue="false"
         android:key="pref_key_overlay"
