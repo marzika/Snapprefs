@@ -230,7 +230,7 @@ public class HookedLayouts
                 {
                     @Override public boolean onTouch( View v, MotionEvent event ) {
                         return Preferences.mModeStory == Preferences.SAVE_S2S &&
-                                gestureEvent.onTouch( v, event );
+                                gestureEvent.onTouch( v, event, Saving.SnapType.STORY );
 
                     }
                 } );
@@ -268,7 +268,7 @@ public class HookedLayouts
                 {
                     @Override public boolean onTouch( View v, MotionEvent event ) {
                         return Preferences.mModeSave == Preferences.SAVE_S2S &&
-                                gestureEvent.onTouch( v, event );
+                                gestureEvent.onTouch( v, event, Saving.SnapType.SNAP );
 
                     }
                 } );
