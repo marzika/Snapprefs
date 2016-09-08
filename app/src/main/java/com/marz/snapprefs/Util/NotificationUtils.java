@@ -2,9 +2,11 @@ package com.marz.snapprefs.Util;
 
 import android.content.res.XModuleResources;
 import android.content.res.XResources;
+import android.graphics.Color;
 
 import com.marz.snapprefs.HookMethods;
 import com.marz.snapprefs.Obfuscator;
+import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.R;
 
 import de.robv.android.xposed.XposedHelpers;
@@ -14,9 +16,9 @@ import de.robv.android.xposed.callbacks.XC_InitPackageResources;
  * Created by MARZ on 2016. 02. 18..
  */
 public class NotificationUtils {
-    public static int DEFAULT_ICON;
     public static final int LENGHT_LONG = 3500; // 3.5 seconds
     public static final int LENGHT_SHORT = 2000; // 2 seconds
+    public static int DEFAULT_ICON;
 
     public static void handleInitPackageResources(XC_InitPackageResources.InitPackageResourcesParam resparam) throws Throwable {
         if (resparam.packageName.equalsIgnoreCase("com.snapchat.android")) {
@@ -36,13 +38,13 @@ public class NotificationUtils {
         Object a = XposedHelpers.callStaticMethod(XposedHelpers.findClass(Obfuscator.notification.NOTIFICATION_CLASS_1, classLoader), "a");
         //Object CHAT_V2 = XposedHelpers.getStaticObjectField(XposedHelpers.findClass("com.snapchat.android.util.debug.FeatureFlagManager$FeatureFlag", classLoader), "CHAT_V2");
         //if ((boolean) (XposedHelpers.callStaticMethod(XposedHelpers.findClass("com.snapchat.android.util.debug.FeatureFlagManager", classLoader), "b", new Class[]{XposedHelpers.findClass("com.snapchat.android.util.debug.FeatureFlagManager$FeatureFlag", classLoader)}, CHAT_V2))) {
-            if (XposedHelpers.getObjectField(a, "c") != null) {
-                aVar = XposedHelpers.callMethod(XposedHelpers.getObjectField(a, "b"), "get", XposedHelpers.getObjectField(a, "c"));
-            }
-            if (aVar == null) {
-                //aVar = XposedHelpers.callMethod(a, "b");
-                aVar=XposedHelpers.newInstance(XposedHelpers.findClass("vz$a", classLoader), XposedHelpers.getObjectField(a, "c"));
-            }
+        if (XposedHelpers.getObjectField(a, "c") != null) {
+            aVar = XposedHelpers.callMethod(XposedHelpers.getObjectField(a, "b"), "get", XposedHelpers.getObjectField(a, "c"));
+        }
+        if (aVar == null) {
+            //aVar = XposedHelpers.callMethod(a, "b");
+            aVar = XposedHelpers.newInstance(XposedHelpers.findClass("vz$a", classLoader), XposedHelpers.getObjectField(a, "c"));
+        }
         //} else {
         //    aVar = XposedHelpers.callMethod(a, "b");
         //}
@@ -59,5 +61,28 @@ public class NotificationUtils {
         if (title != null)
             XposedHelpers.setObjectField(xu, "primaryText", title);
         XposedHelpers.callMethod(XposedHelpers.getObjectField(a, "a"), "a", xu);
+    }
+
+    public static void showStatefulMessage(String message, ToastType type, ClassLoader cl) {
+        if (!Preferences.mToastEnabled)
+            return;
+
+        NotificationUtils.showMessage(
+                message,
+                type.color,
+                SavingUtils.getToastLength(),
+                cl);
+    }
+
+    public enum ToastType {
+        GOOD(Color.rgb(70, 200, 70)),
+        WARNING(Color.rgb(200, 125, 70)),
+        BAD(Color.rgb(200, 70, 70));
+
+        private int color;
+
+        private ToastType(int color) {
+            this.color = color;
+        }
     }
 }
