@@ -41,7 +41,11 @@ public class Chat {
                 Object chat = XposedHelpers.getObjectField(XposedHelpers.getObjectField(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_VAR1), Obfuscator.chat.MESSAGEVIEWHOLDER_VAR2);
                 if (chat != null && chatClass.isInstance(chat)) {
                     if (!(boolean)XposedHelpers.callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISSAVED)) {
-                        XposedHelpers.callMethod(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_SAVE);
+                        try{
+                            XposedHelpers.callMethod(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_SAVE);
+                        }catch (XposedHelpers.InvocationTargetError e){
+                            Logger.log("Unable to save chat text.", true);
+                        }
                     }
                 }
             }
