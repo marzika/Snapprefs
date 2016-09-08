@@ -187,7 +187,7 @@ public class HookMethods
 
             // TODO Set up removal of button when mode is changed
             // Currently requires snapchat to restart to remove the button
-            HookedLayouts.addSaveButtonsAndGestures( resparam, mResources, localContext );
+            HookedLayouts.addSaveButtonsAndGestures( resparam, localContext );
 
             if ( Preferences.shouldAddGhost ) {
                 HookedLayouts.addIcons( resparam, mResources );
