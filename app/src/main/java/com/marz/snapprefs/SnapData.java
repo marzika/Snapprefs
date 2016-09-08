@@ -79,7 +79,7 @@ public class SnapData
             return;
 
         boolean isComplete =
-                flags.contains( FlagState.HEADER ) && flags.contains( FlagState.HEADER );
+                flags.contains( FlagState.HEADER ) && flags.contains( FlagState.PAYLOAD );
 
         if ( isComplete )
             flags.add( FlagState.COMPLETED );

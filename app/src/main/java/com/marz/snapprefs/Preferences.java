@@ -1,9 +1,11 @@
 package com.marz.snapprefs;
 
 import android.os.Environment;
+import android.os.UserHandle;
 import android.view.View;
 
 import java.io.File;
+import java.lang.reflect.Method;
 
 import de.robv.android.xposed.XSharedPreferences;
 
@@ -101,7 +103,7 @@ public class Preferences
         mIntegration = prefs.getBoolean("pref_key_integration", true);
         mCustomFilterBoolean = prefs.getBoolean("pref_key_custom_filter_checkbox", mCustomFilterBoolean);
         mMultiFilterBoolean = prefs.getBoolean("pref_key_multi_filter_checkbox", mMultiFilterBoolean);
-        mCustomFilterLocation = Environment.getExternalStorageDirectory().toString() + "/Snapprefs/Filters";
+        mCustomFilterLocation = getExternalPath() + "/Snapprefs/Filters";
         mCustomFilterType = prefs.getInt("pref_key_filter_type", 0);
         mSpeed = prefs.getBoolean("pref_key_speed", false);
         mWeather = prefs.getBoolean("pref_key_weather", false);
@@ -164,6 +166,23 @@ public class Preferences
         if ( HookedLayouts.saveStoryButton != null )
             HookedLayouts.saveStoryButton.setVisibility(
                     mModeStory == SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE );
+    }
+
+    public static String getExternalPath()
+    {
+        try {
+            Class<?> environmentcls = Class.forName("android.os.Environment");
+            Method setUserRequiredM = environmentcls.getMethod( "setUserRequired", boolean.class);
+            setUserRequiredM.invoke(null, false);
+
+
+            return Environment.getExternalStorageDirectory().getAbsolutePath();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public static void printSettings() {

@@ -9,11 +9,15 @@ import android.content.Intent;
 import android.content.res.XModuleResources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -186,12 +190,32 @@ public class HookedLayouts
             final XModuleResources mResources, final Context localContext
     ) {
         final GestureEvent gestureEvent = new GestureEvent();
-        Logger.log( "Adding Save Buttons" );
+        Logger.log( "Adding Save Buttons", false, true );
+
+
+       Logger.log("ID: " + resparam.res.getIdentifier( "aa_snap_preview_save", "drawable", Common
+               .PACKAGE_SNAP ), false, true );
+
+        Logger.log("Resource name: " + resparam.res.getResourceName( +2130837625 ), false, true);
+
+        int intIconID = resparam.res.getIdentifier( "aa_snap_preview_save", "drawable", Common
+                .PACKAGE_SNAP );
+
+        final BitmapDrawable saveImg = (BitmapDrawable) resparam.res.getDrawable( intIconID );
+        saveImg.setBounds( 0, 0, 50, 50 );
+        //final Bitmap saveImg = drawable.getBitmap();
+        //Drawable drawable;
+        if( saveImg == null )
+            throw new NullPointerException( "Button Image not found" );
+
         final FrameLayout.LayoutParams layoutParams =
-                new FrameLayout.LayoutParams( FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
+                new FrameLayout.LayoutParams( FrameLayout.LayoutParams.WRAP_CONTENT,
+                                              FrameLayout.LayoutParams.WRAP_CONTENT,
                                               Gravity.BOTTOM | Gravity.START );
 
-        final Bitmap saveImg = BitmapFactory.decodeResource( mResources, R.mipmap.snap_button );
+        //stories_mystoryoverlaysave_icon
+
+        //final Bitmap saveImg = BitmapFactory.decodeResource( mResources, R.mipmap.snap_button );
 
         resparam.res.hookLayout( Common.PACKAGE_SNAP, "layout", "view_story_snap", new XC_LayoutInflated()
         {
@@ -204,20 +228,18 @@ public class HookedLayouts
 
                 saveStoryButton = new ImageButton( localContext );
                 saveStoryButton.setLayoutParams( layoutParams );
-                saveStoryButton.setBackgroundColor( 0 );
-                saveStoryButton.setImageBitmap( saveImg );
+                saveStoryButton.setBackgroundColor( Color.argb( 50, 255, 255, 255 ) );
+                saveStoryButton.setImageDrawable( saveImg );
                 saveStoryButton.setAlpha( 0.8f );
                 saveStoryButton.setVisibility( Preferences.mModeStory == Preferences.SAVE_BUTTON ?
                                                        View.VISIBLE : View.INVISIBLE );
 
-
                 frameLayout.setOnTouchListener( new View.OnTouchListener()
                 {
                     @Override public boolean onTouch( View v, MotionEvent event ) {
-                        if( Preferences.mModeStory != Preferences.SAVE_S2S )
-                            return false;
+                        return Preferences.mModeStory == Preferences.SAVE_S2S &&
+                                gestureEvent.onTouch( v, event );
 
-                        return gestureEvent.onTouch( v, event );
                     }
                 } );
 
@@ -246,14 +268,14 @@ public class HookedLayouts
                 saveSnapButton.setLayoutParams( layoutParams );
                 saveSnapButton.setBackgroundColor( 0 );
                 saveSnapButton.setAlpha( 0.8f );
-                saveSnapButton.setImageBitmap( saveImg );
+                saveSnapButton.setImageDrawable( saveImg );
                 saveSnapButton.setVisibility( Preferences.mModeSave == Preferences.SAVE_BUTTON
                                                       ? View.VISIBLE : View.INVISIBLE );
 
                 frameLayout.setOnTouchListener( new View.OnTouchListener()
                 {
                     @Override public boolean onTouch( View v, MotionEvent event ) {
-                        if( Preferences.mModeSave != Preferences.SAVE_S2S )
+                        if ( Preferences.mModeSave != Preferences.SAVE_S2S )
                             return false;
 
                         return gestureEvent.onTouch( v, event );

@@ -348,7 +348,6 @@ public class Saving
                     Preferences.SAVE_BUTTON )
                 return;
 
-
             performManualSnapDataSave();
         }
     }
@@ -421,8 +420,6 @@ public class Saving
 
         String mKey = mId;
         String strSender;
-
-        Logger.log( "Suffix: " + getObjectField( receivedSnap, "mCacheKeyInstanceSuffix" ) );
 
         if ( snapType == SnapType.SNAP ) {
             mKey += (String) getObjectField( receivedSnap, "mCacheKeyInstanceSuffix" );
@@ -631,7 +628,7 @@ public class Saving
             else
                 handleSave( context, snapData );
         } else
-            Logger.printFinalMessage( "Set to BUTTON saving - Awaiting press" );
+            Logger.printFinalMessage( "Auto saving disabled" );
     }
 
     private static boolean shouldSave( SnapData snapData ) {
@@ -714,7 +711,7 @@ public class Saving
                     snapData.getFlags().add( FlagState.FAILED );
 
                     if ( Preferences.mToastEnabled ) {
-                        String message = "Failing saving";
+                        String message = "Failed saving";
 
                         if ( snapData.getMediaType() != null )
                             message += " " + snapData.getMediaType().typeName;
