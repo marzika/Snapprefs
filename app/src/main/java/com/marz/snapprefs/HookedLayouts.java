@@ -7,14 +7,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.XModuleResources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
-import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -116,7 +111,7 @@ public class HookedLayouts
                 row.addView( iv );
                 row.addView( textView );
                 navigation.addView( row );
-                if ( setInt == false ) {
+                if ( setInt ) {
                     setInt = true;
                 } else {//cheap ass fix
                     navigation.removeView( row );
@@ -186,8 +181,7 @@ public class HookedLayouts
     }
 
     public static void addSaveButtonsAndGestures(
-            XC_InitPackageResources.InitPackageResourcesParam resparam,
-            final XModuleResources mResources, final Context localContext
+            XC_InitPackageResources.InitPackageResourcesParam resparam, final Context localContext
     ) {
         final GestureEvent gestureEvent = new GestureEvent();
         Logger.log( "Adding Save Buttons", false, true );
@@ -202,9 +196,7 @@ public class HookedLayouts
                 .PACKAGE_SNAP );
 
         final BitmapDrawable saveImg = (BitmapDrawable) resparam.res.getDrawable( intIconID );
-        saveImg.setBounds( 0, 0, 50, 50 );
-        //final Bitmap saveImg = drawable.getBitmap();
-        //Drawable drawable;
+
         if( saveImg == null )
             throw new NullPointerException( "Button Image not found" );
 
@@ -275,10 +267,9 @@ public class HookedLayouts
                 frameLayout.setOnTouchListener( new View.OnTouchListener()
                 {
                     @Override public boolean onTouch( View v, MotionEvent event ) {
-                        if ( Preferences.mModeSave != Preferences.SAVE_S2S )
-                            return false;
+                        return Preferences.mModeSave == Preferences.SAVE_S2S &&
+                                gestureEvent.onTouch( v, event );
 
-                        return gestureEvent.onTouch( v, event );
                     }
                 } );
                 frameLayout.addView( saveSnapButton );
@@ -414,17 +405,17 @@ public class HookedLayouts
                 {
                     @Override
                     public void run() {
-                        if ( Preferences.mTextTools == true ) {
+                        if ( Preferences.mTextTools ) {
                             relativeLayout.addView( textButton, layoutParams );
                             relativeLayout.addView( outerOptionsLayout, outerOptionsLayoutParams );
                         }
-                        if ( Preferences.mSpeed == true ) {
+                        if ( Preferences.mSpeed ) {
                             relativeLayout.addView( speed, paramsSpeed );
                         }
-                        if ( Preferences.mLocation == true ) {
+                        if ( Preferences.mLocation ) {
                             relativeLayout.addView( location, paramsLocation );
                         }
-                        if ( Preferences.mWeather == true ) {
+                        if ( Preferences.mWeather ) {
                             relativeLayout.addView( weather, paramsWeather );
                         }
                     }
@@ -737,7 +728,7 @@ public class HookedLayouts
                             button_left.setOnClickListener( new View.OnClickListener()
                             {
                                 public void onClick( View view ) {
-                                    HookMethods.editText.setGravity( Gravity.LEFT );
+                                    HookMethods.editText.setGravity( Gravity.START );
                                 }
                             } );
                             button_center.setText( Common.dialog_center );
@@ -751,7 +742,7 @@ public class HookedLayouts
                             button_right.setOnClickListener( new View.OnClickListener()
                             {
                                 public void onClick( View view ) {
-                                    HookMethods.editText.setGravity( Gravity.RIGHT );
+                                    HookMethods.editText.setGravity( Gravity.END );
                                 }
                             } );
                             linearLayout.addView( button_left );

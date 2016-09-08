@@ -143,14 +143,14 @@ public class HookMethods
     }
 
     @Override
-    public void initZygote( StartupParam startupParam ) {
+    public void initZygote( StartupParam startupParam ) throws Throwable  {
         MODULE_PATH = startupParam.modulePath;
         mResources = XModuleResources.createInstance( startupParam.modulePath, null );
         //refreshPreferences();
     }
 
     @Override
-    public void handleInitPackageResources( InitPackageResourcesParam resparam ) {
+    public void handleInitPackageResources( InitPackageResourcesParam resparam ) throws Throwable {
         try {
             if ( !resparam.packageName.equals( Common.PACKAGE_SNAP ) ) {
                 Logger.log( "Skipping resource hooks: Same target package" );
@@ -205,7 +205,7 @@ public class HookMethods
     }
 
     @Override
-    public void handleLoadPackage( final LoadPackageParam lpparam ) {
+    public void handleLoadPackage( final LoadPackageParam lpparam ) throws Throwable {
         try {
             if ( !lpparam.packageName.equals( Common.PACKAGE_SNAP ) )
                 return;
