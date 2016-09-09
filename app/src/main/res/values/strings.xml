@@ -120,6 +120,9 @@
 
     <!-- Saving settings -->
     <string name="pref_category_snapchats">Saving</string>
+    <string name="pref_save_button_position_title">Button position</string>
+    <string name="pref_save_button_position_summary_on">Save button position: LEFT</string>
+    <string name="pref_save_button_position_summary_off">Save button position: RIGHT</string>
     <string name="pref_save_snapchats_default" translatable="false">0</string>
     <string name="pref_save_snaps_images">Image snaps</string>
     <string name="pref_save_snaps_videos">Video snaps</string>

@@ -194,10 +194,11 @@ public class HookedLayouts {
         if (saveImg == null)
             throw new NullPointerException("Button Image not found");
 
+        int horizontalPosition = Preferences.mButtonPosition ? Gravity.START : Gravity.END;
         final FrameLayout.LayoutParams layoutParams =
                 new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
                         FrameLayout.LayoutParams.WRAP_CONTENT,
-                        Gravity.BOTTOM | Gravity.END);
+                        Gravity.BOTTOM | horizontalPosition);
 
         //stories_mystoryoverlaysave_icon
 
@@ -276,6 +277,30 @@ public class HookedLayouts {
                 });
             }
         });
+    }
+
+    public static void refreshButtonPreferences()
+    {
+        int horizontalPosition = Preferences.mButtonPosition ? Gravity.START : Gravity.END;
+        final FrameLayout.LayoutParams layoutParams =
+                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT,
+                        Gravity.BOTTOM | horizontalPosition);
+
+        if (HookedLayouts.saveSnapButton != null) {
+            HookedLayouts.saveSnapButton.setVisibility(
+                    Preferences.mModeSave == Preferences.SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE);
+
+            HookedLayouts.saveSnapButton.setLayoutParams(layoutParams);
+        }
+
+        if (HookedLayouts.saveStoryButton != null) {
+            HookedLayouts.saveStoryButton.setVisibility(
+                    Preferences.mModeStory == Preferences.SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE);
+
+            HookedLayouts.saveStoryButton.setLayoutParams(layoutParams);
+        }
+
     }
 
     private static Bitmap processButtonDrawable(BitmapDrawable drawable) {
