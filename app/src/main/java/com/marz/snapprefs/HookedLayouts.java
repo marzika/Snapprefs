@@ -279,8 +279,7 @@ public class HookedLayouts {
         });
     }
 
-    public static void refreshButtonPreferences()
-    {
+    public static void refreshButtonPreferences() {
         int horizontalPosition = Preferences.mButtonPosition ? Gravity.START : Gravity.END;
         final FrameLayout.LayoutParams layoutParams =
                 new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
@@ -465,7 +464,8 @@ public class HookedLayouts {
         XC_MethodHook hideLayout = new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                outerOptionsLayout.setVisibility(View.GONE);
+                if (outerOptionsLayout != null)
+                    outerOptionsLayout.setVisibility(View.GONE);
             }
         };
         findAndHookMethod("com.snapchat.android.analytics.ui.StickerPickerAnalytics", lpparam.classLoader, "a", hideLayout);
