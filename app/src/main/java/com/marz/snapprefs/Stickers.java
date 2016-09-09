@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -174,8 +175,14 @@ public class Stickers {
                     String str = (String) param.args[0];
                     if (str.contains("twemoji_2_")) {
                         String url = Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/" + str;
-                        Logger.log("Sdcard path: " + url, true);
-                        File file = new File(url);
+                        File file;
+                        try {
+                            Logger.log("Sdcard path: " + url, true);
+                            file = new File(url);
+                        } catch (Exception e){
+                            Logger.log("Stickers file/folder not found", true);
+                            return;
+                        }
 
                         if( !file.exists() ) {
                             Logger.log( "Error loading STICKERS file: " + str );
