@@ -550,7 +550,7 @@ public class HookMethods
         findAndHookMethod(Obfuscator.spoofing.BATTERY_FILTER, lpparam.classLoader, "a", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
-                Object battery = getStaticObjectField(batteryInfoProviderEnum, "FULL_BATTERY");
+                Object battery = getStaticObjectField(batteryInfoProviderEnum, Obfuscator.spoofing.BATTERY_FULL_ENUM);
                 param.setResult(battery);
             }
         });

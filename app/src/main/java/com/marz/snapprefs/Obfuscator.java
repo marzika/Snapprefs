@@ -152,6 +152,7 @@ public class Obfuscator {
         public static final String WEATHER_CLASS = "Wa";
         public static final String WEATHER_FIRST = "avT";
         public static final String BATTERY_FILTER = "UQ";
+        public static final String BATTERY_FULL_ENUM = "FULL";
     }
     public class select {
         //SendToFragment class
