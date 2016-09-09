@@ -214,6 +214,7 @@ public class HookedLayouts
             @Override
             public void handleLayoutInflated( LayoutInflatedParam liparam )
                     throws Throwable {
+                Logger.log("Updating view_story_snap.snap_container layout");
                 final FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(
                         liparam.res.getIdentifier( "snap_container", "id", Common.PACKAGE_SNAP )
                 ).getParent();
@@ -240,7 +241,6 @@ public class HookedLayouts
                 saveStoryButton.setOnClickListener( new View.OnClickListener()
                 {
                     @Override public void onClick( View v ) {
-                        Logger.printTitle( "Performing Button Save" );
                         Saving.performButtonSave();
                     }
                 } );
@@ -252,6 +252,7 @@ public class HookedLayouts
             @Override
             public void handleLayoutInflated( LayoutInflatedParam liparam )
                     throws Throwable {
+                Logger.log("Updating view_snap.snap_container layout");
                 final FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(
                         liparam.res.getIdentifier( "snap_container", "id", Common.PACKAGE_SNAP )
                 ).getParent();

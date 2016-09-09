@@ -52,7 +52,7 @@ public class Saving {
     private static HashSet<Object> spamGuardSet = new HashSet<>();
     private static ConcurrentHashMap<String, SnapData> hashSnapData = new ConcurrentHashMap<>();
     private static boolean printFlags = true;
-    private static SnapData currentSnapData;
+    private static String currentSnapKey;
     private static Context relativeContext;
     //TODO implement user selected save mode
     private static boolean asyncSaveMode = true;
@@ -313,53 +313,75 @@ public class Saving {
     }
 
     public static void performS2SSave() {
-        if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
-            if (currentSnapData.getSnapType() == SnapType.STORY && Preferences.mModeStory !=
-                    Preferences.SAVE_S2S)
-                return;
-            else if (currentSnapData.getSnapType() == SnapType.SNAP && Preferences.mModeSave !=
-                    Preferences.SAVE_S2S)
-                return;
+        SnapData currentSnapData = null;
+        Logger.printTitle("Launching S2S");
+        if (currentSnapKey != null) {
+            currentSnapData = hashSnapData.get(currentSnapKey);
 
-            performManualSnapDataSave();
+            if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
+                if (currentSnapData.getSnapType() == SnapType.STORY &&
+                        Preferences.mModeStory != Preferences.SAVE_S2S) {
+                    Logger.printFinalMessage("Tried to perform story S2S from different mode");
+                    return;
+                } else if (currentSnapData.getSnapType() == SnapType.SNAP &&
+                        Preferences.mModeSave != Preferences.SAVE_S2S) {
+                    Logger.printFinalMessage("Tried to perform snap S2S from different mode");
+                    return;
+                }
+            }
         }
+
+        Logger.printMessage("SnapData set: " + (currentSnapData != null));
+        performManualSnapDataSave(currentSnapData, relativeContext);
     }
 
     public static void performButtonSave() {
-        if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
-            if (currentSnapData.getSnapType() == SnapType.STORY && Preferences.mModeStory !=
-                    Preferences.SAVE_BUTTON)
-                return;
-            else if (currentSnapData.getSnapType() == SnapType.SNAP && Preferences.mModeSave !=
-                    Preferences.SAVE_BUTTON)
-                return;
+        SnapData currentSnapData = null;
+        Logger.printTitle("Launching BUTTON Save");
 
-            performManualSnapDataSave();
+        if (currentSnapKey != null) {
+            currentSnapData = hashSnapData.get(currentSnapKey);
+
+            if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
+                if (currentSnapData.getSnapType() == SnapType.STORY &&
+                        Preferences.mModeStory != Preferences.SAVE_BUTTON) {
+                    Logger.printFinalMessage("Tried to perform story button save from different mode");
+                    return;
+                } else if (currentSnapData.getSnapType() == SnapType.SNAP
+                        && Preferences.mModeSave != Preferences.SAVE_BUTTON) {
+                    Logger.printFinalMessage("Tried to perform snap button save from different mode");
+                    return;
+                }
+            }
         }
+
+        Logger.printMessage("SnapData set: " + (currentSnapData != null));
+        performManualSnapDataSave(currentSnapData, relativeContext);
     }
 
-    public static void performManualSnapDataSave() {
-        if (Preferences.mModeSave == Preferences.DO_NOT_SAVE)
-            return;
-
-        if (currentSnapData != null && relativeContext != null) {
+    public static void performManualSnapDataSave(SnapData snapData, Context context) {
+        if (snapData != null && context != null) {
             Logger.printMessage("Found SnapData to save");
-            Logger.printMessage("Key: " + currentSnapData.getmKey());
-            Logger.printMessage("Sender: " + currentSnapData.getStrSender());
-            Logger.printMessage("Timestamp: " + currentSnapData.getStrTimestamp());
-            Logger.printMessage("SnapType: " + currentSnapData.getSnapType());
-            Logger.printMessage("MediaType: " + currentSnapData.getMediaType());
+            Logger.printMessage("Key: " + snapData.getmKey());
+            Logger.printMessage("Sender: " + snapData.getStrSender());
+            Logger.printMessage("Timestamp: " + snapData.getStrTimestamp());
+            Logger.printMessage("SnapType: " + snapData.getSnapType());
+            Logger.printMessage("MediaType: " + snapData.getMediaType());
+            printFlags(snapData);
 
             try {
-                if (currentSnapData.hasFlag(FlagState.COMPLETED) &&
-                        !currentSnapData.hasFlag(FlagState.SAVED)) {
-                    if (asyncSaveMode)
-                        new AsyncSaveSnapData().execute(relativeContext, currentSnapData);
-                    else
-                        handleSave(relativeContext, currentSnapData);
+                if (snapData.hasFlag(FlagState.COMPLETED) &&
+                        !snapData.hasFlag(FlagState.SAVED)) {
+                    snapData.addFlag(FlagState.PROCESSING);
+                    if (asyncSaveMode) {
+                        new AsyncSaveSnapData().execute(context, snapData);
+                    } else
+                        handleSave(context, snapData);
                 } else {
-                    if (currentSnapData.hasFlag(FlagState.SAVED))
+                    if (snapData.hasFlag(FlagState.SAVED)) {
                         createStatefulToast("Snap recently saved", ToastType.GOOD);
+                        Logger.printFinalMessage("Snap recently saved");
+                    }
                 }
             } catch (Exception e) {
                 Logger.printFinalMessage("Exception saving snap");
@@ -396,15 +418,18 @@ public class Saving {
 
         SnapData snapData = hashSnapData.get(mKey);
 
+        printFlags(snapData);
+
         if (snapData != null && scanForExisting(snapData, FlagState.HEADER)) {
             Logger.printFinalMessage("Existing SnapData with HEADER found");
             return;
         } else if (snapData == null) {
+            // If the snapdata doesn't exist, create a new one with the provided mKey
+            Logger.printMessage("No SnapData found for Header... Creating new");
             snapData = new SnapData(mKey);
             hashSnapData.put(mKey, snapData);
+            Logger.printMessage("Hash Size: " + hashSnapData.size());
         }
-
-        printFlags(snapData);
 
         long lngTimestamp = (Long) callMethod(receivedSnap, Obfuscator.save.SNAP_GETTIMESTAMP);
         Date timestamp = new Date(lngTimestamp);
@@ -413,17 +438,18 @@ public class Saving {
         Logger.printMessage("Timestamp: " + strTimestamp);
 
         snapData.setHeader(mId, mKey, strSender, strTimestamp, snapType);
+        Logger.printMessage("Header attached");
 
-        if (shouldSave(snapData)) {
-            if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED)) {
-                snapData.addFlag(FlagState.PROCESSING);
+        if (shouldAutoSave(snapData)) {
+            snapData.addFlag(FlagState.PROCESSING);
+            if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED))
                 new AsyncSaveSnapData().execute(context, snapData);
-            }
             else
                 handleSave(context, snapData);
         } else {
-            Logger.printFinalMessage("Auto saving disabled");
-            currentSnapData = snapData;
+            Logger.printFinalMessage("Not saving this round");
+            printFlags(snapData);
+            currentSnapKey = snapData.getmKey();
             relativeContext = context;
         }
     }
@@ -506,6 +532,9 @@ public class Saving {
         // Get the snapdata associated with the mKey above
         SnapData snapData = hashSnapData.get(mKey);
 
+        // Print the snapdata's current flags
+        printFlags(snapData);
+
         // Check if the snapdata exists and whether it has already been handled
         if (snapData != null && scanForExisting(snapData, FlagState.PAYLOAD)) {
             Logger.printFinalMessage("Tried to modify existing data");
@@ -515,10 +544,8 @@ public class Saving {
             Logger.printMessage("No SnapData found for Payload... Creating new");
             snapData = new SnapData(mKey);
             hashSnapData.put(mKey, snapData);
+            Logger.printMessage("Hash Size: " + hashSnapData.size());
         }
-
-        // Print the snapdata's current flags
-        printFlags(snapData);
 
         // Get the stream using the filepath provided
         FileInputStream video = new FileInputStream(mAbsoluteFilePath);
@@ -528,15 +555,14 @@ public class Saving {
         Logger.printMessage("Successfully attached payload");
 
         // If set to button saving, do not save
-        if (shouldSave(snapData)) {
-            if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED)) {
-                snapData.addFlag(FlagState.PROCESSING);
+        if (shouldAutoSave(snapData)) {
+            snapData.addFlag(FlagState.PROCESSING);
+            if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED))
                 new AsyncSaveSnapData().execute(context, snapData);
-            }
             else
                 handleSave(context, snapData);
         } else
-            Logger.printFinalMessage("Auto saving disabled");
+            Logger.printFinalMessage("Not saving this round");
     }
 
     /**
@@ -560,6 +586,9 @@ public class Saving {
         // Find the snapData associated with the mKey
         SnapData snapData = hashSnapData.get(mKey);
 
+        // Display the snapData's current flags
+        printFlags(snapData);
+
         // Check if the snapData has been processed
         if (snapData != null && scanForExisting(snapData, FlagState.PAYLOAD)) {
             Logger.printFinalMessage("Tried to modify existing data");
@@ -568,10 +597,8 @@ public class Saving {
             Logger.printMessage("No SnapData found for Payload... Creating new");
             snapData = new SnapData(mKey);
             hashSnapData.put(mKey, snapData);
+            Logger.printMessage("Hash Size: " + hashSnapData.size());
         }
-
-        // Display the snapData's current flags
-        printFlags(snapData);
 
         // Get the bitmap payload
         Bitmap bmp = (Bitmap) param.args[0];
@@ -587,30 +614,58 @@ public class Saving {
         snapData.setPayload(bmp);
         Logger.printMessage("Successfully attached payload");
 
-        if (shouldSave(snapData)) {
-            if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED)) {
-                snapData.addFlag(FlagState.PROCESSING);
+        if (shouldAutoSave(snapData)) {
+            snapData.addFlag(FlagState.PROCESSING);
+            if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED))
                 new AsyncSaveSnapData().execute(context, snapData);
-            }
             else
                 handleSave(context, snapData);
         } else
-            Logger.printFinalMessage("Auto saving disabled");
+            Logger.printFinalMessage("Not saving this round");
     }
 
-    private static boolean shouldSave(SnapData snapData) {
-        if (!snapData.hasFlag(FlagState.COMPLETED) || snapData.getSnapType() != null)
+    private static boolean shouldAutoSave(SnapData snapData) {
+        Logger.printMessage("Performing saving checks");
+        if (!snapData.hasFlag(FlagState.COMPLETED)) {
+            Logger.printMessage("COMPLETED flag not assigned");
             return false;
+        }
+
+        Logger.printMessage("COMPLETED flag is assigned");
+
+        if (snapData.getSnapType() == null) {
+            Logger.printMessage("Header not assigned");
+            snapData.removeFlag(FlagState.COMPLETED);
+            snapData.removeFlag(FlagState.HEADER);
+            return false;
+        }
+
+        Logger.printMessage("Passed header check");
+
+        if (snapData.getPayload() == null) {
+            Logger.printMessage("Payload not assigned");
+            snapData.removeFlag(FlagState.PAYLOAD);
+            snapData.removeFlag(FlagState.COMPLETED);
+            return false;
+        }
+
+        Logger.printMessage("Passed payload checks");
 
         if (snapData.getSnapType() == SnapType.SNAP &&
-                Preferences.mModeSave == Preferences.SAVE_BUTTON ||
-                Preferences.mModeSave == Preferences.SAVE_S2S)
+                (Preferences.mModeSave == Preferences.DO_NOT_SAVE ||
+                        Preferences.mModeSave == Preferences.SAVE_BUTTON ||
+                        Preferences.mModeSave == Preferences.SAVE_S2S)) {
+            Logger.printMessage("Snap save mode check failed");
             return false;
-        else if (snapData.getSnapType() == SnapType.STORY &&
-                Preferences.mModeStory == Preferences.SAVE_BUTTON ||
-                Preferences.mModeStory == Preferences.SAVE_S2S)
+        } else if (snapData.getSnapType() == SnapType.STORY &&
+                (Preferences.mModeStory == Preferences.DO_NOT_SAVE ||
+                        Preferences.mModeStory == Preferences.SAVE_BUTTON ||
+                        Preferences.mModeStory == Preferences.SAVE_S2S)) {
+            Logger.printMessage("Story save mode check failed");
             return false;
+        }
 
+        Logger.printMessage("Save checks passed, moving on");
         return true;
     }
 
@@ -624,11 +679,11 @@ public class Saving {
     private static boolean scanForExisting(SnapData snapData, FlagState flagState) {
         //TODO Remove the FAILED flag to retry saving snaps after failure occurs
 
-        if(snapData.hasFlag(FlagState.SAVED))
+        if (snapData.hasFlag(FlagState.SAVED))
             return true;
-        else if(snapData.hasFlag(flagState))
+        else if (snapData.hasFlag(flagState))
             return true;
-        else if(snapData.hasFlag(FlagState.PROCESSING))
+        else if (snapData.hasFlag(FlagState.PROCESSING))
             return true;
         else
             return false;
@@ -647,12 +702,13 @@ public class Saving {
     public static void handleSave(Context context, SnapData snapData) throws Exception {
         // Ensure snapData is ready for saving
         if (snapData.hasFlag(FlagState.COMPLETED)) {
-            snapData.addFlag(FlagState.PROCESSING);
             Logger.printMessage("Saving Snap");
 
             // Attempt to save the snap
             SaveResponse saveResponse = saveReceivedSnap(context, snapData);
-            snapData.removeFlag(FlagState.PROCESSING);
+
+            while (snapData.hasFlag(FlagState.PROCESSING))
+                snapData.removeFlag(FlagState.PROCESSING);
 
             // Handle the response from the save attempt
             switch (saveResponse) {
@@ -675,6 +731,7 @@ public class Saving {
                     // Assign a FAILED flag to the snap
                     // If the snap fails to save, a force close will likely be necessary
                     // TODO Perform more FAILED handling
+                    snapData.getFlags().clear();
                     snapData.addFlag(FlagState.FAILED);
 
                     String message = "Failed saving";
@@ -687,6 +744,7 @@ public class Saving {
                     return;
                 }
                 case ONGOING: {
+                    Logger.printFinalMessage("Handle save status ONGOING");
                     return;
                 }
                 case EXISTING: {
@@ -719,7 +777,7 @@ public class Saving {
 
         Logger.printMessage("Flags:");
 
-        if (snapData.getFlags().size() <= 0) {
+        if (snapData == null || snapData.getFlags().size() <= 0) {
             Logger.printMessage("-  NONE  -");
             return;
         }
@@ -939,10 +997,11 @@ public class Saving {
 
             try {
                 Saving.handleSave(context, snapData);
+                return true;
             } catch (Exception e) {
                 Logger.log("Exception performing AsyncSave ", e);
             }
-            return null;
+            return false;
         }
     }
 }
