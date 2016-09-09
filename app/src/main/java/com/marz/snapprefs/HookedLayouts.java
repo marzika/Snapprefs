@@ -197,6 +197,7 @@ public class HookedLayouts {
         final FrameLayout.LayoutParams layoutParams =
                 new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
                         FrameLayout.LayoutParams.WRAP_CONTENT,
+                        Gravity.BOTTOM | Gravity.END);
 
         //stories_mystoryoverlaysave_icon
 
@@ -251,6 +252,7 @@ public class HookedLayouts {
                 saveSnapButton = new ImageButton(localContext);
                 saveSnapButton.setLayoutParams(layoutParams);
                 saveSnapButton.setBackgroundColor(0);
+                saveSnapButton.setAlpha(1f);
                 saveSnapButton.setImageBitmap(saveImg);
                 saveSnapButton.setVisibility(Preferences.mModeSave == Preferences.SAVE_BUTTON
                         ? View.VISIBLE : View.INVISIBLE);
