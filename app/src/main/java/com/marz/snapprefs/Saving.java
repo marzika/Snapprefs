@@ -77,16 +77,10 @@ public class Saving {
                     Obfuscator.save.CACHE_CLASS, cl), String.class, Bitmap.class,
                     new XC_MethodHook() {
                         @Override
-                        protected void afterHookedMethod(
-                                MethodHookParam param)
-                                throws Throwable {
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                             super.afterHookedMethod(param);
 
                             try {
-                                if (Preferences.mModeSave ==
-                                        Preferences.DO_NOT_SAVE)
-                                    return;
-
                                 handleVideoPayload(snapContext, param);
                             } catch (Exception e) {
                                 Logger.log(
@@ -104,9 +98,6 @@ public class Saving {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     try {
-                        if (Preferences.mModeSave == Preferences.DO_NOT_SAVE)
-                            return;
-
                         handleImagePayload(snapContext, param);
                     } catch (Exception e) {
                         Logger.log("Exception handling Image Payload\n" + e.getMessage());
@@ -122,9 +113,6 @@ public class Saving {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
-
-                    if (Preferences.mModeSave == Preferences.DO_NOT_SAVE)
-                        return;
 
                     boolean isBeingViewed = (boolean) param.args[0];
 
@@ -144,7 +132,8 @@ public class Saving {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     try {
-                        handleSentSnap( param.thisObject, snapContext);
+                        if( Preferences.mSaveSentSnaps )
+                            handleSentSnap(param.thisObject, snapContext);
                     } catch (Exception e) {
                         Logger.log("Error getting sent media", e);
                     }
@@ -222,8 +211,7 @@ public class Saving {
         }
     }
 
-    public static void handleSentSnap( Object snapPreviewFragment, Context snapContext )
-    {
+    public static void handleSentSnap(Object snapPreviewFragment, Context snapContext) {
         try {
             Logger.printTitle("Handling SENT snap");
             Activity activity = (Activity) callMethod(snapPreviewFragment, "getActivity");
@@ -800,10 +788,6 @@ public class Saving {
      */
     private static SaveResponse saveReceivedSnap(Context context, SnapData snapData) throws
             Exception {
-        if (Preferences.mModeSave == Preferences.DO_NOT_SAVE) {
-            Logger.printMessage("Mode: don't save");
-            return SaveResponse.FAILED;
-        }
 
         // Check if trying to save null snapData
         if (snapData == null) {
