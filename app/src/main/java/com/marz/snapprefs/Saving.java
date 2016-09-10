@@ -1,6 +1,7 @@
 package com.marz.snapprefs;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.XModuleResources;
@@ -66,7 +67,6 @@ public class Saving {
         Preferences.refreshPreferences();
 
         try {
-            //TODO Set up Sweep2Save - IMPORTANT -
             ClassLoader cl = lpparam.classLoader;
 
             /**
@@ -140,103 +140,13 @@ public class Saving {
                 }
             });
 
-            // TODO Implement a better system for saving sent snaps/videos
-            // Currently not too bad but could use fine tuning
-            final Class<?> snapImagebryo =
-                    findClass(Obfuscator.save.SNAPIMAGEBRYO_CLASS, lpparam.classLoader);
-            findAndHookMethod(Obfuscator.save.SENT_CLASS, lpparam.classLoader, Obfuscator.save.SENT_METHOD, Bitmap.class, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    Logger.beforeHook("SENT_CLASS");
-                    sentImage = (Bitmap) param.args[0];
-                }
-            });
-
-            Class<?> mediabryoA =
-                    findClass("com.snapchat.android.model.Mediabryo$a", lpparam.classLoader);
-            findAndHookConstructor("com.snapchat.android.model.Mediabryo", lpparam.classLoader, mediabryoA, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Logger.afterHook("Mediabryo");
-                    videoUri = (Uri) getObjectField(param.thisObject, "mVideoUri");
-
-                    //sentVideo = new FileInputStream(videoUri.toString());
-                    if (videoUri != null) {
-                        Logger.log("We have the URI " + videoUri.toString(), true);
-                    }
-                }
-            });
-            /**
-             * Method which gets called to prepare an image for sending (before selecting contacts).
-             * We check whether it's an image or a video and save it.
-             */
             findAndHookMethod(Obfuscator.save.SNAPPREVIEWFRAGMENT_CLASS, lpparam.classLoader, "l", new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Preferences.refreshPreferences();
-                    Logger.log("----------------------- SNAPPREFS/Sent Snap ------------------------", false);
-
-                    if (!Preferences.mSaveSentSnaps) {
-                        Logger.log("Not saving sent snap");
-                        return;
-                    }
-                    Logger.log("Saving sent snap");
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     try {
-                        final Context context =
-                                (Context) callMethod(param.thisObject, "getActivity");
-                        Logger.log("We have the Context", true);
-                        Object mediabryo =
-                                getObjectField(param.thisObject, "a"); //ash is AnnotatedMediabryo, in SnapPreviewFragment
-                        Logger.log("We have the MediaBryo", true);
-                        final String fileName = dateFormatSent.format(new Date());
-                        Logger.log("We have the filename " + fileName, true);
-
-                        // Check if instance of SnapImageBryo and thus an image or a video
-                        if (snapImagebryo.isInstance(mediabryo)) {
-                            Logger.log("The sent snap is an Image", true);
-                            //Bitmap sentimg = (Bitmap) callMethod(mediabryo, "e", mediabryo);
-                            //TODO Replace with updated system
-                            if (spamGuardSet.contains(sentImage))
-                                return;
-                            else
-                                spamGuardSet.add(sentImage);
-
-                            SaveResponse status =
-                                    saveSnap(SnapType.SENT, MediaType.IMAGE, snapContext, sentImage, null, fileName, null);
-
-                            if (status == SaveResponse.SUCCESS)
-                                spamGuardSet.remove(sentImage);
-                        } else {
-                            Logger.log("The sent snap is a Video", true);
-
-                            FileInputStream sentVid = new FileInputStream(videoUri.getPath());
-
-                            //TODO test spamguard
-                            if (spamGuardSet.contains(videoUri))
-                                return;
-                            else
-                                spamGuardSet.add(sentVid);
-
-                            Logger.log("Saving sent VIDEO SNAP", true);
-                            SaveResponse status =
-                                    saveSnap(SnapType.SENT, MediaType.VIDEO, context, null, sentVid, fileName, null);
-                            if (status == SaveResponse.SUCCESS)
-                                spamGuardSet.remove(videoUri);
-
-                            /*findAndHookMethod("com.snapchat.android.model.Mediabryo", lpparam.classLoader, "c", mediabryoClass, new XC_MethodHook() {
-                                @Override
-                                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                                    Uri videoUri = (Uri) param.getResult();
-                                    Logger.log("We have the URI " + videoUri.toString(), true);
-                                    video = new FileInputStream(videoUri.toString());
-                                    Logger.log("Saving sent VIDEO SNAP", true);
-                                    saveSnap(SnapType.SENT, MediaType.VIDEO, context, null, video, fileName, null);
-                                }
-                            });*/
-                        }
-                    } catch (Throwable t) {
-                        Logger.log("Saving sent snaps failed", true);
-                        Logger.log(t.toString(), true);
+                        handleSentSnap( param.thisObject, snapContext);
+                    } catch (Exception e) {
+                        Logger.log("Error getting sent media", e);
                     }
                 }
             });
@@ -309,6 +219,102 @@ public class Saving {
                             .show();
                 }
             });
+        }
+    }
+
+    public static void handleSentSnap( Object snapPreviewFragment, Context snapContext )
+    {
+        try {
+            Logger.printTitle("Handling SENT snap");
+            Activity activity = (Activity) callMethod(snapPreviewFragment, "getActivity");
+            Object snapEditorView = getObjectField(snapPreviewFragment, "b");
+            Object mediaBryo = getObjectField(snapEditorView, "p");
+
+            if (mediaBryo == null) {
+                Logger.printFinalMessage("MediaBryo not assigned - Halting process");
+                return;
+            }
+
+            String mKey = (String) getObjectField(mediaBryo, "mClientId");
+            Logger.printMessage("mKey: " + mKey);
+
+            SnapData snapData = hashSnapData.get(mKey);
+
+            if (snapData != null && !snapData.hasFlag(FlagState.FAILED)) {
+                Logger.printFinalMessage("Snap already handled");
+                return;
+            } else if (snapData == null) {
+                Logger.printMessage("SnapData not found - Creating new");
+                snapData = new SnapData(mKey);
+                snapData.setSnapType(SnapType.SENT);
+                hashSnapData.put(mKey, snapData);
+            }
+
+            SaveResponse response = null;
+            String filename = dateFormatSent.format(new Date());
+            String bryoName = mediaBryo.getClass().getCanonicalName();
+
+            Logger.printMessage("Saving with filename: " + filename);
+            Logger.printMessage("MediaBryo Type: " + bryoName);
+
+            if (bryoName.equals("VZ")) {
+                Logger.printMessage("Media Type: VIDEO");
+                Uri uri = (Uri) getObjectField(mediaBryo, "mVideoUri");
+
+                if (uri == null)
+                    response = SaveResponse.FAILED;
+                else {
+                    String regex = "preview/tracked_video_(.*?).mp4.nomedia";
+                    Pattern pattern = Pattern.compile(regex);
+                    Matcher matcher = pattern.matcher(uri.toString());
+
+                    if (matcher.find()) {
+                        try {
+                            Logger.printMessage("Original filename: " + matcher.group(0));
+                        } catch (IndexOutOfBoundsException ignore) {
+                            Logger.printMessage("Original filename: " + uri.getPath());
+                        }
+                    } else
+                        Logger.printMessage("Original filename: " + uri.getPath());
+
+                    Logger.printMessage("Uri valid - Trying to save");
+                    FileInputStream videoStream = new FileInputStream(uri.getPath());
+                    response = saveSnap(SnapType.SENT, MediaType.VIDEO,
+                            snapContext, null, videoStream, filename, null);
+                }
+            } else if (bryoName.equals("VC")) {
+                Logger.printMessage("Media Type: IMAGE");
+                Bitmap bmp = (Bitmap) callMethod(snapEditorView, "a", activity, true);
+                if (bmp != null) {
+                    Logger.printMessage("Sent image found - Trying to save");
+                    response = saveSnap(SnapType.SENT, MediaType.IMAGE,
+                            snapContext, bmp, null, filename, null);
+                }
+            }
+
+            if (response == null) {
+                Logger.printMessage("Response not assigned - Assumed failed");
+                response = SaveResponse.FAILED;
+            }
+
+            snapData.getFlags().clear();
+            if (response == SaveResponse.SUCCESS) {
+                Logger.printFinalMessage("Saved sent snap");
+                createStatefulToast("Saved send snap", ToastType.GOOD);
+                snapData.addFlag(FlagState.SAVED);
+                return;
+            } else if (response == SaveResponse.FAILED) {
+                Logger.printFinalMessage("Error saving snap");
+                createStatefulToast("Error saving snap", ToastType.BAD);
+                snapData.addFlag(FlagState.FAILED);
+                return;
+            } else {
+                Logger.printFinalMessage("Unhandled save response");
+                createStatefulToast("Unhandled save response", ToastType.WARNING);
+                return;
+            }
+        } catch (Exception e) {
+            Logger.log("Error getting sent media", e);
         }
     }
 
@@ -677,8 +683,6 @@ public class Saving {
      * @return True if contains any of the flags
      */
     private static boolean scanForExisting(SnapData snapData, FlagState flagState) {
-        //TODO Remove the FAILED flag to retry saving snaps after failure occurs
-
         if (snapData.hasFlag(FlagState.SAVED))
             return true;
         else if (snapData.hasFlag(flagState))
@@ -730,7 +734,6 @@ public class Saving {
 
                     // Assign a FAILED flag to the snap
                     // If the snap fails to save, a force close will likely be necessary
-                    // TODO Perform more FAILED handling
                     snapData.getFlags().clear();
                     snapData.addFlag(FlagState.FAILED);
 

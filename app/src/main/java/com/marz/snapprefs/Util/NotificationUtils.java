@@ -76,7 +76,7 @@ public class NotificationUtils {
 
     public enum ToastType {
         GOOD(Color.rgb(70, 200, 70)),
-        WARNING(Color.rgb(200, 175, 70)),
+        WARNING(Color.rgb(255, 140, 0)),
         BAD(Color.rgb(200, 70, 70));
 
         private int color;
