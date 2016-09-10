@@ -213,6 +213,10 @@ public class HookedLayouts {
                         liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP)
                 ).getParent();
 
+                ViewGroup overlay_group = (ViewGroup) liparam.view.findViewById(
+                        liparam.res.getIdentifier("my_story_swipe_layout", "id", Common.PACKAGE_SNAP)
+                );
+
                 saveStoryButton = new ImageButton(localContext);
                 saveStoryButton.setLayoutParams(layoutParams);
                 saveStoryButton.setBackgroundColor(0);
@@ -231,6 +235,8 @@ public class HookedLayouts {
                 });
 
                 frameLayout.addView(saveStoryButton);
+
+                overlay_group.bringToFront();
 
                 saveStoryButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -300,26 +306,6 @@ public class HookedLayouts {
             HookedLayouts.saveStoryButton.setLayoutParams(layoutParams);
         }
 
-    }
-
-    private static Bitmap processButtonDrawable(BitmapDrawable drawable) {
-        Bitmap originalBmp = drawable.getBitmap();
-        Bitmap srcBmp = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
-                Bitmap.Config.ARGB_8888);
-
-        Canvas canvas = new Canvas(srcBmp);
-        Paint p = new Paint();
-        p.setAntiAlias(true);
-        p.setStrokeWidth(1);
-        p.setStyle(Paint.Style.FILL_AND_STROKE);
-        p.setColor(Color.rgb(0, 0, 0));
-
-        RectF border = new RectF(drawable.getBounds());
-        border.inset(5, 5);
-        canvas.drawRoundRect(border, 5, 5, p);
-        canvas.drawBitmap(originalBmp, 0, 0, p);
-
-        return srcBmp;
     }
 
     public static void addIcons(XC_InitPackageResources.InitPackageResourcesParam resparam,

@@ -197,6 +197,8 @@ public class HookMethods
             if (Preferences.mHidePeople) {
                 Stories.addSnapprefsBtn(resparam, mResources);
             }
+
+            //Chat.initChatSave(resparam, mResources);
             HookedLayouts.fullScreenFilter(resparam);
         } catch (Exception e) {
             Logger.log("Exception thrown in handleInitPackageResources", e);
