@@ -34,8 +34,8 @@ public class SnapData {
         this.strSender = strSender;
         this.strTimestamp = strTimestamp;
         this.snapType = snapType;
-        flags.add(FlagState.HEADER);
-        checkForCompletion();
+        this.addFlag(FlagState.HEADER);
+        this.checkForCompletion();
     }
 
     public boolean setPayload(Object payload) {
@@ -48,8 +48,8 @@ public class SnapData {
         } else
             return false;
 
-        flags.add(FlagState.PAYLOAD);
-        checkForCompletion();
+        this.addFlag(FlagState.PAYLOAD);
+        this.checkForCompletion();
         return true;
     }
 
@@ -88,6 +88,18 @@ public class SnapData {
             flags.clear();
             flags.add(FlagState.COMPLETED);
         }
+    }
+
+    public String toString()
+    {
+        String toString = "mID: " + getmId() +
+                "\nmKey: " + getmKey() +
+                "\nSnapType: " + getSnapType() +
+                "\nMediaType: " + getMediaType() +
+                "\nSender: " + getStrSender() +
+                "\nPayload: " + (getPayload() != null ) +
+                "\nFlagCount: " + getFlags().size();
+        return toString;
     }
 
     // ### GETTERS & SETTERS ### \\

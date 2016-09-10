@@ -186,7 +186,7 @@ public class HookMethods
 
             // TODO Set up removal of button when mode is changed
             // Currently requires snapchat to restart to remove the button
-            HookedLayouts.addSaveButtonsAndGestures(resparam, localContext);
+            HookedLayouts.addSaveButtonsAndGestures(resparam, mResources, localContext);
 
             if (Preferences.shouldAddGhost) {
                 HookedLayouts.addIcons(resparam, mResources);
@@ -550,7 +550,7 @@ public class HookMethods
         findAndHookMethod(Obfuscator.spoofing.BATTERY_FILTER, lpparam.classLoader, "a", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
-                Object battery = getStaticObjectField(batteryInfoProviderEnum, "FULL_BATTERY");
+                Object battery = getStaticObjectField(batteryInfoProviderEnum, Obfuscator.spoofing.BATTERY_FULL_ENUM);
                 param.setResult(battery);
             }
         });

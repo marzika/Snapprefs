@@ -4,13 +4,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Vibrator;
 
 import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.Preferences;
-import com.marz.snapprefs.Saving;
-import com.marz.snapprefs.SnapData;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -23,9 +20,17 @@ import java.io.FileOutputStream;
  */
 public abstract class SavingUtils
 {
+    public static void saveJPGAsync( final File fileToSave, final Bitmap bmp, final Context context ) {
+        new Thread(new Runnable() {
+            public void run() {
+                saveJPG(fileToSave, bmp, context);
+            }
+        }).start();
+    }
     public static boolean saveJPG( File fileToSave, Bitmap bmp, Context context ) {
         if ( bmp == null ) {
-            Logger.printMessage( "Background JPG - Passed Null Image" );
+            Logger.printMessage( "saveJPG - Passed Null Image" );
+            vibrate( context, false );
             return false;
         }
 
@@ -46,9 +51,17 @@ public abstract class SavingUtils
         }
     }
 
+    public static void savePNGAsync( final File fileToSave, final Bitmap bmp, final Context context ) {
+        new Thread(new Runnable() {
+            public void run() {
+                savePNG(fileToSave, bmp, context);
+            }
+        }).start();
+    }
     public static boolean savePNG( File fileToSave, Bitmap bmp, Context context ) {
         if ( bmp == null ) {
-            Logger.printMessage( "Background PNG - Passed Null Image" );
+            Logger.printMessage( "savePNG - Passed Null Image" );
+            vibrate( context, false );
             return false;
         }
 
@@ -68,10 +81,18 @@ public abstract class SavingUtils
         }
     }
 
+    public static void saveVideoAsync( final File fileToSave, final FileInputStream fileStream, final Context context ) {
+        new Thread(new Runnable() {
+            public void run() {
+                saveVideo(fileToSave, fileStream, context);
+            }
+        }).start();
+    }
     public static boolean saveVideo( File fileToSave, FileInputStream fileStream, Context context
     ) {
         if ( fileStream == null ) {
-            Logger.printMessage( "Background PNG - Passed Null Image" );
+            Logger.printMessage( "saveVideo - Passed Null Video" );
+            vibrate( context, false );
             return false;
         }
 

@@ -14,6 +14,12 @@
         android:entryValues="@array/pref_save_mode_values"
         android:key="pref_key_save_story"
         android:title="@string/pref_save_story" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_save_button_position"
+        android:summaryOff="@string/pref_save_button_position_summary_off"
+        android:summaryOn="@string/pref_save_button_position_summary_on"
+        android:title="@string/pref_save_button_position_title" />
     <!--<CheckBoxPreference
         android:defaultValue="false"
         android:key="pref_key_overlay"

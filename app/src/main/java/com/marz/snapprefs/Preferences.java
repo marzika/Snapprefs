@@ -1,8 +1,9 @@
 package com.marz.snapprefs;
 
 import android.os.Environment;
-import android.os.UserHandle;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -12,23 +13,17 @@ import de.robv.android.xposed.XSharedPreferences;
 /**
  * Created by Andre on 07/09/2016.
  */
-public class Preferences
-{
-    static XSharedPreferences prefs;
-    static XSharedPreferences license;
-
+public class Preferences {
     public static final int SAVE_S2S = 1;
     public static final int DO_NOT_SAVE = 2;
     public static final int SAVE_BUTTON = 0;
     public static final int SAVE_AUTO = 3;
-
-    public static int mModeSave = SAVE_AUTO;
-    public static int mModeStory = SAVE_BUTTON;
-
     public static final int TOAST_LENGTH_SHORT = 0;
     public static final int TOAST_LENGTH_LONG = 1;
-    public static int mToastLength = TOAST_LENGTH_LONG;
     public static final int TIMER_MINIMUM_DISABLED = 0;
+    public static int mModeSave = SAVE_AUTO;
+    public static int mModeStory = SAVE_BUTTON;
+    public static int mToastLength = TOAST_LENGTH_LONG;
     public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
     public static int mForceNavbar = 0;
     public static boolean mCustomFilterBoolean = false;
@@ -63,28 +58,29 @@ public class Preferences
     public static boolean mTyping = false;
     public static boolean mUnlimGroups = false;
     public static int mLicense = 0;
-
     public static boolean mLocation;
-
-    private static boolean fullCaption;
     public static boolean selectAll;
     public static boolean hideBf;
-    private static boolean hideRecent;
     public static boolean shouldAddGhost;
-    private static boolean shouldAddVFilters;
     public static boolean mTimerCounter;
     public static boolean mChatAutoSave;
     public static boolean mChatMediaSave;
     public static boolean mIntegration;
+    public static boolean latest = false;
+    public static boolean mButtonPosition = false;
+    static XSharedPreferences prefs;
+    static XSharedPreferences license;
     static boolean selectStory;
     static boolean selectVenue;
     static boolean mTextTools;
     static boolean debug;
-    public static boolean latest = false;
     static boolean acceptedToU = false;
+    private static boolean fullCaption;
+    private static boolean hideRecent;
+    private static boolean shouldAddVFilters;
 
     static void refreshPreferences() {
-        prefs = new XSharedPreferences( new File(
+        prefs = new XSharedPreferences(new File(
                 Environment.getDataDirectory(), "data/"
                 + HookMethods.PACKAGE_NAME + "/shared_prefs/" + HookMethods.PACKAGE_NAME
                 + "_preferences" + ".xml"));
@@ -142,6 +138,7 @@ public class Preferences
         mHideTimerStory = prefs.getBoolean("pref_key_timer_story_hide", mHideTimerStory);
         mLoopingVids = prefs.getBoolean("pref_key_looping_video", mLoopingVids);
         mHideTimer = prefs.getBoolean("pref_key_timer_hide", mHideTimer);
+        mButtonPosition = prefs.getBoolean("pref_key_save_button_position", mButtonPosition);
 
 
         //SHARING
@@ -158,21 +155,13 @@ public class Preferences
 
         acceptedToU = prefs.getBoolean("acceptedToU", false);
 
-
-        if ( HookedLayouts.saveSnapButton != null )
-            HookedLayouts.saveSnapButton.setVisibility(
-                    mModeSave == SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE );
-
-        if ( HookedLayouts.saveStoryButton != null )
-            HookedLayouts.saveStoryButton.setVisibility(
-                    mModeStory == SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE );
+        HookedLayouts.refreshButtonPreferences();
     }
 
-    public static String getExternalPath()
-    {
+    public static String getExternalPath() {
         try {
             Class<?> environmentcls = Class.forName("android.os.Environment");
-            Method setUserRequiredM = environmentcls.getMethod( "setUserRequired", boolean.class);
+            Method setUserRequiredM = environmentcls.getMethod("setUserRequired", boolean.class);
             setUserRequiredM.invoke(null, false);
 
 
@@ -187,61 +176,61 @@ public class Preferences
 
     public static void printSettings() {
 
-        Logger.log( "\nTo see the advanced output enable debugging mode in the Support tab", true );
+        Logger.log("\nTo see the advanced output enable debugging mode in the Support tab", true);
 
-        Logger.log( "\n~~~~~~~~~~~~ SNAPPREFS SETTINGS" );
-        Logger.log( "SelectAll: " + selectAll );
-        Logger.log( "SelectStory: " + selectStory );
-        Logger.log( "SelectVenue: " + selectVenue );
-        Logger.log( "HideBF: " + hideBf );
-        Logger.log( "HideRecent: " + hideRecent );
-        Logger.log( "ShouldAddGhost: " + shouldAddGhost );
-        Logger.log( "mTextTools: " + mTextTools );
-        Logger.log( "mTimerCounter: " + mTimerCounter );
-        Logger.log( "mChatAutoSave: " + mChatAutoSave );
-        Logger.log( "mChatMediaSave: " + mChatMediaSave );
-        Logger.log( "mIntegration: " + mIntegration );
-        Logger.log( "mPaintTools: " + mPaintTools );
-        Logger.log( "CustomFilters: " + mCustomFilterBoolean );
-        Logger.log( "MultiFilters: " + mMultiFilterBoolean );
-        Logger.log( "CustomFiltersLocation: " + mCustomFilterLocation );
-        Logger.log( "CustomFilterType: " + mCustomFilterType );
-        Logger.log( "mSpeed: " + mSpeed );
-        Logger.log( "mWeather: " + mWeather );
-        Logger.log( "mLocation: " + mLocation );
-        Logger.log( "mStoryPreload: " + mStoryPreload );
-        Logger.log( "mDiscoverSnap: " + mDiscoverSnap );
-        Logger.log( "mDiscoverUI: " + mDiscoverUI );
-        Logger.log( "mCustomSticker: " + mCustomSticker );
-        Logger.log( "mHideLive: " + mHideLive );
-        Logger.log( "mHidePeople: " + mHidePeople );
-        Logger.log( "mReplay: " + mReplay );
-        Logger.log( "mStealth: " + mStealth );
-        Logger.log( "mTyping: " + mTyping );
-        Logger.log( "mUnlimGroups: " + mUnlimGroups );
-        Logger.log( "mForceNavbar: " + mForceNavbar );
-        Logger.log( "*****Debugging: " + debug + " *****" );
-        Logger.log( "mLicense: " + mLicense );
-        Logger.log( "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" );
-        Logger.setDebuggingEnabled( mDebugging );
+        Logger.log("\n~~~~~~~~~~~~ SNAPPREFS SETTINGS");
+        Logger.log("SelectAll: " + selectAll);
+        Logger.log("SelectStory: " + selectStory);
+        Logger.log("SelectVenue: " + selectVenue);
+        Logger.log("HideBF: " + hideBf);
+        Logger.log("HideRecent: " + hideRecent);
+        Logger.log("ShouldAddGhost: " + shouldAddGhost);
+        Logger.log("mTextTools: " + mTextTools);
+        Logger.log("mTimerCounter: " + mTimerCounter);
+        Logger.log("mChatAutoSave: " + mChatAutoSave);
+        Logger.log("mChatMediaSave: " + mChatMediaSave);
+        Logger.log("mIntegration: " + mIntegration);
+        Logger.log("mPaintTools: " + mPaintTools);
+        Logger.log("CustomFilters: " + mCustomFilterBoolean);
+        Logger.log("MultiFilters: " + mMultiFilterBoolean);
+        Logger.log("CustomFiltersLocation: " + mCustomFilterLocation);
+        Logger.log("CustomFilterType: " + mCustomFilterType);
+        Logger.log("mSpeed: " + mSpeed);
+        Logger.log("mWeather: " + mWeather);
+        Logger.log("mLocation: " + mLocation);
+        Logger.log("mStoryPreload: " + mStoryPreload);
+        Logger.log("mDiscoverSnap: " + mDiscoverSnap);
+        Logger.log("mDiscoverUI: " + mDiscoverUI);
+        Logger.log("mCustomSticker: " + mCustomSticker);
+        Logger.log("mHideLive: " + mHideLive);
+        Logger.log("mHidePeople: " + mHidePeople);
+        Logger.log("mReplay: " + mReplay);
+        Logger.log("mStealth: " + mStealth);
+        Logger.log("mTyping: " + mTyping);
+        Logger.log("mUnlimGroups: " + mUnlimGroups);
+        Logger.log("mForceNavbar: " + mForceNavbar);
+        Logger.log("*****Debugging: " + debug + " *****");
+        Logger.log("mLicense: " + mLicense);
+        Logger.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        Logger.setDebuggingEnabled(mDebugging);
 
-        Logger.log( "----------------------- SAVING SETTINGS -----------------------" );
-        Logger.log( "Preferences have changed:" );
-        String[] saveModes = { "SAVE_BUTTON", "SAVE_S2S", "DO_NOT_SAVE", "SAVE_AUTO" };
-        Logger.log( "~ mModeSave: " + saveModes[ mModeSave ] );
-        Logger.log( "~ mModeStory: " + saveModes[ mModeSave ] );
-        Logger.log( "~ mOverlays: " + mOverlays );
-        Logger.log( "~ mTimerMinimum: " + mTimerMinimum );
-        Logger.log( "~ mToastEnabled: " + mToastEnabled );
-        Logger.log( "~ mVibrationEnabled: " + mVibrationEnabled );
-        Logger.log( "~ mToastLength: " + mToastLength );
-        Logger.log( "~ mSavePath: " + mSavePath );
-        Logger.log( "~ mSaveSentSnaps: " + mSaveSentSnaps );
-        Logger.log( "~ mSortByCategory: " + mSortByCategory );
-        Logger.log( "~ mSortByUsername: " + mSortByUsername );
-        Logger.log( "~ mTimerUnlimited: " + mTimerUnlimited );
-        Logger.log( "~ mHideTimerStory: " + mHideTimerStory );
-        Logger.log( "~ mLoopingVids: " + mLoopingVids );
-        Logger.log( "~ mHideTimer: " + mHideTimer );
+        Logger.log("----------------------- SAVING SETTINGS -----------------------");
+        Logger.log("Preferences have changed:");
+        String[] saveModes = {"SAVE_BUTTON", "SAVE_S2S", "DO_NOT_SAVE", "SAVE_AUTO"};
+        Logger.log("~ mModeSave: " + saveModes[mModeSave]);
+        Logger.log("~ mModeStory: " + saveModes[mModeSave]);
+        Logger.log("~ mOverlays: " + mOverlays);
+        Logger.log("~ mTimerMinimum: " + mTimerMinimum);
+        Logger.log("~ mToastEnabled: " + mToastEnabled);
+        Logger.log("~ mVibrationEnabled: " + mVibrationEnabled);
+        Logger.log("~ mToastLength: " + mToastLength);
+        Logger.log("~ mSavePath: " + mSavePath);
+        Logger.log("~ mSaveSentSnaps: " + mSaveSentSnaps);
+        Logger.log("~ mSortByCategory: " + mSortByCategory);
+        Logger.log("~ mSortByUsername: " + mSortByUsername);
+        Logger.log("~ mTimerUnlimited: " + mTimerUnlimited);
+        Logger.log("~ mHideTimerStory: " + mHideTimerStory);
+        Logger.log("~ mLoopingVids: " + mLoopingVids);
+        Logger.log("~ mHideTimer: " + mHideTimer);
     }
 }
