@@ -3,6 +3,7 @@
     <ListPreference
         android:defaultValue="@string/pref_rotation_default"
         android:dialogTitle="@string/pref_rotation_title"
+        android:summary="%s"
         android:entries="@array/pref_rotation_entries"
         android:entryValues="@array/pref_rotation_values"
         android:key="pref_rotation"
@@ -11,6 +12,7 @@
     <ListPreference
         android:defaultValue="@string/pref_adjustment_default"
         android:dialogTitle="@string/pref_adjustment_title"
+        android:summary="%s"
         android:entries="@array/pref_adjustment_entries"
         android:entryValues="@array/pref_adjustment_values"
         android:key="pref_adjustment"
