@@ -595,12 +595,22 @@ public class Saving {
         }
 
         // Get the bitmap payload
-        Bitmap bmp = (Bitmap) param.args[0];
+        Bitmap originalBmp = (Bitmap) param.args[0];
 
-        if (bmp == null) {
+        if (originalBmp == null) {
             Logger.printFinalMessage("Tried to attach Null Bitmap");
             return;
         }
+
+        if( originalBmp.isRecycled() )
+        {
+            Logger.printFinalMessage("Bitmap is already recycled");
+            snapData.addFlag(FlagState.FAILED);
+            createStatefulToast("Error saving image", ToastType.BAD);
+            return;
+        }
+
+        Bitmap bmp = originalBmp.copy(Bitmap.Config.ARGB_8888, false);
 
         Logger.printMessage("Pulled Bitmap");
 
