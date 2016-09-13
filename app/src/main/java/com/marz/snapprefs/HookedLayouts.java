@@ -9,15 +9,11 @@ import android.content.Intent;
 import android.content.res.XModuleResources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
-import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.graphics.drawable.ShapeDrawable;
@@ -214,8 +210,7 @@ public class HookedLayouts {
                 ).getParent();
 
                 ViewGroup overlay_group = (ViewGroup) liparam.view.findViewById(
-                        liparam.res.getIdentifier("my_story_swipe_layout", "id", Common.PACKAGE_SNAP)
-                );
+                        liparam.res.getIdentifier("my_story_swipe_layout", "id", Common.PACKAGE_SNAP));
 
                 saveStoryButton = new ImageButton(localContext);
                 saveStoryButton.setLayoutParams(layoutParams);
