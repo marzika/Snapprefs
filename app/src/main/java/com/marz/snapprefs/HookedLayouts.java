@@ -185,7 +185,7 @@ public class HookedLayouts {
                 .PACKAGE_SNAP);
 
         final BitmapDrawable drawable = (BitmapDrawable) resparam.res.getDrawable(intIconID);*/
-        final Bitmap saveImg = BitmapFactory.decodeResource(mResources, R.mipmap.save_button); //processButtonDrawable(drawable);
+        final Bitmap saveImg = BitmapFactory.decodeResource(mResources, R.drawable.save_button); //processButtonDrawable(drawable);
 
         if (saveImg == null)
             throw new NullPointerException("Button Image not found");
@@ -889,9 +889,11 @@ public class HookedLayouts {
                                     new AlertDialog.Builder(HookMethods.SnapContext);
                             SeekBar seekBar = new SeekBar(HookMethods.SnapContext);
                             seekBar.setMax(255);
-                            int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+                            int currentapiVersion = Build.VERSION.SDK_INT;
                             if (currentapiVersion >= Build.VERSION_CODES.KITKAT) {
-                                seekBar.setProgress(HookMethods.editText.getBackground().getAlpha());
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                    seekBar.setProgress(HookMethods.editText.getBackground().getAlpha());
+                                }
                             } else {
                                 seekBar.setProgress(255);
                             }
