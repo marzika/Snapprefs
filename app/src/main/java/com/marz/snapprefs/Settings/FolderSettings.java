@@ -106,7 +106,7 @@ public class FolderSettings extends PreferenceFragmentCompat implements SharedPr
         Preference preference = findPreference(key);
         try {
             preference.setSummary(sharedPreferences.getString(key, ""));
-        } catch (ClassCastException ignore) {
+        } catch (ClassCastException | NullPointerException ignore) {
             //boolean cannot be cast to String
         }
     }
