@@ -55,7 +55,9 @@ public class FilterPreview extends Activity {
             imgId = getIntent().getStringExtra("imageId");
             visual = getIntent().getBooleanExtra("visual", false);
             if(!visual){
-                imgPath = imgPath + ".png";
+                if(!imgPath.toLowerCase().contains(".png")){
+                    imgPath = imgPath + ".png";
+                }
                 original.setVisibility(View.GONE);
             } else {
                 enabled = getIntent().getBooleanExtra("enabled", false);
