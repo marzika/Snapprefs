@@ -14,6 +14,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import com.marz.snapprefs.Util.NotificationUtils;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -262,7 +264,20 @@ public class Chat {
                         Logger.log("We have the file name " + filename, true);
 
                         try {
-                            Saving.saveSnap(Saving.SnapType.CHAT, Saving.MediaType.IMAGE, imageView.getContext(), chatImage, null, filename, sender);
+                            Saving.SaveResponse response = Saving.saveSnap(Saving.SnapType.CHAT, Saving.MediaType.IMAGE, imageView.getContext(), chatImage, null, filename, sender);
+                            if (response == Saving.SaveResponse.SUCCESS) {
+                                Logger.printFinalMessage("Saved Chat image");
+                                Saving.createStatefulToast("Saved Chat image", NotificationUtils.ToastType.GOOD);
+                            } else if (response == Saving.SaveResponse.EXISTING) {
+                                Logger.printFinalMessage("Chat image exists");
+                                Saving.createStatefulToast("Chat image exists", NotificationUtils.ToastType.WARNING);
+                            } else if (response == Saving.SaveResponse.FAILED) {
+                                Logger.printFinalMessage("Error saving Chat image");
+                                Saving.createStatefulToast("Error saving Chat image", NotificationUtils.ToastType.BAD);
+                            } else {
+                                Logger.printFinalMessage("Unhandled save response");
+                                Saving.createStatefulToast("Unhandled save response", NotificationUtils.ToastType.WARNING);
+                            }
                         } catch (Exception e) {
 
                         }
@@ -299,7 +314,7 @@ public class Chat {
                             Logger.log("We have the chat video url: " + mUri.toString(), true);
                             video = new FileInputStream(Uri.parse(mUri.toString()).getPath());
                         } catch (Exception e) {
-                            Logger.log("Error while saving the Chat image:", true);
+                            Logger.log("Error while saving the Chat video:", true);
                             e.printStackTrace();
                         }
                         Object chatMedia = chatMediaArr[0];
@@ -312,7 +327,20 @@ public class Chat {
                         Logger.log("We have the file name " + filename, true);
 
                         try {
-                            Saving.saveSnap(Saving.SnapType.CHAT, Saving.MediaType.VIDEO, (Context) param.args[0], null, video, filename, sender);
+                            Saving.SaveResponse response = Saving.saveSnap(Saving.SnapType.CHAT, Saving.MediaType.VIDEO, (Context) param.args[0], null, video, filename, sender);
+                            if (response == Saving.SaveResponse.SUCCESS) {
+                                Logger.printFinalMessage("Saved Chat video");
+                                Saving.createStatefulToast("Saved Chat video", NotificationUtils.ToastType.GOOD);
+                            }else if (response == Saving.SaveResponse.EXISTING) {
+                                    Logger.printFinalMessage("Chat video exists");
+                                    Saving.createStatefulToast("Chat video exists", NotificationUtils.ToastType.WARNING);
+                            } else if (response == Saving.SaveResponse.FAILED) {
+                                Logger.printFinalMessage("Error saving Chat video");
+                                Saving.createStatefulToast("Error saving Chat video", NotificationUtils.ToastType.BAD);
+                            } else {
+                                Logger.printFinalMessage("Unhandled save response");
+                                Saving.createStatefulToast("Unhandled save response", NotificationUtils.ToastType.WARNING);
+                            }
                         } catch (Exception e) {
 
                         }

@@ -227,7 +227,10 @@ public class FilterFragment extends Fragment {
                     f.author = obj.getString("author");
                     f.downloaded = new File(filtersDir, f.id + ".png").exists();
                     f.url = obj.getString("url");
-                    filters.add(f);
+                    if(f.name.toLowerCase().contains("filter") && !f.name.toLowerCase().contains("filterpack") && !f.url.toLowerCase().contains("/a/") && !f.url.toLowerCase().contains("reddituploads")){
+                        f.name = f.name.substring(f.name.indexOf("]")+1);
+                        filters.add(f);
+                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

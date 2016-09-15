@@ -181,7 +181,7 @@ public class HookedLayouts {
                 .PACKAGE_SNAP);
 
         final BitmapDrawable drawable = (BitmapDrawable) resparam.res.getDrawable(intIconID);*/
-        final Bitmap saveImg = BitmapFactory.decodeResource(mResources, R.mipmap.save_button); //processButtonDrawable(drawable);
+        final Bitmap saveImg = BitmapFactory.decodeResource(mResources, R.drawable.save_button); //processButtonDrawable(drawable);
 
         if (saveImg == null)
             throw new NullPointerException("Button Image not found");

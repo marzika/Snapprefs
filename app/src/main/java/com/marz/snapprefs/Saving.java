@@ -179,7 +179,7 @@ public class Saving {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         param.args[0] =
-                                100000L;//It's how long you see video looping in milliseconds
+                                3600000L;//It's how long you see video looping in milliseconds
                     }
                 });
             }
