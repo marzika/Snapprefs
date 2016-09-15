@@ -20,7 +20,6 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -886,10 +885,12 @@ public class HookedLayouts {
                                     new AlertDialog.Builder(HookMethods.SnapContext);
                             SeekBar seekBar = new SeekBar(HookMethods.SnapContext);
                             seekBar.setMax(255);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                seekBar.setProgress(HookMethods.editText.getBackground().getAlpha());
-                            }
-                            else {
+                            int currentapiVersion = Build.VERSION.SDK_INT;
+                            if (currentapiVersion >= Build.VERSION_CODES.KITKAT) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                                    seekBar.setProgress(HookMethods.editText.getBackground().getAlpha());
+                                }
+                            } else {
                                 seekBar.setProgress(255);
                             }
                             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
