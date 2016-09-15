@@ -142,10 +142,12 @@ public class HookedLayouts {
                         (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("camera_preview_layout", "id", Common.PACKAGE_SNAP));
                 final RelativeLayout.LayoutParams layoutParams =
                         new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("camera_take_snap_button", "id", Common.PACKAGE_SNAP)).getLayoutParams());
-                layoutParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                layoutParams.bottomMargin = HookMethods.px(75.0f);
+
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                layoutParams.rightMargin = px(50);
+                layoutParams.topMargin = -px(12);
                 upload = new ImageButton(HookMethods.SnapContext);
+                upload.setLayoutParams(layoutParams);
                 upload.setBackgroundColor(0);
                 Drawable uploadimg =
                         HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.sharing.UPLOAD_ICON.substring(2), 16));
@@ -163,13 +165,8 @@ public class HookedLayouts {
                         HookMethods.context.startActivity(launchIntent);
                     }
                 });
-                HookMethods.SnapContext.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        relativeLayout.addView(upload, layoutParams);
-                    }
-                });
 
+                relativeLayout.addView(upload);
             }
         });
     }
@@ -791,7 +788,7 @@ public class HookedLayouts {
                             return;
                         }
                         case 6: { //textFont
-                            File folder = new File(Environment.getExternalStorageDirectory() +
+                            File folder = new File(Preferences.getExternalPath() +
                                     "/Snapprefs/Fonts");
                             if (folder.exists()) {
                                 FilenameFilter filter = new FilenameFilter() {
@@ -889,10 +886,10 @@ public class HookedLayouts {
                                     new AlertDialog.Builder(HookMethods.SnapContext);
                             SeekBar seekBar = new SeekBar(HookMethods.SnapContext);
                             seekBar.setMax(255);
-                            int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-                            if (currentapiVersion >= Build.VERSION_CODES.KITKAT) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                                 seekBar.setProgress(HookMethods.editText.getBackground().getAlpha());
-                            } else {
+                            }
+                            else {
                                 seekBar.setProgress(255);
                             }
                             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
