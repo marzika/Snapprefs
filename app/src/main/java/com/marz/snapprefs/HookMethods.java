@@ -10,7 +10,6 @@ import android.content.res.XResources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Environment;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
@@ -180,8 +179,8 @@ public class HookMethods
             GroupDialog.group_item = XResources.getFakeResId(modRes, group_item);
             resparam.res.setReplacement(GroupDialog.group_item, modRes.fwd(group_item));
 
-            //mSavePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
-            //mCustomFilterLocation = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/Filters";
+            //mSavePath = Preferences.getExternalPath().getAbsolutePath() + "/Snapprefs";
+            //mCustomFilterLocation = Preferences.getExternalPath().getAbsolutePath() + "/Snapprefs/Filters";
             Preferences.refreshPreferences();
             resParam = resparam;
 
@@ -218,9 +217,9 @@ public class HookMethods
 
             try {
                 Preferences.mSavePath =
-                        Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs";
+                        Preferences.getExternalPath() + "/Snapprefs";
                 Preferences.mCustomFilterLocation =
-                        Environment.getExternalStorageDirectory().getAbsolutePath() +
+                        Preferences.getExternalPath() +
                                 "/Snapprefs/Filters";
                 XposedUtils.log("----------------- SNAPPREFS HOOKED -----------------", false);
                 Object activityThread =
@@ -294,7 +293,7 @@ public class HookMethods
                             //NewSaving.initSaving(lpparam);
                             Lens.initLens(lpparam, mResources, SnapContext);
                             File vfilters = new File(
-                                    Environment.getExternalStorageDirectory().getAbsolutePath() +
+                                    Preferences.getExternalPath() +
                                             "/Snapprefs/VisualFilters/xpro_map.png");
                             if (vfilters.exists()) {
                                 VisualFilters.initVisualFilters(lpparam);
@@ -387,7 +386,8 @@ public class HookMethods
                     findAndHookMethod(Obfuscator.icons.ICON_HANDLER_CLASS, lpparam.classLoader, Obfuscator.icons.RECORDING_VIDEO, boolean.class, new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
-                            HookedLayouts.upload.setVisibility(View.VISIBLE);
+                            if (HookedLayouts.upload != null)
+                                HookedLayouts.upload.setVisibility(View.VISIBLE);
                         }
                     });
                     for (String s : Obfuscator.ROOTDETECTOR_METHODS) {

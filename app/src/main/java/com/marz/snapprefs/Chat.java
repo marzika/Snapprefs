@@ -194,22 +194,17 @@ public class Chat {
 
         String readLine;
         try {
-
             do {
                 readLine = reader.readLine();
 
                 if (readLine == null)
                     return false;
 
-                //Logger.log("Reading line: " + readLine );
-
                 String splitHash[] = readLine.split("#");
 
                 if (splitHash.length > 0) {
                     String strHash = splitHash[0].trim();
                     String hashMod = Integer.toString(chatData.getHashMod(9999, true));
-
-                    Logger.log("Comparing hash: " + strHash + "/" + hashMod);
 
                     if (hashMod.equals(strHash))
                         return true;

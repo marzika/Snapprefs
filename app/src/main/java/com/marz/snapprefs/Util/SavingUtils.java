@@ -28,27 +28,38 @@ public abstract class SavingUtils
         }).start();
     }
     public static boolean saveJPG( File fileToSave, Bitmap bmp, Context context ) {
+        boolean state = false;
+
         if ( bmp == null ) {
             Logger.printMessage( "saveJPG - Passed Null Image" );
             vibrate( context, false );
             return false;
         }
 
-        try {
-            FileOutputStream out = new FileOutputStream( fileToSave );
+        FileOutputStream outputStream = null;
 
-            bmp.compress( Bitmap.CompressFormat.JPEG, 100, out );
-            out.flush();
-            out.close();
+        try {
+            outputStream = new FileOutputStream( fileToSave );
+
+            bmp.compress( Bitmap.CompressFormat.JPEG, 100, outputStream );
+            outputStream.flush();
+            outputStream.close();
             vibrate( context, true );
             runMediaScanner( context, fileToSave.getAbsolutePath() );
 
-            return true;
+            state = true;
         } catch ( Exception e ) {
             Logger.printMessage( "Exception while saving an image: " + e.getMessage() );
             vibrate( context, false );
-            return false;
         }
+        finally {
+            try {
+                if(outputStream != null)
+                    outputStream.close();
+            } catch( Exception ignored){}
+        }
+
+        return state;
     }
 
     public static void savePNGAsync( final File fileToSave, final Bitmap bmp, final Context context ) {
@@ -59,26 +70,34 @@ public abstract class SavingUtils
         }).start();
     }
     public static boolean savePNG( File fileToSave, Bitmap bmp, Context context ) {
+        boolean state = false;
         if ( bmp == null ) {
             Logger.printMessage( "savePNG - Passed Null Image" );
             vibrate( context, false );
             return false;
         }
+        FileOutputStream outputStream = null;
 
         try {
-            FileOutputStream out = new FileOutputStream( fileToSave );
-            bmp.compress( Bitmap.CompressFormat.PNG, 100, out );
-            out.flush();
-            out.close();
+            outputStream = new FileOutputStream( fileToSave );
+            bmp.compress( Bitmap.CompressFormat.PNG, 100, outputStream );
+            outputStream.flush();
             vibrate( context, true );
             runMediaScanner( context, fileToSave.getAbsolutePath() );
 
-            return true;
+            state = true;
         } catch ( Exception e ) {
             Logger.printMessage( "Exception while saving an image: " + e.getMessage() );
             vibrate( context, false );
-            return false;
         }
+        finally {
+            try {
+                if(outputStream != null)
+                    outputStream.close();
+            } catch( Exception ignored){}
+        }
+
+        return state;
     }
 
     public static void saveVideoAsync( final File fileToSave, final FileInputStream fileStream, final Context context ) {
@@ -90,17 +109,20 @@ public abstract class SavingUtils
     }
     public static boolean saveVideo( File fileToSave, FileInputStream fileStream, Context context
     ) {
+        boolean state = false;
         if ( fileStream == null ) {
             Logger.printMessage( "saveVideo - Passed Null Video" );
             vibrate( context, false );
             return false;
         }
+        BufferedInputStream inputStream = null;
+        BufferedOutputStream outputStream = null;
 
         try {
             // Use bufferedinputstreams for faster saving - Probably unecessary
-            BufferedInputStream inputStream =
+            inputStream =
                     new BufferedInputStream( fileStream );
-            BufferedOutputStream outputStream =
+            outputStream =
                     new BufferedOutputStream( new FileOutputStream( fileToSave ) );
 
             // General disk cluster size for higher efficiency
@@ -110,18 +132,25 @@ public abstract class SavingUtils
                 outputStream.write( buffer, 0, read );
 
             outputStream.flush();
-            inputStream.close();
-            outputStream.close();
 
             vibrate( context, true );
             runMediaScanner( context, fileToSave.getAbsolutePath() );
 
-            return true;
+            state = true;
         } catch ( Exception e ) {
             Logger.printMessage( "Exception while saving a video: " + e.getMessage() );
             vibrate( context, false );
-            return false;
         }
+        finally {
+            try {
+                if( inputStream != null )
+                    inputStream.close();
+                if(outputStream != null)
+                    outputStream.close();
+            } catch( Exception ignored){}
+        }
+
+        return state;
     }
 
     public static void vibrate( Context context, boolean success ) {

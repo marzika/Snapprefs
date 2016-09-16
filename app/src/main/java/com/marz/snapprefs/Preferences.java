@@ -1,9 +1,6 @@
 package com.marz.snapprefs;
 
 import android.os.Environment;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.FrameLayout;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -168,10 +165,10 @@ public class Preferences {
             return Environment.getExternalStorageDirectory().getAbsolutePath();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            Logger.log("Get external path exception", e);
         }
 
-        return null;
+        return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 
     public static void printSettings() {
