@@ -10,6 +10,7 @@ import android.content.res.XResources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
