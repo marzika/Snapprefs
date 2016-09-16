@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Util.LensDatabaseHelper;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import org.apache.http.HttpResponse;
@@ -72,6 +73,7 @@ public class HookMethods
     private static XModuleResources mResources;
     private static int snapchatVersion;
     private static InitPackageResourcesParam resParam;
+    public static LensDatabaseHelper lensDBHelper;
     Class CaptionEditText;
     boolean latest = false;
 
@@ -220,6 +222,8 @@ public class HookMethods
                 Object activityThread =
                         callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
                 context = (Context) callMethod(activityThread, "getSystemContext");
+                lensDBHelper = new LensDatabaseHelper(context);
+
                 classLoader = lpparam.classLoader;
 
                 PackageInfo piSnapChat =
