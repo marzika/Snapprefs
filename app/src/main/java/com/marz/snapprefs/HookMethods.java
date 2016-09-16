@@ -146,6 +146,11 @@ public class HookMethods
         MODULE_PATH = startupParam.modulePath;
         mResources = XModuleResources.createInstance(startupParam.modulePath, null);
         //refreshPreferences();
+        File prefsFile = new File(
+                Environment.getDataDirectory(), "data/"
+                + HookMethods.PACKAGE_NAME + "/shared_prefs/" + HookMethods.PACKAGE_NAME
+                + "_preferences" + ".xml");
+        prefsFile.setReadable(true, false);
     }
 
     @Override
@@ -244,6 +249,7 @@ public class HookMethods
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Preferences.refreshPreferences();
+                    Logger.log("makeWorldReadable: " + Preferences.prefs.makeWorldReadable(), true);
                     Preferences.printSettings();
                     if (Preferences.mLicense == 1 || Preferences.mLicense == 2) {
 
@@ -265,6 +271,7 @@ public class HookMethods
                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                             Preferences.prefs.reload();
                             Preferences.refreshPreferences();
+                            Preferences.prefs.makeWorldReadable();
                             SnapContext = (Activity) param.thisObject;
                             if (!Preferences.acceptedToU) {//new ContextThemeWrapper(context.createPackageContext("com.marz.snapprefs", Context.CONTEXT_IGNORE_SECURITY), R.style.AppCompatDialog)
                                 AlertDialog.Builder builder = new AlertDialog.Builder(SnapContext)
