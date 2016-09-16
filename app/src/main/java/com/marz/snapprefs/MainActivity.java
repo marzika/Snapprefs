@@ -131,6 +131,11 @@ public class MainActivity extends AppCompatActivity {
             cl.getLogDialog().show();
         }
         final SharedPreferences prefs = context.getSharedPreferences("com.marz.snapprefs_preferences", Context.MODE_WORLD_READABLE);
+        File prefsFile = new File(
+                Environment.getDataDirectory(), "data/"
+                + getPackageName() + "/shared_prefs/" + getPackageName()
+                + "_preferences" + ".xml");
+        prefsFile.setReadable(true, false);
         acceptedToU = prefs.getBoolean("acceptedToU", false);
         if(!acceptedToU){
             AlertDialog.Builder builder = new AlertDialog.Builder(context)
