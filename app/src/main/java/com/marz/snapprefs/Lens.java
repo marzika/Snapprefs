@@ -68,14 +68,10 @@ public class Lens {
     }
 
     public static void onJsonResultRebuilt(XC_MethodHook.MethodHookParam param, Object atR, Object Ae) {
-        ConvertOldSystem();
-
         Logger.log("CallingJsonResult");
 
         if (callBoolMethod(Ae, "c") && atR != null && callBoolMethod(atR, "b") &&
                 callBoolMethod(atR, "d") && callBoolMethod(atR, "f")) {
-            loadSavedLenses(true);
-            //HashMap<String, LensData> lensList = new HashMap<String, LensData>();
 
             Logger.log("Entered statement");
             List a = (List) callMethod(atR, "a");
@@ -318,10 +314,6 @@ public class Lens {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public static void ConvertOldSystem() {
-        loadSavedLenses(true);
     }
 
     public static class LensEntry implements BaseColumns {

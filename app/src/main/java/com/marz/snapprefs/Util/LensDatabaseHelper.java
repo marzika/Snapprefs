@@ -84,26 +84,18 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void insertLens(LensData lensData) {
-        if (HookMethods.lensDBHelper == null) {
-            Logger.log("No database initialised");
-            return;
-        }
         Logger.log("Inserting new lens: " + lensData.mCode);
 
-        SQLiteDatabase db = HookMethods.lensDBHelper.getWritableDatabase();
+        SQLiteDatabase db = this.getWritableDatabase();
 
         long newRowId = db.insert(LensEntry.TABLE_NAME, null, lensData.getContent());
         Logger.log("New Lens Row ID: " + newRowId);
     }
 
     public boolean containsLens(String mCode) {
-        if (HookMethods.lensDBHelper == null) {
-            Logger.log("No database initialised");
-            return false;
-        }
         Logger.log("Getting lens from database");
 
-        SQLiteDatabase db = HookMethods.lensDBHelper.getReadableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
 
         String selection = LensEntry.COLUMN_NAME_MCODE + " = ?";
         String[] selectionArgs = {mCode};
@@ -134,13 +126,9 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public LensData getLens(String mCode) {
-        if (HookMethods.lensDBHelper == null) {
-            Logger.log("No database initialised");
-            return null;
-        }
         Logger.log("Getting lens from database");
 
-        SQLiteDatabase db = HookMethods.lensDBHelper.getReadableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
 
         String selection = LensEntry.COLUMN_NAME_MCODE + " = ?";
         String[] selectionArgs = {mCode};
@@ -188,11 +176,6 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<LensData> getAllExcept(ArrayList<String> blacklist) {
-        if (HookMethods.lensDBHelper == null) {
-            Logger.log("No database initialised");
-            return null;
-        }
-
         Logger.log("Getting all lenses from database");
 
         String strBlacklist = formatArrayList(blacklist);
@@ -204,7 +187,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
 
         Logger.log("Performing query: " + query);
 
-        SQLiteDatabase db = HookMethods.lensDBHelper.getReadableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(query, null);
 
@@ -253,13 +236,8 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<LensData> getAllLenses() {
-        if (HookMethods.lensDBHelper == null) {
-            Logger.log("No database initialised");
-            return null;
-        }
-
         Logger.log("Getting all lenses from database");
-        SQLiteDatabase db = HookMethods.lensDBHelper.getReadableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from " + LensEntry.TABLE_NAME, null);
 
         Logger.log("Query size: " + cursor.getCount());
@@ -302,7 +280,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
             return;
         }
 
-        SQLiteDatabase db = HookMethods.lensDBHelper.getWritableDatabase();
+        SQLiteDatabase db = this.getWritableDatabase();
         String selection = LensEntry.COLUMN_NAME_MCODE + " LIKE ?";
         String[] selectionArgs = {mCode};
 
@@ -310,22 +288,12 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void replaceLens(LensData lensData) {
-        if (HookMethods.lensDBHelper == null) {
-            Logger.log("No database initialised");
-            return;
-        }
-
         deleteLens(lensData.mCode);
         insertLens(lensData);
     }
 
     public void updateLens(String strTitle, String strValue) {
-        if (HookMethods.lensDBHelper == null) {
-            Logger.log("No database initialised");
-            return;
-        }
-
-        SQLiteDatabase db = HookMethods.lensDBHelper.getReadableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
 
 // New value for one column
         ContentValues values = new ContentValues();
