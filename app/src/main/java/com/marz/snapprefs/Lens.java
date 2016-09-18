@@ -50,7 +50,7 @@ public class Lens {
         Class TypeClass = findClass("com.snapchat.android.model.lenses.Lens$Type", lpparam.classLoader);
         enumScheduledType = getStaticObjectField(TypeClass, "SCHEDULED");
 
-        if( MainActivity.lensDBHelper == null)
+        if (MainActivity.lensDBHelper == null)
             MainActivity.lensDBHelper = new LensDatabaseHelper(snapContext);
 
         findAndHookMethod("com.snapchat.android.database.SharedPreferenceKey", lpparam.classLoader, "getBoolean", boolean.class, new XC_MethodHook() {
@@ -160,6 +160,9 @@ public class Lens {
         Logger.log("New lenses to load: " + lensList.size());
 
         for (LensData lensData : lensList) {
+            if (!lensData.mActive)
+                continue;
+
             Object lens = buildModifiedLens(lensData);
             list.add(lens);
         }

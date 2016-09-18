@@ -18,21 +18,22 @@ import com.marz.snapprefs.R;
 public class LensesFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         int lensListSize = (int)MainActivity.lensDBHelper.getRowCount();
+        int selectedLensSize = MainActivity.lensDBHelper.getActiveLensCount();
 
         View view = inflater.inflate(R.layout.lensloader_layout,
                 container, false);
 
         Button lensLoaderButton = (Button) view.findViewById(R.id.btnLensSelector);
         TextView totalLensesTextView = (TextView) view.findViewById(R.id.textview_total_lens_count);
-        TextView loadedLensesTextView = (TextView) view.findViewById(R.id.textview_loaded_lens_count);
+        final TextView loadedLensesTextView = (TextView) view.findViewById(R.id.textview_loaded_lens_count);
 
         totalLensesTextView.setText(String.format("%s", lensListSize));
-        loadedLensesTextView.setText(String.format("%s", lensListSize));
+        loadedLensesTextView.setText(String.format("%s", selectedLensSize));
 
         lensLoaderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Dialogs.lensDialog(getContext());
+                Dialogs.lensDialog(getContext(), loadedLensesTextView);
             }
         });
         return view;

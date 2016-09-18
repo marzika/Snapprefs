@@ -18,7 +18,6 @@
  */
 package com.marz.snapprefs;
 
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.marz.snapprefs.Util.StringUtils;
@@ -58,7 +57,13 @@ public class Logger {
             if (prefix) {
                 message = LOG_TAG + message;
             }
-            XposedBridge.log(message);
+
+            try {
+                XposedBridge.log(message);
+            } catch( Exception e)
+            {
+                Log.d("snapchat", message);
+            }
         }
     }
 

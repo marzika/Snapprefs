@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.marz.snapprefs.Lens;
 import com.marz.snapprefs.Lens.LensEntry;
@@ -29,6 +30,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
             LensEntry.COLUMN_NAME_MID,
             LensEntry.COLUMN_NAME_MLENSLINK,
             LensEntry.COLUMN_NAME_MSIGNATURE,
+            LensEntry.COLUMN_NAME_ACTIVE
     };
     private static final String TEXT_TYPE = " TEXT";
     private static final String COMMA_SEP = ",";
@@ -136,6 +138,55 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
+    public boolean toggleLensActiveState(String mCode) throws Exception {
+        Log.d("snapchat", "Toggling lens state");
+        boolean activeState = !getLensActiveState(mCode);
+        Log.d("snapchat", "Current state: " + activeState);
+        ContentValues values = new ContentValues();
+        values.put(LensEntry.COLUMN_NAME_ACTIVE, activeState ? 1 : 0);
+
+        updateLens(mCode, values);
+
+        return activeState;
+    }
+
+    public boolean getLensActiveState(String mCode) throws Exception {
+        Log.d("snapchat", "Getting lens from database");
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String selection = LensEntry.COLUMN_NAME_MCODE + "=?";
+        String[] selectionArgs = {mCode};
+        String sortOrder =
+                LensEntry.COLUMN_NAME_MCODE + " DESC";
+
+        String[] projection = {LensEntry.COLUMN_NAME_ACTIVE};
+        Logger.log("Performing query: " + selection + mCode);
+
+        Cursor cursor = db.query(
+                LensEntry.TABLE_NAME,                     // The table to query
+                projection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+
+        Logger.log("Query count: " + cursor.getCount());
+
+        if (cursor.getCount() == 0) {
+            cursor.close();
+            throw new Exception("No lens found");
+        }
+
+        cursor.moveToFirst();
+
+        short activeState = cursor.getShort(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_ACTIVE));
+        cursor.close();
+        return activeState != 0;
+    }
+
     public LensData getLens(String mCode) {
         Logger.log("Getting lens from database");
 
@@ -167,7 +218,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
 
         LensData lensData = getLensFromCursor(cursor);
 
-        if( lensData == null )
+        if (lensData == null)
             return null;
 
         cursor.close();
@@ -178,7 +229,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<LensData> getAllExcept(ArrayList<String> blacklist) {
         Logger.log("Getting all lenses from database");
 
-        if( !requiresUpdate) {
+        if (!requiresUpdate) {
             Logger.log("Using lens cache");
             return excludedLensCache;
         }
@@ -201,7 +252,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
                 Logger.log("Looping cursor result");
                 LensData lensData = getLensFromCursor(cursor);
 
-                if( lensData == null )
+                if (lensData == null)
                     continue;
 
                 lensDataList.add(lensData);
@@ -216,6 +267,36 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
         excludedLensCache = new ArrayList<>(lensDataList);
         requiresUpdate = false;
         return lensDataList;
+    }
+
+    public int getActiveLensCount()
+    {
+        Logger.log("Getting lens from database");
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String selection = LensEntry.COLUMN_NAME_ACTIVE + " = ?";
+        String[] selectionArgs = {"1"};
+        String sortOrder =
+                LensEntry.COLUMN_NAME_MCODE + " DESC";
+
+        Logger.log("Performing query: " + selection + "1");
+
+        Cursor cursor = db.query(
+                LensEntry.TABLE_NAME,                     // The table to query
+                fullProjection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+
+        int count = cursor.getCount();
+        cursor.close();
+        Logger.log("Query count: " + count);
+
+        return count;
     }
 
     public ArrayList<LensData> getAllLenses() {
@@ -236,7 +317,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
                 Logger.log("Looping cursor result");
                 LensData lensData = getLensFromCursor(cursor);
 
-                if( lensData == null )
+                if (lensData == null)
                     continue;
 
                 lensList.add(lensData);
@@ -269,16 +350,12 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
         insertLens(lensData);
     }
 
-    public void updateLens(String strTitle, String strValue) {
+    public void updateLens(String mCode, ContentValues values) {
         SQLiteDatabase db = this.getReadableDatabase();
 
-// New value for one column
-        ContentValues values = new ContentValues();
-        values.put(strTitle, strValue);
-
 // Which row to update, based on the title
-        String selection = strTitle + " = ?";
-        String[] selectionArgs = {strValue};
+        String selection = LensEntry.COLUMN_NAME_MCODE + " = ?";
+        String[] selectionArgs = {mCode};
 
         int rowsUpdated = db.update(
                 LensEntry.TABLE_NAME,

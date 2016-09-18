@@ -7,7 +7,9 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.text.InputType;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
@@ -32,7 +34,7 @@ public class Dialogs {
     private static Context SnapContext;
     private static TextView editText;
     private static double editDouble;
-    private static HashMap< String, LensButtonPair> iconMap = new HashMap<>();
+    private static HashMap<String, LensButtonPair> iconMap = new HashMap<>();
 
     public static boolean SpeedDialog(final Context context) {
         SnapContext = context;
@@ -111,8 +113,8 @@ public class Dialogs {
         return true;
     }
 
-    public static void lensDialog(final Context context) {
-        if( MainActivity.lensDBHelper == null )
+    public static void lensDialog(final Context context, final TextView loadedLensesTextView) {
+        if (MainActivity.lensDBHelper == null)
             MainActivity.lensDBHelper = new LensDatabaseHelper(context);
 
         ArrayList<LensData> lensList = MainActivity.lensDBHelper.getAllLenses();
@@ -128,21 +130,36 @@ public class Dialogs {
 
         for (LensData lensData : lensList) {
             ImageButton button = new ImageButton(context);
+
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ImageButton btn = (ImageButton) v;
+                    String mCode = (String) btn.getTag();
+                    Log.d("snapchat", "Something happening: " + mCode);
+                    try {
+                        boolean activeState = MainActivity.lensDBHelper.toggleLensActiveState(mCode);
+                        btn.setBackgroundColor(Color.argb(150, 200, 200, activeState ? 0 : 200));
+                        btn.invalidate();
+                    } catch (Exception e) {
+                        Log.d("snapchat", "No lens found with code: " + mCode + "\n" + e.getMessage());
+                    }
+                }
+            });
+
             button.setMinimumHeight(50);
             button.setMinimumWidth(50);
-            button.setBackgroundColor(Color.argb(150, 200, 200 ,200));
+            button.setBackgroundColor(Color.argb(150, 200, 200, lensData.mActive ? 0 : 200));
+            button.setTag(lensData.mCode);
 
-            LensButtonPair buttonPair = iconMap.get( lensData.mCode );
+            LensButtonPair buttonPair = iconMap.get(lensData.mCode);
 
-            if( buttonPair == null || buttonPair.bmp == null )
-            {
+            if (buttonPair == null || buttonPair.bmp == null) {
                 buttonPair = new LensButtonPair(button, null, lensData.mIconLink);
                 iconMap.put(lensData.mCode, buttonPair);
                 new LensIconLoader.AsyncLensIconDownloader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, buttonPair, context);
-            }
-            else
-            {
-                button.setImageBitmap( buttonPair.bmp );
+            } else {
+                button.setImageBitmap(buttonPair.bmp);
                 button.invalidate();
             }
 
@@ -154,27 +171,27 @@ public class Dialogs {
         builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                int selectedLensSize = MainActivity.lensDBHelper.getActiveLensCount();
+                loadedLensesTextView.setText(String.format("%s", selectedLensSize));
             }
         });
         builder.setNegativeButton(Common.dialog_cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // TODO Auto-generated method stub
-
+                int selectedLensSize = MainActivity.lensDBHelper.getActiveLensCount();
+                loadedLensesTextView.setText(String.format("%s", selectedLensSize));
             }
         });
+
         builder.show();
     }
 
-    public static class LensButtonPair
-    {
+    public static class LensButtonPair {
         public ImageButton button;
         public Bitmap bmp;
         public String url;
 
-        public LensButtonPair( ImageButton button, Bitmap bmp, String url)
-        {
+        public LensButtonPair(ImageButton button, Bitmap bmp, String url) {
             this.button = button;
             this.bmp = bmp;
             this.url = url;
