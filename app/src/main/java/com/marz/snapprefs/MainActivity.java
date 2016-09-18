@@ -22,6 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -142,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
         prefsFile.setReadable(true, false);
         acceptedToU = prefs.getBoolean("acceptedToU", false);
         Preferences.mSavePath = prefs.getString("pref_key_save_location", Preferences.mSavePath);
+        Log.d("snapchat", "SAVE LOCATION: " + Preferences.mSavePath);
         if(!acceptedToU){
             AlertDialog.Builder builder = new AlertDialog.Builder(context)
                     .setTitle("ToU and Privacy Policy")

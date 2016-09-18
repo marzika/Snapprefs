@@ -3,6 +3,55 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/rlayoutswitches"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/primary_light"
+        android:padding="5dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Master Switches"
+            android:id="@+id/textView7"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lens Collection System"
+            android:id="@+id/lenscollector_toggle"
+            android:checked="true"
+            android:padding="10dp"
+            android:layout_below="@+id/textView7"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/border" />
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lens Loading System"
+            android:id="@+id/lensloader_toggle"
+            android:layout_below="@+id/lenscollector_toggle"
+            android:checked="true"
+            android:layout_alignRight="@+id/lenscollector_toggle"
+            android:layout_alignEnd="@+id/lenscollector_toggle"
+            android:layout_alignLeft="@+id/lenscollector_toggle"
+            android:layout_alignStart="@+id/lenscollector_toggle"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:background="@drawable/border" />
+
+    </RelativeLayout>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -10,8 +59,9 @@
         android:layout_gravity="center_horizontal|top"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Select lenses to load"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/rlayoutswitches"
+        android:layout_alignLeft="@+id/btnLensSelector"
+        android:layout_alignStart="@+id/btnLensSelector"
         android:layout_marginTop="10dp" />
 
     <Button
@@ -89,7 +139,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Snapchat needs to be fully closed to reload lenses"
+        android:text="Snapchat needs to be fully closed to update the lens list"
         android:id="@+id/textView5"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
