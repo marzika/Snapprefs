@@ -20,10 +20,6 @@ import com.marz.snapprefs.Util.LensData;
 import com.marz.snapprefs.Util.LensDatabaseHelper;
 import com.marz.snapprefs.Util.LensIconLoader;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -120,23 +116,6 @@ public class Dialogs {
             MainActivity.lensDBHelper = new LensDatabaseHelper(context);
 
         ArrayList<LensData> lensList = MainActivity.lensDBHelper.getAllLenses();
-        ArrayList<LensData> convertLensList = getLensesFromFile();
-
-        /*for( LensData newLens : convertLensList)
-        {
-            boolean exists = false;
-
-             for( LensData oldLens : lensList )
-            {
-                if( newLens.mCode.equals(oldLens.mCode)) {
-                    exists = true;
-                    break;
-                }
-            }
-
-            if( !exists)
-                MainActivity.lensDBHelper.insertLens(newLens);
-        }*/
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Select Lenses");
@@ -186,47 +165,6 @@ public class Dialogs {
             }
         });
         builder.show();
-    }
-
-    public static ArrayList<LensData> getLensesFromFile()
-    {
-        ArrayList<LensData> lensList = new ArrayList<>();
-
-        File file = new File(Preferences.mSavePath,"lenses.dat");
-
-//Read text from file
-        StringBuilder text = new StringBuilder();
-
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                String[] args = line.split(";");
-                String mId = args[0];
-                String mCode = args[1];
-                String mLensLink = args[2];
-                String mIconLink = args[3];
-                String mHintId = args[4];
-
-                LensData lensData = new LensData();
-                lensData.mCode = mCode;
-                lensData.mId = mId;
-                lensData.mIconLink = mIconLink;
-                lensData.mLensLink = mLensLink;
-                lensData.mHintId = mHintId;
-                lensData.mSignature = "Unassigned";
-
-                if( !MainActivity.lensDBHelper.containsLens(mCode))
-                    MainActivity.lensDBHelper.insertLens(lensData);
-            }
-            br.close();
-        }
-        catch (IOException e) {
-            //You'll need to add proper error handling here
-        }
-
-        return lensList;
     }
 
     public static class LensButtonPair
