@@ -142,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                 + "_preferences" + ".xml");
         prefsFile.setReadable(true, false);
         acceptedToU = prefs.getBoolean("acceptedToU", false);
-        Preferences.mSavePath = prefs.getString("pref_key_save_location", Preferences.mSavePath);
+        Preferences.refreshPreferences();
         Log.d("snapchat", "SAVE LOCATION: " + Preferences.mSavePath);
         if(!acceptedToU){
             AlertDialog.Builder builder = new AlertDialog.Builder(context)

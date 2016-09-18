@@ -1,6 +1,8 @@
 package com.marz.snapprefs;
 
+import android.content.SharedPreferences;
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -65,6 +67,8 @@ public class Preferences {
     public static boolean mIntegration;
     public static boolean latest = false;
     public static boolean mButtonPosition = false;
+    public static boolean mLoadLenses = true;
+    public static boolean mCollectLenses = true;
     static XSharedPreferences prefs;
     static XSharedPreferences license;
     static boolean selectStory;
@@ -136,6 +140,8 @@ public class Preferences {
         mLoopingVids = prefs.getBoolean("pref_key_looping_video", mLoopingVids);
         mHideTimer = prefs.getBoolean("pref_key_timer_hide", mHideTimer);
         mButtonPosition = prefs.getBoolean("pref_key_save_button_position", mButtonPosition);
+        mLoadLenses = prefs.getBoolean("pref_key_load_lenses", mLoadLenses);
+        mCollectLenses = prefs.getBoolean("pref_key_collect_lenses", mCollectLenses);
 
 
         //SHARING
@@ -169,6 +175,20 @@ public class Preferences {
         }
 
         return Environment.getExternalStorageDirectory().getAbsolutePath();
+    }
+
+    public static void updateBoolean(String settingKey, boolean state) {
+        if (prefs == null) {
+            prefs = new XSharedPreferences(new File(
+                    Environment.getDataDirectory(), "data/"
+                    + HookMethods.PACKAGE_NAME + "/shared_prefs/" + HookMethods.PACKAGE_NAME
+                    + "_preferences" + ".xml"));
+        }
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(settingKey, state);
+        editor.apply();
+
+        Log.d("snapchat", "Updated preference boolean: " + settingKey + " to " + state );
     }
 
     public static void printSettings() {

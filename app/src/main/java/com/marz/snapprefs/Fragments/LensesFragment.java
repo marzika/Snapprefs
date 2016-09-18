@@ -13,12 +13,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.GridLayout;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.marz.snapprefs.Common;
 import com.marz.snapprefs.MainActivity;
+import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.R;
 import com.marz.snapprefs.Util.LensData;
 import com.marz.snapprefs.Util.LensDatabaseHelper;
@@ -43,6 +46,23 @@ public class LensesFragment extends Fragment {
         Button lensLoaderButton = (Button) view.findViewById(R.id.btnLensSelector);
         TextView totalLensesTextView = (TextView) view.findViewById(R.id.textview_total_lens_count);
         final TextView loadedLensesTextView = (TextView) view.findViewById(R.id.textview_loaded_lens_count);
+        Switch loadLensSwitch = (Switch) view.findViewById(R.id.lensloader_toggle);
+        Switch collectLensSwitch = (Switch) view.findViewById(R.id.lenscollector_toggle);
+
+        loadLensSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Preferences.updateBoolean("prefs_key_load_lenses", isChecked);
+            }
+        });
+
+        collectLensSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Preferences.updateBoolean("prefs_key_collect_lenses", isChecked);
+            }
+        });
+
 
         totalLensesTextView.setText(String.format("%s", lensListSize));
         loadedLensesTextView.setText(String.format("%s", selectedLensSize));
