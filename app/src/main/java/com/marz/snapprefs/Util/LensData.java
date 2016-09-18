@@ -4,13 +4,10 @@ import android.content.ContentValues;
 
 import com.marz.snapprefs.Lens.LensEntry;
 
-import java.io.Serializable;
-
 /**
  * Created by Andre on 12/09/2016.
  */
-public class LensData implements Serializable{
-    static final long serialVersionUID =-6331323537528632733L;
+public class LensData {
     public String mCode;
     public String mGplayIapId;
     public String mHintId;
@@ -24,6 +21,7 @@ public class LensData implements Serializable{
     public String mLensLink;
     //public int mPriority;
     public String mSignature;
+    public boolean mActive;
     //public Object mType;
     //public Bitmap mLensIcon;
 

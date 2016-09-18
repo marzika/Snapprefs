@@ -37,15 +37,18 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.marz.snapprefs.Tabs.BuyTabFragment;
+import com.marz.snapprefs.Tabs.ChatLogsTabFragment;
 import com.marz.snapprefs.Tabs.DataTabFragment;
 import com.marz.snapprefs.Tabs.DeluxeTabFragment;
 import com.marz.snapprefs.Tabs.FiltersTabFragment;
 import com.marz.snapprefs.Tabs.GeneralTabFragment;
+import com.marz.snapprefs.Tabs.LensesTabFragment;
 import com.marz.snapprefs.Tabs.MainTabFragment;
 import com.marz.snapprefs.Tabs.SavingTabFragment;
 import com.marz.snapprefs.Tabs.SharingTabFragment;
 import com.marz.snapprefs.Tabs.SpoofingTabFragment;
 import com.marz.snapprefs.Tabs.TextTabFragment;
+import com.marz.snapprefs.Util.LensDatabaseHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -111,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences prefs;
     private String gcmRegId;
     private boolean acceptedToU = false;
+    public static LensDatabaseHelper lensDBHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
                 + "_preferences" + ".xml");
         prefsFile.setReadable(true, false);
         acceptedToU = prefs.getBoolean("acceptedToU", false);
+        Preferences.mSavePath = prefs.getString("pref_key_save_location", Preferences.mSavePath);
         if(!acceptedToU){
             AlertDialog.Builder builder = new AlertDialog.Builder(context)
                     .setTitle("ToU and Privacy Policy")
@@ -283,6 +288,8 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         mDrawerToggle.syncState();
+
+        lensDBHelper = new LensDatabaseHelper(this.getApplicationContext());
     }
 
     public Fragment getForId(int id) {
@@ -317,6 +324,12 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.nav_item_filters:
                     cache.put(id, new FiltersTabFragment());
+                    break;
+                case R.id.nav_item_chatlogs:
+                    cache.put(id, new ChatLogsTabFragment());
+                    break;
+                case R.id.nav_item_lenses:
+                    cache.put(id, new LensesTabFragment());
                     break;
             }
         }
@@ -523,5 +536,9 @@ public class MainActivity extends AppCompatActivity {
 
             return null;
         }
+    }
+
+    private static void createIfNotExisting()
+    {
     }
 }

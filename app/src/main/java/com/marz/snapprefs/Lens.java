@@ -8,6 +8,7 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 import com.marz.snapprefs.Util.LensData;
+import com.marz.snapprefs.Util.LensDatabaseHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,6 +50,9 @@ public class Lens {
         Class TypeClass = findClass("com.snapchat.android.model.lenses.Lens$Type", lpparam.classLoader);
         enumScheduledType = getStaticObjectField(TypeClass, "SCHEDULED");
 
+        if( MainActivity.lensDBHelper == null)
+            MainActivity.lensDBHelper = new LensDatabaseHelper(snapContext);
+
         findAndHookMethod("com.snapchat.android.database.SharedPreferenceKey", lpparam.classLoader, "getBoolean", boolean.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(XC_MethodHook.MethodHookParam methodHookParam) throws Throwable {
@@ -87,7 +91,7 @@ public class Lens {
 
                 Logger.log("Handling lens: " + mCode);
 
-                if (HookMethods.lensDBHelper.containsLens(mCode)) {
+                if (MainActivity.lensDBHelper.containsLens(mCode)) {
                     Logger.log("Already contains lens: " + mCode);
                     lensBlacklist.add(mCode);
                 } else {
@@ -152,7 +156,7 @@ public class Lens {
 
     public static ArrayList<Object> buildModifiedList(ArrayList<Object> list, ArrayList<String> lensBlacklist) {
         Logger.log("Original list size: " + list.size());
-        ArrayList<LensData> lensList = HookMethods.lensDBHelper.getAllExcept(lensBlacklist);
+        ArrayList<LensData> lensList = MainActivity.lensDBHelper.getAllExcept(lensBlacklist);
         Logger.log("New lenses to load: " + lensList.size());
 
         for (LensData lensData : lensList) {
@@ -180,7 +184,7 @@ public class Lens {
 
     public static void performLensSave(Object lens) {
         LensData lensData = buildSaveableLensData(lens);
-        HookMethods.lensDBHelper.insertLens(lensData);
+        MainActivity.lensDBHelper.insertLens(lensData);
 
         /*File directory = new File(Preferences.mSavePath + "/Lenses");
 
@@ -262,8 +266,8 @@ public class Lens {
             if (lensDataMap.containsKey(lensData.mCode))
                 continue;
 
-            if (!HookMethods.lensDBHelper.containsLens(lensData.mCode)) {
-                HookMethods.lensDBHelper.insertLens(lensData);
+            if (!MainActivity.lensDBHelper.containsLens(lensData.mCode)) {
+                MainActivity.lensDBHelper.insertLens(lensData);
                 Logger.log("Added lens: " + lensData.mCode);
             }
             //lensDataMap.put(lensData.mCode, lensData);
@@ -309,11 +313,59 @@ public class Lens {
             connection.setDoInput(true);
             connection.connect();
             InputStream input = connection.getInputStream();
-            return BitmapFactory.decodeStream(input);
+
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = calculateInSampleSize(options, 50,
+                    50);
+
+            // Decode bitmap with inSampleSize set
+            options.inJustDecodeBounds = false;
+
+            // Calculate inSampleSize
+            return BitmapFactory.decodeStream(input, null, options);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static Bitmap decodeSampledBitmapFromResource(String uri,
+                                                         int reqWidth, int reqHeight) throws IOException {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(uri, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth,
+                reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        java.net.URL url = new java.net.URL(uri);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setDoInput(true);
+        connection.connect();
+        InputStream input = connection.getInputStream();
+        return BitmapFactory.decodeStream(input, null, options);
+    }
+
+    private static int calculateInSampleSize(BitmapFactory.Options options,
+                                             int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+            if (width > height) {
+                inSampleSize = Math.round((float) height / (float) reqHeight);
+            } else {
+                inSampleSize = Math.round((float) width / (float) reqWidth);
+            }
+        }
+        return inSampleSize;
     }
 
     public static class LensEntry implements BaseColumns {
@@ -325,5 +377,6 @@ public class Lens {
         public static final String COLUMN_NAME_MID = "mId";
         public static final String COLUMN_NAME_MLENSLINK = "mLensLink";
         public static final String COLUMN_NAME_MSIGNATURE = "mSignature";
+        public static final String COLUMN_NAME_ACTIVE = "mActiveState";
     }
 }
