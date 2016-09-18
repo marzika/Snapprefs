@@ -3,27 +3,14 @@ package com.marz.snapprefs;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.os.AsyncTask;
 import android.text.InputType;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.GridLayout;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Util.FileUtils;
-import com.marz.snapprefs.Util.LensData;
-import com.marz.snapprefs.Util.LensDatabaseHelper;
-import com.marz.snapprefs.Util.LensIconLoader;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
 import de.robv.android.xposed.XSharedPreferences;
@@ -34,7 +21,6 @@ public class Dialogs {
     private static Context SnapContext;
     private static TextView editText;
     private static double editDouble;
-    private static HashMap<String, LensButtonPair> iconMap = new HashMap<>();
 
     public static boolean SpeedDialog(final Context context) {
         SnapContext = context;
@@ -111,90 +97,5 @@ public class Dialogs {
         });
         builder.show();
         return true;
-    }
-
-    public static void lensDialog(final Context context, final TextView loadedLensesTextView) {
-        if (MainActivity.lensDBHelper == null)
-            MainActivity.lensDBHelper = new LensDatabaseHelper(context);
-
-        ArrayList<LensData> lensList = MainActivity.lensDBHelper.getAllLenses();
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Select Lenses");
-        GridLayout.LayoutParams gridLayoutParams = new GridLayout.LayoutParams();
-        gridLayoutParams.setGravity(Gravity.CENTER);
-        gridLayoutParams.columnSpec = GridLayout.spec(Gravity.CENTER);
-        GridLayout gridLayout = new GridLayout(context);
-        gridLayout.setLayoutParams(gridLayoutParams);
-        gridLayout.setColumnCount(4);
-
-        for (LensData lensData : lensList) {
-            ImageButton button = new ImageButton(context);
-
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ImageButton btn = (ImageButton) v;
-                    String mCode = (String) btn.getTag();
-                    Log.d("snapchat", "Something happening: " + mCode);
-                    try {
-                        boolean activeState = MainActivity.lensDBHelper.toggleLensActiveState(mCode);
-                        btn.setBackgroundColor(Color.argb(150, 200, 200, activeState ? 0 : 200));
-                        btn.invalidate();
-                    } catch (Exception e) {
-                        Log.d("snapchat", "No lens found with code: " + mCode + "\n" + e.getMessage());
-                    }
-                }
-            });
-
-            button.setMinimumHeight(50);
-            button.setMinimumWidth(50);
-            button.setBackgroundColor(Color.argb(150, 200, 200, lensData.mActive ? 0 : 200));
-            button.setTag(lensData.mCode);
-
-            LensButtonPair buttonPair = iconMap.get(lensData.mCode);
-
-            if (buttonPair == null || buttonPair.bmp == null) {
-                buttonPair = new LensButtonPair(button, null, lensData.mIconLink);
-                iconMap.put(lensData.mCode, buttonPair);
-                new LensIconLoader.AsyncLensIconDownloader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, buttonPair, context);
-            } else {
-                button.setImageBitmap(buttonPair.bmp);
-                button.invalidate();
-            }
-
-            gridLayout.addView(button);
-        }
-
-
-        builder.setView(gridLayout);
-        builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                int selectedLensSize = MainActivity.lensDBHelper.getActiveLensCount();
-                loadedLensesTextView.setText(String.format("%s", selectedLensSize));
-            }
-        });
-        builder.setNegativeButton(Common.dialog_cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                int selectedLensSize = MainActivity.lensDBHelper.getActiveLensCount();
-                loadedLensesTextView.setText(String.format("%s", selectedLensSize));
-            }
-        });
-
-        builder.show();
-    }
-
-    public static class LensButtonPair {
-        public ImageButton button;
-        public Bitmap bmp;
-        public String url;
-
-        public LensButtonPair(ImageButton button, Bitmap bmp, String url) {
-            this.button = button;
-            this.bmp = bmp;
-            this.url = url;
-        }
     }
 } 

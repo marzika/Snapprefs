@@ -7,7 +7,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageButton;
 
-import com.marz.snapprefs.Dialogs;
+import com.marz.snapprefs.Fragments.LensesFragment;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -20,7 +20,7 @@ public class LensIconLoader {
     public static class AsyncLensIconDownloader extends AsyncTask<Object, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Object... params) {
-            Dialogs.LensButtonPair pair = (Dialogs.LensButtonPair) params[0];
+            LensesFragment.LensButtonPair pair = (LensesFragment.LensButtonPair) params[0];
             Activity context = (Activity) params[1];
 
             final String url = pair.url;

@@ -89,7 +89,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public long getRowCount() {
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(DATABASE_NAME, null, SQLiteDatabase.OPEN_READONLY);
         long count = DatabaseUtils.queryNumEntries(db, LensEntry.TABLE_NAME);
         db.close();
         return count;
@@ -98,17 +98,18 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     public void insertLens(LensData lensData) {
         Logger.log("Inserting new lens: " + lensData.mCode);
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(DATABASE_NAME, null, SQLiteDatabase.OPEN_READWRITE);
 
         long newRowId = db.insert(LensEntry.TABLE_NAME, null, lensData.getContent());
         Logger.log("New Lens Row ID: " + newRowId);
         requiresUpdate = true;
+        db.close();
     }
 
     public boolean containsLens(String mCode) {
         Logger.log("Getting lens from database");
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(DATABASE_NAME, null, SQLiteDatabase.OPEN_READONLY);
 
         String selection = LensEntry.COLUMN_NAME_MCODE + " = ?";
         String[] selectionArgs = {mCode};
@@ -129,12 +130,12 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
 
         Logger.log("Query count: " + cursor.getCount());
 
-        if (cursor.getCount() == 0) {
-            cursor.close();
-            return false;
-        }
-
         cursor.close();
+        db.close();
+
+        if (cursor.getCount() == 0)
+            return false;
+
         return true;
     }
 
@@ -153,7 +154,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     public boolean getLensActiveState(String mCode) throws Exception {
         Log.d("snapchat", "Getting lens from database");
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(DATABASE_NAME, null, SQLiteDatabase.OPEN_READONLY);
 
         String selection = LensEntry.COLUMN_NAME_MCODE + "=?";
         String[] selectionArgs = {mCode};
@@ -175,6 +176,8 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
 
         Logger.log("Query count: " + cursor.getCount());
 
+        db.close();
+
         if (cursor.getCount() == 0) {
             cursor.close();
             throw new Exception("No lens found");
@@ -190,7 +193,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     public LensData getLens(String mCode) {
         Logger.log("Getting lens from database");
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(DATABASE_NAME, null, SQLiteDatabase.OPEN_READONLY);
 
         String selection = LensEntry.COLUMN_NAME_MCODE + " = ?";
         String[] selectionArgs = {mCode};
@@ -222,6 +225,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
             return null;
 
         cursor.close();
+        db.close();
         Logger.log("Queried database to get lens: " + lensData.mCode);
         return lensData;
     }
@@ -240,7 +244,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
 
         Logger.log("Performing query: " + query);
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(DATABASE_NAME, null, SQLiteDatabase.OPEN_READONLY);
 
         Cursor cursor = db.rawQuery(query, null);
 
@@ -263,7 +267,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
         }
 
         cursor.close();
-
+        db.close();
         excludedLensCache = new ArrayList<>(lensDataList);
         requiresUpdate = false;
         return lensDataList;
@@ -273,7 +277,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     {
         Logger.log("Getting lens from database");
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(DATABASE_NAME, null, SQLiteDatabase.OPEN_READONLY);
 
         String selection = LensEntry.COLUMN_NAME_ACTIVE + " = ?";
         String[] selectionArgs = {"1"};
@@ -294,6 +298,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
 
         int count = cursor.getCount();
         cursor.close();
+        db.close();
         Logger.log("Query count: " + count);
 
         return count;
@@ -306,7 +311,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
         }
 
         Logger.log("Getting all lenses from database");
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(DATABASE_NAME, null, SQLiteDatabase.OPEN_READONLY);
         Cursor cursor = db.rawQuery("select * from " + LensEntry.TABLE_NAME, null);
 
         Logger.log("Query size: " + cursor.getCount());
@@ -323,11 +328,11 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
                 lensList.add(lensData);
                 cursor.moveToNext();
             }
-            db.close();
             Logger.log("Completed getting lenses");
         }
 
         cursor.close();
+        db.close();
 
         lensCache = new ArrayList<>(lensList);
         requiresUpdate = false;
@@ -335,7 +340,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void deleteLens(String mCode) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(DATABASE_NAME, null, SQLiteDatabase.OPEN_READWRITE);
         String selection = LensEntry.COLUMN_NAME_MCODE + " LIKE ?";
         String[] selectionArgs = {mCode};
 
@@ -343,6 +348,8 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
 
         if (rowsDeleted > 0)
             requiresUpdate = true;
+
+        db.close();
     }
 
     public void replaceLens(LensData lensData) {
@@ -351,7 +358,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void updateLens(String mCode, ContentValues values) {
-        SQLiteDatabase db = this.getReadableDatabase();
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(DATABASE_NAME, null, SQLiteDatabase.OPEN_READWRITE);
 
 // Which row to update, based on the title
         String selection = LensEntry.COLUMN_NAME_MCODE + " = ?";
@@ -365,6 +372,8 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
 
         if (rowsUpdated > 0)
             requiresUpdate = true;
+
+        db.close();
     }
 
     public LensData getLensFromCursor(Cursor cursor) {

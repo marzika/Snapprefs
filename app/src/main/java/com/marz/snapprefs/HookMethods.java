@@ -373,6 +373,8 @@ public class HookMethods
                 Logger.log("TIMBER: " + param.args[0] + " : " + param.args[1], true);
             }
         });*/
+                    XposedHelpers.findAndHookMethod("com.snapchat.android.framework.release.ReleaseManager", lpparam.classLoader, "a", Context.class, XC_MethodReplacement.returnConstant("DEBUG"));
+
                     //Showing lenses or not
                     findAndHookMethod(Obfuscator.icons.ICON_HANDLER_CLASS, lpparam.classLoader, Obfuscator.icons.SHOW_LENS, boolean.class, boolean.class, new XC_MethodHook() {
                         @Override
