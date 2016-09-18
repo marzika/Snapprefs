@@ -6,7 +6,6 @@ import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import de.robv.android.xposed.XSharedPreferences;
@@ -93,7 +92,7 @@ public class Preferences {
 
         prefs.reload();
 
-        try {
+        /*try {
             Field field = XSharedPreferences.class.getDeclaredField("mLoaded");
             field.setAccessible(true);
             boolean mLoaded = (boolean) field.get(prefs);
@@ -107,7 +106,7 @@ public class Preferences {
             e.printStackTrace();
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
-        }
+        }*/
 
         refreshSelectedPreferences(prefs);
         HookedLayouts.refreshButtonPreferences();
