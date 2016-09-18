@@ -68,6 +68,7 @@ import java.util.UUID;
 import de.cketti.library.changelog.ChangeLog;
 
 public class MainActivity extends AppCompatActivity {
+    public static Context context;
     public static final String PREF_KEY_SAVE_LOCATION = "pref_key_save_location";
     public static final String PREF_KEY_HIDE_LOCATION = "pref_key_hide_location";
     protected static final int MSG_REGISTER_WITH_GCM = 101;
@@ -110,7 +111,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
     };
-    private SharedPreferences sharedPreferences;
     private ArrayList<MenuItem> items = new ArrayList<>();
     private SharedPreferences prefs;
     private String gcmRegId;
@@ -130,21 +130,23 @@ public class MainActivity extends AppCompatActivity {
         UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
         String deviceId = deviceUuid.toString();
         final String confirmationID = readStringPreference("confirmation_id");
-        final Context context = this;
+        context = this;
         ChangeLog cl = new ChangeLog(context);
         if (cl.isFirstRun()) {
             cl.getLogDialog().show();
         }
-        final SharedPreferences prefs = context.getSharedPreferences("com.marz.snapprefs_preferences", Context.MODE_WORLD_READABLE);
+        final SharedPreferences prefs = getSharedPreferences();
+
         File prefsFile = new File(
                 Environment.getDataDirectory(), "data/"
                 + getPackageName() + "/shared_prefs/" + getPackageName()
                 + "_preferences" + ".xml");
         prefsFile.setReadable(true, false);
-        acceptedToU = prefs.getBoolean("acceptedToU", false);
-        Preferences.mSavePath = prefs.getString("pref_key_save_location", Preferences.mSavePath);
-        Preferences.mLoadLenses = prefs.getBoolean("pref_key_load_lenses", Preferences.mLoadLenses);
-        Preferences.mCollectLenses = prefs.getBoolean("pref_key_collect_lenses", Preferences.mCollectLenses);
+
+        Preferences.refreshSelectedPreferences(prefs);
+
+        Log.d("snapchat", "Load lenses: " + prefs.contains("pref_key_load_lenses"));
+
 
         Log.d("snapchat", "SAVE LOCATION: " + Preferences.mSavePath);
         if(!acceptedToU){
@@ -215,7 +217,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.activity_main);
         AdView mAdView = (AdView) findViewById(R.id.adView);
         TextView pugs = (TextView) findViewById(R.id.pugs);
@@ -349,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CHOOSE_DIR && resultCode == Activity.RESULT_OK) {
                 String newLocation = data.getData().toString().substring(7);
 
-                SharedPreferences.Editor editor = sharedPreferences.edit();
+                SharedPreferences.Editor editor = getSharedPreferences().edit();
                 editor.putString(PREF_KEY_SAVE_LOCATION, newLocation);
                 editor.apply();
 
@@ -359,7 +360,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_HIDE_DIR && resultCode == Activity.RESULT_OK) {
                 String newHiddenLocation =  data.getData().toString().substring(7);
 
-                SharedPreferences.Editor editor = sharedPreferences.edit();
+                SharedPreferences.Editor editor = getSharedPreferences().edit();
                 editor.putString(PREF_KEY_HIDE_LOCATION, "Last hidden: " + newHiddenLocation);
                 editor.apply();
 
@@ -415,8 +416,7 @@ public class MainActivity extends AppCompatActivity {
 
     private SharedPreferences getSharedPreferences() {
         if (prefs == null) {
-            prefs = getApplicationContext().getSharedPreferences(
-                    "com.marz.snapprefs_preferences", Context.MODE_PRIVATE);
+            prefs = PreferenceManager.getDefaultSharedPreferences(this);
         }
         return prefs;
     }

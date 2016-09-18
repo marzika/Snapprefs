@@ -125,14 +125,14 @@ public class LensesFragment extends Fragment {
         loadLensSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Preferences.updateBoolean(buttonView.getContext(), "prefs_key_load_lenses", isChecked);
+                Preferences.updateBoolean("pref_key_load_lenses", isChecked);
             }
         });
 
         collectLensSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Preferences.updateBoolean(buttonView.getContext(), "prefs_key_collect_lenses", isChecked);
+                Preferences.updateBoolean("pref_key_collect_lenses", isChecked);
             }
         });
 

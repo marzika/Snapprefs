@@ -264,15 +264,13 @@ public class HookMethods
                             Premium.initViewed(lpparam, modRes, SnapContext);
                         }
                     }
-                    Preferences.prefs.reload();
+
                     Preferences.refreshPreferences();
 
                     XC_MethodHook initHook = new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            Preferences.prefs.reload();
                             Preferences.refreshPreferences();
-                            Preferences.prefs.makeWorldReadable();
                             SnapContext = (Activity) param.thisObject;
                             if (!Preferences.acceptedToU) {//new ContextThemeWrapper(context.createPackageContext("com.marz.snapprefs", Context.CONTEXT_IGNORE_SECURITY), R.style.AppCompatDialog)
                                 AlertDialog.Builder builder = new AlertDialog.Builder(SnapContext)
@@ -288,8 +286,6 @@ public class HookMethods
                             boolean isNull;
                             isNull = SnapContext == null;
                             Logger.log("SNAPCONTEXT, NULL? - " + isNull, true);
-                            Preferences.prefs.reload();
-                            Preferences.refreshPreferences();
                             //SNAPPREFS
                             Saving.initSaving(lpparam, mResources, SnapContext);
                             //NewSaving.initSaving(lpparam);

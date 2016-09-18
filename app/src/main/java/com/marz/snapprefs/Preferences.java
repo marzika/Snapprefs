@@ -6,6 +6,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import de.robv.android.xposed.XSharedPreferences;
@@ -82,12 +83,40 @@ public class Preferences {
     private static boolean shouldAddVFilters;
 
     static void refreshPreferences() {
-        prefs = new XSharedPreferences(new File(
-                Environment.getDataDirectory(), "data/"
-                + HookMethods.PACKAGE_NAME + "/shared_prefs/" + HookMethods.PACKAGE_NAME
-                + "_preferences" + ".xml"));
+        if( prefs == null ) {
+            prefs = new XSharedPreferences(new File(
+                    Environment.getDataDirectory(), "data/"
+                    + HookMethods.PACKAGE_NAME + "/shared_prefs/" + HookMethods.PACKAGE_NAME
+                    + "_preferences" + ".xml"));
+            prefs.makeWorldReadable();
+        }
+
         prefs.reload();
-        prefs.makeWorldReadable();
+
+        try {
+            Field field = XSharedPreferences.class.getDeclaredField("mLoaded");
+            field.setAccessible(true);
+            boolean mLoaded = (boolean) field.get(prefs);
+
+            int spinCount = 0;
+            while( !mLoaded )
+            {
+                Log.d("snapchat", "spinning" + (++spinCount));
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+
+        refreshSelectedPreferences(prefs);
+        HookedLayouts.refreshButtonPreferences();
+    }
+
+    public static void refreshSelectedPreferences( Object sharedPreferences )
+    {
+        SharedPreferences prefs = (SharedPreferences) sharedPreferences;
+
         selectAll = prefs.getBoolean("pref_key_selectall", false);
         selectStory = prefs.getBoolean("pref_key_selectstory", false);
         selectVenue = prefs.getBoolean("pref_key_selectvenue", false);
@@ -158,10 +187,8 @@ public class Preferences {
         shouldAddGhost = mSpeed || mTextTools || mLocation || mWeather;
 
         acceptedToU = prefs.getBoolean("acceptedToU", false);
-
-        Logger.log("Loading lenses: " + mLoadLenses);
-        Logger.log("Collecting lenses: " + mCollectLenses);
-        HookedLayouts.refreshButtonPreferences();
+        Log.d("snapchat", "Loading lenses: " + mLoadLenses);
+        Log.d("snapchat", "Collecting lenses: " + mCollectLenses);
     }
 
     public static String getExternalPath() {
@@ -180,14 +207,15 @@ public class Preferences {
         return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 
-    public static void updateBoolean(Context context, String settingKey, boolean state) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("com.marz.snapprefs_preferences", Context.MODE_WORLD_READABLE);
+    public static void updateBoolean(String settingKey, boolean state) {
+        SharedPreferences sharedPreferences = MainActivity.context.getSharedPreferences("com.marz.snapprefs_preferences", Context.MODE_WORLD_READABLE);
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(settingKey, state);
-        editor.apply();
+        boolean response = editor.commit();
 
-        Log.d("snapchat", "Updated preference boolean: " + settingKey + " to " + state );
+        boolean newstate = sharedPreferences.getBoolean(settingKey, mLoadLenses);
+        Log.d("snapchat", "Updated preference boolean: " + settingKey + " to " + newstate + " savestate: " + response );
     }
 
     public static void printSettings() {

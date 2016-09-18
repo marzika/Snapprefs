@@ -85,18 +85,21 @@ public class Lens {
 
             for (Object atzObj : a) {
                 Object lens = newInstance(LensClass, atzClass.cast(atzObj), enumScheduledType);
-                String url = (String) getObjectField(lens, "mIconLink");
-                Logger.log("Icon url: " + url);
-                String mCode = (String) getObjectField(lens, "mCode");
 
-                Logger.log("Handling lens: " + mCode);
+                if( Preferences.mCollectLenses ) {
+                    String url = (String) getObjectField(lens, "mIconLink");
+                    Logger.log("Icon url: " + url);
+                    String mCode = (String) getObjectField(lens, "mCode");
 
-                if (MainActivity.lensDBHelper.containsLens(mCode)) {
-                    Logger.log("Already contains lens: " + mCode);
-                    lensBlacklist.add(mCode);
-                } else {
-                    Logger.log("Saving new lens: " + mCode);
-                    performLensSave(lens);
+                    Logger.log("Handling lens: " + mCode);
+
+                    if (MainActivity.lensDBHelper.containsLens(mCode)) {
+                        Logger.log("Already contains lens: " + mCode);
+                        lensBlacklist.add(mCode);
+                    } else {
+                        Logger.log("Saving new lens: " + mCode);
+                        performLensSave(lens);
+                    }
                 }
 
                 activeLenses.add(lens);
@@ -114,8 +117,10 @@ public class Lens {
                 activeLenses.add(lens);
             }
 
-            activeLenses = buildModifiedList(activeLenses, lensBlacklist);
-            precachedLenses = buildModifiedList(precachedLenses, lensBlacklist);
+            if( Preferences.mLoadLenses) {
+                activeLenses = buildModifiedList(activeLenses, lensBlacklist);
+                precachedLenses = buildModifiedList(precachedLenses, lensBlacklist);
+            }
 
             Logger.log("Finished list building");
             Logger.log("Building method params");
