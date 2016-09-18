@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<MenuItem> items = new ArrayList<>();
     private SharedPreferences prefs;
     private String gcmRegId;
-    private boolean acceptedToU = false;
     public static LensDatabaseHelper lensDBHelper;
 
     @Override
@@ -149,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         Log.d("snapchat", "SAVE LOCATION: " + Preferences.mSavePath);
-        if(!acceptedToU){
+        if(!Preferences.acceptedToU){
             AlertDialog.Builder builder = new AlertDialog.Builder(context)
                     .setTitle("ToU and Privacy Policy")
                     .setView(R.layout.tos)

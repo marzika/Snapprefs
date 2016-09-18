@@ -6,6 +6,8 @@ import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import de.robv.android.xposed.XSharedPreferences;
@@ -82,7 +84,7 @@ public class Preferences {
     private static boolean shouldAddVFilters;
 
     static void refreshPreferences() {
-        if( prefs == null ) {
+        if (prefs == null) {
             prefs = new XSharedPreferences(new File(
                     Environment.getDataDirectory(), "data/"
                     + HookMethods.PACKAGE_NAME + "/shared_prefs/" + HookMethods.PACKAGE_NAME
@@ -92,28 +94,39 @@ public class Preferences {
 
         prefs.reload();
 
-        /*try {
-            Field field = XSharedPreferences.class.getDeclaredField("mLoaded");
-            field.setAccessible(true);
-            boolean mLoaded = (boolean) field.get(prefs);
+        try {
+            Method method = prefs.getClass().getDeclaredMethod("hasFileChanged");
+            method.setAccessible(true);
+            boolean hasFileChanged = (boolean) method.invoke(prefs);
 
-            int spinCount = 0;
-            while( !mLoaded )
-            {
-                Log.d("snapchat", "spinning" + (++spinCount));
+            if (hasFileChanged) {
+                Field field = XSharedPreferences.class.getDeclaredField("mLoaded");
+                field.setAccessible(true);
+                boolean mLoaded = (boolean) field.get(prefs);
+
+                int spinCount = 0;
+                while (!mLoaded) {
+                    Log.d("snapchat", "spinning" + (++spinCount));
+
+                    if (spinCount > 35000)
+                        break;
+                }
             }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
-        }*/
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
 
         refreshSelectedPreferences(prefs);
         HookedLayouts.refreshButtonPreferences();
     }
 
-    public static void refreshSelectedPreferences( Object sharedPreferences )
-    {
+    public static void refreshSelectedPreferences(Object sharedPreferences) {
         SharedPreferences prefs = (SharedPreferences) sharedPreferences;
 
         selectAll = prefs.getBoolean("pref_key_selectall", false);
@@ -214,7 +227,7 @@ public class Preferences {
         boolean response = editor.commit();
 
         boolean newstate = sharedPreferences.getBoolean(settingKey, mLoadLenses);
-        Log.d("snapchat", "Updated preference boolean: " + settingKey + " to " + newstate + " savestate: " + response );
+        Log.d("snapchat", "Updated preference boolean: " + settingKey + " to " + newstate + " savestate: " + response);
     }
 
     public static void printSettings() {
