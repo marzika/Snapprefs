@@ -55,7 +55,7 @@ public class Chat {
             protected void afterHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
                 Object chat = XposedHelpers.getObjectField(XposedHelpers.getObjectField(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_VAR1), Obfuscator.chat.MESSAGEVIEWHOLDER_VAR2);
                 if (chat != null && chatClass.isInstance(chat)) {
-                    if (!(boolean) XposedHelpers.callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISSAVED)) {
+                    if (!(boolean) XposedHelpers.callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISSAVED) && !(boolean) XposedHelpers.callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISFAILED)) {
                         try {
                             XposedHelpers.callMethod(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_SAVE);
                         } catch (XposedHelpers.InvocationTargetError e) {
