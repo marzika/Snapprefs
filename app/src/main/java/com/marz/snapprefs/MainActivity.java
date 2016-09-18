@@ -142,7 +142,10 @@ public class MainActivity extends AppCompatActivity {
                 + "_preferences" + ".xml");
         prefsFile.setReadable(true, false);
         acceptedToU = prefs.getBoolean("acceptedToU", false);
-        Preferences.refreshPreferences();
+        Preferences.mSavePath = prefs.getString("pref_key_save_location", Preferences.mSavePath);
+        Preferences.mLoadLenses = prefs.getBoolean("pref_key_load_lenses", Preferences.mLoadLenses);
+        Preferences.mCollectLenses = prefs.getBoolean("pref_key_collect_lenses", Preferences.mCollectLenses);
+
         Log.d("snapchat", "SAVE LOCATION: " + Preferences.mSavePath);
         if(!acceptedToU){
             AlertDialog.Builder builder = new AlertDialog.Builder(context)

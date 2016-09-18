@@ -36,48 +36,8 @@ import java.util.HashMap;
 public class LensesFragment extends Fragment {
     private static HashMap<String, LensButtonPair> iconMap = new HashMap<>();
 
-    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        int lensListSize = (int)MainActivity.lensDBHelper.getRowCount();
-        int selectedLensSize = MainActivity.lensDBHelper.getActiveLensCount();
-
-        View view = inflater.inflate(R.layout.lensloader_layout,
-                container, false);
-
-        Button lensLoaderButton = (Button) view.findViewById(R.id.btnLensSelector);
-        TextView totalLensesTextView = (TextView) view.findViewById(R.id.textview_total_lens_count);
-        final TextView loadedLensesTextView = (TextView) view.findViewById(R.id.textview_loaded_lens_count);
-        Switch loadLensSwitch = (Switch) view.findViewById(R.id.lensloader_toggle);
-        Switch collectLensSwitch = (Switch) view.findViewById(R.id.lenscollector_toggle);
-
-        loadLensSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Preferences.updateBoolean("prefs_key_load_lenses", isChecked);
-            }
-        });
-
-        collectLensSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                Preferences.updateBoolean("prefs_key_collect_lenses", isChecked);
-            }
-        });
-
-
-        totalLensesTextView.setText(String.format("%s", lensListSize));
-        loadedLensesTextView.setText(String.format("%s", selectedLensSize));
-
-        lensLoaderButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                lensDialog(getContext(), loadedLensesTextView, inflater, container);
-            }
-        });
-        return view;
-    }
-
     public static void lensDialog(final Context context, final TextView loadedLensesTextView, LayoutInflater inflater,
-                                  ViewGroup container ) {
+                                  ViewGroup container) {
         if (MainActivity.lensDBHelper == null)
             MainActivity.lensDBHelper = new LensDatabaseHelper(context);
 
@@ -145,6 +105,48 @@ public class LensesFragment extends Fragment {
         });
 
         builder.show();
+    }
+
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
+        int lensListSize = (int) MainActivity.lensDBHelper.getRowCount();
+        int selectedLensSize = MainActivity.lensDBHelper.getActiveLensCount();
+
+        View view = inflater.inflate(R.layout.lensloader_layout,
+                container, false);
+
+        Button lensLoaderButton = (Button) view.findViewById(R.id.btnLensSelector);
+        TextView totalLensesTextView = (TextView) view.findViewById(R.id.textview_total_lens_count);
+        final TextView loadedLensesTextView = (TextView) view.findViewById(R.id.textview_loaded_lens_count);
+        Switch loadLensSwitch = (Switch) view.findViewById(R.id.lensloader_toggle);
+        Switch collectLensSwitch = (Switch) view.findViewById(R.id.lenscollector_toggle);
+
+        loadLensSwitch.setChecked(Preferences.mLoadLenses);
+        collectLensSwitch.setChecked(Preferences.mCollectLenses);
+        loadLensSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Preferences.updateBoolean(buttonView.getContext(), "prefs_key_load_lenses", isChecked);
+            }
+        });
+
+        collectLensSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Preferences.updateBoolean(buttonView.getContext(), "prefs_key_collect_lenses", isChecked);
+            }
+        });
+
+
+        totalLensesTextView.setText(String.format("%s", lensListSize));
+        loadedLensesTextView.setText(String.format("%s", selectedLensSize));
+
+        lensLoaderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                lensDialog(getContext(), loadedLensesTextView, inflater, container);
+            }
+        });
+        return view;
     }
 
     public static class LensButtonPair {

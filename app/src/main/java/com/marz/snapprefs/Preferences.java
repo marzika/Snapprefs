@@ -1,5 +1,6 @@
 package com.marz.snapprefs;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.util.Log;
@@ -158,6 +159,8 @@ public class Preferences {
 
         acceptedToU = prefs.getBoolean("acceptedToU", false);
 
+        Logger.log("Loading lenses: " + mLoadLenses);
+        Logger.log("Collecting lenses: " + mCollectLenses);
         HookedLayouts.refreshButtonPreferences();
     }
 
@@ -177,14 +180,10 @@ public class Preferences {
         return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 
-    public static void updateBoolean(String settingKey, boolean state) {
-        if (prefs == null) {
-            prefs = new XSharedPreferences(new File(
-                    Environment.getDataDirectory(), "data/"
-                    + HookMethods.PACKAGE_NAME + "/shared_prefs/" + HookMethods.PACKAGE_NAME
-                    + "_preferences" + ".xml"));
-        }
-        SharedPreferences.Editor editor = prefs.edit();
+    public static void updateBoolean(Context context, String settingKey, boolean state) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("com.marz.snapprefs_preferences", Context.MODE_WORLD_READABLE);
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(settingKey, state);
         editor.apply();
 
