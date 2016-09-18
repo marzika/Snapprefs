@@ -33,7 +33,7 @@ public class Preferences {
     public static boolean mHideTimer = false;
     public static boolean mToastEnabled = true;
     public static boolean mVibrationEnabled = true;
-    public static String mSavePath = "";
+    public static String mSavePath = getExternalPath() + "/Snapprefs";
     public static String mCustomFilterLocation = "";
     public static String mConfirmationID = "";
     public static String mDeviceID = "";
