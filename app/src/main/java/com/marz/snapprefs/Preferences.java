@@ -2,6 +2,7 @@ package com.marz.snapprefs;
 
 import android.content.SharedPreferences;
 import android.os.Environment;
+import android.os.FileObserver;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,76 +36,46 @@ public class Preferences {
     public static final int TOAST_LENGTH_SHORT = 0;
     public static final int TOAST_LENGTH_LONG = 1;
     public static final int TIMER_MINIMUM_DISABLED = 0;
-    public static int mModeSave = SAVE_AUTO;
-    public static int mModeStory = SAVE_BUTTON;
-    public static int mToastLength = TOAST_LENGTH_LONG;
-    public static int mTimerMinimum = TIMER_MINIMUM_DISABLED;
-    public static int mForceNavbar = 0;
-    public static boolean mCustomFilterBoolean = false;
-    public static boolean mPaintTools = true;
-    public static boolean mMultiFilterBoolean = true;
-    public static int mCustomFilterType;
-    public static boolean mTimerUnlimited = true;
-    public static boolean mHideTimerStory = false;
-    public static boolean mLoopingVids = true;
-    public static boolean mHideTimer = false;
-    public static boolean mToastEnabled = true;
-    public static boolean mVibrationEnabled = true;
-    public static String mSavePath = getExternalPath() + "/Snapprefs";
-    public static String mCustomFilterLocation = "";
-    public static String mConfirmationID = "";
-    public static String mDeviceID = "";
-    public static boolean mSaveSentSnaps = false;
-    public static boolean mSortByCategory = true;
-    public static boolean mSortByUsername = true;
-    public static boolean mDebugging = true;
-    public static boolean mOverlays = false;
-    public static boolean mSpeed = false;
-    public static boolean mWeather = false;
-    public static boolean mStoryPreload = false;
-    public static boolean mDiscoverSnap = false;
-    public static boolean mDiscoverUI = false;
-    public static boolean mCustomSticker = false;
-    public static boolean mHideLive = false;
-    public static boolean mHidePeople = false;
-    public static boolean mReplay = false;
-    public static boolean mStealth = false;
-    public static boolean mTyping = false;
-    public static boolean mUnlimGroups = false;
-    public static int mLicense = 0;
-    public static boolean mLocation;
-    public static boolean selectAll;
-    public static boolean hideBf;
-    public static boolean shouldAddGhost;
-    public static boolean mTimerCounter;
-    public static boolean mChatAutoSave;
-    public static boolean mChatMediaSave;
-    public static boolean mIntegration;
-    public static boolean latest = false;
-    public static boolean mButtonPosition = false;
-    public static boolean mLoadLenses = true;
-    public static boolean mCollectLenses = true;
-    public static boolean acceptedToU = true;
-    static XSharedPreferences prefs;
-    static XSharedPreferences license;
-    static boolean selectStory;
-    static boolean selectVenue;
-    static boolean mTextTools;
-    static boolean debug;
-    private static boolean fullCaption;
-    private static boolean hideRecent;
-    private static boolean shouldAddVFilters;
-    private static PreferenceParser preferenceParser;
 
-    static void refreshPreferences() {
-        /*if (preferenceParser == null) {
-            preferenceParser = new PreferenceParser(Environment.getDataDirectory() + "/data/" +
-                    HookMethods.PACKAGE_NAME + "/shared_prefs/" + HookMethods.PACKAGE_NAME + "_preferences.xml");
-        }*/
+    private static ConcurrentHashMap<String, Object> preferenceMap = new ConcurrentHashMap<>();
+    private static XSharedPreferences xSharedPreferences;
+    private static FileObserver observer;
+    public static boolean hasLoaded = false;
 
-        prefs = new XSharedPreferences(HookMethods.PACKAGE_NAME, HookMethods.PACKAGE_NAME + "_preferences");
+    public static void loadMapFromXposed()
+    {
+        File prefsFile = new File(
+                Environment.getDataDirectory(), "data/"
+                + "com.marz.snapprefs" + "/shared_prefs/" + "com.marz.snapprefs"
+                + "_preferences" + ".xml");
 
-        prefs.reload();
+        observer = new FileObserver(prefsFile.getAbsolutePath()) {//this needs to be field, because as variable it will be garbage collected
+            @Override
+            public void onEvent(int event, String path) {
+                if (event == FileObserver.CLOSE_WRITE) {
+                    Log.d("snapchat", "HOOKED Observer: CLOSE_WRITE");
+                } else if( event == FileObserver.CLOSE_NOWRITE)
+                    Log.d("snapchat", "HOOKED Observer: CLOSE_NOWRITE");
+                else if( event == FileObserver.ACCESS)
+                    Log.d("snapchat", "HOOKED Observer: ACCESS");
+                else if( event == FileObserver.OPEN)
+                    Log.d("snapchat", "HOOKED Observer: OPEN");
+                else if( event == FileObserver.CREATE)
+                    Log.d("snapchat", "HOOKED Observer: CREATE");
+
+            }
+        };
+        observer.startWatching();
+
+        if( hasLoaded )
+            return;
+
+        if( xSharedPreferences == null ) {
+                        xSharedPreferences = new XSharedPreferences(HookMethods.PACKAGE_NAME,
+                    HookMethods.PACKAGE_NAME + "_preferences");
+        }
+
+        xSharedPreferences.reload();
 
         try {
             int spinCount = 0;
@@ -111,110 +83,246 @@ public class Preferences {
             field.setAccessible(true);
             boolean mLoaded;
 
+
+            Log.d("snapchat", "Starting spin");
             do {
-                Log.d("snapchat", "spinning" + (++spinCount));
+                spinCount++;
+
+                if( (spinCount % 5000 ) >= 5000 )
+                    Log.d("snapchat", "Spin count: " + spinCount);
 
                 if (spinCount > 35000)
                     break;
 
                 field.setAccessible(true);
-                mLoaded = (boolean) field.get(prefs);
+                mLoaded = (boolean) field.get(xSharedPreferences);
             } while (!mLoaded);
 
+            Log.d("snapchat", "Completed " + spinCount + " spins");
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
 
-        try {
-            refreshSelectedPreferences(prefs);
-        } catch (Exception e) {
-            e.printStackTrace();
+        loadMap( xSharedPreferences );
+        hasLoaded = true;
+    }
+
+    public static void initialiseListener( SharedPreferences sharedPreferences)
+    {
+        sharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sPrefs, String key) {
+                Log.d("snapchat", "SharedPreference changed: " + key);
+                Object preferenceVal = preferenceMap.get(key);
+
+                if( preferenceVal == null ) {
+                    Log.d("snapchat", "No value found in preferences: " + key);
+                    return;
+                }
+
+                Prefs[] prefsList = Prefs.values();
+
+                for( Prefs preference : prefsList)
+                {
+                    if(!key.equals(preference.key))
+                        continue;
+
+                    if( preferenceVal instanceof Boolean)
+                        setPref(preference, sPrefs.getBoolean(key, (boolean) preference.defaultVal));
+                    else if( preferenceVal instanceof String)
+                        setPref(preference, sPrefs.getString(key, (String) preference.defaultVal));
+                    else if(preferenceVal instanceof Integer)
+                       setPref(preference, sPrefs.getInt(key, (int) preference.defaultVal));
+
+                    break;
+                }
+            }
+        });
+    }
+
+    public static void loadMap(SharedPreferences sharedPreferences)
+    {
+        Log.d("snapchat", "loading preference map");
+        preferenceMap = new ConcurrentHashMap<>(sharedPreferences.getAll());
+
+        for( String key : preferenceMap.keySet())
+        {
+            Object obj = preferenceMap.get(key);
+            Log.d("snapchat", "Loaded preference: " + key + " val: " + obj);
         }
-
-        HookedLayouts.refreshButtonPreferences();
     }
 
-    public static void refreshSelectedPreferences(Object sharedPreferences) {
-        SharedPreferences prefs = (SharedPreferences) sharedPreferences;
-
-        acceptedToU = true;
-        selectAll = prefs.getBoolean("pref_key_selectall", false);
-        selectStory = prefs.getBoolean("pref_key_selectstory", false);
-        selectVenue = prefs.getBoolean("pref_key_selectvenue", false);
-        hideBf = prefs.getBoolean("pref_key_hidebf", false);
-        hideRecent = prefs.getBoolean("pref_key_hiderecent", false);
-        mTextTools = prefs.getBoolean("pref_key_text", false);
-        mPaintTools = prefs.getBoolean("pref_key_paint_checkbox", mPaintTools);
-        mTimerCounter = prefs.getBoolean("pref_key_timercounter", true);
-        mChatAutoSave = prefs.getBoolean("pref_key_save_chat_text", true);
-        mChatMediaSave = prefs.getBoolean("pref_key_save_chat_image", true);
-        mIntegration = prefs.getBoolean("pref_key_integration", true);
-        mCustomFilterBoolean = prefs.getBoolean("pref_key_custom_filter_checkbox", mCustomFilterBoolean);
-        mMultiFilterBoolean = prefs.getBoolean("pref_key_multi_filter_checkbox", mMultiFilterBoolean);
-        mCustomFilterLocation = getExternalPath() + "/Snapprefs/Filters";
-        mCustomFilterType = prefs.getInt("pref_key_filter_type", 0);
-        mSpeed = prefs.getBoolean("pref_key_speed", false);
-        mWeather = prefs.getBoolean("pref_key_weather", false);
-        mLocation = prefs.getBoolean("pref_key_location", false);
-        mStoryPreload = prefs.getBoolean("pref_key_storypreload", false);
-        mDiscoverSnap = prefs.getBoolean("pref_key_discover", false);
-        mDiscoverUI = prefs.getBoolean("pref_key_discover_ui", false);
-        mCustomSticker = prefs.getBoolean("pref_key_sticker", false);
-        mHideLive = prefs.getBoolean("pref_key_hidelive", false);
-        mHidePeople = prefs.getBoolean("pref_key_hidepeople", false);
-        mReplay = prefs.getBoolean("pref_key_replay", false);
-        mStealth = prefs.getBoolean("pref_key_viewed", false);
-        mTyping = prefs.getBoolean("pref_key_typing", false);
-        mUnlimGroups = prefs.getBoolean("pref_key_groups_unlim", false);
-        mForceNavbar = prefs.getInt("pref_key_forcenavbar", 0);
-        mConfirmationID = prefs.getString("confirmation_id", "");
-        debug = prefs.getBoolean("pref_key_debug", false);
-        mDeviceID = prefs.getString("device_id", null);
-        mLicense = prefs.getInt(mDeviceID, 0);
-
-        //SAVING
-
-        mModeSave = prefs.getInt("pref_key_save", mModeSave);
-        mModeStory = prefs.getInt("pref_key_save_story", mModeStory);
-        mTimerMinimum = prefs.getInt("pref_key_timer_minimum", mTimerMinimum);
-        mToastEnabled = prefs.getBoolean("pref_key_toasts_checkbox", mToastEnabled);
-        mVibrationEnabled = prefs.getBoolean("pref_key_vibration_checkbox", mVibrationEnabled);
-        mToastLength = prefs.getInt("pref_key_toasts_duration", mToastLength);
-        mSavePath = prefs.getString("pref_key_save_location", mSavePath);
-        mSaveSentSnaps = prefs.getBoolean("pref_key_save_sent_snaps", mSaveSentSnaps);
-        mSortByCategory = prefs.getBoolean("pref_key_sort_files_mode", mSortByCategory);
-        mSortByUsername = prefs.getBoolean("pref_key_sort_files_username", mSortByUsername);
-        mDebugging = prefs.getBoolean("pref_key_debug_mode", mDebugging);
-        mOverlays = prefs.getBoolean("pref_key_overlay", mOverlays);
-        mTimerUnlimited = prefs.getBoolean("pref_key_timer_unlimited", mTimerUnlimited);
-        mHideTimerStory = prefs.getBoolean("pref_key_timer_story_hide", mHideTimerStory);
-        mLoopingVids = prefs.getBoolean("pref_key_looping_video", mLoopingVids);
-        mHideTimer = prefs.getBoolean("pref_key_timer_hide", mHideTimer);
-        mButtonPosition = prefs.getBoolean("pref_key_save_button_position", mButtonPosition);
-        mLoadLenses = prefs.getBoolean("pref_key_load_lenses", mLoadLenses);
-        mCollectLenses = prefs.getBoolean("pref_key_collect_lenses", mCollectLenses);
-
-
-        //SHARING
-
-        Common.ROTATION_MODE = Integer.parseInt(prefs.getString("pref_rotation", Integer.toString(Common.ROTATION_MODE)));
-        Common.ADJUST_METHOD = Integer.parseInt(prefs.getString("pref_adjustment", Integer.toString(Common.ADJUST_METHOD)));
-        Common.CAPTION_UNLIMITED_VANILLA = prefs.getBoolean("pref_caption_unlimited_vanilla", Common.CAPTION_UNLIMITED_VANILLA);
-        Common.CAPTION_UNLIMITED_FAT = prefs.getBoolean("pref_caption_unlimited_fat", Common.CAPTION_UNLIMITED_FAT);
-        Common.DEBUGGING = prefs.getBoolean("pref_debug", Common.DEBUGGING);
-        Common.CHECK_SIZE = !prefs.getBoolean("pref_size_disabled", !Common.CHECK_SIZE);
-        Common.TIMBER = prefs.getBoolean("pref_timber", Common.TIMBER);
-
-        shouldAddGhost = mSpeed || mTextTools || mLocation || mWeather;
-
-        Log.d("snapchat", "CONTAINS ACCEPTED: " + prefs.contains("acceptedToU"));
-        Log.d("snapchat", "Loading lenses: " + mLoadLenses);
-        Log.d("snapchat", "Collecting lenses: " + mCollectLenses);
-
-        printSettings();
+    public static ConcurrentHashMap<String, Object> getMap()
+    {
+        return preferenceMap;
     }
+
+    public static Object getPref(String key, Object defaultVal){
+        Object preferenceVal = preferenceMap.get( key );
+
+        Log.d("snapchat", "Preference key: " + key + " Value: " + preferenceVal);
+
+        if( preferenceVal == null)
+            return defaultVal;
+
+        return preferenceVal;
+    }
+
+    public static Object getPref(Prefs preference){
+        Object preferenceVal = preferenceMap.get( preference.key );
+
+        Log.d("snapchat", "Preference key: " + preference.key + " Value: " + preferenceVal);
+
+        if( preferenceVal == null)
+            return preference.defaultVal;
+
+        return preferenceVal;
+    }
+
+    public static boolean getBool(Prefs preference)
+    {
+        return (boolean) getPref(preference);
+    }
+
+    public static String getString(Prefs preference)
+    {
+        return (String) getPref(preference);
+    }
+
+    public static int getInt(Prefs preference)
+    {
+        Object preferenceVal = getPref(preference);
+
+        if( preferenceVal instanceof String)
+            return Integer.parseInt((String) preferenceVal);
+
+        return (int) preferenceVal;
+    }
+
+    public static void setPref(String key, Object value) throws NullPointerException
+    {
+        preferenceMap.put(key, value);
+    }
+
+    public static void setPref(Prefs preference, Object value)
+    {
+        preferenceMap.put(preference.key, value != null ? value : preference.defaultVal);
+    }
+
+    public static boolean shouldAddGhost(){
+        return getBool(Prefs.SPEED ) || getBool(Prefs.TEXT_TOOLS) || getBool(Prefs.WEATHER);
+    }
+
+    public static int getLicence()
+    {
+        String deviceId = getString(Prefs.DEVICE_ID);
+        return (int) getPref( deviceId, Prefs.LICENCE.defaultVal);
+    }
+
+    public enum Prefs
+    {
+        CUSTOM_FILTER("pref_key_force_navbar", false),
+        PAINT_TOOLS("pref_key_paint_checkbox", true),
+        MULTI_FILTER("pref_key_multi_filter_checkbox", true),
+        TIMER_UNLIMITED("pref_key_timer_unlimited", true),
+        HIDE_TIMER_STORY("pref_key_timer_story_hide", false),
+        LOOPING_VIDS("pref_key_looping_video", true),
+        HIDE_TIMER_SNAP("pref_key_timer_hide", false),
+        TOAST_ENABLED("pref_key_toasts_checkbox", true),
+        VIBRATIONS_ENABLED("pref_key_vibration_checkbox", true),
+        SAVE_SENT_SNAPS("pref_key_save_sent_snaps", true),
+        SORT_BY_CATEGORY("pref_key_sort_files_mode", false),
+        SORT_BY_USERNAME("pref_key_sort_files_username", true),
+        DEBUGGING("pref_key_debug", true),
+        OVERLAYS("pref_key_overlay", false),
+        SPEED("pref_key_speed", false),
+        WEATHER("pref_key_weather", false),
+        LOCATION("pref_key_location", false),
+        STORY_PRELOAD("pref_key_storypreload", false),
+        DISCOVER_SNAP("pref_key_discover", false),
+        DISCOVER_UI("pref_key_discover_ui", false),
+        CUSTOM_STICKER("pref_key_sticker", false),
+        HIDE_LIVE("pref_key_hidelive", false),
+        HIDE_PEOPLE("pref_key_hidepeople", false),
+        REPLAY("pref_key_replay", false),
+        STEALTH("pref_key_viewed", false),
+        TYPING("pref_key_typing", false),
+        UNLIM_GROUPS("pref_key_groups_unlim", false),
+        SELECT_ALL("pref_key_selectall", false),
+        HIDE_BF("pref_key_hidebf", false),
+        TIMER_COUNTER("pref_key_timercounter", false),
+        CHAT_AUTO_SAVE("pref_key_save_chat_text", false),
+        CHAT_MEDIA_SAVE("pref_key_save_chat_image", false),
+        INTEGRATION("pref_key_integration", false),
+        BUTTON_POSITION("pref_key_save_button_position", false),
+        LENSES_LOAD("pref_key_load_lenses", true),
+        LENSES_COLLECT("pref_key_collect_lenses", true),
+        ACCEPTED_TOU("acceptedToU", false),
+        SELECT_STORY("pref_key_selectstory", false),
+        SELECT_VENUE("pref_key_selectvenue", false),
+        TEXT_TOOLS("pref_key_text", false),
+        HIDE_RECENT("pref_key_hiderecent", false),
+        ADD_VISUAL_FILTERS("", false),
+        CAPTION_UNLIMITED_VANILLA("pref_caption_unlimited_vanilla", false),
+        CAPTION_UNLIMITED_FAT("pref_caption_unlimited_fat", false),
+        CHECK_SIZE("pref_size_disabled", true),
+        TIMBER("pref_timber", false),
+
+        SAVE_PATH("pref_key_save_location", getExternalPath() + "/Snapprefs"),
+        CUSTOM_FILTER_LOCATION("", SAVE_PATH.defaultVal + "/FILTERS"),
+        CONFIRMATION_ID("confirmation_id", ""),
+        DEVICE_ID("device_id", ""),
+
+        SAVEMODE_SNAP("pref_key_save", SAVE_AUTO),
+        SAVEMODE_STORY("pref_key_save_story", SAVE_AUTO),
+        TOAST_LENGTH("pref_key_toasts_duration", TOAST_LENGTH_LONG),
+        TIMER_MINIMUM("pref_key_timer_minimum", TIMER_MINIMUM_DISABLED),
+        FORCE_NAVBAR("pref_key_force_navbar", 0),
+        CUSTOM_FILTER_TYPE("pref_key_filter_type", 0),
+        LICENCE(DEVICE_ID.key, 0),
+        ROTATION_MODE("pref_rotation", Common.ROTATION_CW),
+        ADJUST_METHOD("pref_adjustment", Common.ADJUST_CROP);
+
+        public String key;
+        public Object defaultVal;
+
+        Prefs(String key, Object defaultVal)
+        {
+            this.key = key;
+            this.defaultVal = defaultVal;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private static PreferenceParser preferenceParser;
 
     public static String getExternalPath() {
         try {
@@ -233,75 +341,35 @@ public class Preferences {
     }
 
     public static void updateBoolean(String settingKey, boolean state) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.context);
+        File prefsFile = new File(
+                Environment.getDataDirectory(), "data/"
+                + "com.marz.snapprefs" + "/shared_prefs/" + "com.marz.snapprefs"
+                + "_preferences" + ".xml");
+        prefsFile.setWritable(true, false);
 
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if( MainActivity.prefs == null )
+        {
+            Log.d("snapchat", "Updating preference");
+            MainActivity.prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.context);
+        }
+
+        SharedPreferences.Editor editor = MainActivity.prefs.edit();
         editor.putBoolean(settingKey, state);
-        editor.apply();
-
-        boolean newstate = sharedPreferences.getBoolean(settingKey, mLoadLenses);
-        Log.d("snapchat", "Updated preference boolean: " + settingKey + " to " + newstate);
+        editor.commit();
+        prefsFile.setReadable(true, false);
     }
 
     public static void printSettings() {
 
         Logger.log("\nTo see the advanced output enable debugging mode in the Support tab", true);
 
-        Logger.setDebuggingEnabled(true);
         Logger.log("\n~~~~~~~~~~~~ SNAPPREFS SETTINGS");
-        Logger.log("SelectAll: " + selectAll);
-        Logger.log("SelectStory: " + selectStory);
-        Logger.log("SelectVenue: " + selectVenue);
-        Logger.log("HideBF: " + hideBf);
-        Logger.log("HideRecent: " + hideRecent);
-        Logger.log("ShouldAddGhost: " + shouldAddGhost);
-        Logger.log("mTextTools: " + mTextTools);
-        Logger.log("mTimerCounter: " + mTimerCounter);
-        Logger.log("mChatAutoSave: " + mChatAutoSave);
-        Logger.log("mChatMediaSave: " + mChatMediaSave);
-        Logger.log("mIntegration: " + mIntegration);
-        Logger.log("mPaintTools: " + mPaintTools);
-        Logger.log("CustomFilters: " + mCustomFilterBoolean);
-        Logger.log("MultiFilters: " + mMultiFilterBoolean);
-        Logger.log("CustomFiltersLocation: " + mCustomFilterLocation);
-        Logger.log("CustomFilterType: " + mCustomFilterType);
-        Logger.log("mSpeed: " + mSpeed);
-        Logger.log("mWeather: " + mWeather);
-        Logger.log("mLocation: " + mLocation);
-        Logger.log("mStoryPreload: " + mStoryPreload);
-        Logger.log("mDiscoverSnap: " + mDiscoverSnap);
-        Logger.log("mDiscoverUI: " + mDiscoverUI);
-        Logger.log("mCustomSticker: " + mCustomSticker);
-        Logger.log("mHideLive: " + mHideLive);
-        Logger.log("mHidePeople: " + mHidePeople);
-        Logger.log("mReplay: " + mReplay);
-        Logger.log("mStealth: " + mStealth);
-        Logger.log("mTyping: " + mTyping);
-        Logger.log("mUnlimGroups: " + mUnlimGroups);
-        Logger.log("mForceNavbar: " + mForceNavbar);
-        Logger.log("*****Debugging: " + debug + " *****");
-        Logger.log("mLicense: " + mLicense);
-        Logger.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+        for( String key : preferenceMap.keySet() )
+        {
+            Object value = preferenceMap.get(key);
 
-        Logger.log("----------------------- SAVING SETTINGS -----------------------");
-        Logger.log("Preferences have changed:");
-        String[] saveModes = {"SAVE_BUTTON", "SAVE_S2S", "DO_NOT_SAVE", "SAVE_AUTO"};
-        Logger.log("~ mModeSave: " + saveModes[mModeSave]);
-        Logger.log("~ mModeStory: " + saveModes[mModeSave]);
-        Logger.log("~ mOverlays: " + mOverlays);
-        Logger.log("~ mTimerMinimum: " + mTimerMinimum);
-        Logger.log("~ mToastEnabled: " + mToastEnabled);
-        Logger.log("~ mVibrationEnabled: " + mVibrationEnabled);
-        Logger.log("~ mToastLength: " + mToastLength);
-        Logger.log("~ mSavePath: " + mSavePath);
-        Logger.log("~ mSaveSentSnaps: " + mSaveSentSnaps);
-        Logger.log("~ mSortByCategory: " + mSortByCategory);
-        Logger.log("~ mSortByUsername: " + mSortByUsername);
-        Logger.log("~ mTimerUnlimited: " + mTimerUnlimited);
-        Logger.log("~ mHideTimerStory: " + mHideTimerStory);
-        Logger.log("~ mLoopingVids: " + mLoopingVids);
-        Logger.log("~ mHideTimer: " + mHideTimer);
-        Logger.log("~ acceptedToU: " + acceptedToU);
+            Logger.log( key + ": " + value);
+        }
     }
 
     public static class PreferenceParser {
@@ -318,12 +386,10 @@ public class Preferences {
         public void loadPreferences() throws FileNotFoundException {
             preferenceMap = new HashMap<>();
             File prefsFile = new File(path);
-            Log.d("snapchat", "Loading preferences");
+            Log.d("snapchat", "File dosn't exist: " + path);
 
-            if (!prefsFile.exists()) {
-                Log.d("snapchat", "File dosn't exist: " + path);
+            if (!prefsFile.exists())
                 return;
-            }
 
             try {
 
@@ -334,11 +400,8 @@ public class Preferences {
                 Document preferenceDocument = db.parse(prefsFile);
 
                 Element mainElement = preferenceDocument.getDocumentElement();
-                Log.d("snapchat", "Building boolean preferences");
                 buildBooleanList(mainElement);
-                Log.d("snapchat", "Building integer preferences");
                 buildIntList(mainElement);
-                Log.d("snapchat", "Building string preferences");
                 buildStringList(mainElement);
             } catch (ParserConfigurationException pce) {
                 pce.printStackTrace();
@@ -361,7 +424,7 @@ public class Preferences {
                     String strValue = prefElement.getAttribute("value");
                     boolean prefState = strValue.equalsIgnoreCase("true");
                     preferenceMap.put(prefKey, prefState);
-                    Log.d("snapchat", "Found boolean: " + prefKey + " : " + prefState);
+                    Log.d("snapchat", "Found key: " + prefKey + " : " + prefState);
                 }
             }
         }
@@ -378,7 +441,7 @@ public class Preferences {
                     String strState = prefElement.getFirstChild().getNodeValue();
 
                     preferenceMap.put(prefKey, strState);
-                    Log.d("snapchat", "Found string: " + prefKey + " : " + strState);
+                    Log.d("snapchat", "Found key: " + prefKey + " : " + strState);
                 }
             }
         }
@@ -397,7 +460,7 @@ public class Preferences {
                     try {
                         int parsedStr = Integer.parseInt(strState);
                         preferenceMap.put(prefKey, parsedStr);
-                        Log.d("snapchat", "Found int: " + prefKey + " : " + parsedStr);
+                        Log.d("snapchat", "Found key: " + prefKey + " : " + parsedStr);
                     } catch( Exception e)
                     {
                         Log.d("snapchat", "Could not parse value: " + prefKey);

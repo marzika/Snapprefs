@@ -8,6 +8,7 @@ import android.os.Vibrator;
 
 import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.Preferences;
+import com.marz.snapprefs.Preferences.Prefs;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -154,7 +155,7 @@ public abstract class SavingUtils
     }
 
     public static void vibrate( Context context, boolean success ) {
-        if( !Preferences.mVibrationEnabled )
+        if( !Preferences.getBool(Prefs.VIBRATIONS_ENABLED) )
             return;
 
         if ( success ) {
@@ -210,7 +211,7 @@ public abstract class SavingUtils
     }
 
     public static int getToastLength() {
-        if ( Preferences.mToastLength == Preferences.TOAST_LENGTH_SHORT ) {
+        if ( Preferences.getInt(Prefs.TOAST_LENGTH) == Preferences.TOAST_LENGTH_SHORT ) {
             return NotificationUtils.LENGHT_SHORT;
         } else {
             return NotificationUtils.LENGHT_LONG;

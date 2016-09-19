@@ -27,7 +27,6 @@ import de.robv.android.xposed.XposedBridge;
 public class Logger {
 
     public static final String LOG_TAG = "SnapPrefs: ";
-    private static boolean debugging;
     private static int printWidth = 70;
 
     /**
@@ -36,14 +35,6 @@ public class Logger {
     private Logger() {
     }
 
-    /**
-     * Enable or disable writing debug information to the Xposed Log.
-     *
-     * @param debug Whether to enable or disable it
-     */
-    public static void setDebuggingEnabled(boolean debug) {
-        debugging = debug;
-    }
 
     /**
      * Write debug information to the Xposed Log if enabled or forced by the parameter.
@@ -53,18 +44,18 @@ public class Logger {
      * @param forced  Whether to force log and thus overrides the debug setting
      */
     public static void log(String message, boolean prefix, boolean forced) {
-        if (debugging || forced) {
+
             if (prefix) {
                 message = LOG_TAG + message;
             }
 
             try {
                 XposedBridge.log(message);
-            } catch( Exception e)
+            } catch( NoClassDefFoundError e)
             {
                 Log.d("snapchat", message);
             }
-        }
+
     }
 
     public static void afterHook( String message )

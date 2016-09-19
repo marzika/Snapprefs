@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.FileObserver;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -83,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String GCM_SENDER_ID = "410204387699";
     private static final String WEB_SERVER_URL = "http://snapprefs.com/gcm/register_user.php";
     private static final int ACTION_PLAY_SERVICES_DIALOG = 100;
+    private static FileObserver observer;
+
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     FragmentManager mFragmentManager;
@@ -112,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
     };
     private ArrayList<MenuItem> items = new ArrayList<>();
-    private SharedPreferences prefs;
+    public static SharedPreferences prefs;
     private String gcmRegId;
     public static LensDatabaseHelper lensDBHelper;
 
@@ -141,23 +144,42 @@ public class MainActivity extends AppCompatActivity {
                 + getPackageName() + "/shared_prefs/" + getPackageName()
                 + "_preferences" + ".xml");
         prefsFile.setReadable(true, false);
+        prefsFile.setWritable(true, false);
 
-        Preferences.refreshSelectedPreferences(prefs);
+        observer = new FileObserver(prefsFile.getAbsolutePath()) {//this needs to be field, because as variable it will be garbage collected
+            @Override
+            public void onEvent(int event, String path) {
+                if (event == FileObserver.CLOSE_WRITE) {
+                    Log.d("snapchat", "MAIN Observer: CLOSE_WRITE");
+                } else if( event == FileObserver.CLOSE_NOWRITE)
+                    Log.d("snapchat", "MAIN Observer: CLOSE_NOWRITE");
+                else if( event == FileObserver.ACCESS)
+                    Log.d("snapchat", "MAIN Observer: ACCESS");
+                else if( event == FileObserver.OPEN)
+                    Log.d("snapchat", "MAIN Observer: OPEN");
+                else if( event == FileObserver.CREATE)
+                    Log.d("snapchat", "MAIN Observer: CREATE");
+
+            }
+        };
+        observer.startWatching();
+
+        Preferences.loadMap( prefs);
+        Preferences.initialiseListener(prefs);
+        //Preferences.refreshSelectedPreferences(prefs);
 
         Log.d("snapchat", "Load lenses: " + prefs.contains("pref_key_load_lenses"));
 
 
-        Log.d("snapchat", "SAVE LOCATION: " + Preferences.mSavePath);
-        if(!Preferences.acceptedToU){
+        Log.d("snapchat", "SAVE LOCATION: " + Preferences.getString(Preferences.Prefs.SAVE_PATH));
+        if(!Preferences.getBool(Preferences.Prefs.ACCEPTED_TOU)){
             AlertDialog.Builder builder = new AlertDialog.Builder(context)
                     .setTitle("ToU and Privacy Policy")
                     .setView(R.layout.tos)
                     .setMessage("You haven't accepted our Terms of Use and Privacy. Please read it carefully and accept it, otherwise you will not be able to use our product.")
                     .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            SharedPreferences.Editor editor = prefs.edit();
-                            editor.putBoolean("acceptedToU", true);
-                            editor.apply();
+                            Preferences.updateBoolean("acceptedToU", true);
                             Toast.makeText(MainActivity.this, "You accepted the Terms of Use and Privacy Policy", Toast.LENGTH_SHORT).show();
                         }
                     })
@@ -414,9 +436,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private SharedPreferences getSharedPreferences() {
-        if (prefs == null) {
-            prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        }
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         return prefs;
     }
 

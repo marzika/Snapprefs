@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.marz.snapprefs.Util.LensData;
 import com.marz.snapprefs.Util.LensDatabaseHelper;
+import com.marz.snapprefs.Preferences.Prefs;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -86,7 +87,7 @@ public class Lens {
             for (Object atzObj : a) {
                 Object lens = newInstance(LensClass, atzClass.cast(atzObj), enumScheduledType);
 
-                if( Preferences.mCollectLenses ) {
+                if( Preferences.getBool(Prefs.LENSES_COLLECT) ) {
                     String url = (String) getObjectField(lens, "mIconLink");
                     Logger.log("Icon url: " + url);
                     String mCode = (String) getObjectField(lens, "mCode");
@@ -117,7 +118,7 @@ public class Lens {
                 activeLenses.add(lens);
             }
 
-            if( Preferences.mLoadLenses) {
+            if( Preferences.getBool(Prefs.LENSES_LOAD)) {
                 activeLenses = buildModifiedList(activeLenses, lensBlacklist);
                 precachedLenses = buildModifiedList(precachedLenses, lensBlacklist);
             }

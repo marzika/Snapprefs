@@ -47,6 +47,7 @@ import android.widget.Toast;
 import com.marz.snapprefs.Util.GestureEvent;
 import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.TypefaceUtil;
+import com.marz.snapprefs.Preferences.Prefs;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -186,7 +187,7 @@ public class HookedLayouts {
         if (saveImg == null)
             throw new NullPointerException("Button Image not found");
 
-        int horizontalPosition = Preferences.mButtonPosition ? Gravity.START : Gravity.END;
+        int horizontalPosition = Preferences.getBool(Prefs.BUTTON_POSITION) ? Gravity.START : Gravity.END;
         final FrameLayout.LayoutParams layoutParams =
                 new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
                         FrameLayout.LayoutParams.WRAP_CONTENT,
@@ -213,13 +214,13 @@ public class HookedLayouts {
                 saveStoryButton.setBackgroundColor(0);
                 saveStoryButton.setImageBitmap(saveImg);
                 saveStoryButton.setAlpha(0.8f);
-                saveStoryButton.setVisibility(Preferences.mModeStory == Preferences.SAVE_BUTTON ?
+                saveStoryButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ?
                         View.VISIBLE : View.INVISIBLE);
 
                 frameLayout.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-                        return Preferences.mModeStory == Preferences.SAVE_S2S &&
+                        return Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S &&
                                 gestureEvent.onTouch(v, event, Saving.SnapType.STORY);
 
                     }
@@ -252,13 +253,13 @@ public class HookedLayouts {
                 saveSnapButton.setBackgroundColor(0);
                 saveSnapButton.setAlpha(1f);
                 saveSnapButton.setImageBitmap(saveImg);
-                saveSnapButton.setVisibility(Preferences.mModeSave == Preferences.SAVE_BUTTON
+                saveSnapButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
                         ? View.VISIBLE : View.INVISIBLE);
 
                 frameLayout.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-                        return Preferences.mModeSave == Preferences.SAVE_S2S &&
+                        return Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S &&
                                 gestureEvent.onTouch(v, event, Saving.SnapType.SNAP);
 
                     }
@@ -277,7 +278,7 @@ public class HookedLayouts {
     }
 
     public static void refreshButtonPreferences() {
-        int horizontalPosition = Preferences.mButtonPosition ? Gravity.START : Gravity.END;
+        int horizontalPosition = Preferences.getBool(Prefs.BUTTON_POSITION) ? Gravity.START : Gravity.END;
         final FrameLayout.LayoutParams layoutParams =
                 new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
                         FrameLayout.LayoutParams.WRAP_CONTENT,
@@ -285,14 +286,14 @@ public class HookedLayouts {
 
         if (HookedLayouts.saveSnapButton != null) {
             HookedLayouts.saveSnapButton.setVisibility(
-                    Preferences.mModeSave == Preferences.SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE);
+                    Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE);
 
             HookedLayouts.saveSnapButton.setLayoutParams(layoutParams);
         }
 
         if (HookedLayouts.saveStoryButton != null) {
             HookedLayouts.saveStoryButton.setVisibility(
-                    Preferences.mModeStory == Preferences.SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE);
+                    Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE);
 
             HookedLayouts.saveStoryButton.setLayoutParams(layoutParams);
         }
@@ -413,17 +414,17 @@ public class HookedLayouts {
                 HookMethods.SnapContext.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (Preferences.mTextTools) {
+                        if (Preferences.getBool(Prefs.TEXT_TOOLS)) {
                             relativeLayout.addView(textButton, layoutParams);
                             relativeLayout.addView(outerOptionsLayout, outerOptionsLayoutParams);
                         }
-                        if (Preferences.mSpeed) {
+                        if (Preferences.getBool(Prefs.SPEED)) {
                             relativeLayout.addView(speed, paramsSpeed);
                         }
-                        if (Preferences.mLocation) {
+                        if (Preferences.getBool(Prefs.LOCATION)) {
                             relativeLayout.addView(location, paramsLocation);
                         }
-                        if (Preferences.mWeather) {
+                        if (Preferences.getBool(Prefs.WEATHER)) {
                             relativeLayout.addView(weather, paramsWeather);
                         }
                     }

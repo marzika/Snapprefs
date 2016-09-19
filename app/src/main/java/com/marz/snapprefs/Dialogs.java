@@ -29,8 +29,6 @@ public class Dialogs {
         LinearLayout linearLayout = new LinearLayout(SnapContext);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
 
-        Preferences.refreshPreferences();
-
         final EditText eText = new EditText(SnapContext);
         eText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
         linearLayout.addView(eText);
@@ -66,8 +64,6 @@ public class Dialogs {
         builder.setTitle("Enter Temperature value");
         LinearLayout linearLayout = new LinearLayout(SnapContext);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
-
-        Preferences.refreshPreferences();
 
         final EditText eText = new EditText(SnapContext);
         eText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);

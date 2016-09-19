@@ -22,6 +22,7 @@ import android.widget.TextView;
 import com.marz.snapprefs.Common;
 import com.marz.snapprefs.MainActivity;
 import com.marz.snapprefs.Preferences;
+import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.R;
 import com.marz.snapprefs.Util.LensData;
 import com.marz.snapprefs.Util.LensDatabaseHelper;
@@ -120,8 +121,8 @@ public class LensesFragment extends Fragment {
         Switch loadLensSwitch = (Switch) view.findViewById(R.id.lensloader_toggle);
         Switch collectLensSwitch = (Switch) view.findViewById(R.id.lenscollector_toggle);
 
-        loadLensSwitch.setChecked(Preferences.mLoadLenses);
-        collectLensSwitch.setChecked(Preferences.mCollectLenses);
+        loadLensSwitch.setChecked(Preferences.getBool(Prefs.LENSES_LOAD));
+        collectLensSwitch.setChecked(Preferences.getBool(Prefs.LENSES_COLLECT));
         loadLensSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

@@ -29,9 +29,6 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
-import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
-import static de.robv.android.xposed.XposedHelpers.setObjectField;
-import static de.robv.android.xposed.XposedHelpers.getObjectField;
 
 public class Sharing {
 
@@ -61,7 +58,7 @@ public class Sharing {
         findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                Preferences.refreshPreferences();
+                Preferences.loadMapFromXposed();
                 XposedUtils.log("----------------- SNAPSHARE STARTED -----------------", false);
                 final Activity activity = (Activity) param.thisObject;
                 // Get intent, action and MIME type
@@ -201,7 +198,6 @@ public class Sharing {
         XC_MethodHook cameraLoadedHook = new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                Preferences.refreshPreferences(); // Refresh preferences for captions
                 if (initializedUri == null) {
                     return; // We don't have an image to send, so don't try to send one
                 }

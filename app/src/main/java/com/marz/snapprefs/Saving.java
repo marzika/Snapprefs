@@ -16,6 +16,7 @@ import com.marz.snapprefs.SnapData.FlagState;
 import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.NotificationUtils.ToastType;
 import com.marz.snapprefs.Util.SavingUtils;
+import com.marz.snapprefs.Preferences.Prefs;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,7 +65,6 @@ public class Saving {
         lpparam2 = lpparam;
 
         if (mSCResources == null) mSCResources = snapContext.getResources();
-        Preferences.refreshPreferences();
 
         try {
             ClassLoader cl = lpparam.classLoader;
@@ -132,7 +132,7 @@ public class Saving {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     try {
-                        if( Preferences.mSaveSentSnaps )
+                        if( Preferences.getBool(Prefs.SAVE_SENT_SNAPS) )
                             handleSentSnap(param.thisObject, snapContext);
                     } catch (Exception e) {
                         Logger.log("Error getting sent media", e);
@@ -150,25 +150,25 @@ public class Saving {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     //Logger.afterHook("RECEIVEDSNAP - DisplayTime");
                     Double currentResult = (Double) param.getResult();
-                    if (Preferences.mTimerUnlimited) {
+                    if (Preferences.getBool(Prefs.TIMER_UNLIMITED)) {
                         findAndHookMethod("com.snapchat.android.ui.SnapTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
                         param.setResult((double) 9999.9F);
                     } else {
-                        if ((double) Preferences.mTimerMinimum !=
+                        if ((double) Preferences.getInt(Prefs.TIMER_MINIMUM) !=
                                 Preferences.TIMER_MINIMUM_DISABLED &&
-                                currentResult < (double) Preferences.mTimerMinimum) {
-                            param.setResult((double) Preferences.mTimerMinimum);
+                                currentResult < (double) Preferences.getInt(Prefs.TIMER_MINIMUM)) {
+                            param.setResult((double) Preferences.getInt(Prefs.TIMER_MINIMUM));
                         }
                     }
                 }
             });
-            if (Preferences.mHideTimer) {
+            if (Preferences.getBool(Prefs.HIDE_TIMER_SNAP)) {
                 findAndHookMethod("com.snapchat.android.ui.SnapTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
-            if (Preferences.mHideTimerStory) {
+            if (Preferences.getBool(Prefs.HIDE_TIMER_STORY)) {
                 findAndHookMethod("com.snapchat.android.ui.StoryTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
-            if (Preferences.mLoopingVids) {
+            if (Preferences.getBool(Prefs.LOOPING_VIDS)) {
                 findAndHookMethod("com.snapchat.opera.shared.view.TextureVideoView", lpparam.classLoader, "start", new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -314,11 +314,11 @@ public class Saving {
 
             if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
                 if (currentSnapData.getSnapType() == SnapType.STORY &&
-                        Preferences.mModeStory != Preferences.SAVE_S2S) {
+                        Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_S2S) {
                     Logger.printFinalMessage("Tried to perform story S2S from different mode");
                     return;
                 } else if (currentSnapData.getSnapType() == SnapType.SNAP &&
-                        Preferences.mModeSave != Preferences.SAVE_S2S) {
+                        Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_S2S) {
                     Logger.printFinalMessage("Tried to perform snap S2S from different mode");
                     return;
                 }
@@ -338,11 +338,11 @@ public class Saving {
 
             if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
                 if (currentSnapData.getSnapType() == SnapType.STORY &&
-                        Preferences.mModeStory != Preferences.SAVE_BUTTON) {
+                        Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_BUTTON) {
                     Logger.printFinalMessage("Tried to perform story button save from different mode");
                     return;
                 } else if (currentSnapData.getSnapType() == SnapType.SNAP
-                        && Preferences.mModeSave != Preferences.SAVE_BUTTON) {
+                        && Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_BUTTON) {
                     Logger.printFinalMessage("Tried to perform snap button save from different mode");
                     return;
                 }
@@ -656,15 +656,15 @@ public class Saving {
         Logger.printMessage("Passed payload checks");
 
         if (snapData.getSnapType() == SnapType.SNAP &&
-                (Preferences.mModeSave == Preferences.DO_NOT_SAVE ||
-                        Preferences.mModeSave == Preferences.SAVE_BUTTON ||
-                        Preferences.mModeSave == Preferences.SAVE_S2S)) {
+                (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.DO_NOT_SAVE ||
+                        Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON ||
+                        Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S)) {
             Logger.printMessage("Snap save mode check failed");
             return false;
         } else if (snapData.getSnapType() == SnapType.STORY &&
-                (Preferences.mModeStory == Preferences.DO_NOT_SAVE ||
-                        Preferences.mModeStory == Preferences.SAVE_BUTTON ||
-                        Preferences.mModeStory == Preferences.SAVE_S2S)) {
+                (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.DO_NOT_SAVE ||
+                        Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ||
+                        Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S)) {
             Logger.printMessage("Story save mode check failed");
             return false;
         }
@@ -897,7 +897,7 @@ public class Saving {
             File overlayFile =
                     new File(directory, filename + "_overlay" + MediaType.IMAGE.fileExtension);
 
-            if (Preferences.mOverlays) {
+            if (Preferences.getBool(Prefs.OVERLAYS)) {
                 if (overlayFile.exists()) {
                     Logger.printMessage("VideoOverlay already exists");
                     SavingUtils.vibrate(context, false);
@@ -934,13 +934,13 @@ public class Saving {
     }
 
     public static File createFileDir(String category, String sender) throws IOException {
-        File directory = new File(Preferences.mSavePath);
+        File directory = new File(Preferences.getString(Prefs.SAVE_PATH));
 
-        if (Preferences.mSortByCategory || (Preferences.mSortByUsername && sender == null)) {
+        if (Preferences.getBool(Prefs.SORT_BY_CATEGORY) || (Preferences.getBool(Prefs.SORT_BY_USERNAME) && sender == null)) {
             directory = new File(directory, category);
         }
 
-        if (Preferences.mSortByUsername && sender != null) {
+        if (Preferences.getBool(Prefs.SORT_BY_USERNAME) && sender != null) {
             directory = new File(directory, sender);
         }
 
