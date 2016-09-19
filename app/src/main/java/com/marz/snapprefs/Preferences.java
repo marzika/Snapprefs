@@ -1,14 +1,25 @@
 package com.marz.snapprefs;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import de.robv.android.xposed.XSharedPreferences;
 
@@ -72,63 +83,63 @@ public class Preferences {
     public static boolean mButtonPosition = false;
     public static boolean mLoadLenses = true;
     public static boolean mCollectLenses = true;
+    public static boolean acceptedToU = true;
     static XSharedPreferences prefs;
     static XSharedPreferences license;
     static boolean selectStory;
     static boolean selectVenue;
     static boolean mTextTools;
     static boolean debug;
-    static boolean acceptedToU = false;
     private static boolean fullCaption;
     private static boolean hideRecent;
     private static boolean shouldAddVFilters;
+    private static PreferenceParser preferenceParser;
 
     static void refreshPreferences() {
-        if (prefs == null) {
-            prefs = new XSharedPreferences(new File(
-                    Environment.getDataDirectory(), "data/"
-                    + HookMethods.PACKAGE_NAME + "/shared_prefs/" + HookMethods.PACKAGE_NAME
-                    + "_preferences" + ".xml"));
-            prefs.makeWorldReadable();
-        }
+        /*if (preferenceParser == null) {
+            preferenceParser = new PreferenceParser(Environment.getDataDirectory() + "/data/" +
+                    HookMethods.PACKAGE_NAME + "/shared_prefs/" + HookMethods.PACKAGE_NAME + "_preferences.xml");
+        }*/
+
+        prefs = new XSharedPreferences(HookMethods.PACKAGE_NAME, HookMethods.PACKAGE_NAME + "_preferences");
 
         prefs.reload();
 
         try {
-            Method method = prefs.getClass().getDeclaredMethod("hasFileChanged");
-            method.setAccessible(true);
-            boolean hasFileChanged = (boolean) method.invoke(prefs);
+            int spinCount = 0;
+            Field field = XSharedPreferences.class.getDeclaredField("mLoaded");
+            field.setAccessible(true);
+            boolean mLoaded;
 
-            if (hasFileChanged) {
-                Field field = XSharedPreferences.class.getDeclaredField("mLoaded");
+            do {
+                Log.d("snapchat", "spinning" + (++spinCount));
+
+                if (spinCount > 35000)
+                    break;
+
                 field.setAccessible(true);
-                boolean mLoaded = (boolean) field.get(prefs);
+                mLoaded = (boolean) field.get(prefs);
+            } while (!mLoaded);
 
-                int spinCount = 0;
-                while (!mLoaded) {
-                    Log.d("snapchat", "spinning" + (++spinCount));
-
-                    if (spinCount > 35000)
-                        break;
-                }
-            }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        }
+
+        try {
+            refreshSelectedPreferences(prefs);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        refreshSelectedPreferences(prefs);
         HookedLayouts.refreshButtonPreferences();
     }
 
     public static void refreshSelectedPreferences(Object sharedPreferences) {
         SharedPreferences prefs = (SharedPreferences) sharedPreferences;
 
+        acceptedToU = true;
         selectAll = prefs.getBoolean("pref_key_selectall", false);
         selectStory = prefs.getBoolean("pref_key_selectstory", false);
         selectVenue = prefs.getBoolean("pref_key_selectvenue", false);
@@ -198,9 +209,11 @@ public class Preferences {
 
         shouldAddGhost = mSpeed || mTextTools || mLocation || mWeather;
 
-        acceptedToU = prefs.getBoolean("acceptedToU", false);
+        Log.d("snapchat", "CONTAINS ACCEPTED: " + prefs.contains("acceptedToU"));
         Log.d("snapchat", "Loading lenses: " + mLoadLenses);
         Log.d("snapchat", "Collecting lenses: " + mCollectLenses);
+
+        printSettings();
     }
 
     public static String getExternalPath() {
@@ -220,20 +233,21 @@ public class Preferences {
     }
 
     public static void updateBoolean(String settingKey, boolean state) {
-        SharedPreferences sharedPreferences = MainActivity.context.getSharedPreferences("com.marz.snapprefs_preferences", Context.MODE_WORLD_READABLE);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.context);
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(settingKey, state);
-        boolean response = editor.commit();
+        editor.apply();
 
         boolean newstate = sharedPreferences.getBoolean(settingKey, mLoadLenses);
-        Log.d("snapchat", "Updated preference boolean: " + settingKey + " to " + newstate + " savestate: " + response);
+        Log.d("snapchat", "Updated preference boolean: " + settingKey + " to " + newstate);
     }
 
     public static void printSettings() {
 
         Logger.log("\nTo see the advanced output enable debugging mode in the Support tab", true);
 
+        Logger.setDebuggingEnabled(true);
         Logger.log("\n~~~~~~~~~~~~ SNAPPREFS SETTINGS");
         Logger.log("SelectAll: " + selectAll);
         Logger.log("SelectStory: " + selectStory);
@@ -268,7 +282,6 @@ public class Preferences {
         Logger.log("*****Debugging: " + debug + " *****");
         Logger.log("mLicense: " + mLicense);
         Logger.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        Logger.setDebuggingEnabled(mDebugging);
 
         Logger.log("----------------------- SAVING SETTINGS -----------------------");
         Logger.log("Preferences have changed:");
@@ -288,5 +301,126 @@ public class Preferences {
         Logger.log("~ mHideTimerStory: " + mHideTimerStory);
         Logger.log("~ mLoopingVids: " + mLoopingVids);
         Logger.log("~ mHideTimer: " + mHideTimer);
+        Logger.log("~ acceptedToU: " + acceptedToU);
+    }
+
+    public static class PreferenceParser {
+        private HashMap<String, Object> preferenceMap = new HashMap<>();
+        private String path;
+        private DocumentBuilderFactory builderFactory;
+
+        public PreferenceParser(String path) {
+            this.path = path;
+            this.builderFactory = DocumentBuilderFactory.newInstance();
+            preferenceMap = new HashMap<>();
+        }
+
+        public void loadPreferences() throws FileNotFoundException {
+            preferenceMap = new HashMap<>();
+            File prefsFile = new File(path);
+            Log.d("snapchat", "Loading preferences");
+
+            if (!prefsFile.exists()) {
+                Log.d("snapchat", "File dosn't exist: " + path);
+                return;
+            }
+
+            try {
+
+                //Using factory get an instance of document builder
+                DocumentBuilder db = builderFactory.newDocumentBuilder();
+
+                //parse using builder to get DOM representation of the XML file
+                Document preferenceDocument = db.parse(prefsFile);
+
+                Element mainElement = preferenceDocument.getDocumentElement();
+                Log.d("snapchat", "Building boolean preferences");
+                buildBooleanList(mainElement);
+                Log.d("snapchat", "Building integer preferences");
+                buildIntList(mainElement);
+                Log.d("snapchat", "Building string preferences");
+                buildStringList(mainElement);
+            } catch (ParserConfigurationException pce) {
+                pce.printStackTrace();
+            } catch (SAXException se) {
+                se.printStackTrace();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+
+        public void buildBooleanList(Element mainElement) {
+            NodeList nodeList = mainElement.getElementsByTagName("boolean");
+
+            if (nodeList != null) {
+                Log.d("snapchat", "Nodelist null");
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    Log.d("snapchat", "Looping nodelst");
+                    Element prefElement = (Element) nodeList.item(i);
+                    String prefKey = prefElement.getAttribute("name");
+                    String strValue = prefElement.getAttribute("value");
+                    boolean prefState = strValue.equalsIgnoreCase("true");
+                    preferenceMap.put(prefKey, prefState);
+                    Log.d("snapchat", "Found boolean: " + prefKey + " : " + prefState);
+                }
+            }
+        }
+
+        public void buildStringList(Element mainElement) {
+            NodeList nodeList = mainElement.getElementsByTagName("string");
+
+            if (nodeList != null) {
+                Log.d("snapchat", "Nodelist null");
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    Log.d("snapchat", "Looping nodelst");
+                    Element prefElement = (Element) nodeList.item(i);
+                    String prefKey = prefElement.getAttribute("name");
+                    String strState = prefElement.getFirstChild().getNodeValue();
+
+                    preferenceMap.put(prefKey, strState);
+                    Log.d("snapchat", "Found string: " + prefKey + " : " + strState);
+                }
+            }
+        }
+
+        public void buildIntList(Element mainElement) {
+            NodeList nodeList = mainElement.getElementsByTagName("int");
+
+            if (nodeList != null) {
+                Log.d("snapchat", "Nodelist null");
+                for (int i = 0; i < nodeList.getLength(); i++) {
+                    Log.d("snapchat", "Looping nodelst");
+                    Element prefElement = (Element) nodeList.item(i);
+                    String prefKey = prefElement.getAttribute("name");
+                    String strState = prefElement.getAttribute("value");
+
+                    try {
+                        int parsedStr = Integer.parseInt(strState);
+                        preferenceMap.put(prefKey, parsedStr);
+                        Log.d("snapchat", "Found int: " + prefKey + " : " + parsedStr);
+                    } catch( Exception e)
+                    {
+                        Log.d("snapchat", "Could not parse value: " + prefKey);
+                    }
+                }
+            }
+        }
+
+        public Object getPreference(String key, Object defaultVal) {
+            Object prefValue = preferenceMap.get(key);
+
+            if (prefValue == null)
+                return defaultVal;
+
+            return prefValue;
+        }
+
+        public void closeParser() {
+            preferenceMap.clear();
+        }
+
+        public HashMap<String, Object> getPreferenceMap() {
+            return preferenceMap;
+        }
     }
 }
