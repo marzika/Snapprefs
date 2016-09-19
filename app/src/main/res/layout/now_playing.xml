@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/space" />
+
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:id="@+id/albumImage"
+        android:layout_above="@+id/space"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:padding="10dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginStart="30dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/title"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_alignTop="@+id/albumImage"
+        android:layout_toRightOf="@+id/albumImage"
+        android:layout_toEndOf="@+id/albumImage"
+        android:gravity="start|center_vertical" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/album"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_below="@+id/title"
+        android:gravity="start|center_vertical"
+        android:layout_alignLeft="@+id/title"
+        android:layout_alignStart="@+id/title" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Medium Text"
+        android:id="@+id/artist"
+        android:layout_marginEnd="30dp"
+        android:layout_marginRight="30dp"
+        android:gravity="start|center_vertical"
+        android:layout_below="@+id/album"
+        android:layout_alignLeft="@+id/album"
+        android:layout_alignStart="@+id/album" />
+
+</RelativeLayout>

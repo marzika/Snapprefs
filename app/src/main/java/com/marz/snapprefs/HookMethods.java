@@ -278,9 +278,9 @@ public class HookMethods
                                         .setTitle("ToU and Privacy Policy")
                                         .setMessage("You haven't accepted our Terms of Use and Privacy. Please read it carefully and accept it, otherwise you will not be able to use our product. Open the Snapprefs app to do that.")
                                         .setIcon(android.R.drawable.ic_dialog_alert);
-                                builder.setCancelable(false);
+//                                builder.setCancelable(false);
                                 final AlertDialog dialog = builder.create();
-                                dialog.setCanceledOnTouchOutside(false);
+//                                dialog.setCanceledOnTouchOutside(false);
                                 dialog.show();
                                 return;
                             }
