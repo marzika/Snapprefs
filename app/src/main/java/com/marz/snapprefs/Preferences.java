@@ -36,6 +36,7 @@ public class Preferences {
     public static final int TOAST_LENGTH_SHORT = 0;
     public static final int TOAST_LENGTH_LONG = 1;
     public static final int TIMER_MINIMUM_DISABLED = 0;
+    public static final int SPIN_EXCESS = 200;
 
     private static ConcurrentHashMap<String, Object> preferenceMap = new ConcurrentHashMap<>();
     private static XSharedPreferences xSharedPreferences;
@@ -82,21 +83,29 @@ public class Preferences {
             Field field = XSharedPreferences.class.getDeclaredField("mLoaded");
             field.setAccessible(true);
             boolean mLoaded;
-
+            boolean triggerSpinExcess = false;
+            int currentExcess = 0;
 
             Log.d("snapchat", "Starting spin");
             do {
                 spinCount++;
 
-                if( (spinCount % 5000 ) >= 5000 )
-                    Log.d("snapchat", "Spin count: " + spinCount);
+                if( (spinCount % 50) == 0)
+                    Log.d("snapchat", "Current spin count: " + spinCount);
 
                 if (spinCount > 35000)
                     break;
 
                 field.setAccessible(true);
                 mLoaded = (boolean) field.get(xSharedPreferences);
-            } while (!mLoaded);
+
+                if(mLoaded && !triggerSpinExcess)
+                    triggerSpinExcess = true;
+
+                if( triggerSpinExcess)
+                    currentExcess++;
+
+            } while (currentExcess < SPIN_EXCESS);
 
             Log.d("snapchat", "Completed " + spinCount + " spins");
         } catch (IllegalAccessException e) {
