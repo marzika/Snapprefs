@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import com.marz.snapprefs.SnapData.FlagState;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,6 +33,7 @@ import java.util.regex.Pattern;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
@@ -38,6 +41,7 @@ import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
+import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
 
 public class Saving {
     //public static final String SNAPCHAT_PACKAGE_NAME = "com.snapchat.android";
@@ -199,6 +203,42 @@ public class Saving {
                     Logger.afterHook("StorySnapView - Hide1");
                 }
             });
+            findAndHookMethod("com.snapchat.android.fragments.FriendMiniProfilePopupFragment", lpparam.classLoader, "y", new XC_MethodHook() {
+                // TODO remove spread out code
+                @Override
+                protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                    View mini_profile_snapcode = (View) getObjectField(param.thisObject, "q");
+                    mini_profile_snapcode.setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(View v) {
+                            final File profileImagesFolder = new File(Preferences.mSavePath, "profileImages/");
+                            if(!profileImagesFolder.exists()){
+                                profileImagesFolder.mkdir();
+                            }
+                            // Execluting: List<Bitmap> a = this.i.a(this.F.g(), ProfileImageSize.MEDIUM);
+                            Object F = getObjectField(param.thisObject, "F");
+                            String username = (String) callMethod(F, "g");
+                            Object MEDIUM = getStaticObjectField(findClass("com.snapchat.android.util.profileimages.ProfileImageUtils$ProfileImageSize", lpparam.classLoader), "MEDIUM");
+                            //String username = (String) callMethod(getObjectField(param.thisObject, "F"), "g");
+                            Object i = getObjectField(param.thisObject, "i");
+                            List<Bitmap> profileImages = (List<Bitmap>) callMethod(i, "a", new Class[]{String.class, findClass("com.snapchat.android.util.profileimages.ProfileImageUtils$ProfileImageSize", lpparam.classLoader)}, username, MEDIUM);
+                            //List<Bitmap> profileImages = (List<Bitmap>) callMethod(getObjectField(param.thisObject, "i"), "a", new Class[]{String.class, findClass("com.snapchat.android.util.profileimages.ProfileImageUtils$ProfileImageSize", lpparam.classLoader)}, username, MEDIUM);
+                            if (Preferences.debug) {
+                                XposedBridge.log("Object F: " + F + "\nObject i: " + i + "\nUsername: " + username + "\nMEDIUM: " + MEDIUM + "\nprofileImages: " + profileImages);
+                            }
+                            if(profileImages == null) {
+                                SavingUtils.vibrate(HookMethods.context, false);
+                                return false;
+                            }
+                            for (int iter = 0; iter < profileImages.size(); iter++) {
+                                File f = new File(profileImagesFolder, username + "-" + iter + ".jpg");
+                                SavingUtils.saveJPGAsync(f, profileImages.get(iter), HookMethods.context);
+                            }
+                            return true;
+                        }
+                    });
+                }
+            });
         } catch (Exception e) {
             Logger.log("Error occured: Snapprefs doesn't currently support this version, wait for an update", e);
 
@@ -210,7 +250,6 @@ public class Saving {
             });
         }
     }
-
     public static void handleSentSnap(Object snapPreviewFragment, Context snapContext) {
         try {
             Logger.printTitle("Handling SENT snap");
