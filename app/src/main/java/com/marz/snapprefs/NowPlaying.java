@@ -45,6 +45,33 @@ public class NowPlaying {
     private static View nowPlaying;
     private static Bitmap bitmap;
     private static GetSpotifyTrackTask lastTask;
+    private static int layoutNumber = 0;
+
+    public static void changeLayout() {
+        layoutNumber++;
+        if (layoutNumber > 1) layoutNumber = 0;
+        int id;
+        switch (layoutNumber) {
+            case 0:
+                id = R.layout.now_playing;
+                break;
+            case 1:
+                id = R.layout.now_playing_2;
+                break;
+            default:
+                id = R.layout.now_playing;
+                break;
+        }
+        Context myContext;
+        try {
+            myContext = HookMethods.context.createPackageContext("com.marz.snapprefs", Context.CONTEXT_IGNORE_SECURITY);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return;
+        }
+        nowPlaying = LayoutInflater.from(myContext).inflate(id, null);
+        generateBitmap();
+    }
 
     public static void init() {
         Context myContext;
