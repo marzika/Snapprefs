@@ -273,7 +273,7 @@ public class HookMethods
                             Preferences.refreshPreferences();
                             Preferences.prefs.makeWorldReadable();
                             SnapContext = (Activity) param.thisObject;
-                            if (!Preferences.acceptedToU) {//new ContextThemeWrapper(context.createPackageContext("com.marz.snapprefs", Context.CONTEXT_IGNORE_SECURITY), R.style.AppCompatDialog)
+                            /*if (!Preferences.acceptedToU) {//new ContextThemeWrapper(context.createPackageContext("com.marz.snapprefs", Context.CONTEXT_IGNORE_SECURITY), R.style.AppCompatDialog)
                                 AlertDialog.Builder builder = new AlertDialog.Builder(SnapContext)
                                         .setTitle("ToU and Privacy Policy")
                                         .setMessage("You haven't accepted our Terms of Use and Privacy. Please read it carefully and accept it, otherwise you will not be able to use our product. Open the Snapprefs app to do that.")
@@ -283,7 +283,7 @@ public class HookMethods
                                 dialog.setCanceledOnTouchOutside(false);
                                 dialog.show();
                                 return;
-                            }
+                            }*/
                             boolean isNull;
                             isNull = SnapContext == null;
                             Logger.log("SNAPCONTEXT, NULL? - " + isNull, true);
