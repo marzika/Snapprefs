@@ -6,23 +6,11 @@ import android.os.FileObserver;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import de.robv.android.xposed.XSharedPreferences;
 
@@ -293,6 +281,41 @@ public class Preferences {
         return (int) getPref( storedDeviceId, Prefs.LICENCE.defaultVal);
     }
 
+
+    public static String getExternalPath() {
+        try {
+            Class<?> environmentcls = Class.forName("android.os.Environment");
+            Method setUserRequiredM = environmentcls.getMethod("setUserRequired", boolean.class);
+            setUserRequiredM.invoke(null, false);
+
+
+            return Environment.getExternalStorageDirectory().getAbsolutePath();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            Logger.log("Get external path exception", e);
+        }
+
+        return Environment.getExternalStorageDirectory().getAbsolutePath();
+    }
+
+    public static void updateBoolean(String settingKey, boolean state) {
+        File prefsFile = new File(
+                Environment.getDataDirectory(), "data/"
+                + "com.marz.snapprefs" + "/shared_prefs/" + "com.marz.snapprefs"
+                + "_preferences" + ".xml");
+
+        if( MainActivity.prefs == null )
+        {
+            Log.d("snapchat", "Updating preference");
+            MainActivity.prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.context);
+        }
+
+        SharedPreferences.Editor editor = MainActivity.prefs.edit();
+        editor.putBoolean(settingKey, state);
+        editor.commit();
+        prefsFile.setReadable(true, false);
+    }
+
     public enum Prefs
     {
         CUSTOM_FILTER("pref_key_force_navbar", false),
@@ -364,197 +387,6 @@ public class Preferences {
         {
             this.key = key;
             this.defaultVal = defaultVal;
-        }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    private static PreferenceParser preferenceParser;
-
-    public static String getExternalPath() {
-        try {
-            Class<?> environmentcls = Class.forName("android.os.Environment");
-            Method setUserRequiredM = environmentcls.getMethod("setUserRequired", boolean.class);
-            setUserRequiredM.invoke(null, false);
-
-
-            return Environment.getExternalStorageDirectory().getAbsolutePath();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            Logger.log("Get external path exception", e);
-        }
-
-        return Environment.getExternalStorageDirectory().getAbsolutePath();
-    }
-
-    public static void updateBoolean(String settingKey, boolean state) {
-        File prefsFile = new File(
-                Environment.getDataDirectory(), "data/"
-                + "com.marz.snapprefs" + "/shared_prefs/" + "com.marz.snapprefs"
-                + "_preferences" + ".xml");
-
-        if( MainActivity.prefs == null )
-        {
-            Log.d("snapchat", "Updating preference");
-            MainActivity.prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.context);
-        }
-
-        SharedPreferences.Editor editor = MainActivity.prefs.edit();
-        editor.putBoolean(settingKey, state);
-        editor.commit();
-        prefsFile.setReadable(true, false);
-    }
-
-    public static void printSettings() {
-
-        Logger.log("\nTo see the advanced output enable debugging mode in the Support tab", true);
-
-        Logger.log("\n~~~~~~~~~~~~ SNAPPREFS SETTINGS");
-        for( String key : preferenceMap.keySet() )
-        {
-            Object value = preferenceMap.get(key);
-
-            Logger.log( key + ": " + value);
-        }
-    }
-
-    public static class PreferenceParser {
-        private HashMap<String, Object> preferenceMap = new HashMap<>();
-        private String path;
-        private DocumentBuilderFactory builderFactory;
-
-        public PreferenceParser(String path) {
-            this.path = path;
-            this.builderFactory = DocumentBuilderFactory.newInstance();
-            preferenceMap = new HashMap<>();
-        }
-
-        public void loadPreferences() throws FileNotFoundException {
-            preferenceMap = new HashMap<>();
-            File prefsFile = new File(path);
-            Log.d("snapchat", "File dosn't exist: " + path);
-
-            if (!prefsFile.exists())
-                return;
-
-            try {
-
-                //Using factory get an instance of document builder
-                DocumentBuilder db = builderFactory.newDocumentBuilder();
-
-                //parse using builder to get DOM representation of the XML file
-                Document preferenceDocument = db.parse(prefsFile);
-
-                Element mainElement = preferenceDocument.getDocumentElement();
-                buildBooleanList(mainElement);
-                buildIntList(mainElement);
-                buildStringList(mainElement);
-            } catch (ParserConfigurationException pce) {
-                pce.printStackTrace();
-            } catch (SAXException se) {
-                se.printStackTrace();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            }
-        }
-
-        public void buildBooleanList(Element mainElement) {
-            NodeList nodeList = mainElement.getElementsByTagName("boolean");
-
-            if (nodeList != null) {
-                Log.d("snapchat", "Nodelist null");
-                for (int i = 0; i < nodeList.getLength(); i++) {
-                    Log.d("snapchat", "Looping nodelst");
-                    Element prefElement = (Element) nodeList.item(i);
-                    String prefKey = prefElement.getAttribute("name");
-                    String strValue = prefElement.getAttribute("value");
-                    boolean prefState = strValue.equalsIgnoreCase("true");
-                    preferenceMap.put(prefKey, prefState);
-                    Log.d("snapchat", "Found key: " + prefKey + " : " + prefState);
-                }
-            }
-        }
-
-        public void buildStringList(Element mainElement) {
-            NodeList nodeList = mainElement.getElementsByTagName("string");
-
-            if (nodeList != null) {
-                Log.d("snapchat", "Nodelist null");
-                for (int i = 0; i < nodeList.getLength(); i++) {
-                    Log.d("snapchat", "Looping nodelst");
-                    Element prefElement = (Element) nodeList.item(i);
-                    String prefKey = prefElement.getAttribute("name");
-                    String strState = prefElement.getFirstChild().getNodeValue();
-
-                    preferenceMap.put(prefKey, strState);
-                    Log.d("snapchat", "Found key: " + prefKey + " : " + strState);
-                }
-            }
-        }
-
-        public void buildIntList(Element mainElement) {
-            NodeList nodeList = mainElement.getElementsByTagName("int");
-
-            if (nodeList != null) {
-                Log.d("snapchat", "Nodelist null");
-                for (int i = 0; i < nodeList.getLength(); i++) {
-                    Log.d("snapchat", "Looping nodelst");
-                    Element prefElement = (Element) nodeList.item(i);
-                    String prefKey = prefElement.getAttribute("name");
-                    String strState = prefElement.getAttribute("value");
-
-                    try {
-                        int parsedStr = Integer.parseInt(strState);
-                        preferenceMap.put(prefKey, parsedStr);
-                        Log.d("snapchat", "Found key: " + prefKey + " : " + parsedStr);
-                    } catch( Exception e)
-                    {
-                        Log.d("snapchat", "Could not parse value: " + prefKey);
-                    }
-                }
-            }
-        }
-
-        public Object getPreference(String key, Object defaultVal) {
-            Object prefValue = preferenceMap.get(key);
-
-            if (prefValue == null)
-                return defaultVal;
-
-            return prefValue;
-        }
-
-        public void closeParser() {
-            preferenceMap.clear();
-        }
-
-        public HashMap<String, Object> getPreferenceMap() {
-            return preferenceMap;
         }
     }
 }
