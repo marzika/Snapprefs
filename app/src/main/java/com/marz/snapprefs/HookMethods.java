@@ -13,7 +13,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.InputFilter;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -503,8 +506,30 @@ public class HookMethods
                     if (Preferences.selectAll) {
                         HookSendList.initSelectAll(lpparam);
                     }
+                    findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "onKeyDownEvent", XposedHelpers.findClass(Obfuscator.flash.KEYEVENT_CLASS, lpparam.classLoader), new XC_MethodHook() {
+                        public boolean frontFlash = false;
+                        public long lastChange = System.currentTimeMillis();
 
-
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            //this.mIsVisible && this.n.e() != 0 && this.n.e() != 2 && !this.n.c()
+                            boolean isVisible = XposedHelpers.getBooleanField(param.thisObject, Obfuscator.flash.ISVISIBLE_FIELD);
+                            Object swipeLayout = XposedHelpers.getObjectField(param.thisObject, Obfuscator.flash.SWIPELAYOUT_FIELD);
+                            int resId = (int) XposedHelpers.callMethod(swipeLayout, Obfuscator.flash.GETRESID_METHOD);
+                            boolean c = (boolean) XposedHelpers.callMethod(swipeLayout, Obfuscator.flash.ISSCROLLED_METHOD);
+                            if (isVisible && resId != 0 && resId != 2 && !c) {
+                                int keycode = XposedHelpers.getIntField(param.args[0], Obfuscator.flash.KEYCODE_FIELD);
+                                if (keycode == KeyEvent.KEYCODE_VOLUME_UP) {
+                                    if (System.currentTimeMillis() - lastChange > 500) {
+                                        lastChange = System.currentTimeMillis();
+                                        frontFlash = !frontFlash;
+                                        XposedHelpers.callMethod(XposedHelpers.getObjectField(param.thisObject, Obfuscator.flash.OVERLAY_FIELD), Obfuscator.flash.FLASH_METHOD, new Class[]{boolean.class}, frontFlash);
+                                    }
+                                    param.setResult(null);
+                                }
+                            }
+                        }
+                    });
                 }
             });
         } catch (Exception e) {
