@@ -5,16 +5,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.provider.MediaStore;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import de.robv.android.xposed.XposedBridge;
 
@@ -28,11 +39,12 @@ public class NowPlaying {
     private static volatile String artist = "";
     private static volatile String album = "";
     private static volatile String title = "";
-    private static volatile String albumId = "";
+    private static volatile Bitmap albumArt;
     private static volatile boolean playing = false;
     private static volatile boolean isBitmapReady = false;
     private static View nowPlaying;
     private static Bitmap bitmap;
+    private static GetSpotifyTrackTask lastTask;
 
     public static void init() {
         Context myContext;
@@ -99,17 +111,15 @@ public class NowPlaying {
         //Scrobble Droid
         iF.addAction("net.jjc1138.android.scrobbler.action.MUSIC_STATUS");
         //Spotify
-//        iF.addAction("com.spotify.music.metadatachanged");
         iF.addAction("com.spotify.music.playbackstatechanged");
-//        iF.addAction("com.spotify.music.queuechanged");
         HookMethods.context.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                XposedBridge.log(intent.getAction());
-                for (String key : intent.getExtras().keySet()) {
-                    XposedBridge.log(key + ": " + intent.getExtras().get(key));
-                }
-                XposedBridge.log("----");
+//                XposedBridge.log(intent.getAction());
+//                for (String key : intent.getExtras().keySet()) {
+//                    XposedBridge.log(key + ": " + intent.getExtras().get(key));
+//                }
+//                XposedBridge.log("----");
                 String artist = intent.getStringExtra("artist");
                 if (artist == null) artist = "";
                 String album = intent.getStringExtra("album");
@@ -120,46 +130,39 @@ public class NowPlaying {
                     playing = intent.getBooleanExtra("playing", false);
                 } else if (title.isEmpty()) {
                     playing = false;
-                    return;
+                }
+                if (!playing) return;
+                if (intent.getAction().equalsIgnoreCase("com.spotify.music.playbackstatechanged") && !intent.getStringExtra("id").contains("spotify:local")) {
+                    String id = intent.getStringExtra("id").split(":")[2];
+                    if (lastTask == null || !id.equals(lastTask.id)) {
+                        if (lastTask != null)
+                            lastTask.cancel(true);
+                        lastTask = new GetSpotifyTrackTask(id);
+                    }
                 }
                 if (!NowPlaying.artist.equalsIgnoreCase(artist) || !NowPlaying.album.equalsIgnoreCase(album) || !NowPlaying.title.equalsIgnoreCase(title)) {
                     isBitmapReady = false;
+                    if (!intent.getAction().equalsIgnoreCase("com.spotify.music.playbackstatechanged")) {
+                        if (lastTask != null) lastTask.cancel(true);
+                        lastTask = new GetSpotifyTrackTask(artist, album, title);
+                    }
                 }
                 NowPlaying.artist = artist;
                 NowPlaying.album = album;
                 NowPlaying.title = title;
-                albumId = intent.getStringExtra("albumId");
-                playing = intent.getBooleanExtra("playing", true);
             }
         }, iF);
     }
 
     private static void generateBitmap() {
         if (bitmap == null)
-        bitmap = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+            bitmap = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bitmap);
         c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        try {
-//            Cursor cursor = HookMethods.context.getContentResolver().query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-//                    new String[]{MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM, MediaStore.Audio.Albums.ALBUM_ART},
-//                    /*MediaStore.Audio.Albums.ALBUM + "=?"*/"1=1",
-//                    new String[]{album},
-//                    null);
-//
-//            if (cursor != null) {
-//                while (cursor.moveToNext()) {
-//                    String path = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
-//                    String a = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM));
-//                    XposedBridge.log("Path: " + path + ", album: " + a);
-//                }
-//                cursor.close();
-//            }
-
-            //TODO: Album art!
-//        ((ImageView) nowPlaying.findViewById(R.id.albumImage)).setImageBitmap(albumArt);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
+        if (albumArt != null)
+            ((ImageView) nowPlaying.findViewById(R.id.albumImage)).setImageBitmap(albumArt);
+        else
+            ((ImageView) nowPlaying.findViewById(R.id.albumImage)).setImageResource(R.drawable.no_cover);
         ((TextView) nowPlaying.findViewById(R.id.album)).setText(album);
         ((TextView) nowPlaying.findViewById(R.id.title)).setText(title);
         ((TextView) nowPlaying.findViewById(R.id.artist)).setText(artist);
@@ -168,6 +171,7 @@ public class NowPlaying {
                 View.MeasureSpec.makeMeasureSpec(nowPlaying.getLayoutParams().height, View.MeasureSpec.EXACTLY));
         nowPlaying.layout(0, 0, WIDTH, HEIGHT);
         nowPlaying.draw(c);
+        isBitmapReady = true;
     }
 
     public static boolean isPlaying() {
@@ -179,4 +183,112 @@ public class NowPlaying {
             generateBitmap();
         return bitmap;
     }
+
+    static class GetSpotifyTrackTask extends AsyncTask<Void, Void, Bitmap> {
+
+        public static final String SPOTIFY_TRACKS = "https://api.spotify.com/v1/tracks/";
+        public static final String SPOTIFY_SEARCH = "https://api.spotify.com/v1/search?q=artist:%s+album:%s+track:%s&type=track";
+        private String artist;
+        private String album;
+        private String track;
+        private boolean search = false;
+        private String id = "";
+
+        public GetSpotifyTrackTask(String id) {
+            this.id = id;
+            execute();
+        }
+
+        public GetSpotifyTrackTask(String artist, String album, String track) {
+            this.artist = artist;
+            this.album = album;
+            this.track = track;
+            search = true;
+            execute();
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bmp) {
+            Bitmap oldOne = albumArt;
+            albumArt = bmp;
+            generateBitmap();
+            if (oldOne != null) oldOne.recycle();
+            Logger.log("Album art loaded!");
+        }
+
+        @Override
+        protected Bitmap doInBackground(Void... params) {
+            if (isCancelled()) return null;
+            String jsonString;
+            try {
+                String str;
+                if (!search) str = SPOTIFY_TRACKS + id;
+                else
+                    str = String.format(SPOTIFY_SEARCH, artist.replaceAll(" ", "+"), album.replaceAll(" ", "+"), track.replaceAll(" ", "+"));
+                Logger.log(str);
+                URL website = new URL(str);
+                HttpURLConnection connection = (HttpURLConnection) website.openConnection();
+                BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder response = new StringBuilder();
+                String inputLine;
+                while ((inputLine = in.readLine()) != null)
+                    response.append(inputLine);
+                in.close();
+                connection.disconnect();
+                jsonString = response.toString();
+            } catch (Throwable t) {
+                t.printStackTrace();
+                Logger.log("Failed to retrieve track info from spotify!");
+                Logger.log(t);
+                return null;
+            }
+            if (isCancelled()) return null;
+            String urlString;
+            try {
+                JSONObject json = new JSONObject(jsonString);
+                if (!search)
+                    urlString = json.getJSONObject("album").getJSONArray("images").getJSONObject(1).getString("url");
+                else {
+                    if (json.getJSONObject("tracks").getInt("total") == 1) {
+                        urlString = json.getJSONObject("tracks").getJSONArray("items").getJSONObject(0).getJSONObject("album").getJSONArray("images").getJSONObject(1).getString("url");
+                    } else return null;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Logger.log("Failed to parse response from spotify!");
+                Logger.log(e);
+                return null;
+            }
+            if (isCancelled()) return null;
+            InputStream input = null;
+            HttpURLConnection connection = null;
+            try {
+                URL url = new URL(urlString);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    Logger.log("Server returned HTTP " + connection.getResponseCode() + " " + connection.getResponseMessage());
+                    return null;
+                }
+                input = connection.getInputStream();
+                Bitmap bmp = BitmapFactory.decodeStream(input);
+                if (isCancelled()) return null;
+                return bmp;
+            } catch (Exception e) {
+                e.printStackTrace();
+                Logger.log("Failed to retrieve album art from spotify!");
+                Logger.log(e);
+                return null;
+            } finally {
+                try {
+                    if (input != null)
+                        input.close();
+                } catch (IOException ignored) {
+                }
+                if (connection != null)
+                    connection.disconnect();
+            }
+        }
+    }
+
 }
