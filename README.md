@@ -62,6 +62,7 @@ Current features are:
 - 10+ sec. recording
 - Force to show Lenses on older devices
 - Hide icon from every launcher
+- Now Playing filter
 
 Credits
 -------
