@@ -2,6 +2,7 @@ package com.marz.snapprefs;
 
 import android.content.Context;
 import android.content.res.XModuleResources;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.view.View;
@@ -16,20 +17,17 @@ import java.util.List;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
+import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
-import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
-import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
-import static de.robv.android.xposed.XposedHelpers.setAdditionalStaticField;
-import static de.robv.android.xposed.XposedHelpers.setStaticObjectField;
-
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class MultiFilter {
     public static ArrayList<String> added = new ArrayList<String>();
-    public static void initMultiFilter(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext){
+    private static Class<?> fc;
+    private static Class<?> el;
+
+    public static void initMultiFilter(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
         File myFile = new File(Environment.getExternalStorageDirectory() + "/Snapprefs/Filters/");
         myFile.mkdirs();
         final File[] files = myFile.listFiles(new FilenameFilter() {
@@ -41,25 +39,19 @@ public class MultiFilter {
         for (File f : files) {
             XposedBridge.log("Adding " + f.getName());
         }
-        final Class<?> fc = findClass(Obfuscator.filters.OBJECT_CLASS, lpparam.classLoader);
-        final Class<?> el = findClass(Obfuscator.filters.FILTER_CLASS, lpparam.classLoader); // e-> first param passed
+        NowPlaying.init();
+        fc = findClass(Obfuscator.filters.OBJECT_CLASS, lpparam.classLoader);
+        el = findClass(Obfuscator.filters.FILTER_CLASS, lpparam.classLoader);
         findAndHookMethod(Obfuscator.filters.LOADER_CLASS, lpparam.classLoader, "a", Context.class, findClass(Obfuscator.filters.LOADER_FIRST, lpparam.classLoader), new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 XposedBridge.log("Adding new filters");
+                if (NowPlaying.isPlaying()) {
+                    XposedBridge.log("Adding now playing");
+                    addFilter("NowPlaying", NowPlaying.getBitmap(), param);
+                }
                 for (File f : files) {
-                    //XposedBridge.log("Trying to add: " + f.toString());
-                    if(added.contains(f.toString())){
-                        continue;
-                    }
-                    Object elObj = XposedHelpers.newInstance(el, param.args[1]);
-                    View view = (View) XposedHelpers.callMethod(param.args[1], "a", new Class[]{int.class, ViewGroup.class, boolean.class}, Obfuscator.filters.BATTERY_VIEW, null, false); //battery_view 2130968587
-                    XposedHelpers.setObjectField(elObj, "a", view);
-                    ImageView image = (ImageView) XposedHelpers.callMethod(view, "findViewById", Obfuscator.filters.BATTERY_ICON); //"Battery" - battery_icon
-                    image.setImageBitmap(BitmapFactory.decodeFile(f.getPath()));
-                    image.setTranslationY(0);
-                    ((List) param.getResult()).add(XposedHelpers.newInstance(fc, elObj));
-                    added.add(f.toString());
+                    addFilter(f.toString(), BitmapFactory.decodeFile(f.getPath()), param);
                 }
             }
         });
@@ -70,5 +62,19 @@ public class MultiFilter {
                 XposedBridge.log("CLEARING ADDED");
             }
         });
+    }
+
+    private static void addFilter(String id, Bitmap bitmap, XC_MethodHook.MethodHookParam param) {
+        if (added.contains(id)) {
+            return;
+        }
+        Object elObj = XposedHelpers.newInstance(el, param.args[1]);
+        View view = (View) XposedHelpers.callMethod(param.args[1], "a", new Class[]{int.class, ViewGroup.class, boolean.class}, Obfuscator.filters.BATTERY_VIEW, null, false); //battery_view 2130968587
+        XposedHelpers.setObjectField(elObj, "a", view);
+        ImageView image = (ImageView) XposedHelpers.callMethod(view, "findViewById", Obfuscator.filters.BATTERY_ICON); //"Battery" - battery_icon
+        image.setImageBitmap(bitmap);
+        image.setTranslationY(0);
+        ((List) param.getResult()).add(XposedHelpers.newInstance(fc, elObj));
+        added.add(id);
     }
 }
