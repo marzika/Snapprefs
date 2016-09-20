@@ -20,7 +20,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -85,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String WEB_SERVER_URL = "http://snapprefs.com/gcm/register_user.php";
     private static final int ACTION_PLAY_SERVICES_DIALOG = 100;
     private static FileObserver observer;
+    private static UUID deviceUuid;
 
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
@@ -115,38 +115,25 @@ public class MainActivity extends AppCompatActivity {
 
     };
     private ArrayList<MenuItem> items = new ArrayList<>();
-    public static SharedPreferences prefs;
+    public static SharedPreferences prefs = null;
     private String gcmRegId;
     public static LensDatabaseHelper lensDBHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
-        final String tmDevice, tmSerial, androidId;
-        tmDevice = "" + tm.getDeviceId();
-        tmSerial = "" + tm.getSimSerialNumber();
-        androidId = "" + android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-
-        UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
-        String deviceId = deviceUuid.toString();
-        final String confirmationID = readStringPreference("confirmation_id");
         context = this;
         ChangeLog cl = new ChangeLog(context);
+        createDeviceId();
+
         if (cl.isFirstRun()) {
             cl.getLogDialog().show();
         }
-        final SharedPreferences prefs = getSharedPreferences();
 
-        File prefsFile = new File(
-                Environment.getDataDirectory(), "data/"
-                + getPackageName() + "/shared_prefs/" + getPackageName()
-                + "_preferences" + ".xml");
-        prefsFile.setReadable(true, false);
-        prefsFile.setWritable(true, false);
+        Preferences.loadMap(createPrefsIfNotExisting());
+        Preferences.initialiseListener(prefs);
 
-        observer = new FileObserver(prefsFile.getAbsolutePath()) {//this needs to be field, because as variable it will be garbage collected
+        /*observer = new FileObserver(prefsFile.getAbsolutePath()) {//this needs to be field, because as variable it will be garbage collected
             @Override
             public void onEvent(int event, String path) {
                 if (event == FileObserver.CLOSE_WRITE) {
@@ -162,10 +149,8 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-        observer.startWatching();
+        observer.startWatching();*/
 
-        Preferences.loadMap( prefs);
-        Preferences.initialiseListener(prefs);
         //Preferences.refreshSelectedPreferences(prefs);
 
         Log.d("snapchat", "Load lenses: " + prefs.contains("pref_key_load_lenses"));
@@ -229,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
             gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
 
             // Read saved registration id from shared preferences.
-            gcmRegId = getSharedPreferences().getString(PREF_GCM_REG_ID, "");
+            gcmRegId = createPrefsIfNotExisting().getString(PREF_GCM_REG_ID, "");
 
             if (TextUtils.isEmpty(gcmRegId)) {
                 handler.sendEmptyMessage(MSG_REGISTER_WITH_GCM);
@@ -241,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         AdView mAdView = (AdView) findViewById(R.id.adView);
         TextView pugs = (TextView) findViewById(R.id.pugs);
-        if (readLicense(deviceId, confirmationID) == 1 || readLicense(deviceId, confirmationID) == 2) {
+        if (Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 1 || Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 2) {
             mAdView.destroy();
             pugs.setVisibility(View.GONE);
             mAdView.setVisibility(View.GONE);
@@ -261,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         mNavigationView = (NavigationView) findViewById(R.id.fuckyou);
-        if (readLicense(deviceId, confirmationID) == 1 || readLicense(deviceId, confirmationID) == 2) {
+        if (Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 1 || Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 2) {
             mNavigationView.getMenu().getItem(1).getSubMenu().getItem(1).setEnabled(true);
             LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mDrawerLayout.getLayoutParams();
             lp.setMargins(0, 0, 0, 0);
@@ -371,7 +356,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CHOOSE_DIR && resultCode == Activity.RESULT_OK) {
                 String newLocation = data.getData().toString().substring(7);
 
-                SharedPreferences.Editor editor = getSharedPreferences().edit();
+                SharedPreferences.Editor editor = createPrefsIfNotExisting().edit();
                 editor.putString(PREF_KEY_SAVE_LOCATION, newLocation);
                 editor.apply();
 
@@ -381,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_HIDE_DIR && resultCode == Activity.RESULT_OK) {
                 String newHiddenLocation =  data.getData().toString().substring(7);
 
-                SharedPreferences.Editor editor = getSharedPreferences().edit();
+                SharedPreferences.Editor editor = createPrefsIfNotExisting().edit();
                 editor.putString(PREF_KEY_HIDE_LOCATION, "Last hidden: " + newHiddenLocation);
                 editor.apply();
 
@@ -413,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public int readLicense(String deviceID, String confirmationID) {
+    /*public int readLicense(String deviceID, String confirmationID) {
         int status;
         if (confirmationID != null) {
             SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
@@ -427,23 +412,55 @@ public class MainActivity extends AppCompatActivity {
             status = 0;
         }
         return status;
+    }*/
+
+    public void createDeviceId()
+    {
+        if(deviceUuid != null)
+            return;
+
+        final TelephonyManager tm = (TelephonyManager) this.getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+        final String tmDevice, tmSerial, androidId;
+        tmDevice = "" + tm.getDeviceId();
+        tmSerial = "" + tm.getSimSerialNumber();
+        androidId = "" + android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+
+        deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
+    }
+
+    public static String getDeviceId()
+    {
+        return deviceUuid != null ? deviceUuid.toString() : (String) Preferences.Prefs.DEVICE_ID.defaultVal;
     }
 
     public String readStringPreference(String key) {
-        SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
+        SharedPreferences prefs = getPrefereces();
         String returned = prefs.getString(key, null);
         return returned;
     }
 
-    private SharedPreferences getSharedPreferences() {
-        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    private SharedPreferences createPrefsIfNotExisting() {
+        File prefsFile = new File(
+            Environment.getDataDirectory(), "data/"
+            + getPackageName() + "/shared_prefs/" + getPackageName()
+            + "_preferences" + ".xml");
+        prefsFile.setReadable(true, false);
+        Log.d("snapchat", "Creating preference object : " + this.getPackageName());
 
+        if( prefs == null)
+            prefs = this.getSharedPreferences(this.getPackageName() + "_preferences", Activity.MODE_WORLD_READABLE);
+
+        return prefs;
+    }
+
+    public static SharedPreferences getPrefereces()
+    {
         return prefs;
     }
 
     public void saveInSharedPref(String result) {
         // TODO Auto-generated method stub
-        SharedPreferences.Editor editor = getSharedPreferences().edit();
+        SharedPreferences.Editor editor = createPrefsIfNotExisting().edit();
         editor.putString(PREF_GCM_REG_ID, result);
         editor.commit();
     }

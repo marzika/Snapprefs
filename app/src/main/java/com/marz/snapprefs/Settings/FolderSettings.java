@@ -4,10 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
+import com.marz.snapprefs.MainActivity;
 import com.nononsenseapps.filepicker.FilePickerActivity;
 
 import java.io.File;
@@ -16,7 +16,6 @@ import java.io.File;
  * Created by MARZ on 2016. 02. 11..
  */
 public class FolderSettings extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener  {
-    private SharedPreferences sharedPreferences;
     private int preferenceId;
     public static final String PREF_KEY_SAVE_LOCATION = "pref_key_save_location";
     public static final String PREF_KEY_HIDE_LOCATION = "pref_key_hide_location";
@@ -29,7 +28,7 @@ public class FolderSettings extends PreferenceFragmentCompat implements SharedPr
         getPreferenceManager().setSharedPreferencesMode(Context.MODE_WORLD_READABLE);
         addPreferencesFromResource(preferenceId);
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences sharedPreferences = MainActivity.getPrefereces();
         onSharedPreferenceChanged(sharedPreferences, PREF_KEY_SAVE_LOCATION);
         onSharedPreferenceChanged(sharedPreferences, PREF_KEY_HIDE_LOCATION);
         // Set onClickListener for choosing the Save Location

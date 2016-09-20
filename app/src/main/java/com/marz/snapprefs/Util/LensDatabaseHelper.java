@@ -54,8 +54,6 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
 
     public LensDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-
-        createIfNotExisting();
     }
 
     public static String formatExclusionList(ArrayList<String> list) {
@@ -96,10 +94,12 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public long getRowCount() {
+        createIfNotExisting();
         return DatabaseUtils.queryNumEntries(writeableDatabase, LensEntry.TABLE_NAME);
     }
 
     public void insertLens(LensData lensData) {
+        createIfNotExisting();
         Logger.log("Inserting new lens: " + lensData.mCode);
 
         long newRowId = writeableDatabase.insert(LensEntry.TABLE_NAME, null, lensData.getContent());
@@ -108,6 +108,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean containsLens(String mCode) {
+        createIfNotExisting();
         Logger.log("Getting lens from database");
 
         String selection = LensEntry.COLUMN_NAME_MCODE + " = ?";
@@ -135,6 +136,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean toggleLensActiveState(String mCode) throws Exception {
+        createIfNotExisting();
         Log.d("snapchat", "Toggling lens state");
         boolean activeState = !getLensActiveState(mCode);
         Log.d("snapchat", "Current state: " + activeState);
@@ -147,6 +149,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean getLensActiveState(String mCode) throws Exception {
+        createIfNotExisting();
         Log.d("snapchat", "Getting lens from database");
 
         String selection = LensEntry.COLUMN_NAME_MCODE + "=?";
@@ -182,6 +185,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public LensData getLens(String mCode) {
+        createIfNotExisting();
         Logger.log("Getting lens from database");
 
         String selection = LensEntry.COLUMN_NAME_MCODE + " = ?";
@@ -219,6 +223,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<LensData> getAllExcept(ArrayList<String> blacklist) {
+        createIfNotExisting();
         Logger.log("Getting all lenses from database");
 
         if (!requiresUpdate) {
@@ -259,6 +264,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public int getActiveLensCount() {
+        createIfNotExisting();
         Logger.log("Getting lens from database");
 
         String selection = LensEntry.COLUMN_NAME_ACTIVE + " = ?";
@@ -286,6 +292,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<LensData> getAllLenses() {
+        createIfNotExisting();
         if (!requiresUpdate) {
             Logger.log("Using lens cache");
             return lensCache;
@@ -319,6 +326,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void deleteLens(String mCode) {
+        createIfNotExisting();
         String selection = LensEntry.COLUMN_NAME_MCODE + " LIKE ?";
         String[] selectionArgs = {mCode};
 
@@ -329,11 +337,13 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void replaceLens(LensData lensData) {
+        createIfNotExisting();
         deleteLens(lensData.mCode);
         insertLens(lensData);
     }
 
     public void updateLens(String mCode, ContentValues values) {
+        createIfNotExisting();
 // Which row to update, based on the title
         String selection = LensEntry.COLUMN_NAME_MCODE + " = ?";
         String[] selectionArgs = {mCode};

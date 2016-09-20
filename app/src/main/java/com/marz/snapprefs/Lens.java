@@ -7,9 +7,9 @@ import android.graphics.BitmapFactory;
 import android.provider.BaseColumns;
 import android.util.Log;
 
+import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.LensData;
 import com.marz.snapprefs.Util.LensDatabaseHelper;
-import com.marz.snapprefs.Preferences.Prefs;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,7 +23,6 @@ import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
-import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
@@ -41,7 +40,6 @@ public class Lens {
     public static Object enumScheduledType;
     public static Class atzClass;
     public static HashMap<String, LensData> lensDataMap = new HashMap<>();
-    static XSharedPreferences prefs;
 
     static void initLens(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
         lensPrepareState = findClass("com.snapchat.android.util.eventbus.LensPrepareStateChangedEvent", lpparam.classLoader);

@@ -10,7 +10,6 @@ import android.content.res.XResources;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Environment;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.View;
@@ -19,8 +18,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.marz.snapprefs.Util.XposedUtils;
 import com.marz.snapprefs.Preferences.Prefs;
+import com.marz.snapprefs.Util.XposedUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -148,12 +147,6 @@ public class HookMethods
         mResources = XModuleResources.createInstance(startupParam.modulePath, null);
         //refreshPreferences();
         Logger.log("Init zygote");
-        File prefsFile = new File(
-                Environment.getDataDirectory(), "data/"
-                + HookMethods.PACKAGE_NAME + "/shared_prefs/" + HookMethods.PACKAGE_NAME
-                + "_preferences" + ".xml");
-        prefsFile.setReadable(true, false);
-        prefsFile.setWritable(true, false);
     }
 
     @Override
@@ -163,6 +156,10 @@ public class HookMethods
                 Logger.log("Skipping resource hooks: Same target package");
                 return;
             }
+
+            Object activityThread =
+                    callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
+            Context localContext = (Context) callMethod(activityThread, "getSystemContext");
 
             int name = R.id.name;
             int checkBox = R.id.checkBox;
@@ -183,14 +180,23 @@ public class HookMethods
             GroupDialog.group_item = XResources.getFakeResId(modRes, group_item);
             resparam.res.setReplacement(GroupDialog.group_item, modRes.fwd(group_item));
 
+            Log.d("snapchat", "Initialising preferences from xposed");
+
+            try {
+                if (Preferences.getMap() == null || Preferences.getMap().isEmpty()) {
+                    Log.d("snapchat", "Loading map from xposed");
+                    Preferences.loadMapFromXposed();
+                }
+            } catch( Exception e )
+            {
+                Log.e("snapchat", "EXCEPTION LOADING HOOKED PREFS");
+                e.printStackTrace();
+            }
+
             //mSavePath = Preferences.getExternalPath().getAbsolutePath() + "/Snapprefs";
             //mCustomFilterLocation = Preferences.getExternalPath().getAbsolutePath() + "/Snapprefs/Filters";
-            Preferences.loadMapFromXposed();
+            //Preferences.loadMapFromXposed();
             resParam = resparam;
-
-            Object activityThread =
-                    callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
-            Context localContext = (Context) callMethod(activityThread, "getSystemContext");
 
             // TODO Set up removal of button when mode is changed
             // Currently requires snapchat to restart to remove the button
@@ -244,6 +250,20 @@ public class HookMethods
                 XposedUtils.log("Exception while trying to get version info", e);
                 return;
             }
+
+            try {
+                Preferences.createXSPrefsIfNotExisting();
+
+                if (Preferences.getMap() == null || Preferences.getMap().size() <= 0) {
+                    Log.d("snapchat", "Loading map from exposed");
+                    Preferences.loadMapFromXposed();
+                }
+            } catch( Exception e )
+            {
+                Log.e("snapchat", "EXCEPTION LOADING HOOKED PREFS");
+                e.printStackTrace();
+            }
+
             findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -268,7 +288,7 @@ public class HookMethods
                     XC_MethodHook initHook = new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            Preferences.loadMapFromXposed();
+                            //Preferences.loadMapFromXposed();
                             SnapContext = (Activity) param.thisObject;
                             if (!Preferences.getBool(Prefs.ACCEPTED_TOU)) {//new ContextThemeWrapper(context.createPackageContext("com.marz.snapprefs", Context.CONTEXT_IGNORE_SECURITY), R.style.AppCompatDialog)
                                 AlertDialog.Builder builder = new AlertDialog.Builder(SnapContext)

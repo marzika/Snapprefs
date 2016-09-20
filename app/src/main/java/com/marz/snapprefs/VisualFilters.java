@@ -1,54 +1,42 @@
 package com.marz.snapprefs;
 
         import android.content.Context;
-        import android.graphics.Bitmap;
-        import android.graphics.Canvas;
-        import android.graphics.Color;
-        import android.graphics.Paint;
-        import android.graphics.PorterDuff;
-        import android.graphics.PorterDuffXfermode;
-        import android.os.Environment;
-        import android.support.v4.view.GravityCompat;
-        import android.view.Gravity;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.view.animation.LinearInterpolator;
-        import android.widget.TextView;
+import android.graphics.Bitmap;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
+import android.widget.TextView;
 
-        import java.io.File;
-        import java.util.ArrayList;
+import java.util.ArrayList;
 
-        import de.robv.android.xposed.XC_MethodHook;
-        import de.robv.android.xposed.XSharedPreferences;
-        import de.robv.android.xposed.XposedBridge;
-        import de.robv.android.xposed.XposedHelpers;
-        import de.robv.android.xposed.callbacks.XC_LoadPackage;
-        import jp.co.cyberagent.android.gpuimage.GPUImage;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IF1977Filter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFAmaroFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFBrannanFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFEarlybirdFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFHefeFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFHudsonFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFImageFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFInkwellFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFLomoFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFLordKelvinFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFNashvilleFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFRiseFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFSierraFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFSutroFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFToasterFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFValenciaFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFWaldenFilter;
-        import jp.co.cyberagent.android.gpuimage.sample.filter.IFXprollFilter;
+import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XSharedPreferences;
+import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
+import de.robv.android.xposed.callbacks.XC_LoadPackage;
+import jp.co.cyberagent.android.gpuimage.GPUImage;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IF1977Filter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFAmaroFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFBrannanFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFEarlybirdFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFHefeFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFHudsonFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFImageFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFInkwellFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFLomoFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFLordKelvinFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFNashvilleFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFRiseFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFSierraFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFSutroFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFToasterFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFValenciaFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFWaldenFilter;
+import jp.co.cyberagent.android.gpuimage.sample.filter.IFXprollFilter;
 
-        import static de.robv.android.xposed.XposedHelpers.callMethod;
-        import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
-        import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
-        import static de.robv.android.xposed.XposedHelpers.findClass;
-        import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
-        import static de.robv.android.xposed.XposedHelpers.getObjectField;
+import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+import static de.robv.android.xposed.XposedHelpers.findClass;
 
 
 public class VisualFilters {
@@ -357,10 +345,8 @@ public class VisualFilters {
 //        canvas.drawText(type.name(), 150, 150, paint);
     }
     static void refreshPreferences() {
-        prefs = new XSharedPreferences(new File(
-                Environment.getDataDirectory(), "data/"
-                + PACKAGE_NAME + "/shared_prefs/" + PACKAGE_NAME
-                + "_preferences" + ".xml"));
+        prefs = Preferences.createXSPrefsIfNotExisting();
+
         prefs.reload();
         mAmaro = prefs.getBoolean("AMARO", mAmaro);
         mF1997 = prefs.getBoolean("F1997", mF1997);

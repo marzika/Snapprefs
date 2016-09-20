@@ -13,10 +13,7 @@ import com.marz.snapprefs.Util.FileUtils;
 
 import java.util.Random;
 
-import de.robv.android.xposed.XSharedPreferences;
-
 public class Dialogs {
-    static XSharedPreferences prefs;
     static Random rColor = new Random();
     private static Context SnapContext;
     private static TextView editText;

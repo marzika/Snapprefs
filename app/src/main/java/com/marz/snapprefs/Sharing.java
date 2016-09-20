@@ -58,7 +58,7 @@ public class Sharing {
         findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                Preferences.loadMapFromXposed();
+                //Preferences.loadMapFromXposed();
                 XposedUtils.log("----------------- SNAPSHARE STARTED -----------------", false);
                 final Activity activity = (Activity) param.thisObject;
                 // Get intent, action and MIME type

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -39,18 +40,39 @@ public class Preferences {
     public static final int SPIN_EXCESS = 200;
 
     private static ConcurrentHashMap<String, Object> preferenceMap = new ConcurrentHashMap<>();
-    private static XSharedPreferences xSharedPreferences;
+    private static XSharedPreferences xSPrefs;
     private static FileObserver observer;
-    public static boolean hasLoaded = false;
+
+    public static XSharedPreferences createXSPrefsIfNotExisting()
+    {
+        Log.d("snapchat", "Loading preferences");
+
+        if( xSPrefs == null) {
+            Log.d("snapchat", "Null preferences... Creating new");
+            Log.d("snapchat", "Package name: " + HookMethods.PACKAGE_NAME);
+
+            File prefsFile = new File(
+                    Environment.getDataDirectory(), "data/"
+                    + HookMethods.class.getPackage().getName() + "/shared_prefs/" + HookMethods.class.getPackage().getName()
+                    + "_preferences" + ".xml");
+
+            if( prefsFile.exists()) {
+                prefsFile.setReadable(true, false);
+                Log.d("snapchat", "XPrefs file exists: " + prefsFile.getPath());
+            }
+
+            xSPrefs = new XSharedPreferences(HookMethods.PACKAGE_NAME, HookMethods.PACKAGE_NAME + "_preferences");
+        }
+
+        Log.d("snapchat", "Making readable");
+        xSPrefs.makeWorldReadable();
+
+        return xSPrefs;
+    }
 
     public static void loadMapFromXposed()
     {
-        File prefsFile = new File(
-                Environment.getDataDirectory(), "data/"
-                + "com.marz.snapprefs" + "/shared_prefs/" + "com.marz.snapprefs"
-                + "_preferences" + ".xml");
-
-        observer = new FileObserver(prefsFile.getAbsolutePath()) {//this needs to be field, because as variable it will be garbage collected
+        /*observer = new FileObserver(prefsFile.getAbsolutePath()) {//this needs to be field, because as variable it will be garbage collected
             @Override
             public void onEvent(int event, String path) {
                 if (event == FileObserver.CLOSE_WRITE) {
@@ -66,17 +88,11 @@ public class Preferences {
 
             }
         };
-        observer.startWatching();
+        observer.startWatching();*/
 
-        if( hasLoaded )
-            return;
+        createXSPrefsIfNotExisting();
 
-        if( xSharedPreferences == null ) {
-                        xSharedPreferences = new XSharedPreferences(HookMethods.PACKAGE_NAME,
-                    HookMethods.PACKAGE_NAME + "_preferences");
-        }
-
-        xSharedPreferences.reload();
+        xSPrefs.reload();
 
         try {
             int spinCount = 0;
@@ -86,18 +102,18 @@ public class Preferences {
             boolean triggerSpinExcess = false;
             int currentExcess = 0;
 
-            Log.d("snapchat", "Starting spin");
+            Log.v("snapchat", "Starting spin");
             do {
                 spinCount++;
 
                 if( (spinCount % 50) == 0)
-                    Log.d("snapchat", "Current spin count: " + spinCount);
+                    Log.v("snapchat", "Current spin count: " + spinCount);
 
                 if (spinCount > 35000)
                     break;
 
                 field.setAccessible(true);
-                mLoaded = (boolean) field.get(xSharedPreferences);
+                mLoaded = (boolean) field.get(xSPrefs);
 
                 if(mLoaded && !triggerSpinExcess)
                     triggerSpinExcess = true;
@@ -107,15 +123,14 @@ public class Preferences {
 
             } while (currentExcess < SPIN_EXCESS);
 
-            Log.d("snapchat", "Completed " + spinCount + " spins");
+            Log.v("snapchat", "Completed " + spinCount + " spins");
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
 
-        loadMap( xSharedPreferences );
-        hasLoaded = true;
+        loadMap(xSPrefs);
     }
 
     public static void initialiseListener( SharedPreferences sharedPreferences)
@@ -153,13 +168,31 @@ public class Preferences {
 
     public static void loadMap(SharedPreferences sharedPreferences)
     {
-        Log.d("snapchat", "loading preference map");
-        preferenceMap = new ConcurrentHashMap<>(sharedPreferences.getAll());
+        Log.d("snapchat", "loading preference map: " + (sharedPreferences != null));
 
-        for( String key : preferenceMap.keySet())
+        if( sharedPreferences == null )
+            return;
+
+        Map<String, ?> map = sharedPreferences.getAll();
+        Log.d("snapchat", "Map size: " + (map != null ? map.size() : "null"));
+
+        if( map == null) {
+            Log.d("snapchat", "Null map :(");
+            return;
+        }
+
+        //preferenceMap = new ConcurrentHashMap<>(map);
+        preferenceMap = new ConcurrentHashMap<>();
+        for( String key : map.keySet())
         {
-            Object obj = preferenceMap.get(key);
+            if( key == null)
+            {
+                Log.d("snapchat", "Null key");
+                continue;
+            }
+            Object obj = map.get(key);
             Log.d("snapchat", "Loaded preference: " + key + " val: " + obj);
+            preferenceMap.put(key, obj);
         }
     }
 
@@ -171,7 +204,7 @@ public class Preferences {
     public static Object getPref(String key, Object defaultVal){
         Object preferenceVal = preferenceMap.get( key );
 
-        Log.d("snapchat", "Preference key: " + key + " Value: " + preferenceVal);
+        //Log.d("snapchat", "Preference key: " + key + " Value: " + preferenceVal);
 
         if( preferenceVal == null)
             return defaultVal;
@@ -224,10 +257,40 @@ public class Preferences {
         return getBool(Prefs.SPEED ) || getBool(Prefs.TEXT_TOOLS) || getBool(Prefs.WEATHER);
     }
 
+    /**
+     * This method should be used exclusively in the Snapprefs threads - Not on a snapchat thread
+     * @param deviceId
+     * @return
+     */
+    public static int getLicenceUsingID(String deviceId)
+    {
+        String confirmationId = getString(Prefs.CONFIRMATION_ID);
+
+        if( confirmationId.equals(Prefs.CONFIRMATION_ID.defaultVal))
+            return 0;
+
+        String storedDeviceId = getString(Prefs.DEVICE_ID);
+
+        if( storedDeviceId == null || storedDeviceId.equals(Prefs.DEVICE_ID.defaultVal) ||
+                !storedDeviceId.equals(deviceId))
+            return 0;
+
+        return (int) getPref( storedDeviceId, Prefs.LICENCE.defaultVal);
+    }
+
     public static int getLicence()
     {
-        String deviceId = getString(Prefs.DEVICE_ID);
-        return (int) getPref( deviceId, Prefs.LICENCE.defaultVal);
+        String confirmationId = getString(Prefs.CONFIRMATION_ID);
+
+        if( confirmationId.equals(Prefs.CONFIRMATION_ID.defaultVal))
+            return 0;
+
+        String storedDeviceId = getString(Prefs.DEVICE_ID);
+
+        if( storedDeviceId == null || storedDeviceId.equals(Prefs.DEVICE_ID.defaultVal))
+            return 0;
+
+        return (int) getPref( storedDeviceId, Prefs.LICENCE.defaultVal);
     }
 
     public enum Prefs
@@ -354,7 +417,6 @@ public class Preferences {
                 Environment.getDataDirectory(), "data/"
                 + "com.marz.snapprefs" + "/shared_prefs/" + "com.marz.snapprefs"
                 + "_preferences" + ".xml");
-        prefsFile.setWritable(true, false);
 
         if( MainActivity.prefs == null )
         {
