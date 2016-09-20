@@ -506,13 +506,6 @@ public class HookMethods
                     if (Preferences.selectAll) {
                         HookSendList.initSelectAll(lpparam);
                     }
-                    final Object[] overlay = new Object[1];
-                    findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "onCreateView", LayoutInflater.class, ViewGroup.class, Bundle.class, new XC_MethodHook() {
-                        @Override
-                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            overlay[0] = XposedHelpers.getObjectField(param.thisObject, Obfuscator.flash.OVERLAY_FIELD);
-                        }
-                    });
                     findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "onKeyDownEvent", XposedHelpers.findClass(Obfuscator.flash.KEYEVENT_CLASS, lpparam.classLoader), new XC_MethodHook() {
                         public boolean frontFlash = false;
                         public long lastChange = System.currentTimeMillis();
@@ -530,7 +523,7 @@ public class HookMethods
                                     if (System.currentTimeMillis() - lastChange > 500) {
                                         lastChange = System.currentTimeMillis();
                                         frontFlash = !frontFlash;
-                                        XposedHelpers.callMethod(overlay[0], Obfuscator.flash.FLASH_METHOD, new Class[]{boolean.class}, frontFlash);
+                                        XposedHelpers.callMethod(XposedHelpers.getObjectField(param.thisObject, Obfuscator.flash.OVERLAY_FIELD), Obfuscator.flash.FLASH_METHOD, new Class[]{boolean.class}, frontFlash);
                                     }
                                     param.setResult(null);
                                 }
