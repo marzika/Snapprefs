@@ -26,12 +26,19 @@ import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 
 import com.marz.snapprefs.Util.CommonUtils;
+import com.marz.snapprefs.Util.FileUtils;
+import com.yalantis.ucrop.UCrop;
+import com.yalantis.ucrop.UCropActivity;
+
+import java.io.File;
 
 /**
  * This Activity has an intent-filter to receive images and videos.
@@ -53,24 +60,65 @@ public class ReceiveMediaActivity extends Activity implements DialogInterface.On
         String action = intent.getAction();
         String type = intent.getType();
 
-        if (type != null && Intent.ACTION_SEND.equals(action) && (type.startsWith("image/") || type.startsWith("video/"))) {
-            Uri mediaUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+        try {
+            if (type != null && Intent.ACTION_SEND.equals(action) && (type.startsWith("image/") || type.startsWith("video/"))) {
+                Uri mediaUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
 
-            if (mediaUri != null) {
-                Log.d(Common.LOG_TAG, "Received Media share of type " + type + "\nand URI " + mediaUri.toString() + "\nCalling hooked Snapchat with same Intent.");
-                if (CommonUtils.isModuleEnabled()) {
-                    intent.setComponent(ComponentName.unflattenFromString("com.snapchat.android/.LandingPageActivity"));
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                } else {
-                    createXposedDialog().show();
-                    finish = false;
+                if (mediaUri != null) {
+                    File directory = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Snapprefs/temp");
+                    directory.mkdirs();
+                    for (File f : directory.listFiles()) {
+                        if (f.getName().toLowerCase().startsWith("share")) f.delete();
+                    }
+                    File out = File.createTempFile("share", ".no_media", directory);
+                    Log.d(Common.LOG_TAG, "Received Media share of type " + type + "\nand URI " + mediaUri.toString() + "\nCalling hooked Snapchat with same Intent.");
+                    if (CommonUtils.isModuleEnabled()) {
+                        if (type.startsWith("image/")) {
+                            finish = false;
+                            UCrop.Options options = new UCrop.Options();
+                            options.setAllowedGestures(UCropActivity.ALL, UCropActivity.ALL, UCropActivity.ALL);
+                            options.setCompressionFormat(Bitmap.CompressFormat.PNG);
+                            options.setCompressionQuality(100);
+                            UCrop.of(mediaUri, Uri.fromFile(out))
+                                    .withAspectRatio(9, 16)
+                                    .withMaxResultSize(1080, 1920)
+                                    .withOptions(options)
+                                    .start(this);
+                        } else {
+                            FileUtils.saveStream(getContentResolver().openInputStream(mediaUri), out);
+                            intent.setComponent(ComponentName.unflattenFromString("com.snapchat.android/.LandingPageActivity"));
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(out));
+                            startActivity(intent);
+                        }
+                    } else {
+                        createXposedDialog().show();
+                        finish = false;
+                    }
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         // Finish this activity
         if (finish) {
             finish();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            final Uri resultUri = UCrop.getOutput(data);
+            Intent intent = getIntent();
+            intent.putExtra(Intent.EXTRA_STREAM, resultUri);
+            intent.setComponent(ComponentName.unflattenFromString("com.snapchat.android/.LandingPageActivity"));
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            final Throwable cropError = UCrop.getError(data);
+            cropError.printStackTrace();
         }
     }
 

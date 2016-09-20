@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion "23.0.2"
     useLibrary 'org.apache.http.legacy'
 
@@ -29,13 +29,14 @@ repositories {
 
 dependencies {
     provided files('lib/XposedBridgeApi-54.jar')
-    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.googlecode.mp4parser:isoparser:1.0.5.4'
     compile 'de.cketti.library.changelog:ckchangelog:1.2.2'
     compile 'com.google.android.gms:play-services:7.0.0'
     compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.3.0'
-    compile 'com.android.support:design:23.1.1'
-    compile 'com.android.support:preference-v7:23.1.1'
-    compile 'com.android.support:preference-v14:23.1.1'
+    compile 'com.android.support:design:24.2.1'
+    compile 'com.android.support:preference-v7:24.2.1'
+    compile 'com.android.support:preference-v14:24.2.1'
     compile 'com.nononsenseapps:filepicker:2.5.1'
+    compile 'com.yalantis:ucrop:2.2.0-native'
 }
