@@ -297,4 +297,14 @@ public class Obfuscator {
     public class paint{
         public static final String LEGACYCANVASVIEW_A = "BZ";
     }
+    public class flash {
+        public static final String ISVISIBLE_FIELD = "mIsVisible";
+        public static final String SWIPELAYOUT_FIELD = "n";
+        public static final String GETRESID_METHOD = "e";
+        public static final String ISSCROLLED_METHOD = "c";
+        public static final String KEYEVENT_CLASS = "CX";
+        public static final String KEYCODE_FIELD = "a";
+        public static final String FLASH_METHOD = "b";
+        public static final String OVERLAY_FIELD = "y";
+    }
 }
