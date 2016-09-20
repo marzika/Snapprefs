@@ -45,6 +45,7 @@ public class GroupDialogList extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         LinearLayout.LayoutParams linearparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         LinearLayout v = new LinearLayout(HookMethods.SnapContext);
+        v.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         v.setOrientation(LinearLayout.VERTICAL);
         v.setLayoutParams(linearparams);
 
