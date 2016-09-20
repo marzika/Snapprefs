@@ -3,8 +3,9 @@ package com.marz.snapprefs;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.os.FileObserver;
-import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.marz.snapprefs.Settings.MiscSettings;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -31,26 +32,25 @@ public class Preferences {
     private static XSharedPreferences xSPrefs;
     private static FileObserver observer;
 
-    public static XSharedPreferences createXSPrefsIfNotExisting()
-    {
+    public static XSharedPreferences createXSPrefsIfNotExisting() {
+        File prefsFile = new File(
+                Environment.getDataDirectory(), "data/"
+                + HookMethods.class.getPackage().getName() + "/shared_prefs/" + HookMethods.class.getPackage().getName()
+                + "_preferences" + ".xml");
+
+        if (prefsFile.exists()) {
+            prefsFile.setReadable(true, false);
+            Log.d("snapchat", "XPrefs file exists: " + prefsFile.getPath());
+        }
+
         Log.d("snapchat", "Loading preferences");
 
-        if( xSPrefs == null) {
+
             Log.d("snapchat", "Null preferences... Creating new");
             Log.d("snapchat", "Package name: " + HookMethods.PACKAGE_NAME);
 
-            File prefsFile = new File(
-                    Environment.getDataDirectory(), "data/"
-                    + HookMethods.class.getPackage().getName() + "/shared_prefs/" + HookMethods.class.getPackage().getName()
-                    + "_preferences" + ".xml");
-
-            if( prefsFile.exists()) {
-                prefsFile.setReadable(true, false);
-                Log.d("snapchat", "XPrefs file exists: " + prefsFile.getPath());
-            }
-
             xSPrefs = new XSharedPreferences(HookMethods.PACKAGE_NAME, HookMethods.PACKAGE_NAME + "_preferences");
-        }
+
 
         Log.d("snapchat", "Making readable");
         xSPrefs.makeWorldReadable();
@@ -58,8 +58,7 @@ public class Preferences {
         return xSPrefs;
     }
 
-    public static void loadMapFromXposed()
-    {
+    public static void loadMapFromXposed() {
         /*observer = new FileObserver(prefsFile.getAbsolutePath()) {//this needs to be field, because as variable it will be garbage collected
             @Override
             public void onEvent(int event, String path) {
@@ -78,7 +77,8 @@ public class Preferences {
         };
         observer.startWatching();*/
 
-        createXSPrefsIfNotExisting();
+
+            createXSPrefsIfNotExisting();
 
         xSPrefs.reload();
 
@@ -94,7 +94,7 @@ public class Preferences {
             do {
                 spinCount++;
 
-                if( (spinCount % 50) == 0)
+                if ((spinCount % 50) == 0)
                     Log.v("snapchat", "Current spin count: " + spinCount);
 
                 if (spinCount > 35000)
@@ -103,10 +103,10 @@ public class Preferences {
                 field.setAccessible(true);
                 mLoaded = (boolean) field.get(xSPrefs);
 
-                if(mLoaded && !triggerSpinExcess)
+                if (mLoaded && !triggerSpinExcess)
                     triggerSpinExcess = true;
 
-                if( triggerSpinExcess)
+                if (triggerSpinExcess)
                     currentExcess++;
 
             } while (currentExcess < SPIN_EXCESS);
@@ -121,164 +121,196 @@ public class Preferences {
         loadMap(xSPrefs);
     }
 
-    public static void initialiseListener( SharedPreferences sharedPreferences)
-    {
+    public static void initialiseListener(SharedPreferences sharedPreferences) {
         sharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sPrefs, String key) {
                 Log.d("snapchat", "SharedPreference changed: " + key);
-                Object preferenceVal = preferenceMap.get(key);
+                Prefs preference = Prefs.getPrefFromKey(key);
 
-                if( preferenceVal == null ) {
-                    Log.d("snapchat", "No value found in preferences: " + key);
+                if (preference == null) {
+                    Log.d("snapchat", "No value found in the internal preference list: " + key);
                     return;
                 }
 
-                Prefs[] prefsList = Prefs.values();
-
-                for( Prefs preference : prefsList)
-                {
-                    if(!key.equals(preference.key))
-                        continue;
-
-                    if( preferenceVal instanceof Boolean)
-                        setPref(preference, sPrefs.getBoolean(key, (boolean) preference.defaultVal));
-                    else if( preferenceVal instanceof String)
-                        setPref(preference, sPrefs.getString(key, (String) preference.defaultVal));
-                    else if(preferenceVal instanceof Integer)
-                       setPref(preference, sPrefs.getInt(key, (int) preference.defaultVal));
-
-                    break;
-                }
+                if (preference.defaultVal instanceof Boolean)
+                    setPref(preference, sPrefs.getBoolean(key, (boolean) preference.defaultVal));
+                else if (preference.defaultVal instanceof String)
+                    setPref(preference, sPrefs.getString(key, (String) preference.defaultVal));
+                else if (preference.defaultVal instanceof Integer)
+                    setPref(preference, sPrefs.getInt(key, (int) preference.defaultVal));
             }
         });
     }
 
-    public static void loadMap(SharedPreferences sharedPreferences)
-    {
+    public static void loadMap(SharedPreferences sharedPreferences) {
         Log.d("snapchat", "loading preference map: " + (sharedPreferences != null));
 
-        if( sharedPreferences == null )
+        if (sharedPreferences == null)
             return;
 
         Map<String, ?> map = sharedPreferences.getAll();
         Log.d("snapchat", "Map size: " + (map != null ? map.size() : "null"));
 
-        if( map == null) {
+        if (map == null) {
             Log.d("snapchat", "Null map :(");
             return;
         }
 
         //preferenceMap = new ConcurrentHashMap<>(map);
         preferenceMap = new ConcurrentHashMap<>();
-        for( String key : map.keySet())
-        {
-            if( key == null)
-            {
+        for (String key : map.keySet()) {
+            if (key == null) {
                 Log.d("snapchat", "Null key");
                 continue;
             }
             Object obj = map.get(key);
+
+            if (obj == null) {
+                Log.d("snapchat", "Loading null object for: " + key);
+                return;
+            }
             Log.d("snapchat", "Loaded preference: " + key + " val: " + obj);
             preferenceMap.put(key, obj);
         }
     }
 
-    public static ConcurrentHashMap<String, Object> getMap()
-    {
+    public static ConcurrentHashMap<String, Object> getMap() {
         return preferenceMap;
     }
 
-    public static Object getPref(String key, Object defaultVal){
-        Object preferenceVal = preferenceMap.get( key );
+    public static Object getPref(String key, Object defaultVal) {
+        Object preferenceVal = preferenceMap.get(key);
 
         //Log.d("snapchat", "Preference key: " + key + " Value: " + preferenceVal);
 
-        if( preferenceVal == null)
+        if (preferenceVal == null)
             return defaultVal;
 
         return preferenceVal;
     }
 
-    public static Object getPref(Prefs preference){
-        Object preferenceVal = preferenceMap.get( preference.key );
+    public static Object getPref(Prefs preference) {
+        Object preferenceVal = preferenceMap.get(preference.key);
 
         Log.d("snapchat", "Preference key: " + preference.key + " Value: " + preferenceVal);
 
-        if( preferenceVal == null)
+        if (preferenceVal == null)
             return preference.defaultVal;
 
         return preferenceVal;
     }
 
-    public static boolean getBool(Prefs preference)
-    {
+    public static boolean getBool(Prefs preference) {
         return (boolean) getPref(preference);
     }
 
-    public static String getString(Prefs preference)
-    {
+    public static String getString(Prefs preference) {
         return (String) getPref(preference);
     }
 
-    public static int getInt(Prefs preference)
-    {
+    public static int getInt(Prefs preference) {
         Object preferenceVal = getPref(preference);
 
-        if( preferenceVal instanceof String)
+        if (preferenceVal instanceof String)
             return Integer.parseInt((String) preferenceVal);
 
         return (int) preferenceVal;
     }
 
-    public static void setPref(String key, Object value) throws NullPointerException
-    {
+    public static void setPref(String key, Object value) throws NullPointerException {
         preferenceMap.put(key, value);
     }
 
-    public static void setPref(Prefs preference, Object value)
-    {
+    public static void setPref(Prefs preference, Object value) {
         preferenceMap.put(preference.key, value != null ? value : preference.defaultVal);
     }
 
-    public static boolean shouldAddGhost(){
-        return getBool(Prefs.SPEED ) || getBool(Prefs.TEXT_TOOLS) || getBool(Prefs.WEATHER);
+    public static void putContent(Map<String, Object> values)
+    {
+        SharedPreferences.Editor editor = MainActivity.prefs.edit();
+
+        for( String key : values.keySet() )
+        {
+            Object obj = values.get(key);
+
+            if( obj instanceof Integer )
+                editor.putInt(key, (Integer) obj);
+            else if( obj instanceof String)
+                editor.putString(key, (String) obj);
+            else if( obj instanceof Boolean)
+                editor.putBoolean(key, (boolean) obj);
+
+            preferenceMap.put(key, obj);
+        }
+
+        editor.commit();
+        updateProtection();
+    }
+    public static void putString(String key, String value) {
+        SharedPreferences.Editor editor = MainActivity.prefs.edit();
+        editor.putString(key, value);
+        if(editor.commit())
+            preferenceMap.put(key, value);
+
+        updateProtection();
+    }
+
+    public static void putBool(String key, boolean value) {
+        SharedPreferences.Editor editor = MainActivity.prefs.edit();
+        editor.putBoolean(key, value);
+        if(editor.commit())
+            preferenceMap.put(key, value);
+
+        updateProtection();
+    }
+
+    public static void putInt(String key, int value) {
+        SharedPreferences.Editor editor = MainActivity.prefs.edit();
+        editor.putInt(key, value);
+        if(editor.commit())
+            preferenceMap.put(key, value);
+
+        updateProtection();
+    }
+
+    public static boolean shouldAddGhost() {
+        return getBool(Prefs.SPEED) || getBool(Prefs.TEXT_TOOLS) || getBool(Prefs.WEATHER);
     }
 
     /**
      * This method should be used exclusively in the Snapprefs threads - Not on a snapchat thread
+     *
      * @param deviceId
      * @return
      */
-    public static int getLicenceUsingID(String deviceId)
-    {
+    public static int getLicenceUsingID(String deviceId) {
         String confirmationId = getString(Prefs.CONFIRMATION_ID);
 
-        if( confirmationId.equals(Prefs.CONFIRMATION_ID.defaultVal))
+        if (confirmationId.equals(Prefs.CONFIRMATION_ID.defaultVal))
             return 0;
 
         String storedDeviceId = getString(Prefs.DEVICE_ID);
 
-        if( storedDeviceId == null || storedDeviceId.equals(Prefs.DEVICE_ID.defaultVal) ||
+        if (storedDeviceId == null || storedDeviceId.equals(Prefs.DEVICE_ID.defaultVal) ||
                 !storedDeviceId.equals(deviceId))
             return 0;
 
-        return (int) getPref( storedDeviceId, Prefs.LICENCE.defaultVal);
+        return (int) getPref(storedDeviceId, Prefs.LICENCE.defaultVal);
     }
 
-    public static int getLicence()
-    {
+    public static int getLicence() {
         String confirmationId = getString(Prefs.CONFIRMATION_ID);
 
-        if( confirmationId.equals(Prefs.CONFIRMATION_ID.defaultVal))
+        if (confirmationId.equals(Prefs.CONFIRMATION_ID.defaultVal))
             return 0;
 
         String storedDeviceId = getString(Prefs.DEVICE_ID);
 
-        if( storedDeviceId == null || storedDeviceId.equals(Prefs.DEVICE_ID.defaultVal))
+        if (storedDeviceId == null || storedDeviceId.equals(Prefs.DEVICE_ID.defaultVal))
             return 0;
 
-        return (int) getPref( storedDeviceId, Prefs.LICENCE.defaultVal);
+        return (int) getPref(storedDeviceId, Prefs.LICENCE.defaultVal);
     }
 
 
@@ -298,26 +330,17 @@ public class Preferences {
         return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 
-    public static void updateBoolean(String settingKey, boolean state) {
+    public static void updateProtection() {
         File prefsFile = new File(
                 Environment.getDataDirectory(), "data/"
-                + "com.marz.snapprefs" + "/shared_prefs/" + "com.marz.snapprefs"
+                + MiscSettings.class.getPackage().getName() + "/shared_prefs/" + MiscSettings.class.getPackage().getName()
                 + "_preferences" + ".xml");
 
-        if( MainActivity.prefs == null )
-        {
-            Log.d("snapchat", "Updating preference");
-            MainActivity.prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.context);
-        }
-
-        SharedPreferences.Editor editor = MainActivity.prefs.edit();
-        editor.putBoolean(settingKey, state);
-        editor.commit();
-        prefsFile.setReadable(true, false);
+        if (prefsFile.exists())
+            prefsFile.setReadable(true, false);
     }
 
-    public enum Prefs
-    {
+    public enum Prefs {
         CUSTOM_FILTER("pref_key_force_navbar", false),
         PAINT_TOOLS("pref_key_paint_checkbox", true),
         MULTI_FILTER("pref_key_multi_filter_checkbox", true),
@@ -364,11 +387,30 @@ public class Preferences {
         CAPTION_UNLIMITED_FAT("pref_caption_unlimited_fat", false),
         CHECK_SIZE("pref_size_disabled", true),
         TIMBER("pref_timber", false),
+        VFILTER_AMARO("AMARO", false),
+        VFILTER_F1997("F1997", false),
+        VFILTER_BRANNAN("BRANNAN", false),
+        VFILTER_EARLYBIRD("EARLYBIRD", true),
+        VFILTER_HEFE("HEFE", false),
+        VFILTER_HUDSON("HUDSON", false),
+        VFILTER_INKWELL("INKWELL", false),
+        VFILTER_LOMO("LOMO", true),
+        VFILTER_LORD_KELVIN("LORD_KELVIN", false),
+        VFILTER_NASHVILLE("NASHVILLE", false),
+        VFILTER_RISE("RISE", true),
+        VFILTER_SIERRA("SIERRA", false),
+        VFILTER_SUTRO("SUTRO", false),
+        VFILTER_TOASTER("TOASTER", true),
+        VFILTER_VALENCIA("VALENCIA", false),
+        VFILTER_WALDEN("WALDEN", false),
+        VFILTER_XPROLL("XPROLL", false),
 
         SAVE_PATH("pref_key_save_location", getExternalPath() + "/Snapprefs"),
         CUSTOM_FILTER_LOCATION("", SAVE_PATH.defaultVal + "/FILTERS"),
         CONFIRMATION_ID("confirmation_id", ""),
         DEVICE_ID("device_id", ""),
+        PREF_KEY_SAVE_LOCATION("pref_key_save_location", ""),
+        PREF_KEY_HIDE_LOCATION("pref_key_hide_location", ""),
 
         SAVEMODE_SNAP("pref_key_save", SAVE_AUTO),
         SAVEMODE_STORY("pref_key_save_story", SAVE_AUTO),
@@ -383,10 +425,20 @@ public class Preferences {
         public String key;
         public Object defaultVal;
 
-        Prefs(String key, Object defaultVal)
-        {
+        Prefs(String key, Object defaultVal) {
             this.key = key;
             this.defaultVal = defaultVal;
+        }
+
+        public static Prefs getPrefFromKey(String key)
+        {
+            for(Prefs pref : Prefs.values())
+            {
+                if( pref.key.equals(key))
+                    return pref;
+            }
+
+            return null;
         }
     }
 }

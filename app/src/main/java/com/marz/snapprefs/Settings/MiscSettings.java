@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
@@ -51,11 +52,13 @@ public class MiscSettings extends PreferenceFragmentCompat {
         super.onPause();
 
         // Set preferences file permissions to be world readable
-        File sharedPrefsDir = new File(getActivity().getApplicationInfo().dataDir, "shared_prefs");
-        File sharedPrefsFile = new File(sharedPrefsDir, getPreferenceManager().getSharedPreferencesName() + ".xml");
-        if (sharedPrefsFile.exists()) {
-            sharedPrefsFile.setReadable(true, false);
-        }
+        File prefsFile = new File(
+                Environment.getDataDirectory(), "data/"
+                + MiscSettings.class.getPackage().getName() + "/shared_prefs/" + MiscSettings.class.getPackage().getName()
+                + "_preferences" + ".xml");
+
+        if (prefsFile.exists())
+            prefsFile.setReadable(true, false);
     }
 
     public MiscSettings setPreferenceId(int preferenceId) {

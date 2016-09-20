@@ -2,7 +2,6 @@ package com.marz.snapprefs.Util;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -15,7 +14,7 @@ import android.widget.Toast;
 import com.marz.snapprefs.Fragments.DownloadedFiltersFragment;
 import com.marz.snapprefs.Fragments.FilterFragment;
 import com.marz.snapprefs.Fragments.VisualFragment;
-import com.marz.snapprefs.MainActivity;
+import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.R;
 
 import org.apache.http.HttpResponse;
@@ -93,11 +92,9 @@ public class FilterPreview extends Activity {
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SharedPreferences sharedPreferences = MainActivity.getPrefereces();
-                SharedPreferences.Editor editor = sharedPreferences.edit();
                 if(imgId.equals("1997")) imgId = "F"+imgId;
-                editor.putBoolean(imgId, checkBox.isChecked());
-                editor.commit();
+
+                Preferences.putBool(imgId, checkBox.isChecked());
                 VisualFragment.refreshPreferences();
                 VisualFragment.addFilters();
             }

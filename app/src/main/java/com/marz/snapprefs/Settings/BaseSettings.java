@@ -3,6 +3,7 @@ package com.marz.snapprefs.Settings;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
 import java.io.File;
@@ -18,10 +19,25 @@ public class BaseSettings extends PreferenceFragmentCompat {
         super.onCreate(savedInstanceState);
         getPreferenceManager().setSharedPreferencesMode(Context.MODE_WORLD_READABLE);
         addPreferencesFromResource(preferenceId);
+
+        File prefsFile = new File(
+                Environment.getDataDirectory(), "data/"
+                + BaseSettings.class.getPackage().getName() + "/shared_prefs/" + BaseSettings.class.getPackage().getName()
+                + "_preferences" + ".xml");
+
+        if( prefsFile.exists())
+            prefsFile.setReadable(true, false);
     }
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
+        File prefsFile = new File(
+                Environment.getDataDirectory(), "data/"
+                + BaseSettings.class.getPackage().getName() + "/shared_prefs/" + BaseSettings.class.getPackage().getName()
+                + "_preferences" + ".xml");
+
+        if( prefsFile.exists())
+            prefsFile.setReadable(true, false);
     }
 
 
@@ -34,12 +50,15 @@ public class BaseSettings extends PreferenceFragmentCompat {
         super.onPause();
 
         // Set preferences file permissions to be world readable
-        File sharedPrefsDir = new File(getActivity().getApplicationInfo().dataDir, "shared_prefs");
-        File sharedPrefsFile = new File(sharedPrefsDir, getPreferenceManager().getSharedPreferencesName() + ".xml");
         getPreferenceManager().setSharedPreferencesMode(Activity.MODE_WORLD_READABLE);
-        /*if (sharedPrefsFile.exists()) {
-            sharedPrefsFile.setReadable(true, false);
-        }*/
+
+        File prefsFile = new File(
+                Environment.getDataDirectory(), "data/"
+                + BaseSettings.class.getPackage().getName() + "/shared_prefs/" + BaseSettings.class.getPackage().getName()
+                + "_preferences" + ".xml");
+
+        if( prefsFile.exists())
+            prefsFile.setReadable(true, false);
     }
 
     public BaseSettings setPreferenceId(int preferenceId) {

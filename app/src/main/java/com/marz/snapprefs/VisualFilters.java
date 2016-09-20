@@ -1,7 +1,8 @@
 package com.marz.snapprefs;
 
-        import android.content.Context;
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -35,6 +35,24 @@ import jp.co.cyberagent.android.gpuimage.sample.filter.IFValenciaFilter;
 import jp.co.cyberagent.android.gpuimage.sample.filter.IFWaldenFilter;
 import jp.co.cyberagent.android.gpuimage.sample.filter.IFXprollFilter;
 
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_AMARO;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_BRANNAN;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_EARLYBIRD;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_F1997;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_HEFE;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_HUDSON;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_INKWELL;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_LOMO;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_LORD_KELVIN;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_NASHVILLE;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_RISE;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_SIERRA;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_SUTRO;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_TOASTER;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_VALENCIA;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_WALDEN;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_XPROLL;
+import static com.marz.snapprefs.Preferences.createXSPrefsIfNotExisting;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 
@@ -45,24 +63,6 @@ public class VisualFilters {
     private static final String FILTER_TITLE = "filterTitle";
     private static final String NULLIFY_FLAG = "nullify";
     private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
-    private static boolean mAmaro = false;
-    private static boolean mF1997 = false;
-    private static boolean mBrannan = false;
-    private static boolean mEarlybird = true;
-    private static boolean mHefe = false;
-    private static boolean mHudson = false;
-    private static boolean mInkwell = false;
-    private static boolean mLomo = true;
-    private static boolean mLordKelvin = false;
-    private static boolean mNashville = false;
-    private static boolean mRise = true;
-    private static boolean mSierra = false;
-    private static boolean mSutro = false;
-    private static boolean mToaster = true;
-    private static boolean mValencia = false;
-    private static boolean mWalden = false;
-    private static boolean mXproll = false;
-    static XSharedPreferences prefs;
     public static ArrayList<String> added = new ArrayList<String>();
     public static ArrayList<String> added2 = new ArrayList<String>();
 
@@ -299,23 +299,23 @@ public class VisualFilters {
     }
 
     private static void setPreferences() {
-        FilterType.AMARO.setEnabled(mAmaro);
-        FilterType.F1997.setEnabled(mF1997);
-        FilterType.BRANNAN.setEnabled(mBrannan);
-        FilterType.EARLYBIRD.setEnabled(mEarlybird);
-        FilterType.HEFE.setEnabled(mHefe);
-        FilterType.HUDSON.setEnabled(mHudson);
-        FilterType.INKWELL.setEnabled(mInkwell);
-        FilterType.LOMO.setEnabled(mLomo);
-        FilterType.LORD_KELVIN.setEnabled(mLordKelvin);
-        FilterType.NASHVILLE.setEnabled(mNashville);
-        FilterType.RISE.setEnabled(mRise);
-        FilterType.SIERRA.setEnabled(mSierra);
-        FilterType.SUTRO.setEnabled(mSutro);
-        FilterType.TOASTER.setEnabled(mToaster);
-        FilterType.VALENCIA.setEnabled(mValencia);
-        FilterType.WALDEN.setEnabled(mWalden);
-        FilterType.XPROLL.setEnabled(mXproll);
+        FilterType.AMARO.setEnabled(Preferences.getBool(VFILTER_AMARO));
+        FilterType.F1997.setEnabled(Preferences.getBool(VFILTER_F1997));
+        FilterType.BRANNAN.setEnabled(Preferences.getBool(VFILTER_BRANNAN));
+        FilterType.EARLYBIRD.setEnabled(Preferences.getBool(VFILTER_EARLYBIRD));
+        FilterType.HEFE.setEnabled(Preferences.getBool(VFILTER_HEFE));
+        FilterType.HUDSON.setEnabled(Preferences.getBool(VFILTER_HUDSON));
+        FilterType.INKWELL.setEnabled(Preferences.getBool(VFILTER_INKWELL));
+        FilterType.LOMO.setEnabled(Preferences.getBool(VFILTER_LOMO));
+        FilterType.LORD_KELVIN.setEnabled(Preferences.getBool(VFILTER_LORD_KELVIN));
+        FilterType.NASHVILLE.setEnabled(Preferences.getBool(VFILTER_NASHVILLE));
+        FilterType.RISE.setEnabled(Preferences.getBool(VFILTER_RISE));
+        FilterType.SIERRA.setEnabled(Preferences.getBool(VFILTER_SIERRA));
+        FilterType.SUTRO.setEnabled(Preferences.getBool(VFILTER_SUTRO));
+        FilterType.TOASTER.setEnabled(Preferences.getBool(VFILTER_TOASTER));
+        FilterType.VALENCIA.setEnabled(Preferences.getBool(VFILTER_VALENCIA));
+        FilterType.WALDEN.setEnabled(Preferences.getBool(VFILTER_WALDEN));
+        FilterType.XPROLL.setEnabled(Preferences.getBool(VFILTER_XPROLL));
     }
 
     private static void applyFilter(Bitmap source, Bitmap result, FilterType type) {
@@ -345,25 +345,12 @@ public class VisualFilters {
 //        canvas.drawText(type.name(), 150, 150, paint);
     }
     static void refreshPreferences() {
-        prefs = Preferences.createXSPrefsIfNotExisting();
-
-        prefs.reload();
-        mAmaro = prefs.getBoolean("AMARO", mAmaro);
-        mF1997 = prefs.getBoolean("F1997", mF1997);
-        mBrannan  = prefs.getBoolean("BRANNAN", mBrannan );
-        mEarlybird   = prefs.getBoolean("EARLYBIRD", mEarlybird  );
-        mHefe  = prefs.getBoolean("HEFE", mHefe);
-        mHudson  = prefs.getBoolean("HUDSON", mHudson);
-        mInkwell  = prefs.getBoolean("INKWELL", mInkwell);
-        mLomo  = prefs.getBoolean("LOMO", mLomo);
-        mLordKelvin  = prefs.getBoolean("LORD_KELVIN", mLordKelvin);
-        mNashville  = prefs.getBoolean("NASHVILLE", mNashville);
-        mRise  = prefs.getBoolean("RISE", mRise);
-        mSierra  = prefs.getBoolean("SIERRA", mSierra);
-        mSutro  = prefs.getBoolean("SUTRO", mSutro);
-        mToaster  = prefs.getBoolean("TOASTER", mToaster);
-        mValencia  = prefs.getBoolean("VALENCIA", mValencia);
-        mWalden  = prefs.getBoolean("WALDEN", mWalden);
-        mXproll  = prefs.getBoolean("XPROLL", mXproll);
+        try
+        {
+            createXSPrefsIfNotExisting();
+        }catch( Exception e) {
+            Log.d("snapchat", "Something about VISUAL FILTERS");
+            return;
+        }
     }
 }

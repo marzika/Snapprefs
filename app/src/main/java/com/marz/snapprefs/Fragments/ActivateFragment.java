@@ -42,6 +42,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -394,23 +395,20 @@ public class ActivateFragment extends Fragment {
 
     private void saveLicense(String deviceID, String confirmationID, int i) {
         if (confirmationID != null) {
-            SharedPreferences.Editor editor = MainActivity.getPrefereces().edit();
-            editor.putString("device_id", deviceID);
-            editor.putInt(deviceID, i);
-            editor.apply();
+            HashMap<String, Object> map = new HashMap<>();
+            map.put( "device_id", deviceID);
+            map.put(deviceID, i);
+
+            Preferences.putContent(map);
         }
     }
 
     public void saveStringPreference(String key, String value) {
-        SharedPreferences.Editor editor = MainActivity.getPrefereces().edit();
-        editor.putString(key, value);
-        editor.apply();
+        Preferences.putString(key, value);
     }
 
     public void saveDeviceID(String value) {
-        SharedPreferences.Editor editor = MainActivity.getPrefereces().edit();
-        editor.putString("device_id", value);
-        editor.apply();
+        Preferences.putString("device_id", value);
     }
     public String readStringPreference(String key) {
         SharedPreferences prefs = MainActivity.getPrefereces();

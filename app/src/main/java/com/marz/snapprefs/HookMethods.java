@@ -13,9 +13,7 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -254,18 +252,10 @@ public class HookMethods
                 return;
             }
 
-            try {
-                Preferences.createXSPrefsIfNotExisting();
+            Preferences.createXSPrefsIfNotExisting();
+            Log.d("snapchat", "Loading map from exposed");
+            Preferences.loadMapFromXposed();
 
-                if (Preferences.getMap() == null || Preferences.getMap().size() <= 0) {
-                    Log.d("snapchat", "Loading map from exposed");
-                    Preferences.loadMapFromXposed();
-                }
-            } catch( Exception e )
-            {
-                Log.e("snapchat", "EXCEPTION LOADING HOOKED PREFS");
-                e.printStackTrace();
-            }
 
             findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
