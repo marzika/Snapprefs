@@ -14,15 +14,13 @@ import android.os.Environment;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.marz.snapprefs.Util.DebugUtils;
+import com.marz.snapprefs.Util.DebugHelper;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import org.apache.http.HttpResponse;
@@ -252,7 +250,7 @@ public class HookMethods
             findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    DebugUtils.init(lpparam);
+                    DebugHelper.init(lpparam);
                     Preferences.refreshPreferences();
                     Logger.log("makeWorldReadable: " + Preferences.prefs.makeWorldReadable(), true);
                     Preferences.printSettings();
@@ -532,6 +530,10 @@ public class HookMethods
                             }
                         }
                     });
+                    //disable auto advance
+                    //search for "AUTO_ADVANCE_RECENT_UPDATES"
+                    //commented as it can be right now by disabling it in dev settings
+                    //XposedHelpers.findAndHookMethod("abb", lpparam.classLoader, "a", XC_MethodReplacement.returnConstant(false));
                 }
             });
         } catch (Exception e) {
