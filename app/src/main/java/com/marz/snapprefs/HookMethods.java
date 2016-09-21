@@ -276,7 +276,7 @@ public class HookMethods
                             Preferences.refreshPreferences();
                             Preferences.prefs.makeWorldReadable();
                             SnapContext = (Activity) param.thisObject;
-                            if (!Preferences.acceptedToU) {//new ContextThemeWrapper(context.createPackageContext("com.marz.snapprefs", Context.CONTEXT_IGNORE_SECURITY), R.style.AppCompatDialog)
+                            /*if (!Preferences.acceptedToU) {//new ContextThemeWrapper(context.createPackageContext("com.marz.snapprefs", Context.CONTEXT_IGNORE_SECURITY), R.style.AppCompatDialog)
                                 AlertDialog.Builder builder = new AlertDialog.Builder(SnapContext)
                                         .setTitle("ToU and Privacy Policy")
                                         .setMessage("You haven't accepted our Terms of Use and Privacy. Please read it carefully and accept it, otherwise you will not be able to use our product. Open the Snapprefs app to do that.")
@@ -286,7 +286,19 @@ public class HookMethods
                                 dialog.setCanceledOnTouchOutside(false);
                                 dialog.show();
                                 return;
-                            }
+                            }*/
+
+                            // TODO: REMOVE BEFORE PULL REQUEST
+                            AlertDialog.Builder builder = new AlertDialog.Builder(SnapContext)
+                                    .setTitle("M1kep Custom Build feature/ProfileImageSaving v001")
+                                    .setMessage("This popup is used to confirm correct APK is installed.\nRefernce number is 001")
+                                    .setIcon(android.R.drawable.ic_dialog_alert);
+                            builder.setCancelable(true);
+                            final AlertDialog dialog = builder.create();
+                            dialog.setCanceledOnTouchOutside(true);
+                            dialog.show();
+                            // TODO: REMOVE BEFORE PULL REQUEST
+
                             boolean isNull;
                             isNull = SnapContext == null;
                             Logger.log("SNAPCONTEXT, NULL? - " + isNull, true);
