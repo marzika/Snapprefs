@@ -35,12 +35,15 @@ import jp.co.cyberagent.android.gpuimage.sample.filter.IFValenciaFilter;
 import jp.co.cyberagent.android.gpuimage.sample.filter.IFWaldenFilter;
 import jp.co.cyberagent.android.gpuimage.sample.filter.IFXprollFilter;
 
-import static com.marz.snapprefs.Preferences.Prefs.*;
-import static com.marz.snapprefs.Preferences.createXSPrefsIfNotExisting;
 
-import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
-import static de.robv.android.xposed.XposedHelpers.findClass;
-import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
+        import static de.robv.android.xposed.XposedHelpers.callMethod;
+        import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
+        import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+        import static de.robv.android.xposed.XposedHelpers.findClass;
+        import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
+        import static de.robv.android.xposed.XposedHelpers.getObjectField;
+        import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
+
 
 
 public class VisualFilters {

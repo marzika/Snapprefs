@@ -27,8 +27,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import de.robv.android.xposed.XposedBridge;
-
 /**
  * Created by stirante
  */
@@ -46,10 +44,25 @@ public class NowPlaying {
     private static Bitmap bitmap;
     private static GetSpotifyTrackTask lastTask;
     private static int layoutNumber = 0;
+    private static boolean landscape = false;
+
+    /**
+     * This is EXTREMELY slow, but works
+     */
+    private static void rotate(Bitmap source, Bitmap target) {
+        for (int x = 0; x < source.getWidth(); x++) {
+            for (int y = 0; y < source.getHeight(); y++) {
+                target.setPixel(source.getHeight() - y - 1, x, source.getPixel(x, y));
+            }
+        }
+    }
 
     public static void changeLayout() {
         layoutNumber++;
-        if (layoutNumber > 1) layoutNumber = 0;
+        if (layoutNumber > 1) {
+            layoutNumber = 0;
+//            landscape = !landscape;
+        }
         int id;
         switch (layoutNumber) {
             case 0:
@@ -142,11 +155,6 @@ public class NowPlaying {
         HookMethods.context.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-//                XposedBridge.log(intent.getAction());
-//                for (String key : intent.getExtras().keySet()) {
-//                    XposedBridge.log(key + ": " + intent.getExtras().get(key));
-//                }
-//                XposedBridge.log("----");
                 String artist = intent.getStringExtra("artist");
                 if (artist == null) artist = "";
                 String album = intent.getStringExtra("album");
@@ -184,20 +192,38 @@ public class NowPlaying {
     private static void generateBitmap() {
         if (bitmap == null)
             bitmap = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(bitmap);
-        c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        if (albumArt != null)
-            ((ImageView) nowPlaying.findViewById(R.id.albumImage)).setImageBitmap(albumArt);
-        else
-            ((ImageView) nowPlaying.findViewById(R.id.albumImage)).setImageResource(R.drawable.no_cover);
-        ((TextView) nowPlaying.findViewById(R.id.album)).setText(album);
-        ((TextView) nowPlaying.findViewById(R.id.title)).setText(title);
-        ((TextView) nowPlaying.findViewById(R.id.artist)).setText(artist);
-        nowPlaying.setLayoutParams(new RelativeLayout.LayoutParams(WIDTH, HEIGHT));
-        nowPlaying.measure(View.MeasureSpec.makeMeasureSpec(nowPlaying.getLayoutParams().width, View.MeasureSpec.EXACTLY),
-                View.MeasureSpec.makeMeasureSpec(nowPlaying.getLayoutParams().height, View.MeasureSpec.EXACTLY));
-        nowPlaying.layout(0, 0, WIDTH, HEIGHT);
-        nowPlaying.draw(c);
+        if (landscape) {
+            Bitmap bmp = Bitmap.createBitmap(HEIGHT, WIDTH, Bitmap.Config.ARGB_8888);
+            Canvas c = new Canvas(bmp);
+            if (albumArt != null)
+                ((ImageView) nowPlaying.findViewById(R.id.albumImage)).setImageBitmap(albumArt);
+            else
+                ((ImageView) nowPlaying.findViewById(R.id.albumImage)).setImageResource(R.drawable.no_cover);
+            ((TextView) nowPlaying.findViewById(R.id.album)).setText(album);
+            ((TextView) nowPlaying.findViewById(R.id.title)).setText(title);
+            ((TextView) nowPlaying.findViewById(R.id.artist)).setText(artist);
+            nowPlaying.setLayoutParams(new RelativeLayout.LayoutParams(HEIGHT, WIDTH));
+            nowPlaying.measure(View.MeasureSpec.makeMeasureSpec(nowPlaying.getLayoutParams().width, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(nowPlaying.getLayoutParams().height, View.MeasureSpec.EXACTLY));
+            nowPlaying.layout(0, 0, HEIGHT, WIDTH);
+            nowPlaying.draw(c);
+            rotate(bmp, bitmap);
+        } else {
+            Canvas c = new Canvas(bitmap);
+            c.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            if (albumArt != null)
+                ((ImageView) nowPlaying.findViewById(R.id.albumImage)).setImageBitmap(albumArt);
+            else
+                ((ImageView) nowPlaying.findViewById(R.id.albumImage)).setImageResource(R.drawable.no_cover);
+            ((TextView) nowPlaying.findViewById(R.id.album)).setText(album);
+            ((TextView) nowPlaying.findViewById(R.id.title)).setText(title);
+            ((TextView) nowPlaying.findViewById(R.id.artist)).setText(artist);
+            nowPlaying.setLayoutParams(new RelativeLayout.LayoutParams(WIDTH, HEIGHT));
+            nowPlaying.measure(View.MeasureSpec.makeMeasureSpec(nowPlaying.getLayoutParams().width, View.MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(nowPlaying.getLayoutParams().height, View.MeasureSpec.EXACTLY));
+            nowPlaying.layout(0, 0, WIDTH, HEIGHT);
+            nowPlaying.draw(c);
+        }
         isBitmapReady = true;
     }
 
@@ -252,7 +278,6 @@ public class NowPlaying {
                 if (!search) str = SPOTIFY_TRACKS + id;
                 else
                     str = String.format(SPOTIFY_SEARCH, artist.replaceAll(" ", "+"), album.replaceAll(" ", "+"), track.replaceAll(" ", "+"));
-                Logger.log(str);
                 URL website = new URL(str);
                 HttpURLConnection connection = (HttpURLConnection) website.openConnection();
                 BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
