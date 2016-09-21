@@ -219,7 +219,7 @@ public class Saving {
                             String username = (String) callMethod(FriendObject, Obfuscator.save.GET_FRIEND_USERNAME);
                             Object MEDIUM = getStaticObjectField(findClass(Obfuscator.save.PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS, lpparam.classLoader), "MEDIUM");
                             Object i = getObjectField(param.thisObject, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_FRIENDS_PROFILE_IMAGES_CACHE);
-                            List<Bitmap> profileImages = (List<Bitmap>) callMethod(i, "a", new Class[]{String.class, findClass(Obfuscator.save.PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS, lpparam.classLoader)}, username, MEDIUM);
+                            List<Bitmap> profileImages = (List<Bitmap>) callMethod(i, Obfuscator.save.PROFILE_IMAGES_CACHE_GET_PROFILE_IMAGES, new Class[]{String.class, findClass(Obfuscator.save.PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS, lpparam.classLoader)}, username, MEDIUM);
                             if (Preferences.debug) {
                                 XposedBridge.log("Object F: " + FriendObject + "\nObject i: " + i + "\nUsername: " + username + "\nMEDIUM: " + MEDIUM + "\nprofileImages: " + profileImages);
                             }
