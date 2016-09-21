@@ -43,8 +43,8 @@ public class GroupDataAdapter extends RecyclerView.Adapter<GroupDataAdapter.View
     public GroupDataAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                           int viewType) {
         // create a new view
-
-        View itemLayoutView = inflater.inflate(GroupDialog.group_item, null);
+        int group_item = (int) GroupDialog.group_item;
+        View itemLayoutView = inflater.inflate(group_item, null);
 
         // create ViewHolder
 
