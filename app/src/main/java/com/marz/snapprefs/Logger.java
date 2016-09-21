@@ -54,7 +54,7 @@ public class Logger {
 
         try {
             XposedBridge.log(message);
-        } catch( NoClassDefFoundError e)
+        } catch( Exception e)
         {
             Log.d("snapchat", message);
         }

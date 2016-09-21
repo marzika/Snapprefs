@@ -82,7 +82,6 @@ public class HookMethods
         MODULE_PATH = startupParam.modulePath;
         mResources = XModuleResources.createInstance(startupParam.modulePath, null);
         //refreshPreferences();
-        Logger.log("Init zygote");
     }
 
     @Override
