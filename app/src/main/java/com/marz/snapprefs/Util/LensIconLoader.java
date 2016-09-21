@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.ImageButton;
 
 import com.marz.snapprefs.Fragments.LensesFragment;
+import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.Preferences;
 
 import java.io.File;
@@ -41,7 +42,7 @@ public class LensIconLoader {
             context.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d("snapchat", "Loading image: " + url);
+                    Logger.log("Loading image: " + url);
                     button.setImageBitmap(bmp);
                     button.invalidate();
                 }
@@ -62,7 +63,7 @@ public class LensIconLoader {
 
         File iconFile = new File( iconDirectory, mCode + ".png");
 
-        Log.d("snapchat", "IconFile: " + iconFile.getPath());
+        Logger.log("IconFile: " + iconFile.getPath());
         if(iconFile.exists())
         {
             Bitmap bmp = loadBitmapFromFile( iconFile);

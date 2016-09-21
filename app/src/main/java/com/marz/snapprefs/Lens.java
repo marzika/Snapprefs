@@ -33,9 +33,9 @@ public class Lens {
     public static HashMap<String, LensData> lensDataMap = new HashMap<>();
 
     static void initLens(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
-        lensPrepareState = findClass("com.snapchat.android.util.eventbus.LensPrepareStateChangedEvent", lpparam.classLoader);
-        PrepareStatus = findClass("com.snapchat.android.util.eventbus.LensPrepareStateChangedEvent$PrepareStatus", lpparam.classLoader);
-        LensClass = findClass("com.snapchat.android.model.lenses.Lens", lpparam.classLoader);
+        lensPrepareState = findClass(Obfuscator.lens.LENSPREPARESTATECHANGE, lpparam.classLoader);
+        PrepareStatus = findClass(Obfuscator.lens.STATECHANGEPREPARESTATUSENUM, lpparam.classLoader);
+        LensClass = findClass(Obfuscator.lens.LENSCLASS, lpparam.classLoader);
         atzClass = findClass("atz", lpparam.classLoader);
         Class TypeClass = findClass("com.snapchat.android.model.lenses.Lens$Type", lpparam.classLoader);
         enumScheduledType = getStaticObjectField(TypeClass, "SCHEDULED");

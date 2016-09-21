@@ -68,7 +68,7 @@ public class HookedLayouts {
     public static ImageButton upload = null;
     public static RelativeLayout outerOptionsLayout = null;
 
-    public static boolean setInt = false;
+    public static boolean setInt = true;
     public static ImageButton saveSnapButton;
     public static ImageButton saveStoryButton;
 
@@ -84,6 +84,7 @@ public class HookedLayouts {
                 TextView orig1 =
                         (TextView) ((TableRow) navigation.getChildAt(0)).getChildAt(1);
                 TableRow row = new TableRow(navigation.getContext());
+                row.setTag("Hello");
                 row.setLayoutParams(navigation.getChildAt(0).getLayoutParams());
                 ImageView iv = new ImageView(navigation.getContext());
                 iv.setImageDrawable(mResources.getDrawable(R.drawable.profile_snapprefs));
@@ -109,10 +110,23 @@ public class HookedLayouts {
                 row.addView(iv);
                 row.addView(textView);
                 navigation.addView(row);
-                if (setInt) {
-                    setInt = true;
-                } else {//cheap ass fix
-                    navigation.removeView(row);
+
+                boolean containsRow = false;
+                for(int index=0; index< navigation.getChildCount(); ++index) {
+                    View nextChild = navigation.getChildAt(index);
+
+                    if( nextChild.getTag() != null && nextChild.getTag() instanceof String )
+                    {
+                        if( nextChild.getTag().equals("Hello"))
+                        {
+                            Logger.log("IT EQUALS IT MOTHA: " + containsRow);
+
+                            if( containsRow)
+                                navigation.removeView(nextChild);
+                            else
+                                containsRow = true;
+                        }
+                    }
                 }
             }
         });

@@ -191,10 +191,14 @@ public class Obfuscator {
         public static final String UPLOAD_ICON = "0x7f020022";
     }
     public class lens {
+        public static final String LENSCLASS = "com.snapchat.android.model.lenses.Lens";
         //ScheduledLensesProvider class
         public static final String LENSESPROVIDER_CLASS = "wr";
         //getLenses()
         public static final String LENSESPROVIDER_GETLENSES = "f";
+
+        public static final String LENSPREPARESTATECHANGE = "com.snapchat.android.util.eventbus.LensPrepareStateChangedEvent";
+        public static final String STATECHANGEPREPARESTATUSENUM = "com.snapchat.android.util.eventbus.LensPrepareStateChangedEvent$PrepareStatus";
     }
     public class stickers {
         //FastZippedAssetReader class

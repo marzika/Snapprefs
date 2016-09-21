@@ -54,10 +54,6 @@
             android:icon="@drawable/filter"
             android:title="Visual Filters / Filters" />
         <item
-            android:id="@+id/nav_item_chatlogs"
-            android:icon="@drawable/filter"
-            android:title="Chat Logs" />
-        <item
             android:id="@+id/nav_item_lenses"
             android:icon="@drawable/lenses"
             android:title="Lens Collector / Loader" />

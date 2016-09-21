@@ -3,7 +3,6 @@ package com.marz.snapprefs;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.os.FileObserver;
-import android.util.Log;
 
 import com.marz.snapprefs.Settings.MiscSettings;
 
@@ -40,19 +39,19 @@ public class Preferences {
 
         if (prefsFile.exists()) {
             prefsFile.setReadable(true, false);
-            Log.d("snapchat", "XPrefs file exists: " + prefsFile.getPath());
+            Logger.log("XPrefs file exists: " + prefsFile.getPath());
         }
 
-        Log.d("snapchat", "Loading preferences");
+        Logger.log("Loading preferences");
 
 
-            Log.d("snapchat", "Null preferences... Creating new");
-            Log.d("snapchat", "Package name: " + HookMethods.PACKAGE_NAME);
+            Logger.log("Null preferences... Creating new");
+            Logger.log("Package name: " + HookMethods.PACKAGE_NAME);
 
             xSPrefs = new XSharedPreferences(HookMethods.PACKAGE_NAME, HookMethods.PACKAGE_NAME + "_preferences");
 
 
-        Log.d("snapchat", "Making readable");
+        Logger.log("Making readable");
         xSPrefs.makeWorldReadable();
 
         return xSPrefs;
@@ -63,15 +62,15 @@ public class Preferences {
             @Override
             public void onEvent(int event, String path) {
                 if (event == FileObserver.CLOSE_WRITE) {
-                    Log.d("snapchat", "HOOKED Observer: CLOSE_WRITE");
+                    Logger.log("HOOKED Observer: CLOSE_WRITE");
                 } else if( event == FileObserver.CLOSE_NOWRITE)
-                    Log.d("snapchat", "HOOKED Observer: CLOSE_NOWRITE");
+                    Logger.log("HOOKED Observer: CLOSE_NOWRITE");
                 else if( event == FileObserver.ACCESS)
-                    Log.d("snapchat", "HOOKED Observer: ACCESS");
+                    Logger.log("HOOKED Observer: ACCESS");
                 else if( event == FileObserver.OPEN)
-                    Log.d("snapchat", "HOOKED Observer: OPEN");
+                    Logger.log("HOOKED Observer: OPEN");
                 else if( event == FileObserver.CREATE)
-                    Log.d("snapchat", "HOOKED Observer: CREATE");
+                    Logger.log("HOOKED Observer: CREATE");
 
             }
         };
@@ -90,12 +89,12 @@ public class Preferences {
             boolean triggerSpinExcess = false;
             int currentExcess = 0;
 
-            Log.v("snapchat", "Starting spin");
+            Logger.log("Starting spin");
             do {
                 spinCount++;
 
-                if ((spinCount % 50) == 0)
-                    Log.v("snapchat", "Current spin count: " + spinCount);
+                if ((spinCount % 100) == 0)
+                    Logger.log("Current spin count: " + spinCount);
 
                 if (spinCount > 35000)
                     break;
@@ -111,7 +110,7 @@ public class Preferences {
 
             } while (currentExcess < SPIN_EXCESS);
 
-            Log.v("snapchat", "Completed " + spinCount + " spins");
+            Logger.log("Completed " + spinCount + " spins");
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (NoSuchFieldException e) {
@@ -125,11 +124,11 @@ public class Preferences {
         sharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sPrefs, String key) {
-                Log.d("snapchat", "SharedPreference changed: " + key);
+                Logger.log("SharedPreference changed: " + key);
                 Prefs preference = Prefs.getPrefFromKey(key);
 
                 if (preference == null) {
-                    Log.d("snapchat", "No value found in the internal preference list: " + key);
+                    Logger.log("No value found in the internal preference list: " + key);
                     return;
                 }
 
@@ -144,16 +143,16 @@ public class Preferences {
     }
 
     public static void loadMap(SharedPreferences sharedPreferences) {
-        Log.d("snapchat", "loading preference map: " + (sharedPreferences != null));
+        Logger.log("loading preference map: " + (sharedPreferences != null));
 
         if (sharedPreferences == null)
             return;
 
         Map<String, ?> map = sharedPreferences.getAll();
-        Log.d("snapchat", "Map size: " + (map != null ? map.size() : "null"));
+        Logger.log("Map size: " + (map != null ? map.size() : "null"));
 
         if (map == null) {
-            Log.d("snapchat", "Null map :(");
+            Logger.log("Null map :(");
             return;
         }
 
@@ -161,16 +160,16 @@ public class Preferences {
         preferenceMap = new ConcurrentHashMap<>();
         for (String key : map.keySet()) {
             if (key == null) {
-                Log.d("snapchat", "Null key");
+                Logger.log("Null key");
                 continue;
             }
             Object obj = map.get(key);
 
             if (obj == null) {
-                Log.d("snapchat", "Loading null object for: " + key);
+                Logger.log("Loading null object for: " + key);
                 return;
             }
-            Log.d("snapchat", "Loaded preference: " + key + " val: " + obj);
+            Logger.log("Loaded preference: " + key + " val: " + obj);
             preferenceMap.put(key, obj);
         }
     }
@@ -182,8 +181,6 @@ public class Preferences {
     public static Object getPref(String key, Object defaultVal) {
         Object preferenceVal = preferenceMap.get(key);
 
-        //Log.d("snapchat", "Preference key: " + key + " Value: " + preferenceVal);
-
         if (preferenceVal == null)
             return defaultVal;
 
@@ -192,8 +189,6 @@ public class Preferences {
 
     public static Object getPref(Prefs preference) {
         Object preferenceVal = preferenceMap.get(preference.key);
-
-        Log.d("snapchat", "Preference key: " + preference.key + " Value: " + preferenceVal);
 
         if (preferenceVal == null)
             return preference.defaultVal;
@@ -240,11 +235,17 @@ public class Preferences {
                 editor.putString(key, (String) obj);
             else if( obj instanceof Boolean)
                 editor.putBoolean(key, (boolean) obj);
-
-            preferenceMap.put(key, obj);
         }
 
-        editor.commit();
+        if( editor.commit())
+        {
+            for( String key : values.keySet())
+            {
+                Object obj = values.get(key);
+                preferenceMap.put(key, obj);
+            }
+        }
+
         updateProtection();
     }
     public static void putString(String key, String value) {
@@ -373,7 +374,7 @@ public class Preferences {
         TIMER_COUNTER("pref_key_timercounter", false),
         CHAT_AUTO_SAVE("pref_key_save_chat_text", false),
         CHAT_MEDIA_SAVE("pref_key_save_chat_image", false),
-        INTEGRATION("pref_key_integration", false),
+        INTEGRATION("pref_key_integration", true),
         BUTTON_POSITION("pref_key_save_button_position", false),
         LENSES_LOAD("pref_key_load_lenses", true),
         LENSES_COLLECT("pref_key_collect_lenses", true),

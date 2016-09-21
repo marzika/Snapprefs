@@ -22,7 +22,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -38,7 +37,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.marz.snapprefs.Tabs.BuyTabFragment;
-import com.marz.snapprefs.Tabs.ChatLogsTabFragment;
 import com.marz.snapprefs.Tabs.DataTabFragment;
 import com.marz.snapprefs.Tabs.DeluxeTabFragment;
 import com.marz.snapprefs.Tabs.FiltersTabFragment;
@@ -154,41 +152,21 @@ public class MainActivity extends AppCompatActivity {
             cl.getLogDialog().show();
         }
 
-        Log.d("snapchat", "MainActivity: createPrefsIfNotExisting");
+        Logger.log("MainActivity: createPrefsIfNotExisting");
         createPrefsIfNotExisting();
 
         if (Preferences.getMap() == null || Preferences.getMap().isEmpty()) {
-            Log.d("snapchat", "MainActivity: Map is null or empty: Loading new");
+            Logger.log("MainActivity: Map is null or empty: Loading new");
             Preferences.loadMap(prefs);
         }
 
-        Log.d("snapchat", "MainActivity: initialiseListener");
+        Logger.log("MainActivity: initialiseListener");
         Preferences.initialiseListener(prefs);
 
-        /*observer = new FileObserver(prefsFile.getAbsolutePath()) {//this needs to be field, because as variable it will be garbage collected
-            @Override
-            public void onEvent(int event, String path) {
-                if (event == FileObserver.CLOSE_WRITE) {
-                    Log.d("snapchat", "MAIN Observer: CLOSE_WRITE");
-                } else if( event == FileObserver.CLOSE_NOWRITE)
-                    Log.d("snapchat", "MAIN Observer: CLOSE_NOWRITE");
-                else if( event == FileObserver.ACCESS)
-                    Log.d("snapchat", "MAIN Observer: ACCESS");
-                else if( event == FileObserver.OPEN)
-                    Log.d("snapchat", "MAIN Observer: OPEN");
-                else if( event == FileObserver.CREATE)
-                    Log.d("snapchat", "MAIN Observer: CREATE");
-
-            }
-        };
-        observer.startWatching();*/
-
-        //Preferences.refreshSelectedPreferences(prefs);
-
-        Log.d("snapchat", "Load lenses: " + prefs.contains("pref_key_load_lenses"));
+        Logger.log("Load lenses: " + prefs.contains("pref_key_load_lenses"));
 
 
-        Log.d("snapchat", "SAVE LOCATION: " + Preferences.getString(Preferences.Prefs.SAVE_PATH));
+        Logger.log("SAVE LOCATION: " + Preferences.getString(Preferences.Prefs.SAVE_PATH));
         if (!Preferences.getBool(Preferences.Prefs.ACCEPTED_TOU)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context)
                     .setTitle("ToU and Privacy Policy")
@@ -384,9 +362,6 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_item_filters:
                     cache.put(id, new FiltersTabFragment());
                     break;
-                case R.id.nav_item_chatlogs:
-                    cache.put(id, new ChatLogsTabFragment());
-                    break;
                 case R.id.nav_item_lenses:
                     cache.put(id, new LensesTabFragment());
                     break;
@@ -466,7 +441,7 @@ public class MainActivity extends AppCompatActivity {
                 + getPackageName() + "/shared_prefs/" + getPackageName()
                 + "_preferences" + ".xml");
         prefsFile.setReadable(true, false);
-        Log.d("snapchat", "Creating preference object : " + this.getPackageName());
+        Logger.log("Creating preference object : " + this.getPackageName());
 
         prefs = this.getSharedPreferences(this.getPackageName() + "_preferences", Activity.MODE_WORLD_READABLE);
 

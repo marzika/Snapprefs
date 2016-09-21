@@ -20,6 +20,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.marz.snapprefs.Common;
+import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.MainActivity;
 import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.Preferences.Prefs;
@@ -58,13 +59,13 @@ public class LensesFragment extends Fragment {
                 public void onClick(View v) {
                     ImageButton btn = (ImageButton) v;
                     String mCode = (String) btn.getTag();
-                    Log.d("snapchat", "Something happening: " + mCode);
+                    Logger.log("Clicked lens item: " + mCode);
                     try {
                         boolean activeState = MainActivity.lensDBHelper.toggleLensActiveState(mCode);
                         btn.setBackgroundColor(Color.argb(activeState ? 150 : 0, 0, 200, 0));
                         btn.invalidate();
                     } catch (Exception e) {
-                        Log.d("snapchat", "No lens found with code: " + mCode + "\n" + e.getMessage());
+                        Logger.log("No lens found with code: " + mCode + "\n" + e.getMessage());
                     }
                 }
             });

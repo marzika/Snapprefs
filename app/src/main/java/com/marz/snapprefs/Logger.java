@@ -54,9 +54,9 @@ public class Logger {
 
         try {
             XposedBridge.log(message);
-        } catch( Error e)
+        } catch( Throwable e)
         {
-            Log.d("snapchat", message);
+            Log.d("SNAPPREFS", message);
         }
     }
 
@@ -118,7 +118,13 @@ public class Logger {
      * @param throwable The throwable to log
      */
     public static void log(Throwable throwable) {
-        XposedBridge.log(throwable);
+        try {
+            XposedBridge.log(throwable);
+        } catch( Throwable t )
+        {
+            Log.e("SNAPPREFS", "Throwable: " + t.getMessage());
+            t.printStackTrace();
+        }
     }
 
     /**

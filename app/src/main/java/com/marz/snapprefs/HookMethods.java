@@ -115,11 +115,11 @@ public class HookMethods
             GroupDialog.group_item = XResources.getFakeResId(modRes, group_item);
             resparam.res.setReplacement(GroupDialog.group_item, modRes.fwd(group_item));
 
-            Log.d("snapchat", "Initialising preferences from xposed");
+            Logger.log("Initialising preferences from xposed");
 
             try {
                 if (Preferences.getMap() == null || Preferences.getMap().isEmpty()) {
-                    Log.d("snapchat", "Loading map from xposed");
+                    Logger.log("Loading map from xposed");
                     Preferences.loadMapFromXposed();
                 }
             } catch( Exception e )
@@ -187,7 +187,7 @@ public class HookMethods
             }
 
             Preferences.createXSPrefsIfNotExisting();
-            Log.d("snapchat", "Loading map from exposed");
+            Logger.log("Loading map from exposed");
             Preferences.loadMapFromXposed();
 
 
@@ -195,7 +195,7 @@ public class HookMethods
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     DebugHelper.init(lpparam);
-                    Log.d("snapchat", "Application hook: " + param.thisObject.getClass().getCanonicalName());
+                    Logger.log("Application hook: " + param.thisObject.getClass().getCanonicalName());
 
                     //Preferences.loadMapFromXposed();
                     //Logger.log("makeWorldReadable: " + Preferences.prefs.makeWorldReadable(), true);
