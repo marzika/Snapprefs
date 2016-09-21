@@ -127,6 +127,17 @@ public class Obfuscator {
         public static final String SWIPEUPARROWVIEW_SETONCLICK = "setTouchAreaOnClickListener";//?
         //stories_mystoryoverlaysave_icon
         public static final String STORIES_MYOVERLAYSAVE_ICON = "0x7f02030e";
+        // Get Username function of Friend Class
+        public static final String GET_FRIEND_USERNAME = "g";
+        // com.snapchat.android.fragments.FriendMiniProfilePopupFragment Friend Field
+        public static final String FRIEND_MINI_PROFILE_POPUP_FRIEND_FIELD = "F";
+        // com.snapchat.android.fragments.FriendMiniProfilePopupFragement getCachedProfilePicutres method
+        public static final String FRIEND_MINI_PROFILE_POPUP_GET_CACHED_PROFILE_PICTURES = "y";
+        // com.snapchat.android.fragments.FriendMiniProfilePopupFragement FriendsProfileImagesCache field
+        public static final String FRIEND_MINI_PROFILE_POPUP_FRIENDS_PROFILE_IMAGES_CACHE = "i";
+        public static final String PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS = "com.snapchat.android.util.profileimages.ProfileImageUtils$ProfileImageSize";
+
+
     }
     public class datasaving {
         public static final String DSNAPDOWNLOADER_CLASS = "KL";
