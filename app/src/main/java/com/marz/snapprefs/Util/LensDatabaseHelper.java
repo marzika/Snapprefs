@@ -10,7 +10,6 @@ import android.util.Log;
 
 import com.marz.snapprefs.Lens;
 import com.marz.snapprefs.Lens.LensEntry;
-import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.Preferences;
 
 import java.util.ArrayList;
@@ -100,23 +99,23 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
 
     public void insertLens(LensData lensData) {
         createIfNotExisting();
-        Logger.log("Inserting new lens: " + lensData.mCode);
+        Log.d("snapprefs", "Inserting new lens: " + lensData.mCode);
 
         long newRowId = writeableDatabase.insert(LensEntry.TABLE_NAME, null, lensData.getContent());
-        Logger.log("New Lens Row ID: " + newRowId);
+        Log.d("snapprefs", "New Lens Row ID: " + newRowId);
         requiresUpdate = true;
     }
 
     public boolean containsLens(String mCode) {
         createIfNotExisting();
-        Logger.log("Getting lens from database");
+        Log.d("snapprefs", "Getting lens from database");
 
         String selection = LensEntry.COLUMN_NAME_MCODE + " = ?";
         String[] selectionArgs = {mCode};
         String sortOrder =
                 LensEntry.COLUMN_NAME_MCODE + " DESC";
 
-        Logger.log("Performing query: " + selection + mCode);
+        Log.d("snapprefs", "Performing query: " + selection + mCode);
 
         Cursor cursor = writeableDatabase.query(
                 LensEntry.TABLE_NAME,                     // The table to query
@@ -128,7 +127,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
                 sortOrder                                 // The sort order
         );
 
-        Logger.log("Query count: " + cursor.getCount());
+        Log.d("snapprefs", "Query count: " + cursor.getCount());
 
         cursor.close();
 
@@ -158,7 +157,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
                 LensEntry.COLUMN_NAME_MCODE + " DESC";
 
         String[] projection = {LensEntry.COLUMN_NAME_ACTIVE};
-        Logger.log("Performing query: " + selection + mCode);
+        Log.d("snapprefs", "Performing query: " + selection + mCode);
 
         Cursor cursor = writeableDatabase.query(
                 LensEntry.TABLE_NAME,                     // The table to query
@@ -170,7 +169,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
                 sortOrder                                 // The sort order
         );
 
-        Logger.log("Query count: " + cursor.getCount());
+        Log.d("snapprefs", "Query count: " + cursor.getCount());
 
         if (cursor.getCount() == 0) {
             cursor.close();
@@ -186,14 +185,14 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
 
     public LensData getLens(String mCode) {
         createIfNotExisting();
-        Logger.log("Getting lens from database");
+        Log.d("snapprefs", "Getting lens from database");
 
         String selection = LensEntry.COLUMN_NAME_MCODE + " = ?";
         String[] selectionArgs = {mCode};
         String sortOrder =
                 LensEntry.COLUMN_NAME_MCODE + " DESC";
 
-        Logger.log("Performing query: " + selection + mCode);
+        Log.d("snapprefs", "Performing query: " + selection + mCode);
 
         Cursor cursor = writeableDatabase.query(
                 LensEntry.TABLE_NAME,                     // The table to query
@@ -205,7 +204,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
                 sortOrder                                 // The sort order
         );
 
-        Logger.log("Query count: " + cursor.getCount());
+        Log.d("snapprefs", "Query count: " + cursor.getCount());
 
         if (cursor.getCount() == 0)
             return null;
@@ -218,16 +217,16 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
             return null;
 
         cursor.close();
-        Logger.log("Queried database to get lens: " + lensData.mCode);
+        Log.d("snapprefs", "Queried database to get lens: " + lensData.mCode);
         return lensData;
     }
 
     public ArrayList<LensData> getAllExcept(ArrayList<String> blacklist) {
         createIfNotExisting();
-        Logger.log("Getting all lenses from database");
+        Log.d("snapprefs", "Getting all lenses from database");
 
         if (!requiresUpdate) {
-            Logger.log("Using lens cache");
+            Log.d("snapprefs", "Using lens cache");
             return excludedLensCache;
         }
 
@@ -235,16 +234,16 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
         String query = "select * from " + LensEntry.TABLE_NAME +
                 " where " + LensEntry.COLUMN_NAME_MCODE + " not in (" + strBlacklist + ")";
 
-        Logger.log("Performing query: " + query);
+        Log.d("snapprefs", "Performing query: " + query);
 
         Cursor cursor = writeableDatabase.rawQuery(query, null);
 
-        Logger.log("Query size: " + cursor.getCount());
+        Log.d("snapprefs", "Query size: " + cursor.getCount());
         ArrayList<LensData> lensDataList = new ArrayList<>();
 
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
-                Logger.log("Looping cursor result");
+                Log.d("snapprefs", "Looping cursor result");
                 LensData lensData = getLensFromCursor(cursor);
 
                 if (lensData == null)
@@ -254,7 +253,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
                 cursor.moveToNext();
             }
 
-            Logger.log("Completed getting lenses");
+            Log.d("snapprefs", "Completed getting lenses");
         }
 
         cursor.close();
@@ -265,14 +264,14 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
 
     public int getActiveLensCount() {
         createIfNotExisting();
-        Logger.log("Getting lens from database");
+        Log.d("snapprefs", "Getting lens from database");
 
         String selection = LensEntry.COLUMN_NAME_ACTIVE + " = ?";
         String[] selectionArgs = {"1"};
         String sortOrder =
                 LensEntry.COLUMN_NAME_MCODE + " DESC";
 
-        Logger.log("Performing query: " + selection + "1");
+        Log.d("snapprefs", "Performing query: " + selection + "1");
 
         Cursor cursor = writeableDatabase.query(
                 LensEntry.TABLE_NAME,                     // The table to query
@@ -286,7 +285,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
 
         int count = cursor.getCount();
         cursor.close();
-        Logger.log("Query count: " + count);
+        Log.d("snapprefs", "Query count: " + count);
 
         return count;
     }
@@ -294,19 +293,19 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
     public ArrayList<LensData> getAllLenses() {
         createIfNotExisting();
         if (!requiresUpdate) {
-            Logger.log("Using lens cache");
+            Log.d("snapprefs", "Using lens cache");
             return lensCache;
         }
 
-        Logger.log("Getting all lenses from database");
+        Log.d("snapprefs", "Getting all lenses from database");
         Cursor cursor = writeableDatabase.rawQuery("select * from " + LensEntry.TABLE_NAME, null);
 
-        Logger.log("Query size: " + cursor.getCount());
+        Log.d("snapprefs", "Query size: " + cursor.getCount());
         ArrayList<LensData> lensList = new ArrayList<>();
 
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
-                Logger.log("Looping cursor result");
+                Log.d("snapprefs", "Looping cursor result");
                 LensData lensData = getLensFromCursor(cursor);
 
                 if (lensData == null)
@@ -315,7 +314,7 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
                 lensList.add(lensData);
                 cursor.moveToNext();
             }
-            Logger.log("Completed getting lenses");
+            Log.d("snapprefs", "Completed getting lenses");
         }
 
         cursor.close();
@@ -372,9 +371,9 @@ public class LensDatabaseHelper extends SQLiteOpenHelper {
             short activeState = cursor.getShort(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_ACTIVE));
             lensData.mActive = activeState != 0;
 
-            Logger.log("Queried database for lens: " + lensData.mCode + " Active: " + lensData.mActive);
+            Log.d("snapprefs", "Queried database for lens: " + lensData.mCode + " Active: " + lensData.mActive);
         } catch (IllegalArgumentException e) {
-            Logger.log("Issue querying database", e);
+            Log.d("snapprefs", "Issue querying database", e);
             return null;
         }
 

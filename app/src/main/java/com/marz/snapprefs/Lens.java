@@ -2,21 +2,12 @@ package com.marz.snapprefs;
 
 import android.content.Context;
 import android.content.res.XModuleResources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.provider.BaseColumns;
-import android.util.Log;
 
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.LensData;
 import com.marz.snapprefs.Util.LensDatabaseHelper;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -192,49 +183,6 @@ public class Lens {
     public static void performLensSave(Object lens) {
         LensData lensData = buildSaveableLensData(lens);
         MainActivity.lensDBHelper.insertLens(lensData);
-
-        /*File directory = new File(Preferences.mSavePath + "/Lenses");
-
-        if (!directory.exists() && !directory.mkdirs()) {
-            Logger.log("Failed to create directory " + directory);
-            return;
-        }
-
-        String lensCode = (String) getObjectField(lens, "mCode");
-        File filename = new File(directory, lensCode + ".ser");
-
-        try {
-            if (filename.exists() || !filename.createNewFile()) {
-                return;
-            }
-        } catch (IOException e) {
-            Logger.log("Could not create new lens file");
-            return;
-        }
-
-        LensData lensData = buildSaveableLensData(lens);
-        FileOutputStream fos = null;
-        ObjectOutputStream os = null;
-
-        try {
-            fos = new FileOutputStream(filename);
-            os = new ObjectOutputStream(fos);
-            os.writeObject(lensData);
-            os.flush();
-        } catch (FileNotFoundException e) {
-            Logger.log("File not found", e);
-        } catch (IOException e) {
-            Logger.log("IOException", e);
-        } finally {
-            try {
-                if (fos != null)
-                    fos.close();
-                if (os != null)
-                    os.close();
-            } catch (Exception ignore) {
-                Logger.log("Exception closing", ignore);
-            }
-        }*/
     }
 
     public static LensData buildSaveableLensData(Object lens) {
@@ -255,124 +203,6 @@ public class Lens {
         //lensData.mLensIcon = getBitmapFromURL(lensData.mIconLink);
 
         return lensData;
-    }
-
-    public static void loadSavedLenses(boolean printDebug) {
-        String lensPath = Preferences.getExternalPath() + "/Snapprefs/Lenses/";
-        Log.d("snapchat", lensPath);
-        File directory = new File(lensPath);
-
-        File[] fileList = directory.listFiles();
-
-        // TODO Add .ser checking
-        for (File file : fileList) {
-            LensData lensData = deserializeLensFile(file);
-
-            if (lensData == null)
-                continue;
-            if (lensDataMap.containsKey(lensData.mCode))
-                continue;
-
-            if (!MainActivity.lensDBHelper.containsLens(lensData.mCode)) {
-                MainActivity.lensDBHelper.insertLens(lensData);
-                Logger.log("Added lens: " + lensData.mCode);
-            }
-            //lensDataMap.put(lensData.mCode, lensData);
-
-            if (printDebug)
-                Logger.log("Found loadable lens: " + lensData.mCode);
-        }
-    }
-
-    public static LensData deserializeLensFile(File filename) {
-        Log.d("snapchat", "File: " + filename);
-        FileInputStream fileIn = null;
-        ObjectInputStream in = null;
-        LensData lens = null;
-
-        try {
-            fileIn = new FileInputStream(filename);
-            in = new ObjectInputStream(fileIn);
-            lens = (LensData) in.readObject();
-        } catch (IOException i) {
-            Log.d("snapchat", i.getMessage());
-            //Logger.log("Exception", i);
-        } catch (ClassNotFoundException c) {
-            Logger.log("Not found", c);
-        } finally {
-            try {
-                if (in != null)
-                    in.close();
-                if (fileIn != null)
-                    fileIn.close();
-            } catch (Exception ignored) {
-            }
-        }
-
-        return lens;
-    }
-
-    public static Bitmap getBitmapFromURL(String src) {
-        try {
-            java.net.URL url = new java.net.URL(src);
-            HttpURLConnection connection = (HttpURLConnection) url
-                    .openConnection();
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream input = connection.getInputStream();
-
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = calculateInSampleSize(options, 50,
-                    50);
-
-            // Decode bitmap with inSampleSize set
-            options.inJustDecodeBounds = false;
-
-            // Calculate inSampleSize
-            return BitmapFactory.decodeStream(input, null, options);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static Bitmap decodeSampledBitmapFromResource(String uri,
-                                                         int reqWidth, int reqHeight) throws IOException {
-
-        // First decode with inJustDecodeBounds=true to check dimensions
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(uri, options);
-
-        // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, reqWidth,
-                reqHeight);
-
-        // Decode bitmap with inSampleSize set
-        options.inJustDecodeBounds = false;
-        java.net.URL url = new java.net.URL(uri);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setDoInput(true);
-        connection.connect();
-        InputStream input = connection.getInputStream();
-        return BitmapFactory.decodeStream(input, null, options);
-    }
-
-    private static int calculateInSampleSize(BitmapFactory.Options options,
-                                             int reqWidth, int reqHeight) {
-        // Raw height and width of image
-        final int height = options.outHeight;
-        final int width = options.outWidth;
-        int inSampleSize = 1;
-
-        if (height > reqHeight || width > reqWidth) {
-            if (width > height) {
-                inSampleSize = Math.round((float) height / (float) reqHeight);
-            } else {
-                inSampleSize = Math.round((float) width / (float) reqWidth);
-            }
-        }
-        return inSampleSize;
     }
 
     public static class LensEntry implements BaseColumns {
