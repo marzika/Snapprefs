@@ -1,6 +1,6 @@
 Snapprefs
 =========
-[![Build Status](http://13.92.242.101:8080/job/SNAPPREFS/badge/icon)](http://13.92.242.101:8080/job/SNAPPREFS/) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
+[![Build Status](http://138.68.21.49:8080/job/SNAPPREFS/badge/icon)](http://138.68.21.49:8080/job/SNAPPREFS) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
 
 Overview
 -------
@@ -108,9 +108,9 @@ Installation
 1. Customize the options
 1. Kill Snapchat after enabling/disabling options 
 
-Latest automatic builds (provided by Dopeland):
+Latest automatic builds (provided by m1kep):
 -------
-[Available as Jenkins artifacts](http://13.92.242.101:8080/job/SNAPPREFS/lastSuccessfulBuild/artifact/app/build/outputs/apk/)
+[Available as Jenkins artifacts](http://138.68.21.49:8080/job/SNAPPREFS/lastSuccessfulBuild/artifact/app/build/outputs/apk/)
 
 License
 -------
