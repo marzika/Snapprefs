@@ -54,11 +54,10 @@ public class Logger {
 
         try {
             XposedBridge.log(message);
-        } catch( Exception e)
+        } catch( Error e)
         {
             Log.d("snapchat", message);
         }
-
     }
 
     public static void afterHook( String message )
