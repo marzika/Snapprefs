@@ -152,6 +152,8 @@ public class NowPlaying {
         iF.addAction("net.jjc1138.android.scrobbler.action.MUSIC_STATUS");
         //Spotify
         iF.addAction("com.spotify.music.playbackstatechanged");
+        //Poweramp
+        iF.addAction("com.maxmpz.audioplayer.TRACK_CHANGED");
         HookMethods.context.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -160,9 +162,12 @@ public class NowPlaying {
                 String album = intent.getStringExtra("album");
                 if (album == null) album = "";
                 String title = intent.getStringExtra("track");
+                if (title == null) {
+                    title = intent.getStringExtra("title");
+                }
                 if (title == null) title = "";
                 if (intent.hasExtra("playing")) {
-                    playing = intent.getBooleanExtra("playing", false);
+                    playing = intent.getBooleanExtra("playing", title.isEmpty());
                 } else if (title.isEmpty()) {
                     playing = false;
                 }
