@@ -49,6 +49,7 @@ package com.marz.snapprefs;
         import static de.robv.android.xposed.XposedHelpers.findClass;
         import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
         import static de.robv.android.xposed.XposedHelpers.getObjectField;
+        import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
 
 
 public class VisualFilters {
@@ -129,6 +130,15 @@ public class VisualFilters {
     public static void initVisualFilters(final XC_LoadPackage.LoadPackageParam lpparam){
         refreshPreferences();
         setPreferences();
+        XposedHelpers.findAndHookMethod(Obfuscator.visualfilters.FILTERMETRICSPROVIDER_CLASS, lpparam.classLoader, "d", XposedHelpers.findClass(Obfuscator.save.SENT_CLASS, lpparam.classLoader), new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                if (param.hasThrowable()) {
+                    param.setThrowable(null);
+                    param.setResult(getStaticObjectField(findClass(Obfuscator.visualfilters.SETFILTER_B_CLASS, lpparam.classLoader), "INSTASNAP"));
+                }
+            }
+        });
         //Had to change equals and hashCode method, because getAdditionalInstanceField depends on that and equals and hashCode method are changed in snapchat to use methods we're changing. It just creates StackOverflowException
         findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, "hashCode", new XC_MethodHook() {
             @Override

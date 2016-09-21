@@ -234,6 +234,7 @@ public class Obfuscator {
         public static final String ADDER_CLASS = "afi"; //TODO: find this
         public static final String ADDER_PARAM = "afr";
         public static final String SNAPCHAPTUREDEVENT_CLASS = "ajD";
+        public static final String FILTERMETRICSPROVIDER_CLASS = "wg";
     }
     public class timer {
         public static final String TAKESNAPBUTTON_CLASS = "com.snapchat.android.ui.camera.TakeSnapButton";
