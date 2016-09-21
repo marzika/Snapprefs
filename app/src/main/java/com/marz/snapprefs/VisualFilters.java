@@ -35,26 +35,12 @@ import jp.co.cyberagent.android.gpuimage.sample.filter.IFValenciaFilter;
 import jp.co.cyberagent.android.gpuimage.sample.filter.IFWaldenFilter;
 import jp.co.cyberagent.android.gpuimage.sample.filter.IFXprollFilter;
 
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_AMARO;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_BRANNAN;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_EARLYBIRD;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_F1997;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_HEFE;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_HUDSON;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_INKWELL;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_LOMO;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_LORD_KELVIN;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_NASHVILLE;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_RISE;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_SIERRA;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_SUTRO;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_TOASTER;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_VALENCIA;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_WALDEN;
-import static com.marz.snapprefs.Preferences.Prefs.VFILTER_XPROLL;
+import static com.marz.snapprefs.Preferences.Prefs.*;
 import static com.marz.snapprefs.Preferences.createXSPrefsIfNotExisting;
+
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
 
 
 public class VisualFilters {
@@ -63,8 +49,8 @@ public class VisualFilters {
     private static final String FILTER_TITLE = "filterTitle";
     private static final String NULLIFY_FLAG = "nullify";
     private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
-    public static ArrayList<String> added = new ArrayList<String>();
-    public static ArrayList<String> added2 = new ArrayList<String>();
+    public static ArrayList<String> added = new ArrayList<>();
+    public static ArrayList<String> added2 = new ArrayList<>();
 
     enum FilterType {
         AMARO(IFAmaroFilter.class),
@@ -115,8 +101,16 @@ public class VisualFilters {
     }
 
     public static void initVisualFilters(final XC_LoadPackage.LoadPackageParam lpparam){
-        refreshPreferences();
         setPreferences();
+        XposedHelpers.findAndHookMethod(Obfuscator.visualfilters.FILTERMETRICSPROVIDER_CLASS, lpparam.classLoader, "d", XposedHelpers.findClass(Obfuscator.save.SENT_CLASS, lpparam.classLoader), new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                if (param.hasThrowable()) {
+                    param.setThrowable(null);
+                    param.setResult(getStaticObjectField(findClass(Obfuscator.visualfilters.SETFILTER_B_CLASS, lpparam.classLoader), "INSTASNAP"));
+                }
+            }
+        });
         //Had to change equals and hashCode method, because getAdditionalInstanceField depends on that and equals and hashCode method are changed in snapchat to use methods we're changing. It just creates StackOverflowException
         findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, "hashCode", new XC_MethodHook() {
             @Override
@@ -343,14 +337,5 @@ public class VisualFilters {
 //
 //        canvas.drawBitmap(result, 0, 0, paint);
 //        canvas.drawText(type.name(), 150, 150, paint);
-    }
-    static void refreshPreferences() {
-        try
-        {
-            createXSPrefsIfNotExisting();
-        }catch( Exception e) {
-            Log.d("snapchat", "Something about VISUAL FILTERS");
-            return;
-        }
     }
 }

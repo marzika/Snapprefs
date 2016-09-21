@@ -22,22 +22,8 @@ import android.widget.Toast;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.XposedUtils;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.ByteArrayBuffer;
-import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import de.robv.android.xposed.IXposedHookInitPackageResources;
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -89,58 +75,6 @@ public class HookMethods
         }
     }
 
-    public boolean postData() {
-
-        // Create a new HttpClient and Post Header
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost("http://snapprefs.com/checkversion.php");
-
-
-        try {
-            // Add your data
-            List<BasicNameValuePair> nameValuePairs = new ArrayList<BasicNameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair("version", "1.5.0"));
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-            // Execute HTTP Post Request
-            HttpResponse response = httpclient.execute(httppost);
-
-            InputStream is = response.getEntity().getContent();
-            BufferedInputStream bis = new BufferedInputStream(is);
-            final ByteArrayBuffer baf = new ByteArrayBuffer(20);
-
-            int current;
-
-            while ((current = bis.read()) != -1) {
-                baf.append((byte) current);
-            }
-            String text = new String(baf.toByteArray());
-            String status;
-            String error_msg;
-            try {
-
-                JSONObject obj = new JSONObject(text);
-                status = obj.getString("status");
-                error_msg = obj.getString("error_msg");
-                if (status.equals("0") && !error_msg.isEmpty()) {
-                    latest = true;
-                }
-                if (status.equals("1") && error_msg.isEmpty()) {
-                    //Toast.makeText(SnapContext, "New version available, update NOW from the Xposed repo.", Toast.LENGTH_SHORT).show();
-                    latest = false;
-                }
-            } catch (Throwable t) {
-                Log.e("Snapprefs", "Could not parse malformed JSON: \"" + text + "\"");
-                latest = false;
-            }
-        } catch (IOException e2) {
-            // TODO Auto-generated catch block
-            //saveIntPreference("license_status", 0);
-            latest = false;
-        }
-
-        return latest;
-    }
 
     @Override
     public void initZygote(StartupParam startupParam) throws Throwable {
