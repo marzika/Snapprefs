@@ -342,6 +342,9 @@ public class Preferences {
     }
 
     public enum Prefs {
+        // FORMAT: PREF_NAME("pref_key", defaultvalue)
+        // Default value cannot be null as it's used to determine the preference type
+        // You could add a third TYPE field which you can use to check against in the InitialiseListener method
         CUSTOM_FILTER("pref_key_force_navbar", false),
         PAINT_TOOLS("pref_key_paint_checkbox", true),
         MULTI_FILTER("pref_key_multi_filter_checkbox", true),
