@@ -374,7 +374,7 @@ public class HookMethods
                         Logger.log(t.toString());
                     } /*For viewing longer videos?*/
 
-                    if (Common.CAPTION_UNLIMITED_VANILLA) {
+                    if (Preferences.getBool(Prefs.CAPTION_UNLIMITED_VANILLA)) {
                         findAndHookMethod("com.snapchat.android.ui.caption.CaptionEditText", lpparam.classLoader, "n", XC_MethodReplacement.DO_NOTHING);
                     }
                     // VanillaCaptionEditText was moved from an inner-class to a separate class in 8.1.0
@@ -383,7 +383,7 @@ public class HookMethods
                     hookAllConstructors(findClass(vanillaCaptionEditTextClassName, lpparam.classLoader), new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
-                            if (Common.CAPTION_UNLIMITED_VANILLA) {
+                            if (Preferences.getBool(Prefs.CAPTION_UNLIMITED_VANILLA)) {
                                 XposedUtils.log("Unlimited vanilla captions");
                                 EditText vanillaCaptionEditText = (EditText) param.thisObject;
                                 // Set single lines mode to false
@@ -405,7 +405,7 @@ public class HookMethods
                     hookAllConstructors(findClass(fatCaptionEditTextClassName, lpparam.classLoader), new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
-                            if (Common.CAPTION_UNLIMITED_FAT) {
+                            if (Preferences.getBool(Prefs.CAPTION_UNLIMITED_FAT)) {
                                 XposedUtils.log("Unlimited fat captions");
                                 EditText fatCaptionEditText = (EditText) param.thisObject;
                                 // Remove InputFilter with character limit

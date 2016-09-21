@@ -45,16 +45,19 @@ public class Logger {
      */
     public static void log(String message, boolean prefix, boolean forced) {
 
-            if (prefix) {
-                message = LOG_TAG + message;
-            }
+        if( !Preferences.getBool(Preferences.Prefs.DEBUGGING) && !forced)
+            return;
 
-            try {
-                XposedBridge.log(message);
-            } catch( NoClassDefFoundError e)
-            {
-                Log.d("snapchat", message);
-            }
+        if (prefix) {
+            message = LOG_TAG + message;
+        }
+
+        try {
+            XposedBridge.log(message);
+        } catch( NoClassDefFoundError e)
+        {
+            Log.d("snapchat", message);
+        }
 
     }
 

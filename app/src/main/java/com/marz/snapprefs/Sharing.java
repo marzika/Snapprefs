@@ -19,6 +19,7 @@ import com.marz.snapprefs.Util.CommonUtils;
 import com.marz.snapprefs.Util.ImageUtils;
 import com.marz.snapprefs.Util.VideoUtils;
 import com.marz.snapprefs.Util.XposedUtils;
+import com.marz.snapprefs.Preferences.Prefs;
 
 import java.io.File;
 
@@ -98,10 +99,10 @@ public class Sharing {
                             // Rotate image using EXIF-data
                             bitmap = ImageUtils.rotateUsingExif(bitmap, filePath);
                             // Landscape images have to be rotated 90 degrees clockwise for Snapchat to be displayed correctly
-                            if (Common.ROTATION_MODE != Common.ROTATION_NONE) {
+                            if (Preferences.getInt(Prefs.ROTATION_MODE) != Common.ROTATION_NONE) {
                                 if (bitmap.getWidth() > bitmap.getHeight()) {
-                                    XposedUtils.log("Landscape image detected, rotating image " + Common.ROTATION_MODE + " degrees");
-                                    bitmap = ImageUtils.rotateBitmap(bitmap, Common.ROTATION_MODE);
+                                    XposedUtils.log("Landscape image detected, rotating image " + Preferences.getInt(Prefs.ROTATION_MODE) + " degrees");
+                                    bitmap = ImageUtils.rotateBitmap(bitmap, Preferences.getInt(Prefs.ROTATION_MODE));
                                 } else {
                                     XposedUtils.log("Image is in portrait, rotation not needed");
                                 }
@@ -109,7 +110,7 @@ public class Sharing {
 
                             // Snapchat will break if the image is too large and it will scale the image up if the Display rectangle is larger than the image.
                             ImageUtils imageUtils = new ImageUtils(activity);
-                            switch (Common.ADJUST_METHOD) {
+                            switch (Preferences.getInt(Prefs.ADJUST_METHOD)) {
                                 case Common.ADJUST_CROP:
                                     XposedUtils.log("Adjustment Method: Crop");
                                     bitmap = imageUtils.adjustmentMethodCrop(bitmap);
@@ -150,7 +151,7 @@ public class Sharing {
                         File tempFile = File.createTempFile("snapshare_video", null);
 
                         try {
-                            if (Common.ROTATION_MODE == Common.ROTATION_NONE) {
+                            if (Preferences.getInt(Prefs.ROTATION_MODE) == Common.ROTATION_NONE) {
                                 XposedUtils.log("Rotation disabled, creating a temporary copy");
                                 CommonUtils.copyFile(videoFile, tempFile);
                             } else {

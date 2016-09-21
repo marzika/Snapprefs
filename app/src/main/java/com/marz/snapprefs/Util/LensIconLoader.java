@@ -1,6 +1,7 @@
 package com.marz.snapprefs.Util;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -8,7 +9,9 @@ import android.util.Log;
 import android.widget.ImageButton;
 
 import com.marz.snapprefs.Fragments.LensesFragment;
+import com.marz.snapprefs.Preferences;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -22,12 +25,18 @@ public class LensIconLoader {
         protected Boolean doInBackground(Object... params) {
             LensesFragment.LensButtonPair pair = (LensesFragment.LensButtonPair) params[0];
             Activity context = (Activity) params[1];
+            String mCode = pair.mCode;
 
             final String url = pair.url;
             final ImageButton button = pair.button;
+            final Bitmap bmp = retrieveAppropriateBitmap(url, mCode, context);
 
-            final Bitmap bmp = getBitmapFromURL(url, 1);
-            pair.bmp = bmp;
+            if( bmp == null )
+                return null;
+
+            float density = context.getResources().getDisplayMetrics().density;
+            int imgSize = (int) (65f * density);
+            pair.bmp = Bitmap.createScaledBitmap(bmp, imgSize, imgSize, false);
 
             context.runOnUiThread(new Runnable() {
                 @Override
@@ -41,6 +50,37 @@ public class LensIconLoader {
 
             return null;
         }
+    }
+
+    public static Bitmap retrieveAppropriateBitmap( String url, String mCode, Context context )
+    {
+        File iconDirectory = new File(Preferences.getString(Preferences.Prefs.SAVE_PATH), "/LensIcons");
+
+        if( !iconDirectory.exists() && !iconDirectory.mkdirs()) {
+            return getBitmapFromURL(url, 1);
+        }
+
+        File iconFile = new File( iconDirectory, mCode + ".png");
+
+        Log.d("snapchat", "IconFile: " + iconFile.getPath());
+        if(iconFile.exists())
+        {
+            Bitmap bmp = loadBitmapFromFile( iconFile);
+
+            if(bmp != null)
+                return bmp;
+        }
+
+        Bitmap bmp = getBitmapFromURL( url, 1);
+        SavingUtils.savePNGAsync(iconFile, bmp, context, false);
+        return bmp;
+    }
+
+    public static Bitmap loadBitmapFromFile(File iconFile)
+    {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        return BitmapFactory.decodeFile(iconFile.getPath(), options);
     }
 
     public static Bitmap getBitmapFromURL(String src, int sampleSize) {
@@ -58,8 +98,7 @@ public class LensIconLoader {
             BitmapFactory.Options options=new BitmapFactory.Options();
             options.inSampleSize = sampleSize;
 
-            bmImg = BitmapFactory.decodeStream(is, null, options);
-            return bmImg;
+            return BitmapFactory.decodeStream(is, null, options);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             Log.d("Error", e.toString());

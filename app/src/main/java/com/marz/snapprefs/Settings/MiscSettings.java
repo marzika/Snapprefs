@@ -2,7 +2,6 @@ package com.marz.snapprefs.Settings;
 
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,7 +14,6 @@ import java.io.File;
  * Created by MARZ on 2016. 02. 11..
  */
 public class MiscSettings extends PreferenceFragmentCompat {
-    private SharedPreferences sharedPreferences;
     private int preferenceId;
 
     @SuppressWarnings("deprecation")

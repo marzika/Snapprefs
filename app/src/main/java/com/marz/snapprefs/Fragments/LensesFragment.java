@@ -61,7 +61,7 @@ public class LensesFragment extends Fragment {
                     Log.d("snapchat", "Something happening: " + mCode);
                     try {
                         boolean activeState = MainActivity.lensDBHelper.toggleLensActiveState(mCode);
-                        btn.setBackgroundColor(Color.argb(150, 200, 200, activeState ? 0 : 200));
+                        btn.setBackgroundColor(Color.argb(activeState ? 150 : 0, 0, 200, 0));
                         btn.invalidate();
                     } catch (Exception e) {
                         Log.d("snapchat", "No lens found with code: " + mCode + "\n" + e.getMessage());
@@ -71,13 +71,13 @@ public class LensesFragment extends Fragment {
 
             button.setMinimumHeight(50);
             button.setMinimumWidth(50);
-            button.setBackgroundColor(Color.argb(150, 200, 200, lensData.mActive ? 0 : 200));
+            button.setBackgroundColor(Color.argb(lensData.mActive ? 150 : 0, 0, 200, 0));
             button.setTag(lensData.mCode);
 
             LensButtonPair buttonPair = iconMap.get(lensData.mCode);
 
             if (buttonPair == null || buttonPair.bmp == null) {
-                buttonPair = new LensButtonPair(button, null, lensData.mIconLink);
+                buttonPair = new LensButtonPair(button, null, lensData.mIconLink, lensData.mCode);
                 iconMap.put(lensData.mCode, buttonPair);
                 new LensIconLoader.AsyncLensIconDownloader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, buttonPair, context);
             } else {
@@ -154,11 +154,13 @@ public class LensesFragment extends Fragment {
         public ImageButton button;
         public Bitmap bmp;
         public String url;
+        public String mCode;
 
-        public LensButtonPair(ImageButton button, Bitmap bmp, String url) {
+        public LensButtonPair(ImageButton button, Bitmap bmp, String url, String mCode) {
             this.button = button;
             this.bmp = bmp;
             this.url = url;
+            this.mCode = mCode;
         }
     }
 }
