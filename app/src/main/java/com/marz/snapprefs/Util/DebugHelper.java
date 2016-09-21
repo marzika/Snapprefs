@@ -14,7 +14,7 @@ import static de.robv.android.xposed.XposedHelpers.findClass;
  * Created by stirante
  */
 
-public class DebugUtils {
+public class DebugHelper {
 
     /**
      * Enables Developer settings, which can be accessed on the bottom of normal settings by clicking around version code
@@ -32,7 +32,7 @@ public class DebugUtils {
     private static XC_LoadPackage.LoadPackageParam lpparam;
 
     public static void init(XC_LoadPackage.LoadPackageParam lpparam) {
-        DebugUtils.lpparam = lpparam;
+        DebugHelper.lpparam = lpparam;
         if (DEVELOPER_SETTINGS) {
             XposedHelpers.findAndHookMethod("com.snapchat.android.framework.release.ReleaseManager", lpparam.classLoader, "a", Context.class, XC_MethodReplacement.returnConstant("DEBUG"));
         }
