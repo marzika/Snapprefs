@@ -2,7 +2,6 @@ package com.marz.snapprefs;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,14 +34,26 @@ import jp.co.cyberagent.android.gpuimage.sample.filter.IFValenciaFilter;
 import jp.co.cyberagent.android.gpuimage.sample.filter.IFWaldenFilter;
 import jp.co.cyberagent.android.gpuimage.sample.filter.IFXprollFilter;
 
-
-        import static de.robv.android.xposed.XposedHelpers.callMethod;
-        import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
-        import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
-        import static de.robv.android.xposed.XposedHelpers.findClass;
-        import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
-        import static de.robv.android.xposed.XposedHelpers.getObjectField;
-        import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_AMARO;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_BRANNAN;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_EARLYBIRD;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_F1997;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_HEFE;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_HUDSON;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_INKWELL;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_LOMO;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_LORD_KELVIN;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_NASHVILLE;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_RISE;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_SIERRA;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_SUTRO;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_TOASTER;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_VALENCIA;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_WALDEN;
+import static com.marz.snapprefs.Preferences.Prefs.VFILTER_XPROLL;
+import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
 
 
 

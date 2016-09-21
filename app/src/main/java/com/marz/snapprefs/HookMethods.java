@@ -19,9 +19,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-
-import com.marz.snapprefs.Util.DebugUtils;
-
+import com.marz.snapprefs.Preferences.Prefs;
+import com.marz.snapprefs.Util.DebugHelper;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import java.io.File;
@@ -196,11 +195,13 @@ public class HookMethods
             findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    DebugUtils.init(lpparam);
-                    Preferences.refreshPreferences();
-                    Logger.log("makeWorldReadable: " + Preferences.prefs.makeWorldReadable(), true);
-                    Preferences.printSettings();
-                    if (Preferences.mLicense == 1 || Preferences.mLicense == 2) {
+                    DebugHelper.init(lpparam);
+                    Log.d("snapchat", "Application hook: " + param.thisObject.getClass().getCanonicalName());
+
+                    //Preferences.loadMapFromXposed();
+                    //Logger.log("makeWorldReadable: " + Preferences.prefs.makeWorldReadable(), true);
+                    //Preferences.printSettings();
+                    if (Preferences.getLicence() == 1 || Preferences.getLicence() == 2) {
                         if (Preferences.getBool(Prefs.REPLAY)) {
                             //Premium.initReplay(lpparam, modRes, SnapContext);
                         }
