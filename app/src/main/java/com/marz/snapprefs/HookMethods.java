@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Util.DebugUtils;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import org.apache.http.HttpResponse;
@@ -251,6 +252,7 @@ public class HookMethods
             findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    DebugUtils.init(lpparam);
                     Preferences.refreshPreferences();
                     Logger.log("makeWorldReadable: " + Preferences.prefs.makeWorldReadable(), true);
                     Preferences.printSettings();
