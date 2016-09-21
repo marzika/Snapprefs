@@ -204,7 +204,6 @@ public class Saving {
                 }
             });
             findAndHookMethod("com.snapchat.android.fragments.FriendMiniProfilePopupFragment", lpparam.classLoader, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_GET_CACHED_PROFILE_PICTURES, new XC_MethodHook() {
-                // TODO remove spread out code
                 @Override
                 protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
                     View mini_profile_snapcode = (View) getObjectField(param.thisObject, "q");
