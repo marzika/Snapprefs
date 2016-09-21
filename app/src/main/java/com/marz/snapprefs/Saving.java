@@ -207,11 +207,11 @@ public class Saving {
             findAndHookMethod("com.snapchat.android.fragments.FriendMiniProfilePopupFragment", lpparam.classLoader, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_GET_CACHED_PROFILE_PICTURES, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
-                    View mini_profile_snapcode = (View) getObjectField(param.thisObject, "q");
+                    View mini_profile_snapcode = (View) getObjectField(param.thisObject, Obfuscator.save.MINI_PROFILE_SNAPCODE);
                     mini_profile_snapcode.setOnLongClickListener(new View.OnLongClickListener() {
                         @Override
                         public boolean onLongClick(View v) {
-                            final File profileImagesFolder = new File(Preferences.mSavePath, "profileImages/");
+                            final File profileImagesFolder = new File(Preferences.mSavePath, "ProfileImages/");
                             if(!profileImagesFolder.exists()){
                                 profileImagesFolder.mkdir();
                             }

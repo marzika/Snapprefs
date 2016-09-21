@@ -137,6 +137,7 @@ public class Obfuscator {
         public static final String FRIEND_MINI_PROFILE_POPUP_FRIENDS_PROFILE_IMAGES_CACHE = "i";
         public static final String PROFILE_IMAGES_CACHE_GET_PROFILE_IMAGES = "a";
         public static final String PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS = "com.snapchat.android.util.profileimages.ProfileImageUtils$ProfileImageSize";
+        public static final String MINI_PROFILE_SNAPCODE = "q";
 
 
     }
