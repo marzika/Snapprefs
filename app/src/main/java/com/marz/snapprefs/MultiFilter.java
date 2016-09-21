@@ -50,7 +50,7 @@ public class MultiFilter {
                 if (((boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, "nowPlaying"))) {
                     MotionEvent event = (MotionEvent) param.args[0];
                     View view = (View) callMethod(param.thisObject, "d");
-                    if (event.getRawY() > view.getHeight()) {
+                    if (event.getRawY() > view.getHeight()/2) {
                         param.setResult(true);
                         NowPlaying.changeLayout();
                         view.invalidate();

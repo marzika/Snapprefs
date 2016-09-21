@@ -6,17 +6,17 @@
     <Space
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/space" />
 
     <RelativeLayout
-        android:layout_below="@+id/space"
+        android:layout_above="@+id/space"
         android:layout_marginLeft="30dp"
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
         android:layout_marginRight="30dp"
-        android:background="#77ffffff"
+        android:background="#00ffffff"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         <ImageView
