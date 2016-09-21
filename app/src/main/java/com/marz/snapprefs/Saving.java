@@ -203,6 +203,7 @@ public class Saving {
                     Logger.afterHook("StorySnapView - Hide1");
                 }
             });
+            //List<Bitmap> a = this.i.a(this.F.g(), ProfileImageSize.MEDIUM);
             findAndHookMethod("com.snapchat.android.fragments.FriendMiniProfilePopupFragment", lpparam.classLoader, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_GET_CACHED_PROFILE_PICTURES, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
@@ -214,23 +215,37 @@ public class Saving {
                             if(!profileImagesFolder.exists()){
                                 profileImagesFolder.mkdir();
                             }
-                            Object FriendObject = getObjectField(param.thisObject, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_FRIEND_FIELD);
-                            String username = (String) callMethod(FriendObject, Obfuscator.save.GET_FRIEND_USERNAME);
+                            // ProfileImageUtils$ProfileImageSize inner class
+                            Class<?> profileImageSizeClass = findClass(Obfuscator.save.PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS, lpparam.classLoader);
+                            // F
+                            Object friendObject = getObjectField(param.thisObject, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_FRIEND_FIELD);
+                            // ^.g
+                            String username = (String) callMethod(friendObject, Obfuscator.save.GET_FRIEND_USERNAME);
+                            // ProfileImageSize.MEDIUM
                             Object MEDIUM = getStaticObjectField(findClass(Obfuscator.save.PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS, lpparam.classLoader), "MEDIUM");
+                            // this.i
                             Object i = getObjectField(param.thisObject, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_FRIENDS_PROFILE_IMAGES_CACHE);
-                            List<Bitmap> profileImages = (List<Bitmap>) callMethod(Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_FRIENDS_PROFILE_IMAGES_CACHE, Obfuscator.save.PROFILE_IMAGES_CACHE_GET_PROFILE_IMAGES, new Class[]{String.class, findClass(Obfuscator.save.PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS, lpparam.classLoader)}, username, MEDIUM);
+                            //^.a(F.g(), ProfileImageSize.MEDIUM)
+                            List<Bitmap> profileImages = (List<Bitmap>) callMethod(i, Obfuscator.save.PROFILE_IMAGES_CACHE_GET_PROFILE_IMAGES, new Class[]{String.class, profileImageSizeClass}, username, MEDIUM);
                             if (Preferences.debug) {
-                                XposedBridge.log("Object F: " + FriendObject + "\nObject i: " + i + "\nUsername: " + username + "\nMEDIUM: " + MEDIUM + "\nprofileImages: " + profileImages);
+                                XposedBridge.log("First Three Letters Of Username: " + username.substring(0, 3) + "\nInner Class: " + profileImageSizeClass + "\nFriend Object: " + friendObject + "\nUsername: " + username + "\nMedium: " + MEDIUM + "\n 'i' Object: " + i + "profileImages: " + profileImages);
                             }
                             if(profileImages == null) {
                                 SavingUtils.vibrate(HookMethods.context, false);
-                                NotificationUtils.showStatefulMessage("Error Saving Profile Images For " + username + "\nEnable Debug Mode And Reproduce", ToastType.BAD, lpparam.classLoader);
+                                NotificationUtils.showStatefulMessage("Error Saving Profile Images For " + username + "\nIf The Profile Image Is Not Blank Please Enable Debug Mode And Rep", ToastType.BAD, lpparam.classLoader);
                                 return false;
                             }
-                            for (int iter = 0; iter < profileImages.size(); iter++) {
+                            int succCounter = 0;
+                            int sizeOfProfileImages = profileImages.size();
+                            for (int iter = 0; iter < sizeOfProfileImages; iter++) {
                                 File f = new File(profileImagesFolder, username + "-" + iter + ".jpg");
-                                SavingUtils.saveJPGAsync(f, profileImages.get(iter), HookMethods.context);
+                                if(SavingUtils.saveJPG(f, profileImages.get(iter), HookMethods.context)) {
+                                    succCounter++;
+                                }
                             }
+                            Boolean succ = (succCounter == sizeOfProfileImages);
+                            NotificationUtils.showStatefulMessage("Saved " + succCounter + "/" + sizeOfProfileImages + " profile images.", succ ? ToastType.GOOD : ToastType.BAD, lpparam.classLoader);
+                            SavingUtils.vibrate(HookMethods.context, succ);
                             return true;
                         }
                     });
