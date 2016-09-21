@@ -203,7 +203,7 @@ public class Saving {
                     Logger.afterHook("StorySnapView - Hide1");
                 }
             });
-            findAndHookMethod("com.snapchat.android.fragments.FriendMiniProfilePopupFragment", lpparam.classLoader, "y", new XC_MethodHook() {
+            findAndHookMethod("com.snapchat.android.fragments.FriendMiniProfilePopupFragment", lpparam.classLoader, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_GET_CACHED_PROFILE_PICTURES, new XC_MethodHook() {
                 // TODO remove spread out code
                 @Override
                 protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
@@ -215,16 +215,13 @@ public class Saving {
                             if(!profileImagesFolder.exists()){
                                 profileImagesFolder.mkdir();
                             }
-                            // Execluting: List<Bitmap> a = this.i.a(this.F.g(), ProfileImageSize.MEDIUM);
-                            Object F = getObjectField(param.thisObject, "F");
-                            String username = (String) callMethod(F, "g");
-                            Object MEDIUM = getStaticObjectField(findClass("com.snapchat.android.util.profileimages.ProfileImageUtils$ProfileImageSize", lpparam.classLoader), "MEDIUM");
-                            //String username = (String) callMethod(getObjectField(param.thisObject, "F"), "g");
-                            Object i = getObjectField(param.thisObject, "i");
-                            List<Bitmap> profileImages = (List<Bitmap>) callMethod(i, "a", new Class[]{String.class, findClass("com.snapchat.android.util.profileimages.ProfileImageUtils$ProfileImageSize", lpparam.classLoader)}, username, MEDIUM);
-                            //List<Bitmap> profileImages = (List<Bitmap>) callMethod(getObjectField(param.thisObject, "i"), "a", new Class[]{String.class, findClass("com.snapchat.android.util.profileimages.ProfileImageUtils$ProfileImageSize", lpparam.classLoader)}, username, MEDIUM);
+                            Object FriendObject = getObjectField(param.thisObject, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_FRIEND_FIELD);
+                            String username = (String) callMethod(FriendObject, Obfuscator.save.GET_FRIEND_USERNAME);
+                            Object MEDIUM = getStaticObjectField(findClass(Obfuscator.save.PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS, lpparam.classLoader), "MEDIUM");
+                            Object i = getObjectField(param.thisObject, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_FRIENDS_PROFILE_IMAGES_CACHE);
+                            List<Bitmap> profileImages = (List<Bitmap>) callMethod(i, "a", new Class[]{String.class, findClass(Obfuscator.save.PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS, lpparam.classLoader)}, username, MEDIUM);
                             if (Preferences.debug) {
-                                XposedBridge.log("Object F: " + F + "\nObject i: " + i + "\nUsername: " + username + "\nMEDIUM: " + MEDIUM + "\nprofileImages: " + profileImages);
+                                XposedBridge.log("Object F: " + FriendObject + "\nObject i: " + i + "\nUsername: " + username + "\nMEDIUM: " + MEDIUM + "\nprofileImages: " + profileImages);
                             }
                             if(profileImages == null) {
                                 SavingUtils.vibrate(HookMethods.context, false);
