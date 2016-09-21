@@ -138,8 +138,8 @@ public abstract class SavingUtils {
         }).start();
     }
 
-    public static boolean saveVideo(File fileToSave, FileInputStream fileStream, Context context
-    ) {
+
+    public static boolean saveVideo( File fileToSave, FileInputStream fileStream, Context context) {
         boolean state = false;
         if (fileStream == null) {
             Logger.printMessage("saveVideo - Passed Null Video");
