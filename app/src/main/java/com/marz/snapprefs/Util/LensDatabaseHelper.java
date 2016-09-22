@@ -20,7 +20,7 @@ import java.util.Iterator;
  */
 public class LensDatabaseHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 2;
-    public static final String DATABASE_NAME = Preferences.getString(Preferences.Prefs.SAVE_PATH) + "/Lenses.db";
+    public static final String DATABASE_NAME = Preferences.getSavePath() + "/Lenses.db";
     public static final String[] fullProjection = {
             LensEntry.COLUMN_NAME_MCODE,
             LensEntry.COLUMN_NAME_GPLAYID,

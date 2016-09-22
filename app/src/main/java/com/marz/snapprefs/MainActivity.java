@@ -146,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         context = this;
         ChangeLog cl = new ChangeLog(context);
+        Preferences.assignDefaultSavePath();
         createDeviceId();
 
         if (cl.isFirstRun()) {
@@ -166,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         Logger.log("Load lenses: " + prefs.contains("pref_key_load_lenses"));
 
 
-        Logger.log("SAVE LOCATION: " + Preferences.getString(Preferences.Prefs.SAVE_PATH));
+        Logger.log("SAVE LOCATION: " + Preferences.getSavePath());
         if (!Preferences.getBool(Preferences.Prefs.ACCEPTED_TOU)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context)
                     .setTitle("ToU and Privacy Policy")

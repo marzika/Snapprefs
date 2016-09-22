@@ -25,11 +25,12 @@ public class Preferences {
     public static final int TOAST_LENGTH_LONG = 1;
     public static final int TIMER_MINIMUM_DISABLED = 0;
     public static final int SPIN_EXCESS = 200;
+    private static boolean foundPath = false;
 
     private static ConcurrentHashMap<String, Object> preferenceMap = new ConcurrentHashMap<>();
     private static XSharedPreferences xSPrefs;
 
-    public static XSharedPreferences createXSPrefsIfNotExisting() {
+    private static XSharedPreferences createXSPrefsIfNotExisting() {
         File prefsFile = new File(
                 Environment.getDataDirectory(), "data/"
                 + HookMethods.class.getPackage().getName() + "/shared_prefs/" + HookMethods.class.getPackage().getName()
@@ -43,10 +44,10 @@ public class Preferences {
         Logger.log("Loading preferences");
 
 
-            Logger.log("Null preferences... Creating new");
-            Logger.log("Package name: " + HookMethods.PACKAGE_NAME);
+        Logger.log("Null preferences... Creating new");
+        Logger.log("Package name: " + HookMethods.PACKAGE_NAME);
 
-            xSPrefs = new XSharedPreferences(HookMethods.PACKAGE_NAME, HookMethods.PACKAGE_NAME + "_preferences");
+        xSPrefs = new XSharedPreferences(HookMethods.PACKAGE_NAME, HookMethods.PACKAGE_NAME + "_preferences");
 
 
         Logger.log("Making readable");
@@ -56,26 +57,9 @@ public class Preferences {
     }
 
     public static void loadMapFromXposed() {
-        /*observer = new FileObserver(prefsFile.getAbsolutePath()) {//this needs to be field, because as variable it will be garbage collected
-            @Override
-            public void onEvent(int event, String path) {
-                if (event == FileObserver.CLOSE_WRITE) {
-                    Logger.log("HOOKED Observer: CLOSE_WRITE");
-                } else if( event == FileObserver.CLOSE_NOWRITE)
-                    Logger.log("HOOKED Observer: CLOSE_NOWRITE");
-                else if( event == FileObserver.ACCESS)
-                    Logger.log("HOOKED Observer: ACCESS");
-                else if( event == FileObserver.OPEN)
-                    Logger.log("HOOKED Observer: OPEN");
-                else if( event == FileObserver.CREATE)
-                    Logger.log("HOOKED Observer: CREATE");
+        assignDefaultSavePath();
 
-            }
-        };
-        observer.startWatching();*/
-
-
-            createXSPrefsIfNotExisting();
+        createXSPrefsIfNotExisting();
 
         xSPrefs.reload();
 
@@ -127,6 +111,11 @@ public class Preferences {
 
                 if (preference == null) {
                     Logger.log("No value found in the internal preference list: " + key);
+                    return;
+                }
+
+                if (preference.defaultVal == null) {
+                    Logger.log("No default value found in the internal preference list");
                     return;
                 }
 
@@ -219,26 +208,22 @@ public class Preferences {
         preferenceMap.put(preference.key, value != null ? value : preference.defaultVal);
     }
 
-    public static void putContent(Map<String, Object> values)
-    {
+    public static void putContent(Map<String, Object> values) {
         SharedPreferences.Editor editor = MainActivity.prefs.edit();
 
-        for( String key : values.keySet() )
-        {
+        for (String key : values.keySet()) {
             Object obj = values.get(key);
 
-            if( obj instanceof Integer )
+            if (obj instanceof Integer)
                 editor.putInt(key, (Integer) obj);
-            else if( obj instanceof String)
+            else if (obj instanceof String)
                 editor.putString(key, (String) obj);
-            else if( obj instanceof Boolean)
+            else if (obj instanceof Boolean)
                 editor.putBoolean(key, (boolean) obj);
         }
 
-        if( editor.commit())
-        {
-            for( String key : values.keySet())
-            {
+        if (editor.commit()) {
+            for (String key : values.keySet()) {
                 Object obj = values.get(key);
                 preferenceMap.put(key, obj);
             }
@@ -246,10 +231,11 @@ public class Preferences {
 
         updateProtection();
     }
+
     public static void putString(String key, String value) {
         SharedPreferences.Editor editor = MainActivity.prefs.edit();
         editor.putString(key, value);
-        if(editor.commit())
+        if (editor.commit())
             preferenceMap.put(key, value);
 
         updateProtection();
@@ -258,7 +244,7 @@ public class Preferences {
     public static void putBool(String key, boolean value) {
         SharedPreferences.Editor editor = MainActivity.prefs.edit();
         editor.putBoolean(key, value);
-        if(editor.commit())
+        if (editor.commit())
             preferenceMap.put(key, value);
 
         updateProtection();
@@ -267,7 +253,7 @@ public class Preferences {
     public static void putInt(String key, int value) {
         SharedPreferences.Editor editor = MainActivity.prefs.edit();
         editor.putInt(key, value);
-        if(editor.commit())
+        if (editor.commit())
             preferenceMap.put(key, value);
 
         updateProtection();
@@ -312,6 +298,43 @@ public class Preferences {
         return (int) getPref(storedDeviceId, Prefs.LICENCE.defaultVal);
     }
 
+    public static String assignDefaultSavePath() {
+        try {
+            return (String) (Prefs.SAVE_PATH.defaultVal = getExternalPath() + "/Snapprefs");
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    public static String getSavePath() throws Throwable {
+        String savePath = getString(Prefs.SAVE_PATH);
+
+        if (savePath == null) {
+            String newPath = assignDefaultSavePath();
+
+            if (newPath == null)
+                throw new Throwable("Tried to get path before runtime is ready");
+            else
+                return newPath;
+        }
+
+        return getString(Prefs.SAVE_PATH);
+    }
+
+    public static String getFilterPath() throws Throwable {
+        String path = getString(Prefs.CUSTOM_FILTER_LOCATION);
+
+        if( path == null ) {
+            String newPath = (String) (Prefs.CUSTOM_FILTER_LOCATION.defaultVal = getSavePath() + "/Filters");
+
+            if (newPath == null)
+                throw new Throwable("Tried to get path before runtime is ready");
+            else
+                return newPath;
+        }
+        
+        return path;
+    }
 
     public static String getExternalPath() {
         try {
@@ -407,8 +430,10 @@ public class Preferences {
         VFILTER_WALDEN("WALDEN", false),
         VFILTER_XPROLL("XPROLL", false),
 
-        SAVE_PATH("pref_key_save_location", getExternalPath() + "/Snapprefs"),
-        CUSTOM_FILTER_LOCATION("", SAVE_PATH.defaultVal + "/FILTERS"),
+        // String based values requiring save paths must have a function to do so
+        //
+        SAVE_PATH("pref_key_save_location", null),
+        CUSTOM_FILTER_LOCATION("", null),
         CONFIRMATION_ID("confirmation_id", ""),
         DEVICE_ID("device_id", ""),
         PREF_KEY_SAVE_LOCATION("pref_key_save_location", ""),
@@ -432,11 +457,9 @@ public class Preferences {
             this.defaultVal = defaultVal;
         }
 
-        public static Prefs getPrefFromKey(String key)
-        {
-            for(Prefs pref : Prefs.values())
-            {
-                if( pref.key.equals(key))
+        public static Prefs getPrefFromKey(String key) {
+            for (Prefs pref : Prefs.values()) {
+                if (pref.key.equals(key))
                     return pref;
             }
 

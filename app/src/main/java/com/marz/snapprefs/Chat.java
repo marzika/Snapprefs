@@ -158,7 +158,7 @@ public class Chat {
     }
 
     static void performChatSave(ChatData chatData) throws IOException {
-        String savePath = Preferences.getString(Prefs.SAVE_PATH) + "/ChatLogs/" + chatData.getmOtherUser() + ".txt";
+        String savePath = Preferences.getSavePath() + "/ChatLogs/" + chatData.getmOtherUser() + ".txt";
 
         File outputFile = new File(savePath);
 

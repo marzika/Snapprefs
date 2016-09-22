@@ -55,7 +55,7 @@ public class LensIconLoader {
 
     public static Bitmap retrieveAppropriateBitmap( String url, String mCode, Context context )
     {
-        File iconDirectory = new File(Preferences.getString(Preferences.Prefs.SAVE_PATH), "/LensIcons");
+        File iconDirectory = new File(Preferences.getSavePath(), "/LensIcons");
 
         if( !iconDirectory.exists() && !iconDirectory.mkdirs()) {
             return getBitmapFromURL(url, 1);

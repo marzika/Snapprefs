@@ -82,15 +82,14 @@ public class HookMethods
         MODULE_PATH = startupParam.modulePath;
         mResources = XModuleResources.createInstance(startupParam.modulePath, null);
         //refreshPreferences();
+        Preferences.assignDefaultSavePath();
     }
 
     @Override
     public void handleInitPackageResources(InitPackageResourcesParam resparam) throws Throwable {
         try {
-            if (!resparam.packageName.equals(Common.PACKAGE_SNAP)) {
-                Logger.log("Skipping resource hooks: Same target package");
+            if (!resparam.packageName.equals(Common.PACKAGE_SNAP))
                 return;
-            }
 
             Object activityThread =
                     callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
@@ -186,8 +185,7 @@ public class HookMethods
                 return;
             }
 
-            Preferences.createXSPrefsIfNotExisting();
-            Logger.log("Loading map from exposed");
+            Logger.log("Loading map from xposed");
             Preferences.loadMapFromXposed();
 
 
@@ -492,24 +490,24 @@ public class HookMethods
                         if (iv.getContext().getPackageName().equals("com.snapchat.android"))
                             if (resId ==
                                     iv.getContext().getResources().getIdentifier("camera_batteryfilter_full", "drawable", "com.snapchat.android"))
-                                if (Preferences.getString(Prefs.CUSTOM_FILTER_LOCATION) == null) {
+                                if (Preferences.getFilterPath() == null) {
                                     iv.setImageDrawable(modRes.getDrawable(R.drawable.custom_filter_1));
                                     Logger.log("Replaced batteryfilter from R.drawable", true);
                                 } else {
                                     if (Preferences.getInt(Prefs.CUSTOM_FILTER_TYPE) == 0) {
                                         iv.setImageDrawable(Drawable.createFromPath(
-                                                Preferences.getString(Prefs.CUSTOM_FILTER_LOCATION) +
+                                                Preferences.getFilterPath() +
                                                         "/fullscreen_filter.png"));
                                         //iv.setImageDrawable(modRes.getDrawable(R.drawable.imsafe));
                                     } else if (Preferences.getInt(Prefs.CUSTOM_FILTER_TYPE) == 1) {
                                         //iv.setImageDrawable(modRes.getDrawable(R.drawable.imsafe));
                                         iv.setImageDrawable(Drawable.createFromPath(
-                                                Preferences.getString(Prefs.CUSTOM_FILTER_LOCATION) +
+                                                Preferences.getFilterPath() +
                                                         "/banner_filter.png"));
                                     }
                                     Logger.log(
                                             "Replaced batteryfilter from " +
-                                                    Preferences.getString(Prefs.CUSTOM_FILTER_LOCATION) +
+                                                    Preferences.getFilterPath() +
                                                     " Type: " +
                                                     Preferences.getInt(Prefs.CUSTOM_FILTER_TYPE), true);
                                 }
