@@ -10,13 +10,14 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.SnapData.FlagState;
 import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.NotificationUtils.ToastType;
 import com.marz.snapprefs.Util.SavingUtils;
-import com.marz.snapprefs.Preferences.Prefs;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,6 +34,7 @@ import java.util.regex.Pattern;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
@@ -39,6 +42,7 @@ import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
+import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
 
 public class Saving {
     //public static final String SNAPCHAT_PACKAGE_NAME = "com.snapchat.android";
@@ -197,6 +201,57 @@ public class Saving {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Logger.afterHook("StorySnapView - Hide1");
+                }
+            });
+            //List<Bitmap> a = this.i.a(this.F.g(), ProfileImageSize.MEDIUM);
+            findAndHookMethod("com.snapchat.android.fragments.FriendMiniProfilePopupFragment", lpparam.classLoader, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_GET_CACHED_PROFILE_PICTURES, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
+                    View mini_profile_snapcode = (View) getObjectField(param.thisObject, Obfuscator.save.MINI_PROFILE_SNAPCODE);
+                    mini_profile_snapcode.setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(View v) {
+                            final File profileImagesFolder = new File(Preferences.getString(Prefs.SAVE_PATH), "ProfileImages/");
+                            if(!profileImagesFolder.exists() && !profileImagesFolder.mkdirs()){
+                                Logger.log("Error creating profile images folder");
+                                return false;
+                            }
+
+                            // ProfileImageUtils$ProfileImageSize inner class
+                            Class<?> profileImageSizeClass = findClass(Obfuscator.save.PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS, lpparam.classLoader);
+                            // F
+                            Object friendObject = getObjectField(param.thisObject, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_FRIEND_FIELD);
+                            // ^.g
+                            String username = (String) callMethod(friendObject, Obfuscator.save.GET_FRIEND_USERNAME);
+                            // ProfileImageSize.MEDIUM
+                            Object MEDIUM = getStaticObjectField(findClass(Obfuscator.save.PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS, lpparam.classLoader), "MEDIUM");
+                            // this.i
+                            Object i = getObjectField(param.thisObject, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_FRIENDS_PROFILE_IMAGES_CACHE);
+                            //^.a(F.g(), ProfileImageSize.MEDIUM)
+                            List<Bitmap> profileImages = (List<Bitmap>) callMethod(i, Obfuscator.save.PROFILE_IMAGES_CACHE_GET_PROFILE_IMAGES, new Class[]{String.class, profileImageSizeClass}, username, MEDIUM);
+                            if (Preferences.getBool(Prefs.DEBUGGING)) {
+                                XposedBridge.log("First Three Letters Of Username: " + username.substring(0, 3) + "\nInner Class: " + profileImageSizeClass + "\nFriend Object: " + friendObject + "\nUsername: " + username + "\nMedium: " + MEDIUM + "\n 'i' Object: " + i + "profileImages: " + profileImages);
+                            }
+                            
+                            if(profileImages == null) {
+                                SavingUtils.vibrate(HookMethods.context, false);
+                                NotificationUtils.showStatefulMessage("Error Saving Profile Images For " + username + "\nIf The Profile Image Is Not Blank Please Enable Debug Mode And Rep", ToastType.BAD, lpparam.classLoader);
+                                return false;
+                            }
+                            int succCounter = 0;
+                            int sizeOfProfileImages = profileImages.size();
+                            for (int iter = 0; iter < sizeOfProfileImages; iter++) {
+                                File f = new File(profileImagesFolder, username + "-" + iter + ".jpg");
+                                if(SavingUtils.saveJPG(f, profileImages.get(iter), HookMethods.context)) {
+                                    succCounter++;
+                                }
+                            }
+                            Boolean succ = (succCounter == sizeOfProfileImages);
+                            NotificationUtils.showStatefulMessage("Saved " + succCounter + "/" + sizeOfProfileImages + " profile images.", succ ? ToastType.GOOD : ToastType.BAD, lpparam.classLoader);
+                            SavingUtils.vibrate(HookMethods.context, succ);
+                            return true;
+                        }
+                    });
                 }
             });
         } catch (Exception e) {
