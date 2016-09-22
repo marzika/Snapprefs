@@ -47,7 +47,7 @@ public class Friendmojis {
         try {
             file = new File(Environment.getExternalStorageDirectory() + "/Snapprefs/friendmojis.dat");
             load();
-            XposedHelpers.findAndHookMethod(Obfuscator.select.FRIEND_CLASS, lpparam.classLoader, "o", new XC_MethodHook() {
+            XposedHelpers.findAndHookMethod(Obfuscator.select.FRIEND_CLASS, lpparam.classLoader, Obfuscator.friendmojis.GET_FRIENDMOJI_STRING_METHOD, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     String username = (String) XposedHelpers.callMethod(param.thisObject, Obfuscator.save.GET_FRIEND_USERNAME);
