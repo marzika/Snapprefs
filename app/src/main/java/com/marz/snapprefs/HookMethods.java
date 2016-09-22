@@ -250,8 +250,9 @@ public class HookMethods
             findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    DebugHelper.init(lpparam);
                     Preferences.refreshPreferences();
+                    Friendmojis.init(lpparam);
+                    DebugHelper.init(lpparam);
                     Logger.log("makeWorldReadable: " + Preferences.prefs.makeWorldReadable(), true);
                     Preferences.printSettings();
                     if (Preferences.mLicense == 1 || Preferences.mLicense == 2) {
