@@ -2,7 +2,6 @@ package com.marz.snapprefs;
 
 import android.content.SharedPreferences;
 import android.os.Environment;
-import android.os.FileObserver;
 
 import com.marz.snapprefs.Settings.MiscSettings;
 
@@ -29,7 +28,6 @@ public class Preferences {
 
     private static ConcurrentHashMap<String, Object> preferenceMap = new ConcurrentHashMap<>();
     private static XSharedPreferences xSPrefs;
-    private static FileObserver observer;
 
     public static XSharedPreferences createXSPrefsIfNotExisting() {
         File prefsFile = new File(

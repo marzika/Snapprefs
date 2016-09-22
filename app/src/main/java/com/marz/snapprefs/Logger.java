@@ -44,9 +44,14 @@ public class Logger {
      * @param forced  Whether to force log and thus overrides the debug setting
      */
     public static void log(String message, boolean prefix, boolean forced) {
-
-        if( !Preferences.getBool(Preferences.Prefs.DEBUGGING) && !forced)
+        try {
+            if (!Preferences.getBool(Preferences.Prefs.DEBUGGING) && !forced)
+                return;
+        } catch( Throwable t)
+        {
+            Log.d("SNAPPREFS", "Tried to log before fully loaded: ["  + message + "]");
             return;
+        }
 
         if (prefix) {
             message = LOG_TAG + message;
