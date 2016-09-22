@@ -312,10 +312,7 @@ public class Preferences {
         if (savePath == null) {
             String newPath = assignDefaultSavePath();
 
-            if (newPath == null)
-                throw new RuntimeException("Tried to get path before runtime is ready");
-            else
-                return newPath;
+            return newPath;
         }
 
         return getString(Prefs.SAVE_PATH);
@@ -327,10 +324,7 @@ public class Preferences {
         if( path == null ) {
             String newPath = (String) (Prefs.CUSTOM_FILTER_LOCATION.defaultVal = getSavePath() + "/Filters");
 
-            if (newPath == null)
-                throw new RuntimeException("Tried to get path before runtime is ready");
-            else
-                return newPath;
+            return newPath;
         }
 
         return path;
