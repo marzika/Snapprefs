@@ -327,5 +327,6 @@ public class Obfuscator {
         public static final String FRIENDS_MAP_FIELD = "mOutgoingFriendsListMap";
         public static final String GET_VALUES_METHOD = "b";
         public static final String IS_IT_ME_METHOD = "k";
+        public static final String GET_FRIENDMOJI_STRING_METHOD = "o";
     }
 }
