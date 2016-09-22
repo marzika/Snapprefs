@@ -306,14 +306,14 @@ public class Preferences {
         }
     }
 
-    public static String getSavePath() throws Throwable {
+    public static String getSavePath() {
         String savePath = getString(Prefs.SAVE_PATH);
 
         if (savePath == null) {
             String newPath = assignDefaultSavePath();
 
             if (newPath == null)
-                throw new Throwable("Tried to get path before runtime is ready");
+                throw new RuntimeException("Tried to get path before runtime is ready");
             else
                 return newPath;
         }
@@ -321,18 +321,18 @@ public class Preferences {
         return getString(Prefs.SAVE_PATH);
     }
 
-    public static String getFilterPath() throws Throwable {
+    public static String getFilterPath() {
         String path = getString(Prefs.CUSTOM_FILTER_LOCATION);
 
         if( path == null ) {
             String newPath = (String) (Prefs.CUSTOM_FILTER_LOCATION.defaultVal = getSavePath() + "/Filters");
 
             if (newPath == null)
-                throw new Throwable("Tried to get path before runtime is ready");
+                throw new RuntimeException("Tried to get path before runtime is ready");
             else
                 return newPath;
         }
-        
+
         return path;
     }
 
