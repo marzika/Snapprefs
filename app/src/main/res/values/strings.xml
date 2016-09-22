@@ -20,7 +20,7 @@
 
     <string name="hidelive_text">Hide Live stories</string>
     <string name="hidelive_summary">Hides the Live stories section on the Stories screen</string>
-    <string name="hidepeople_text">Hide People from Stories</string>
+    <string name="hidepeople_text">Hide People From Stories</string>
     <string name="hidepeople_summary">Enables the option to hide certain people\'s stories</string>
     <string name="showfavs_text">Show Favourites</string>
     <string name="showfavs_summary">Shows only the Favourites on the Stories screen</string>
@@ -36,7 +36,7 @@
     <string name="full_text">Unlimited Text</string>
     <string name="full_text_summary">Enables unlimited text for the captions</string>
     <string name="select_text">Select-All</string>
-    <string name="select_text_summary">Adds Select-All function for sending snaps</string>
+    <string name="select_text_summary">Enables the Select-All functionality for sending snaps</string>
     <string name="selectstory_text">Including My Story</string>
     <string name="selectstory_text_summary">Includes My Story to the Select-All function</string>
     <string name="selectvenue_text">Including Local Venues</string>
@@ -120,7 +120,7 @@
 
     <!-- Saving settings -->
     <string name="pref_category_snapchats">Saving</string>
-    <string name="pref_save_button_position_title">Button position</string>
+    <string name="pref_save_button_position_title">Button Bosition</string>
     <string name="pref_save_button_position_summary_on">Save button position: LEFT</string>
     <string name="pref_save_button_position_summary_off">Save button position: RIGHT</string>
     <string name="pref_save_snapchats_default" translatable="false">0</string>
@@ -131,8 +131,8 @@
     <string name="pref_save_sent_snaps_title">Sent snaps</string>
     <string name="pref_save_sent_snaps_summary_on">Sent snaps will be saved</string>
     <string name="pref_save_sent_snaps_summary_off">Sent snaps won\'t be saved</string>
-    <string name="pref_save_snaps">Snap save mode</string>
-    <string name="pref_save_story">Story save mode</string>
+    <string name="pref_save_snaps">Snap Save Mode</string>
+    <string name="pref_save_story">Story Save Mode</string>
 
     <string-array name="pref_forcenavbar_entries">
         <item>Force Navbar padding to hide</item>
@@ -194,12 +194,12 @@
         <item>7</item>
         <item>10</item>
     </string-array>
-    <string name="pref_custom_filter_cb_title">Enable custom filter</string>
+    <string name="pref_custom_filter_cb_title">Enable Custom Filters</string>
     <string name="pref_custom_filter_cb_summary_on">Select a custom filter below</string>
     <string name="pref_custom_filter_cb_summary_off">Custom filters are disabled</string>
-    <string name="pref_multi_filter_cb_title">Enable Multi-filters</string>
+    <string name="pref_multi_filter_cb_title">Enable Multi-Filters</string>
     <string name="pref_multi_filter_cb_summary_on">Every filter will be loaded from /sdcard/Snapprefs/Filters</string>
-    <string name="pref_multi_filter_cb_summary_off">Multi filters are disabled</string>
+    <string name="pref_multi_filter_cb_summary_off">Multi-Filters are disabled</string>
     <string name="pref_custom_filter_title">Choose custom filter</string>
     <string name="pref_filter_group_summary">Here you can download custom filters to have</string>
     <string name="pref_filter_group_title">Open the Google+ group for filters</string>
@@ -360,12 +360,12 @@
     <string name="pref_paint_cb_title">Enable Paint Tools</string>
     <string name="pref_timercounter_cb_summary">When enabled your taken video\'s length will be shown on the recording button during recording.</string>
     <string name="pref_timercounter_cb_title">Enable Timer Counter</string>
-    <string name="pref_save_chat_image_title">Enable Chat media saving</string>
+    <string name="pref_save_chat_image_title">Enable Chat Media Saving</string>
     <string name="pref_save_chat_image_summary">When enabled long press on the image when opened to save it, for  videos use the button.</string>
-    <string name="pref_save_chat_text_title">Enable Chat text auto-save</string>
-    <string name="pref_save_chat_text_summary">When enabled sent/received Chats gets saved automatically</string>
+    <string name="pref_save_chat_text_title">Enable Chat text Auto-Save</string>
+    <string name="pref_save_chat_text_summary">When enabled sent and received Chats will be saved automatically</string>
     <string name="pref_save_integration_title">Enable Snapchat integration</string>
     <string name="pref_save_integration_summary">When enabled you can launch Snapprefs\'s settings by pulling down Snapchat\'s settings bar and clicking on Snapprefs</string>
-    <string name="licenses">Snapprefs is licensed under GNU GPLv3. \n\nUsed libraries - License:\Instagram Filters for Android - Apache License 2.0\nckChangeLog - Apache License 2.0\nColorPicker for Android - Apache Lic. 2.0\nNoNonsense-FilePicker - MPL 2.0\nmp4parser - Free License\n\nModule was originally based on:\nKeepchat - GNU GPLv3\nSnapshare - GNU GPLv3\n\nSnapchat™ is the property of Snapchat Inc.\nSnapprefs is in no way affiliated with, authorized, maintained, sponsored or endorsed by the Snapchat Inc. or any of its affiliates or subsidiaries. This is an independent application.</string>
-    <string name="hide_text">Show icon in launcher</string>
+    <string name="licenses">Snapprefs is licensed under GNU GPLv3. \n\nUsed libraries - License:\nInstagram Filters for Android - Apache License 2.0\nckChangeLog - Apache License 2.0\nColorPicker for Android - Apache Lic. 2.0\nNoNonsense-FilePicker - MPL 2.0\nmp4parser - Free License\n\nModule was originally based on:\nKeepchat - GNU GPLv3\nSnapshare - GNU GPLv3\n\nSnapchat™ is the property of Snapchat Inc.\nSnapprefs is in no way affiliated with, authorized, maintained, sponsored or endorsed by the Snapchat Inc. or any of its affiliates or subsidiaries. This is an independent application.</string>
+    <string name="hide_text">Show Icon In Launcher</string>
 </resources>
