@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
-import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
@@ -211,7 +210,7 @@ public class Saving {
                     mini_profile_snapcode.setOnLongClickListener(new View.OnLongClickListener() {
                         @Override
                         public boolean onLongClick(View v) {
-                            final File profileImagesFolder = new File(Preferences.getString(Prefs.SAVE_PATH), "ProfileImages/");
+                            final File profileImagesFolder = new File(Preferences.getSavePath(), "ProfileImages/");
                             if(!profileImagesFolder.exists() && !profileImagesFolder.mkdirs()){
                                 Logger.log("Error creating profile images folder");
                                 return false;
@@ -229,10 +228,8 @@ public class Saving {
                             Object i = getObjectField(param.thisObject, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_FRIENDS_PROFILE_IMAGES_CACHE);
                             //^.a(F.g(), ProfileImageSize.MEDIUM)
                             List<Bitmap> profileImages = (List<Bitmap>) callMethod(i, Obfuscator.save.PROFILE_IMAGES_CACHE_GET_PROFILE_IMAGES, new Class[]{String.class, profileImageSizeClass}, username, MEDIUM);
-                            if (Preferences.getBool(Prefs.DEBUGGING)) {
-                                XposedBridge.log("First Three Letters Of Username: " + username.substring(0, 3) + "\nInner Class: " + profileImageSizeClass + "\nFriend Object: " + friendObject + "\nUsername: " + username + "\nMedium: " + MEDIUM + "\n 'i' Object: " + i + "profileImages: " + profileImages);
-                            }
-                            
+                            Logger.log("First Three Letters Of Username: " + username.substring(0, 3) + "\nInner Class: " + profileImageSizeClass + "\nFriend Object: " + friendObject + "\nUsername: " + username + "\nMedium: " + MEDIUM + "\n 'i' Object: " + i + "profileImages: " + profileImages);
+
                             if(profileImages == null) {
                                 SavingUtils.vibrate(HookMethods.context, false);
                                 NotificationUtils.showStatefulMessage("Error Saving Profile Images For " + username + "\nIf The Profile Image Is Not Blank Please Enable Debug Mode And Rep", ToastType.BAD, lpparam.classLoader);
@@ -989,7 +986,7 @@ public class Saving {
     }
 
     public static File createFileDir(String category, String sender) throws IOException {
-        File directory = new File(Preferences.getString(Prefs.SAVE_PATH));
+        File directory = new File(Preferences.getSavePath());
 
         if (Preferences.getBool(Prefs.SORT_BY_CATEGORY) || (Preferences.getBool(Prefs.SORT_BY_USERNAME) && sender == null)) {
             directory = new File(directory, category);

@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.marz.snapprefs.MainActivity;
 import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.R;
+import com.marz.snapprefs.Util.CommonUtils;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -39,7 +40,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -140,23 +140,18 @@ public class ActivateFragment extends Fragment {
         applygod.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (name.getText().toString().trim().length() > 0){
-                    MessageDigest md = null;
+                if (name.getText().toString().trim().length() > 0) {
+                    String hashed;
                     try {
-                        md = MessageDigest.getInstance("SHA-256");
+                        hashed = CommonUtils.sha256(name.getText().toString());
                     } catch (NoSuchAlgorithmException e) {
                         e.printStackTrace();
                         Toast.makeText(context, "NoSuchAlgorithm", Toast.LENGTH_SHORT).show();
                         return;
-                    }
-                    try {
-                        md.update(name.getText().toString().getBytes("UTF-8")); // Change this to "UTF-16" if needed
                     } catch (UnsupportedEncodingException e) {
                         Toast.makeText(context, "Invalid username", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    byte[] digest = md.digest();
-                    String hashed = String.format("%064x", new java.math.BigInteger(1, digest));
                     new ConnectionGod().execute(cID.getText().toString(), hashed);
                 } else {
                     Toast.makeText(context, "Empty username", Toast.LENGTH_SHORT).show();
@@ -166,6 +161,7 @@ public class ActivateFragment extends Fragment {
 
         return view;
     }
+
     public void postData(final String confirmationID, final String deviceID) {
         // Create a new HttpClient and Post Header
         HttpClient httpclient = new DefaultHttpClient();
@@ -334,6 +330,7 @@ public class ActivateFragment extends Fragment {
             saveLicense(deviceID, confirmationID, 0);
         }
     }
+
     public void postGod(final String confirmationID, final String username) {
         // Create a new HttpClient and Post Header
         HttpClient httpclient = new DefaultHttpClient();
@@ -410,6 +407,7 @@ public class ActivateFragment extends Fragment {
     public void saveDeviceID(String value) {
         Preferences.putString("device_id", value);
     }
+
     public String readStringPreference(String key) {
         SharedPreferences prefs = MainActivity.getPrefereces();
         return prefs.getString(key, null);
@@ -424,6 +422,7 @@ public class ActivateFragment extends Fragment {
         }
 
     }
+
     private class ConnectionGod extends AsyncTask<String, Void, Void> {
 
         @Override

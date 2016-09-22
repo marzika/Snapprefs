@@ -191,9 +191,12 @@ public class HookMethods
             findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    Preferences.refreshPreferences();
+                    Friendmojis.init(lpparam);
                     DebugHelper.init(lpparam);
-                    Logger.log("Application hook: " + param.thisObject.getClass().getCanonicalName());
-
+                    Logger.log("makeWorldReadable: " + Preferences.prefs.makeWorldReadable(), true);
+                    Preferences.printSettings();
+                    if (Preferences.mLicense == 1 || Preferences.mLicense == 2) {
                     //Preferences.loadMapFromXposed();
                     //Logger.log("makeWorldReadable: " + Preferences.prefs.makeWorldReadable(), true);
                     //Preferences.printSettings();
