@@ -146,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         context = this;
         ChangeLog cl = new ChangeLog(context);
-        Preferences.assignDefaultSavePath();
         createDeviceId();
 
         if (cl.isFirstRun()) {

@@ -298,7 +298,7 @@ public class Preferences {
         return (int) getPref(storedDeviceId, Prefs.LICENCE.defaultVal);
     }
 
-    public static String assignDefaultSavePath() {
+    private static String assignDefaultSavePath() {
         try {
             return (String) (Prefs.SAVE_PATH.defaultVal = getExternalPath() + "/Snapprefs");
         } catch (Throwable t) {
@@ -312,7 +312,12 @@ public class Preferences {
         if (savePath == null) {
             String newPath = assignDefaultSavePath();
 
-            return newPath;
+            if (newPath == null) {
+                Logger.log("[SEVERE ERROR] PROBLEM ASSIGNING SAVEPATH! Probably too close to runtime");
+                return null;
+            }
+            else
+                return newPath;
         }
 
         return getString(Prefs.SAVE_PATH);
@@ -324,7 +329,12 @@ public class Preferences {
         if( path == null ) {
             String newPath = (String) (Prefs.CUSTOM_FILTER_LOCATION.defaultVal = getSavePath() + "/Filters");
 
-            return newPath;
+            if (newPath == null) {
+                Logger.log("[SEVERE ERROR] PROBLEM ASSIGNING SAVEPATH! Probably too close to runtime");
+                return null;
+            }
+            else
+                return newPath;
         }
 
         return path;
