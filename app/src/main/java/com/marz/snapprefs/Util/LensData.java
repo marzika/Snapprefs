@@ -35,6 +35,7 @@ public class LensData {
         contentValues.put(LensEntry.COLUMN_NAME_MID, mId);
         contentValues.put(LensEntry.COLUMN_NAME_MLENSLINK, mLensLink);
         contentValues.put(LensEntry.COLUMN_NAME_MSIGNATURE, mSignature);
+        contentValues.put(LensEntry.COLUMN_NAME_ACTIVE, mActive);
         return contentValues;
     }
 }

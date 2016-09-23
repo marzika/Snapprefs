@@ -25,7 +25,6 @@ public class Preferences {
     public static final int TOAST_LENGTH_LONG = 1;
     public static final int TIMER_MINIMUM_DISABLED = 0;
     public static final int SPIN_EXCESS = 200;
-    private static boolean foundPath = false;
 
     private static ConcurrentHashMap<String, Object> preferenceMap = new ConcurrentHashMap<>();
     private static XSharedPreferences xSPrefs;
@@ -406,6 +405,8 @@ public class Preferences {
         BUTTON_POSITION("pref_key_save_button_position", false),
         LENSES_LOAD("pref_key_load_lenses", true),
         LENSES_COLLECT("pref_key_collect_lenses", true),
+        LENSES_AUTO_ENABLE("pref_key_auto_enable_lenses", false),
+        LENSES_FORCED("pref_key_forced_lenses", true),
         ACCEPTED_TOU("acceptedToU", false),
         SELECT_STORY("pref_key_selectstory", false),
         SELECT_VENUE("pref_key_selectvenue", false),

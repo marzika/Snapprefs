@@ -132,6 +132,8 @@ public class Logger {
         }
     }
 
+
+
     /**
      * Write a throwable with a message to the Xposed Log, even when debugging is disabled.
      *
@@ -141,5 +143,12 @@ public class Logger {
     public static void log(String message, Throwable throwable) {
         log(message, true, true);
         log(throwable);
+    }
+
+    public static void logStackTrace() {
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+
+        for(StackTraceElement traceElement : stackTraceElements)
+            Logger.log("Stack trace: [Class: " + traceElement.getClassName() + "] [Method: " + traceElement.getMethodName() + "]");
     }
 }

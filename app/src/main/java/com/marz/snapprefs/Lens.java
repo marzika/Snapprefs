@@ -43,6 +43,7 @@ public class Lens {
         if (MainActivity.lensDBHelper == null)
             MainActivity.lensDBHelper = new LensDatabaseHelper(snapContext);
 
+        // TODO Allow for this to be toggled
         findAndHookMethod("com.snapchat.android.database.SharedPreferenceKey", lpparam.classLoader, "getBoolean", boolean.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(XC_MethodHook.MethodHookParam methodHookParam) throws Throwable {
@@ -200,6 +201,7 @@ public class Lens {
         lensData.mLensLink = (String) getObjectField(lens, "mLensLink");
         //lensData.mPriority = (int) getObjectField(lens, "mPriority");
         lensData.mSignature = (String) getObjectField(lens, "mSignature");
+        lensData.mActive = Preferences.getBool(Prefs.LENSES_AUTO_ENABLE);
         //lensData.mLensIcon = getBitmapFromURL(lensData.mIconLink);
 
         return lensData;
