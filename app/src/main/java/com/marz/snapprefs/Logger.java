@@ -18,9 +18,6 @@
  */
 package com.marz.snapprefs;
 
-import android.text.TextUtils;
-import android.util.Log;
-
 import com.marz.snapprefs.Util.StringUtils;
 
 import de.robv.android.xposed.XposedBridge;

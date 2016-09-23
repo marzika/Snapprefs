@@ -1,14 +1,5 @@
 package com.marz.snapprefs;
 
-import android.database.Cursor;
-import android.graphics.Color;
-import android.net.NetworkInfo;
-import android.os.Looper;
-import android.widget.Toast;
-
-import com.marz.snapprefs.Util.NotificationUtils;
-
-import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;

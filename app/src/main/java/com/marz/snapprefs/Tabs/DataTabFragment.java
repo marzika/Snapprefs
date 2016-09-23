@@ -11,9 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.marz.snapprefs.Fragments.AboutFragment;
-import com.marz.snapprefs.Fragments.SupportFragment;
-import com.marz.snapprefs.Fragments.MainFragment;
 import com.marz.snapprefs.R;
 import com.marz.snapprefs.Settings.BaseSettings;
 

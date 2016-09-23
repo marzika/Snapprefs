@@ -11,11 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.marz.snapprefs.Fragments.AboutFragment;
 import com.marz.snapprefs.Fragments.ActivateFragment;
 import com.marz.snapprefs.Fragments.BuyFragment;
-import com.marz.snapprefs.Fragments.SupportFragment;
-import com.marz.snapprefs.Fragments.MainFragment;
 import com.marz.snapprefs.R;
 
 public class BuyTabFragment extends Fragment {

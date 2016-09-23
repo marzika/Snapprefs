@@ -1,6 +1,5 @@
 package jp.co.cyberagent.android.gpuimage.sample.filter;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;

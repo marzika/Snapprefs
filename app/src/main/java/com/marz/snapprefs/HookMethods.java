@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Util.DebugHelper;
+import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import org.apache.http.HttpResponse;
@@ -349,6 +350,7 @@ public class HookMethods
                             if (Preferences.mIntegration) {
                                 HookedLayouts.initIntegration(lpparam, mResources);
                             }
+                            NotificationUtils.showStatefulMessage("refract002", NotificationUtils.ToastType.GOOD, lpparam.classLoader);
                             Misc.forceNavBar(lpparam, Preferences.mForceNavbar);
                             getEditText(lpparam);
                             findAndHookMethod(Obfuscator.save.SCREENSHOTDETECTOR_CLASS, lpparam.classLoader, Obfuscator.save.SCREENSHOTDETECTOR_RUN, LinkedHashMap.class, XC_MethodReplacement.DO_NOTHING);
