@@ -120,7 +120,7 @@
 
     <!-- Saving settings -->
     <string name="pref_category_snapchats">Saving</string>
-    <string name="pref_save_button_position_title">Button Bosition</string>
+    <string name="pref_save_button_position_title">Button Position</string>
     <string name="pref_save_button_position_summary_on">Save button position: LEFT</string>
     <string name="pref_save_button_position_summary_off">Save button position: RIGHT</string>
     <string name="pref_save_snapchats_default" translatable="false">0</string>
@@ -326,7 +326,7 @@
     <string name="pref_support_faq" translatable="false">FAQ</string>
     <string name="support" translatable="false">Support</string>
     <string name="pref_support_faq_summary" translatable="false">Opens the XDA post containing the Frequently Asked Questions with answers.</string>
-    <string name="title_activity_maps">Longclick on a location to spoof</string>
+    <string name="title_activity_maps">Tap and Hold on a location to spoof</string>
     <string name="str_btn_find">Search</string>
     <string name="hnt_et_location">Type here a location to find</string>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">

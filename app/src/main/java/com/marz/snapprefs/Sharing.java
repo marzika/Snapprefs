@@ -220,7 +220,7 @@ public class Sharing {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         param.args[0] = mediaImg.getContent();
-                        Logger.log("Set IMAGE media in camerafragment", true);
+                        Logger.log("Set IMAGE media in CameraFragment", true);
                     }
                 });
                 /*findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onSnapCapturedEvent", lpparam.classLoader.loadClass("Ue"), new XC_MethodHook() {
@@ -237,7 +237,7 @@ public class Sharing {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         param.args[0] = mediaVid.getContent();
-                        Logger.log("Set Video media in camerafragment", true);
+                        Logger.log("Set Video media in CameraFragment", true);
                     }
                 });
 
@@ -246,12 +246,12 @@ public class Sharing {
                 //    Object builder = newInstance(findClass("com.snapchat.android.model.Snapbryo.Builder", lpparam.classLoader));
                 //   builder = callMethod(builder, Obfuscator_share.BUILDER_CONSTRUCTOR.getValue(snapchatVersion), media.getContent());
                 //  Object snapbryo = callMethod(builder, Obfuscator_share.CREATE_SNAPBRYO.getValue(snapchatVersion));
-                //Object snapbryo = media.getContent();
-                //snapCaptureEvent = newInstance(snapCapturedEventClass, snapbryo, SnapCaptureContext.getEnumConstants()[0]); //SNAPCAPTURECONTEXT
+                // Object snapbryo = media.getContent();
+                // snapCaptureEvent = newInstance(snapCapturedEventClass, snapbryo, SnapCaptureContext.getEnumConstants()[0]); //SNAPCAPTURECONTEXT
 
                 // Call the eventbus to post our SnapCapturedEvent, this will take us to the SnapPreviewFragment
-                //Object busProvider = callStaticMethod(findClass(Obfuscator.sharing.BUSPROVIDER_CLASS, lpparam.classLoader), Obfuscator.sharing.BUSPROVIDER_RETURNBUS);//upd. below
-                //callMethod(busProvider, "a", snapCaptureEvent);
+                // Object busProvider = callStaticMethod(findClass(Obfuscator.sharing.BUSPROVIDER_CLASS, lpparam.classLoader), Obfuscator.sharing.BUSPROVIDER_RETURNBUS);//upd. below
+                // callMethod(busProvider, "a", snapCaptureEvent);
                 // Clean up after ourselves, otherwise snapchat will crash
                 initializedUri = null;
             }
