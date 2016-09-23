@@ -74,7 +74,7 @@ public class Saving {
             ClassLoader cl = lpparam.classLoader;
 
             /**
-             * Called whenever a video is decrypted by snapchat
+             * Called whenever a video is decrypted by Snapchat
              * Will pre-load the next snap in the list
              */
             findAndHookConstructor(Obfuscator.save.DECRYPTEDSNAPVIDEO_CLASS, cl, findClass(
@@ -188,7 +188,7 @@ public class Saving {
                 });
             }
             /**
-             * We hook SnapView.a to determine wether we have stopped viewing the Snap.
+             * We hook SnapView.a to determine whether we have stopped viewing the Snap.
              */
             findAndHookMethod(Obfuscator.save.SNAPVIEW_CLASS, lpparam.classLoader, Obfuscator.save.SNAPVIEW_HIDE, findClass(Obfuscator.save.ENDREASON_CLASS, lpparam.classLoader), new XC_MethodHook() {
                 @Override
@@ -235,16 +235,16 @@ public class Saving {
                                 NotificationUtils.showStatefulMessage("Error Saving Profile Images For " + username + "\nIf The Profile Image Is Not Blank Please Enable Debug Mode And Rep", ToastType.BAD, lpparam.classLoader);
                                 return false;
                             }
-                            int succCounter = 0;
+                            int successCounter = 0;
                             int sizeOfProfileImages = profileImages.size();
-                            for (int iter = 0; iter < sizeOfProfileImages; iter++) {
-                                File f = new File(profileImagesFolder, username + "-" + iter + ".jpg");
-                                if(SavingUtils.saveJPG(f, profileImages.get(iter), HookMethods.context)) {
-                                    succCounter++;
+                            for (int iterator = 0; iterator < sizeOfProfileImages; iterator++) {
+                                File f = new File(profileImagesFolder, username + "-" + iterator + ".jpg");
+                                if(SavingUtils.saveJPG(f, profileImages.get(iterator), HookMethods.context)) {
+                                    successCounter++;
                                 }
                             }
-                            Boolean succ = (succCounter == sizeOfProfileImages);
-                            NotificationUtils.showStatefulMessage("Saved " + succCounter + "/" + sizeOfProfileImages + " profile images.", succ ? ToastType.GOOD : ToastType.BAD, lpparam.classLoader);
+                            Boolean succ = (successCounter == sizeOfProfileImages);
+                            NotificationUtils.showStatefulMessage("Saved " + successCounter + "/" + sizeOfProfileImages + " profile images.", succ ? ToastType.GOOD : ToastType.BAD, lpparam.classLoader);
                             SavingUtils.vibrate(HookMethods.context, succ);
                             return true;
                         }
@@ -252,11 +252,11 @@ public class Saving {
                 }
             });
         } catch (Exception e) {
-            Logger.log("Error occured: Snapprefs doesn't currently support this version, wait for an update", e);
+            Logger.log("Error occurred: Snapprefs doesn't currently support this version, wait for an update", e);
 
             findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Toast.makeText((Context) param.thisObject, "This version of snapchat is currently not supported by Snapprefs.", Toast.LENGTH_LONG)
+                    Toast.makeText((Context) param.thisObject, "This version of Snapchat is currently not supported by Snapprefs.", Toast.LENGTH_LONG)
                             .show();
                 }
             });

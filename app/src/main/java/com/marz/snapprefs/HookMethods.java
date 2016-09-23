@@ -192,7 +192,7 @@ public class HookMethods
             Context localContext = (Context) callMethod(activityThread, "getSystemContext");
 
             // TODO Set up removal of button when mode is changed
-            // Currently requires snapchat to restart to remove the button
+            // Currently requires Snapchat to restart to remove the button
             HookedLayouts.addSaveButtonsAndGestures(resparam, mResources, localContext);
 
             if (Preferences.shouldAddGhost) {

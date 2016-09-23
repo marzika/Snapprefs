@@ -5,7 +5,7 @@
     <string name="pref_received_title">Received Snaps</string>
     <string name="pref_sent_title">Sent Snaps</string>
     <string name="pref_colour_title">Colour Settings</string>
-    <string name="pref_debug_title">INFORMATIONS</string>
+    <string name="pref_debug_title">INFORMATION</string>
 
     <string name="pref_thanks_title">Thanks to</string>
     <string name="pref_thanks_summary">stirante, Mr. Yawnie, P1ngu1n, manvir, elesbb, chiralcode, Yoganandh, bnalls33, cketti, ddmanfire, MikeOrtiz, sangmingming</string>
@@ -51,12 +51,12 @@
     <string name="saving">Saving settings</string>
     <string name="sharing">Sharing settings</string>
     <string name="spoofing">Spoofing settings</string>
-    <string name="pref_text_title">Caption customization</string>
+    <string name="pref_text_title">Caption Customization</string>
     <string name="pref_text_summary">Enable countless text and background customization of captions</string>
-    <string name="pref_speed_title">Speed spoofing</string>
+    <string name="pref_speed_title">Speed Spoofing</string>
     <string name="pref_speed_value_title">Current set speed:</string>
-    <string name="pref_speed_summary_on">Enabled speed spoofing</string>
-    <string name="pref_speed_summary_off">Disabled speed spoofing</string>
+    <string name="pref_speed_summary_on">Speed spoofing is enabled</string>
+    <string name="pref_speed_summary_off">Speed spoofing is disabled</string>
     <string name="pref_sticker">Custom sticker</string>
     <string name="pref_sticker_title">Enable custom stickers</string>
     <string name="pref_sticker_summary_on">Custom sticker will be loaded</string>
@@ -69,11 +69,11 @@
     <string name="pref_discover_readme_title">HOW TO USE</string>
     <string name="pref_weather_summary_off">Weather will NOT be spoofed</string>
     <string name="pref_weather_summary_on">Weather will be spoofed</string>
-    <string name="pref_weather_title">Weather spoofing</string>
+    <string name="pref_weather_title">Weather Spoofing</string>
     <string name="pref_location_summary_off">Location will NOT be spoofed</string>
     <string name="pref_location_summary_on">Location will be spoofed</string>
     <string name="pref_location_readme_title">HOW TO USE</string>
-    <string name="pref_location_title">Location spoofing</string>
+    <string name="pref_location_title">Location Spoofing</string>
     <string name="pref_location_latitude_dialog">Enter latitude</string>
     <string name="pref_location_latitude_summary">Click here to enter latitude</string>
     <string name="pref_location_latitude_title">Latitude</string>
@@ -88,13 +88,13 @@
     <string name="pref_weather_how_summary">After typing in your desired value, you have to kill Snapchat, then restart to apply it.</string>
     <string name="pref_storypreload_summary_off">Stories will be preloaded</string>
     <string name="pref_storypreload_summary_on">Stories will NOT be preloaded</string>
-    <string name="pref_storypreload_title">Block Story preload</string>
+    <string name="pref_storypreload_title">Block Story Preload</string>
     <string name="pref_discover_summary_off">Discover will load and download</string>
     <string name="pref_discover_summary_on">Discover will NOT load NOR download</string>
-    <string name="pref_discover_title">Block Discover snaps</string>
+    <string name="pref_discover_title">Block Discover Snaps</string>
     <string name="pref_discover_ui_summary_off">Discover will show in the UI</string>
     <string name="pref_discover_ui_summary_on">Discover will NOT show in the UI</string>
-    <string name="pref_discover_ui_title">Block Discover from the UI</string>
+    <string name="pref_discover_ui_title">Block Discover From The UI</string>
     <string name="datasaving">Datasaving settings</string>
     <string name="pref_discover_readme_summary">Previously downloaded/cached Discovers before enabling this feature will load. Also, the second option saves like 5kB more data, since it block brand logos from downloading.</string>
     <string name="pref_overlay_summary_off">Video overlays will NOT be saved</string>
@@ -217,13 +217,13 @@
         <item>1</item>
     </string-array>
 
-    <string name="pref_toasts_title">Show toast messages</string>
+    <string name="pref_toasts_title">Show Toast Messages</string>
     <string name="pref_toasts_summary_on">Toast messages are enabled</string>
     <string name="pref_toasts_summary_off">Toast messages are disabled</string>
-    <string name="pref_vibration_title">Vibrate when saved</string>
+    <string name="pref_vibration_title">Vibrate When Saved:</string>
     <string name="pref_vibration_summary_on">Vibration is enabled. Soft vibration means success, hard vibration means error.</string>
     <string name="pref_vibration_summary_off">Vibration is disabled</string>
-    <string name="pref_toasts_duration_title">Toast duration</string>
+    <string name="pref_toasts_duration_title">Toast Duration</string>
     <string name="pref_forcenavbar_title">Force Navbar padding</string>
     <string name="pref_toasts_duration_default_value" translatable="false">0</string>
     <string-array name="pref_toasts_duration_entries">
@@ -239,14 +239,14 @@
 
 
     <string name="pref_category_folder">Folder</string>
-    <string name="pref_hide_location_title">Hide a folder</string>
-    <string name="pref_save_location_title">Saving location</string>
-    <string name="pref_sort_files_mode_title">Sort files by category</string>
+    <string name="pref_hide_location_title">Hide a Folder</string>
+    <string name="pref_save_location_title">Saving Location</string>
+    <string name="pref_sort_files_mode_title">Sort Files by Category</string>
     <string name="pref_sort_files_mode_summary_on">Snaps and stories will be saved into different folders</string>
-    <string name="pref_sort_files_mode_summary_off">Snaps and stories will be sorted into the same folder</string>
+    <string name="pref_sort_files_mode_summary_off">Snaps and stories will be saved into the same folder</string>
     <string name="pref_sort_files_username_title">Sort files by sender</string>
-    <string name="pref_sort_files_username_summary_on">Files will be sorted into a subfolder foreach sender</string>
-    <string name="pref_sort_files_username_summary_off">Files will be sorted into the same folder foreach sender</string>
+    <string name="pref_sort_files_username_summary_on">Files will be saved in a subfolder for each sender</string>
+    <string name="pref_sort_files_username_summary_off">Files will be saved into the same folder for each sender</string>
 
     <!-- Toast messages -->
 
@@ -274,7 +274,7 @@
     <!-- Media settings -->
     <string name="pref_media">Media</string>
 
-    <string name="pref_rotation_title">Rotation mode</string>
+    <string name="pref_rotation_title">Rotation Mode</string>
     <string name="pref_rotation_default" translatable="false">0</string>
     <string-array name="pref_rotation_entries">
         <item>Don\'t rotate</item>
@@ -287,7 +287,7 @@
         <item>270</item>
     </string-array>
 
-    <string name="pref_adjustment_title">Image adjustment method</string>
+    <string name="pref_adjustment_title">Image Adjustment Method</string>
     <string name="pref_adjustment_default" translatable="false">2</string>
     <string-array name="pref_adjustment_entries">
         <item>Crop</item>
@@ -304,11 +304,11 @@
     <string name="pref_caption">Unlimited Captions</string>
     <string name="pref_caption_explanation">Note: unlimited captions works for BOTH snaps taken with Snapchat\'s camera and snaps shared from the Gallery, so it\'s NOT limited to shared snaps.</string>
 
-    <string name="pref_caption_unlimited_vanilla_title">Unlimited regular captions</string>
+    <string name="pref_caption_unlimited_vanilla_title">Unlimited Regular Captions</string>
     <string name="pref_caption_unlimited_vanilla_on">Regular captions are unlimited</string>
     <string name="pref_caption_unlimited_vanilla_off">Regular captions are only one line</string>
 
-    <string name="pref_caption_unlimited_fat_title">Unlimited fat captions</string>
+    <string name="pref_caption_unlimited_fat_title">Unlimited Fat Captions</string>
     <string name="pref_caption_unlimited_fat_on">Fat captions are unlimited</string>
     <string name="pref_caption_unlimited_fat_off">Fat captions are 33 characters maximum</string>
 
@@ -361,7 +361,7 @@
     <string name="pref_timercounter_cb_summary">When enabled your taken video\'s length will be shown on the recording button during recording.</string>
     <string name="pref_timercounter_cb_title">Enable Timer Counter</string>
     <string name="pref_save_chat_image_title">Enable Chat Media Saving</string>
-    <string name="pref_save_chat_image_summary">When enabled long press on the image when opened to save it, for  videos use the button.</string>
+    <string name="pref_save_chat_image_summary">When enabled open the chat image and tap and hold to save, for  videos use the button.</string>
     <string name="pref_save_chat_text_title">Enable Chat text Auto-Save</string>
     <string name="pref_save_chat_text_summary">When enabled sent and received Chats will be saved automatically</string>
     <string name="pref_save_integration_title">Enable Snapchat integration</string>

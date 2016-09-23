@@ -133,7 +133,7 @@ public class Chat {
         boolean mIsSavedByRecipient =
                 (boolean) XposedHelpers.getObjectField(obj, "mIsSavedByRecipient");
 
-        //Logger.log("IsSeen: " + isSeen +  "Are you the sender? " + areYouTheSender + "from: " + mSender + " to " + mRecipient + " isSavedBySender: " + mIsSavedBySender + " isSaveByReci: " + mIsSavedByRecipient );
+        //Logger.log("IsSeen: " + isSeen +  "Are you the sender? " + areYouTheSender + "from: " + mSender + " to " + mRecipient + " isSavedBySender: " + mIsSavedBySender + " isSaveByRecipient: " + mIsSavedByRecipient );
 
         if ((areYouTheSender && mIsSavedBySender) ||
                 (!areYouTheSender && mIsSavedByRecipient))

@@ -118,7 +118,7 @@ public abstract class SavingUtils
         BufferedOutputStream outputStream = null;
 
         try {
-            // Use bufferedinputstreams for faster saving - Probably unecessary
+            // Use BufferedInputStreams for faster saving - Probably unnecessary
             inputStream =
                     new BufferedInputStream( fileStream );
             outputStream =
@@ -210,9 +210,9 @@ public abstract class SavingUtils
 
     public static int getToastLength() {
         if ( Preferences.mToastLength == Preferences.TOAST_LENGTH_SHORT ) {
-            return NotificationUtils.LENGHT_SHORT;
+            return NotificationUtils.LENGTH_SHORT;
         } else {
-            return NotificationUtils.LENGHT_LONG;
+            return NotificationUtils.LENGTH_LONG;
         }
     }
 }

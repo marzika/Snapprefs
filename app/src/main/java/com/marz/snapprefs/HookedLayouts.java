@@ -830,12 +830,12 @@ public class HookedLayouts {
                                     LinearLayout listLayout =
                                             (LinearLayout) rootLayout.findViewById(R.id.fontLayout);
                                     for (final File font : fonts) {
-                                        String fontname =
+                                        String fontName =
                                                 font.getName().substring(0, font.getName().toLowerCase().lastIndexOf("."));
                                         TextView item = new TextView(context);
                                         item.setLayoutParams(new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                                         item.setPadding(0, 0, 0, 2);
-                                        item.setText(fontname);
+                                        item.setText(fontName);
                                         item.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 22.0f);
                                         item.setGravity(Gravity.CENTER_HORIZONTAL);
                                         item.setTypeface(TypefaceUtil.get(font));
@@ -850,10 +850,10 @@ public class HookedLayouts {
                                     builder.setView(rootLayout);
                                     builder.show();
                                 } else {
-                                    NotificationUtils.showMessage("Fonts folder is empty", Color.RED, NotificationUtils.LENGHT_SHORT, HookMethods.classLoader);
+                                    NotificationUtils.showMessage("Fonts folder is empty", Color.RED, NotificationUtils.LENGTH_SHORT, HookMethods.classLoader);
                                 }
                             } else {
-                                NotificationUtils.showMessage("Fonts folder is not available", Color.RED, NotificationUtils.LENGHT_SHORT, HookMethods.classLoader);
+                                NotificationUtils.showMessage("Fonts folder is not available", Color.RED, NotificationUtils.LENGTH_SHORT, HookMethods.classLoader);
                             }
                             return;
                         }
@@ -885,8 +885,8 @@ public class HookedLayouts {
                                     new AlertDialog.Builder(HookMethods.SnapContext);
                             SeekBar seekBar = new SeekBar(HookMethods.SnapContext);
                             seekBar.setMax(255);
-                            int currentapiVersion = Build.VERSION.SDK_INT;
-                            if (currentapiVersion >= Build.VERSION_CODES.KITKAT) {
+                            int currentAPIVersion = Build.VERSION.SDK_INT;
+                            if (currentAPIVersion >= Build.VERSION_CODES.KITKAT) {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                                     seekBar.setProgress(HookMethods.editText.getBackground().getAlpha());
                                 }

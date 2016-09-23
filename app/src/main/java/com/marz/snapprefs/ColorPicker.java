@@ -235,7 +235,7 @@ public class ColorPicker extends View {
     }
 
     @Override
-    protected void onSizeChanged(int width, int height, int oldw, int oldh) {
+    protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
 
         int centerX = width / 2;
         int centerY = height / 2;

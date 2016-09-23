@@ -52,10 +52,10 @@ public class GroupDialog extends DialogFragment {
                             }
                         }
                 );
-        LinearLayout.LayoutParams linearparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams linearParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         LinearLayout v = new LinearLayout(HookMethods.SnapContext);
         v.setOrientation(LinearLayout.VERTICAL);
-        v.setLayoutParams(linearparams);
+        v.setLayoutParams(linearParams);
 
         final File[] files = Groups.groupsDir.listFiles();
         Arrays.sort(files);

@@ -64,16 +64,16 @@ public class ActivateFragment extends Fragment {
         UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
         String deviceId = deviceUuid.toString();
 
-        Button submitbtn = (Button) view.findViewById(R.id.submit);
+        Button submitBtn = (Button) view.findViewById(R.id.submit);
         final EditText cID = (EditText) view.findViewById(R.id.confirmationID);
         final TextView textView = (TextView) view.findViewById(R.id.textView);
-        final Button buynow = (Button) view.findViewById(R.id.button);
-        final Button applygod = (Button) view.findViewById(R.id.god);
+        final Button buyNowBtn = (Button) view.findViewById(R.id.button);
+        final Button applyForGodModeBtn = (Button) view.findViewById(R.id.god);
         final EditText name = (EditText) view.findViewById(R.id.username);
         final TextView god = (TextView) view.findViewById(R.id.god_desc);
         TextView dID = (TextView) view.findViewById(R.id.deviceID);
         god.setVisibility(View.GONE);
-        applygod.setVisibility(View.GONE);
+        applyForGodModeBtn.setVisibility(View.GONE);
         name.setVisibility(View.GONE);
         dID.setText(deviceId);
         cID.setText(readStringPreference("confirmation_id"));
@@ -82,11 +82,11 @@ public class ActivateFragment extends Fragment {
         if (readLicense(deviceID, confirmationID) == 0) {
             String text = "Your license status is: <font color='blue'>Free</font>";
             textView.setText(Html.fromHtml(text), TextView.BufferType.SPANNABLE);
-            applygod.setVisibility(View.GONE);
+            applyForGodModeBtn.setVisibility(View.GONE);
             god.setVisibility(View.GONE);
             name.setVisibility(View.GONE);
-            buynow.setText("Click here to buy a license");
-            buynow.setOnClickListener(new Button.OnClickListener() {
+            buyNowBtn.setText("Click here to buy a license");
+            buyNowBtn.setOnClickListener(new Button.OnClickListener() {
                 public void onClick(View v) {
                     new AlertDialog.Builder(context)
                             .setTitle("Buy a license")
@@ -106,15 +106,15 @@ public class ActivateFragment extends Fragment {
                             .show();
                 }
             });
-            buynow.setVisibility(View.VISIBLE);
+            buyNowBtn.setVisibility(View.VISIBLE);
         } else if (readLicense(deviceID, confirmationID) == 1) {
             String text = "Your license status is: <font color='green'>Premium</font>";
             textView.setText(Html.fromHtml(text), TextView.BufferType.SPANNABLE);
-            buynow.setText("Click here to upgrade your license");
-            buynow.setVisibility(View.VISIBLE);
-            applygod.setVisibility(View.INVISIBLE);
+            buyNowBtn.setText("Click here to upgrade your license");
+            buyNowBtn.setVisibility(View.VISIBLE);
+            applyForGodModeBtn.setVisibility(View.INVISIBLE);
             god.setVisibility(View.INVISIBLE);
-            buynow.setOnClickListener(new Button.OnClickListener() {
+            buyNowBtn.setOnClickListener(new Button.OnClickListener() {
                 public void onClick(View v) {
                     new AlertDialog.Builder(context)
                             .setTitle("Upgrade your license")
@@ -131,8 +131,8 @@ public class ActivateFragment extends Fragment {
         } else if (readLicense(deviceID, confirmationID) == 2) {
             String text = "Your license status is: <font color='#FFCC00'>Deluxe</font>";
             textView.setText(Html.fromHtml(text), TextView.BufferType.SPANNABLE);
-            buynow.setVisibility(View.GONE);
-            applygod.setVisibility(View.VISIBLE);
+            buyNowBtn.setVisibility(View.GONE);
+            applyForGodModeBtn.setVisibility(View.VISIBLE);
             name.setVisibility(View.VISIBLE);
             god.setVisibility(View.VISIBLE);
         }
@@ -140,12 +140,12 @@ public class ActivateFragment extends Fragment {
             //new Connection().execute(cID.getText().toString(), deviceID);
         }
 
-        submitbtn.setOnClickListener(new Button.OnClickListener() {
+        submitBtn.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 new Connection().execute(cID.getText().toString(), deviceID);
             }
         });
-        applygod.setOnClickListener(new View.OnClickListener() {
+        applyForGodModeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (name.getText().toString().trim().length() > 0){
@@ -212,8 +212,8 @@ public class ActivateFragment extends Fragment {
                     String error_msg = null;
                     TextView txtvw = (TextView) view.findViewById(R.id.textView);
                     TextView errorTV = (TextView) view.findViewById(R.id.errorTV);
-                    Button buynow = (Button) view.findViewById(R.id.button);
-                    Button applygod = (Button) view.findViewById(R.id.god);
+                    Button buyNowBtn = (Button) view.findViewById(R.id.button);
+                    Button applyForGodModeBtn = (Button) view.findViewById(R.id.god);
                     EditText name = (EditText) view.findViewById(R.id.username);
                     TextView god = (TextView) view.findViewById(R.id.god_desc);
                     try {
@@ -225,11 +225,11 @@ public class ActivateFragment extends Fragment {
                             String text2 = "Your license status is: <font color='blue'>Free</font>";
                             txtvw.setText(Html.fromHtml(text2), TextView.BufferType.SPANNABLE);
                             errorTV.setText("Error: " + error_msg);
-                            buynow.setText("Click here to buy a license");
-                            applygod.setVisibility(View.GONE);
+                            buyNowBtn.setText("Click here to buy a license");
+                            applyForGodModeBtn.setVisibility(View.GONE);
                             god.setVisibility(View.GONE);
                             name.setVisibility(View.GONE);
-                            buynow.setOnClickListener(new Button.OnClickListener() {
+                            buyNowBtn.setOnClickListener(new Button.OnClickListener() {
                                 public void onClick(View v) {
                                     new AlertDialog.Builder(context)
                                             .setTitle("Buy a license")
@@ -249,7 +249,7 @@ public class ActivateFragment extends Fragment {
                                             .show();
                                 }
                             });
-                            buynow.setVisibility(View.VISIBLE);
+                            buyNowBtn.setVisibility(View.VISIBLE);
                             //saveIntPreference("license_status", 0);
                             saveLicense(deviceID, confirmationID, 0);
                         }
@@ -257,8 +257,8 @@ public class ActivateFragment extends Fragment {
                             String text2 = "Your license status is: <font color='green'>Premium</font>";
                             txtvw.setText(Html.fromHtml(text2), TextView.BufferType.SPANNABLE);
                             errorTV.setText("");
-                            buynow.setText("Click here to upgrade your license");
-                            buynow.setOnClickListener(new Button.OnClickListener() {
+                            buyNowBtn.setText("Click here to upgrade your license");
+                            buyNowBtn.setOnClickListener(new Button.OnClickListener() {
                                 public void onClick(View v) {
                                     new AlertDialog.Builder(context)
                                             .setTitle("Upgrade your license")
@@ -272,7 +272,7 @@ public class ActivateFragment extends Fragment {
                                             .show();
                                 }
                             });
-                            buynow.setVisibility(View.VISIBLE);
+                            buyNowBtn.setVisibility(View.VISIBLE);
                             saveLicense(deviceID, confirmationID, 1);
 
                             new AlertDialog.Builder(context)
@@ -298,7 +298,7 @@ public class ActivateFragment extends Fragment {
                         if (status.equals("2") && error_msg.isEmpty()) {
                             String text2 = "Your license status is: <font color='#FFCC00'>Deluxe</font>";
                             txtvw.setText(Html.fromHtml(text2), TextView.BufferType.SPANNABLE);
-                            buynow.setVisibility(View.GONE);
+                            buyNowBtn.setVisibility(View.GONE);
                             errorTV.setText("");
                             saveLicense(deviceID, confirmationID, 2);
                             new AlertDialog.Builder(context)
@@ -325,7 +325,7 @@ public class ActivateFragment extends Fragment {
                     } catch (Throwable t) {
                         Log.e("Snapprefs", "Could not parse malformed JSON: \"" + text + "\"");
                         Log.e("Snapprefs", t.toString());
-                        errorTV.setText("Error while reedeming your license, bad response");
+                        errorTV.setText("Error while redeeming your license, bad response");
                         saveLicense(deviceID, confirmationID, 0);
                     }
 

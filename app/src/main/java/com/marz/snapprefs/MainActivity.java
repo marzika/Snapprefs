@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     protected static final int MSG_REGISTER_WEB_SERVER_FAILURE = 104;
     private static final int REQUEST_CHOOSE_DIR = 1;
     private static final int REQUEST_HIDE_DIR = 2;
-    // Resgistration Id from GCM
+    // Registration Id from GCM
     private static final String PREF_GCM_REG_ID = "PREF_GCM_REG_ID";
     // Your project number and web server url. Please change below.
     private static final String GCM_SENDER_ID = "410204387699";
@@ -156,18 +156,18 @@ public class MainActivity extends AppCompatActivity {
             dialog.setCanceledOnTouchOutside(false);
             dialog.show();
 
-            Button privacypolicy = (Button) dialog.findViewById(R.id.privacypolicy);
+            Button privacyPolicy = (Button) dialog.findViewById(R.id.privacypolicy);
             Button tou = (Button) dialog.findViewById(R.id.tou);
             CheckBox accepted = (CheckBox) dialog.findViewById(R.id.readandaccepted);
 
-            privacypolicy.setOnClickListener(new View.OnClickListener() {
+            privacyPolicy.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     try {
                         Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://snapprefs.com/wp/privacy-policy/"));
                         startActivity(myIntent);
                     } catch (ActivityNotFoundException e) {
-                        Toast.makeText(MainActivity.this, "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "No application can handle this request." + " Please install a web browser", Toast.LENGTH_LONG).show();
                         e.printStackTrace();
                     }
                 }
@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                         Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://snapprefs.com/wp/terms-of-use/"));
                         startActivity(myIntent);
                     } catch (ActivityNotFoundException e) {
-                        Toast.makeText(MainActivity.this, "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "No application can handle this request." + " Please install a web browser", Toast.LENGTH_LONG).show();
                         e.printStackTrace();
                     }
                 }

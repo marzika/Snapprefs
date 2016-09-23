@@ -139,7 +139,7 @@ public class VisualFilters {
                 }
             }
         });
-        //Had to change equals and hashCode method, because getAdditionalInstanceField depends on that and equals and hashCode method are changed in snapchat to use methods we're changing. It just creates StackOverflowException
+        //Had to change equals and hashCode method, because getAdditionalInstanceField depends on that and equals and hashCode method are changed in Snapchat to use methods we're changing. It just creates StackOverflowException
         findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, "hashCode", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {

@@ -130,7 +130,7 @@ public class HookSendList {
     public static CheckBox getCheckbox(Context c) {
         CheckBox cb = new CheckBox(c);
         try {
-            //Setting properties from snapchat's res/layout/send_to_item.xml checkbox
+            //Setting properties from Snapchat's res/layout/send_to_item.xml checkbox
             cb.setButtonDrawable(c.getResources().getIdentifier("send_to_button_selector", "drawable", "com.snapchat.android"));
             //May need to scale drawable bitmap...
             cb.setScaleX(0.7F);

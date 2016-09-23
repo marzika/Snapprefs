@@ -113,12 +113,12 @@ public class Stories {
                     //layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                     layoutParams2.topMargin = HookMethods.px(8.0f);
                     layoutParams2.rightMargin = HookMethods.px(115.0f);
-                    final ImageView spbtn = new ImageView(HookMethods.SnapContext);
-                    spbtn.setImageDrawable(mResources.getDrawable(R.drawable.story_filter));
-                    spbtn.setScaleX(0.75f);
-                    spbtn.setScaleY(0.75f);
+                    final ImageView snapPrefsBtn = new ImageView(HookMethods.SnapContext);
+                    snapPrefsBtn.setImageDrawable(mResources.getDrawable(R.drawable.story_filter));
+                    snapPrefsBtn.setScaleX(0.75f);
+                    snapPrefsBtn.setScaleY(0.75f);
                     Logger.log("Adding Snapprefs button to story section");
-                    spbtn.setOnClickListener(new View.OnClickListener() {
+                    snapPrefsBtn.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             readFriendList(HookMethods.classLoader);
@@ -138,7 +138,7 @@ public class Stories {
                     HookMethods.SnapContext.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            relativeLayout.addView(spbtn, layoutParams2);
+                            relativeLayout.addView(snapPrefsBtn, layoutParams2);
                         }
                     });
                 }
