@@ -45,6 +45,7 @@ public class NowPlaying {
     private static GetSpotifyTrackTask lastTask;
     private static int layoutNumber = 0;
     private static boolean landscape = false;
+    private static boolean careAboutOtherPlayersThanSpotify = true;//SUPERIOR PLAYER
 
     /**
      * This is EXTREMELY slow, but works
@@ -157,6 +158,11 @@ public class NowPlaying {
         HookMethods.context.registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equalsIgnoreCase("com.spotify.music.playbackstatechanged") && intent.hasExtra("playing")) {
+                    careAboutOtherPlayersThanSpotify = !intent.getBooleanExtra("playing", false);
+                } else if (!careAboutOtherPlayersThanSpotify) {
+                    return;
+                }
                 String artist = intent.getStringExtra("artist");
                 if (artist == null) artist = "";
                 String album = intent.getStringExtra("album");

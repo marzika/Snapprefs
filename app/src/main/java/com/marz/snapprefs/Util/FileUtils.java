@@ -174,8 +174,10 @@ public class FileUtils {
 
     public static void writeObjectFile(File f, Object obj) {
         try {
+            if (!f.exists()) f.createNewFile();
             ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(f));
             stream.writeObject(obj);
+            stream.flush();
             stream.close();
         } catch (IOException e) {
             e.printStackTrace();
