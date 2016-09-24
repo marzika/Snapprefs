@@ -26,11 +26,10 @@ public class LensIconLoader {
         protected Boolean doInBackground(Object... params) {
             LensesFragment.LensButtonPair pair = (LensesFragment.LensButtonPair) params[0];
             Activity context = (Activity) params[1];
-            String mCode = pair.mCode;
 
             final String url = pair.url;
             final ImageButton button = pair.button;
-            final Bitmap bmp = retrieveAppropriateBitmap(url, mCode, context);
+            final Bitmap bmp = retrieveAppropriateBitmap(url, context);
 
             if( bmp == null )
                 return null;
@@ -53,26 +52,27 @@ public class LensIconLoader {
         }
     }
 
-    public static Bitmap retrieveAppropriateBitmap( String url, String mCode, Context context )
+    public static Bitmap retrieveAppropriateBitmap( String url, Context context )
     {
-        File iconDirectory = new File(Preferences.getSavePath(), "/LensIcons");
+        File iconDirectory = new File(Preferences.getSavePath(), "/LensIcons.nomedia");
 
         if( !iconDirectory.exists() && !iconDirectory.mkdirs()) {
             return getBitmapFromURL(url, 1);
         }
 
-        File iconFile = new File( iconDirectory, mCode + ".png");
+        String hashedFileName = hashBuilder(url);
+        File iconFile = new File( iconDirectory, hashedFileName + ".png");
 
         Logger.log("IconFile: " + iconFile.getPath());
         if(iconFile.exists())
         {
-            Bitmap bmp = loadBitmapFromFile( iconFile);
+            Bitmap bmp = loadBitmapFromFile(iconFile);
 
             if(bmp != null)
                 return bmp;
         }
 
-        Bitmap bmp = getBitmapFromURL( url, 1);
+        Bitmap bmp = getBitmapFromURL(url, 1);
         SavingUtils.savePNGAsync(iconFile, bmp, context, false);
         return bmp;
     }
@@ -105,5 +105,10 @@ public class LensIconLoader {
             Log.d("Error", e.toString());
             return null;
         }
+    }
+
+    public static String hashBuilder(String inputVal)
+    {
+        return Integer.toString(inputVal.hashCode() % 999999999);
     }
 }
