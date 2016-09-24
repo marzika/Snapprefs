@@ -2,11 +2,10 @@ package com.marz.snapprefs;
 
 import android.content.Context;
 import android.content.res.XModuleResources;
-import android.provider.BaseColumns;
 
+import com.marz.snapprefs.Databases.LensDatabaseHelper;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.LensData;
-import com.marz.snapprefs.Util.LensDatabaseHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -152,10 +151,11 @@ public class Lens {
 
     public static ArrayList<Object> buildModifiedList(ArrayList<Object> list, ArrayList<String> lensBlacklist) {
         Logger.log("Original list size: " + list.size());
-        ArrayList<LensData> lensList = MainActivity.lensDBHelper.getAllExcept(lensBlacklist);
+        ArrayList<Object> lensList = MainActivity.lensDBHelper.getAllExcept(lensBlacklist);
         Logger.log("New lenses to load: " + lensList.size());
 
-        for (LensData lensData : lensList) {
+        for (Object lensObj : lensList) {
+            LensData lensData = (LensData) lensObj;
             if (!lensData.mActive)
                 continue;
 
@@ -205,17 +205,5 @@ public class Lens {
         //lensData.mLensIcon = getBitmapFromURL(lensData.mIconLink);
 
         return lensData;
-    }
-
-    public static class LensEntry implements BaseColumns {
-        public static final String TABLE_NAME = "LensTable";
-        public static final String COLUMN_NAME_MCODE = "mCode";
-        public static final String COLUMN_NAME_GPLAYID = "mGplayIapId";
-        public static final String COLUMN_NAME_MHINTID = "mHintId";
-        public static final String COLUMN_NAME_MICONLINK = "mIconLink";
-        public static final String COLUMN_NAME_MID = "mId";
-        public static final String COLUMN_NAME_MLENSLINK = "mLensLink";
-        public static final String COLUMN_NAME_MSIGNATURE = "mSignature";
-        public static final String COLUMN_NAME_ACTIVE = "mActiveState";
     }
 }

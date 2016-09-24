@@ -101,7 +101,7 @@ public class Chat {
     }
 
 
-    static void handleChatFeedItem(Object obj) {
+    private static void handleChatFeedItem(Object obj) {
         if (!obj.getClass().getName().equals("Wv"))
             return;
 

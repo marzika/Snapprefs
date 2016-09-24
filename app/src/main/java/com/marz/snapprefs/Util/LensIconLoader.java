@@ -6,7 +6,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.marz.snapprefs.Fragments.LensesFragment;
 import com.marz.snapprefs.Logger;
@@ -28,14 +30,16 @@ public class LensIconLoader {
             Activity context = (Activity) params[1];
 
             final String url = pair.url;
-            final ImageButton button = pair.button;
+            final LinearLayout inflatedLayout = pair.inflatedLayout;
+            final ImageView button = pair.button;
+            final TextView textView = pair.textView;
             final Bitmap bmp = retrieveAppropriateBitmap(url, context);
 
             if( bmp == null )
                 return null;
 
             float density = context.getResources().getDisplayMetrics().density;
-            int imgSize = (int) (65f * density);
+            final int imgSize = (int) (65f * density);
             pair.bmp = Bitmap.createScaledBitmap(bmp, imgSize, imgSize, false);
 
             context.runOnUiThread(new Runnable() {
@@ -44,6 +48,10 @@ public class LensIconLoader {
                     Logger.log("Loading image: " + url);
                     button.setImageBitmap(bmp);
                     button.invalidate();
+
+                    textView.setMaxWidth(imgSize);
+                    textView.invalidate();
+                    inflatedLayout.invalidate();
                 }
             });
 

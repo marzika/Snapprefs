@@ -2,7 +2,7 @@ package com.marz.snapprefs.Util;
 
 import android.content.ContentValues;
 
-import com.marz.snapprefs.Lens.LensEntry;
+import com.marz.snapprefs.Databases.LensDatabaseHelper.LensEntry;
 
 /**
  * Created by Andre on 12/09/2016.

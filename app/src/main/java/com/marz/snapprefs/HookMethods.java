@@ -187,7 +187,6 @@ public class HookMethods
             Logger.log("Loading map from xposed");
             Preferences.loadMapFromXposed();
 
-
             findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {

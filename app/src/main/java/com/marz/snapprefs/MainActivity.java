@@ -47,7 +47,7 @@ import com.marz.snapprefs.Tabs.SavingTabFragment;
 import com.marz.snapprefs.Tabs.SharingTabFragment;
 import com.marz.snapprefs.Tabs.SpoofingTabFragment;
 import com.marz.snapprefs.Tabs.TextTabFragment;
-import com.marz.snapprefs.Util.LensDatabaseHelper;
+import com.marz.snapprefs.Databases.LensDatabaseHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
