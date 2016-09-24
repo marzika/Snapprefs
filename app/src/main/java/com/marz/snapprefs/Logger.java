@@ -18,7 +18,6 @@
  */
 package com.marz.snapprefs;
 
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.marz.snapprefs.Util.StringUtils;
@@ -28,7 +27,6 @@ import de.robv.android.xposed.XposedBridge;
 public class Logger {
 
     public static final String LOG_TAG = "SnapPrefs: ";
-    private static boolean debugging;
     private static int printWidth = 70;
 
     /**
@@ -37,14 +35,6 @@ public class Logger {
     private Logger() {
     }
 
-    /**
-     * Enable or disable writing debug information to the Xposed Log.
-     *
-     * @param debug Whether to enable or disable it
-     */
-    public static void setDebuggingEnabled(boolean debug) {
-        debugging = debug;
-    }
 
     /**
      * Write debug information to the Xposed Log if enabled or forced by the parameter.
@@ -54,11 +44,24 @@ public class Logger {
      * @param forced  Whether to force log and thus overrides the debug setting
      */
     public static void log(String message, boolean prefix, boolean forced) {
-        if (debugging || forced) {
-            if (prefix) {
-                message = LOG_TAG + message;
-            }
+        try {
+            if (!Preferences.getBool(Preferences.Prefs.DEBUGGING) && !forced)
+                return;
+        } catch( Throwable t)
+        {
+            Log.d("SNAPPREFS", "Tried to log before fully loaded: ["  + message + "]");
+            return;
+        }
+
+        if (prefix) {
+            message = LOG_TAG + message;
+        }
+
+        try {
             XposedBridge.log(message);
+        } catch( Throwable e)
+        {
+            Log.d("SNAPPREFS", message);
         }
     }
 
@@ -120,8 +123,16 @@ public class Logger {
      * @param throwable The throwable to log
      */
     public static void log(Throwable throwable) {
-        XposedBridge.log(throwable);
+        try {
+            XposedBridge.log(throwable);
+        } catch( Throwable t )
+        {
+            Log.e("SNAPPREFS", "Throwable: " + t.getMessage());
+            t.printStackTrace();
+        }
     }
+
+
 
     /**
      * Write a throwable with a message to the Xposed Log, even when debugging is disabled.
@@ -132,5 +143,12 @@ public class Logger {
     public static void log(String message, Throwable throwable) {
         log(message, true, true);
         log(throwable);
+    }
+
+    public static void logStackTrace() {
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+
+        for(StackTraceElement traceElement : stackTraceElements)
+            Logger.log("Stack trace: [Class: " + traceElement.getClassName() + "] [Method: " + traceElement.getMethodName() + "]");
     }
 }

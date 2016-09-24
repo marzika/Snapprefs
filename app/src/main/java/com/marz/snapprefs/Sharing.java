@@ -19,6 +19,7 @@ import com.marz.snapprefs.Util.CommonUtils;
 import com.marz.snapprefs.Util.ImageUtils;
 import com.marz.snapprefs.Util.VideoUtils;
 import com.marz.snapprefs.Util.XposedUtils;
+import com.marz.snapprefs.Preferences.Prefs;
 
 import java.io.File;
 
@@ -29,9 +30,6 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
-import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
-import static de.robv.android.xposed.XposedHelpers.setObjectField;
-import static de.robv.android.xposed.XposedHelpers.getObjectField;
 
 public class Sharing {
 
@@ -61,7 +59,7 @@ public class Sharing {
         findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                Preferences.refreshPreferences();
+                //Preferences.loadMapFromXposed();
                 XposedUtils.log("----------------- SNAPSHARE STARTED -----------------", false);
                 final Activity activity = (Activity) param.thisObject;
                 // Get intent, action and MIME type
@@ -101,10 +99,10 @@ public class Sharing {
                             // Rotate image using EXIF-data
                             bitmap = ImageUtils.rotateUsingExif(bitmap, filePath);
                             // Landscape images have to be rotated 90 degrees clockwise for Snapchat to be displayed correctly
-                            if (Common.ROTATION_MODE != Common.ROTATION_NONE) {
+                            if (Preferences.getInt(Prefs.ROTATION_MODE) != Common.ROTATION_NONE) {
                                 if (bitmap.getWidth() > bitmap.getHeight()) {
-                                    XposedUtils.log("Landscape image detected, rotating image " + Common.ROTATION_MODE + " degrees");
-                                    bitmap = ImageUtils.rotateBitmap(bitmap, Common.ROTATION_MODE);
+                                    XposedUtils.log("Landscape image detected, rotating image " + Preferences.getInt(Prefs.ROTATION_MODE) + " degrees");
+                                    bitmap = ImageUtils.rotateBitmap(bitmap, Preferences.getInt(Prefs.ROTATION_MODE));
                                 } else {
                                     XposedUtils.log("Image is in portrait, rotation not needed");
                                 }
@@ -112,7 +110,7 @@ public class Sharing {
 
                             // Snapchat will break if the image is too large and it will scale the image up if the Display rectangle is larger than the image.
                             ImageUtils imageUtils = new ImageUtils(activity);
-                            switch (Common.ADJUST_METHOD) {
+                            switch (Preferences.getInt(Prefs.ADJUST_METHOD)) {
                                 case Common.ADJUST_CROP:
                                     XposedUtils.log("Adjustment Method: Crop");
                                     bitmap = imageUtils.adjustmentMethodCrop(bitmap);
@@ -153,7 +151,7 @@ public class Sharing {
                         File tempFile = File.createTempFile("snapshare_video", null);
 
                         try {
-                            if (Common.ROTATION_MODE == Common.ROTATION_NONE) {
+                            if (Preferences.getInt(Prefs.ROTATION_MODE) == Common.ROTATION_NONE) {
                                 XposedUtils.log("Rotation disabled, creating a temporary copy");
                                 CommonUtils.copyFile(videoFile, tempFile);
                             } else {
@@ -201,7 +199,6 @@ public class Sharing {
         XC_MethodHook cameraLoadedHook = new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                Preferences.refreshPreferences(); // Refresh preferences for captions
                 if (initializedUri == null) {
                     return; // We don't have an image to send, so don't try to send one
                 }

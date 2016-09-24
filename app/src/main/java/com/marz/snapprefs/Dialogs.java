@@ -3,18 +3,9 @@ package com.marz.snapprefs;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
-import android.text.Html;
 import android.text.InputType;
-import android.view.Gravity;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,12 +13,7 @@ import com.marz.snapprefs.Util.FileUtils;
 
 import java.util.Random;
 
-import de.robv.android.xposed.XSharedPreferences;
-
 public class Dialogs {
-
-    private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
-    static XSharedPreferences prefs;
     static Random rColor = new Random();
     private static Context SnapContext;
     private static TextView editText;
@@ -39,8 +25,6 @@ public class Dialogs {
         builder.setTitle("Enter Speed(m/s)");
         LinearLayout linearLayout = new LinearLayout(SnapContext);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
-
-        Preferences.refreshPreferences();
 
         final EditText eText = new EditText(SnapContext);
         eText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
@@ -77,8 +61,6 @@ public class Dialogs {
         builder.setTitle("Enter Temperature value");
         LinearLayout linearLayout = new LinearLayout(SnapContext);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
-
-        Preferences.refreshPreferences();
 
         final EditText eText = new EditText(SnapContext);
         eText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);

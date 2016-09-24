@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.FileObserver;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -19,7 +20,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -41,11 +41,13 @@ import com.marz.snapprefs.Tabs.DataTabFragment;
 import com.marz.snapprefs.Tabs.DeluxeTabFragment;
 import com.marz.snapprefs.Tabs.FiltersTabFragment;
 import com.marz.snapprefs.Tabs.GeneralTabFragment;
+import com.marz.snapprefs.Tabs.LensesTabFragment;
 import com.marz.snapprefs.Tabs.MainTabFragment;
 import com.marz.snapprefs.Tabs.SavingTabFragment;
 import com.marz.snapprefs.Tabs.SharingTabFragment;
 import com.marz.snapprefs.Tabs.SpoofingTabFragment;
 import com.marz.snapprefs.Tabs.TextTabFragment;
+import com.marz.snapprefs.Databases.LensDatabaseHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -63,9 +65,10 @@ import java.util.UUID;
 
 import de.cketti.library.changelog.ChangeLog;
 
+import static com.marz.snapprefs.Preferences.Prefs.PREF_KEY_HIDE_LOCATION;
+import static com.marz.snapprefs.Preferences.Prefs.PREF_KEY_SAVE_LOCATION;
+
 public class MainActivity extends AppCompatActivity {
-    public static final String PREF_KEY_SAVE_LOCATION = "pref_key_save_location";
-    public static final String PREF_KEY_HIDE_LOCATION = "pref_key_hide_location";
     protected static final int MSG_REGISTER_WITH_GCM = 101;
     protected static final int MSG_REGISTER_WEB_SERVER = 102;
     protected static final int MSG_REGISTER_WEB_SERVER_SUCCESS = 103;
@@ -78,6 +81,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String GCM_SENDER_ID = "410204387699";
     private static final String WEB_SERVER_URL = "http://snapprefs.com/gcm/register_user.php";
     private static final int ACTION_PLAY_SERVICES_DIALOG = 100;
+    public static Context context;
+    public static SharedPreferences prefs = null;
+    public static LensDatabaseHelper lensDBHelper;
+    private static FileObserver observer;
+    private static UUID deviceUuid;
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
     FragmentManager mFragmentManager;
@@ -106,47 +114,67 @@ public class MainActivity extends AppCompatActivity {
         }
 
     };
-    private SharedPreferences sharedPreferences;
     private ArrayList<MenuItem> items = new ArrayList<>();
-    private SharedPreferences prefs;
     private String gcmRegId;
-    private boolean acceptedToU = false;
+
+    public static String getDeviceId() {
+        return deviceUuid != null ? deviceUuid.toString() : (String) Preferences.Prefs.DEVICE_ID.defaultVal;
+    }
+
+    public static SharedPreferences getPrefereces() {
+        return prefs;
+    }
+
+    private static void createIfNotExisting() {
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onPause(){
+        super.onPause();
 
-        final TelephonyManager tm = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
-        final String tmDevice, tmSerial, androidId;
-        tmDevice = "" + tm.getDeviceId();
-        tmSerial = "" + tm.getSimSerialNumber();
-        androidId = "" + android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
-
-        UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
-        String deviceId = deviceUuid.toString();
-        final String confirmationID = readStringPreference("confirmation_id");
-        final Context context = this;
-        ChangeLog cl = new ChangeLog(context);
-        if (cl.isFirstRun()) {
-            cl.getLogDialog().show();
-        }
-        final SharedPreferences prefs = context.getSharedPreferences("com.marz.snapprefs_preferences", Context.MODE_WORLD_READABLE);
         File prefsFile = new File(
                 Environment.getDataDirectory(), "data/"
                 + getPackageName() + "/shared_prefs/" + getPackageName()
                 + "_preferences" + ".xml");
-        prefsFile.setReadable(true, false);
-        acceptedToU = prefs.getBoolean("acceptedToU", false);
-        if(!acceptedToU){
+
+        if( prefsFile.exists())
+            prefsFile.setReadable(true, false);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        context = this;
+        ChangeLog cl = new ChangeLog(context);
+        createDeviceId();
+
+        if (cl.isFirstRun()) {
+            cl.getLogDialog().show();
+        }
+
+        Logger.log("MainActivity: createPrefsIfNotExisting");
+        createPrefsIfNotExisting();
+
+        if (Preferences.getMap() == null || Preferences.getMap().isEmpty()) {
+            Logger.log("MainActivity: Map is null or empty: Loading new");
+            Preferences.loadMap(prefs);
+        }
+
+        Logger.log("MainActivity: initialiseListener");
+        Preferences.initialiseListener(prefs);
+
+        Logger.log("Load lenses: " + prefs.contains("pref_key_load_lenses"));
+
+
+        Logger.log("SAVE LOCATION: " + Preferences.getSavePath());
+        if (!Preferences.getBool(Preferences.Prefs.ACCEPTED_TOU)) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context)
                     .setTitle("ToU and Privacy Policy")
                     .setView(R.layout.tos)
                     .setMessage("You haven't accepted our Terms of Use and Privacy. Please read it carefully and accept it, otherwise you will not be able to use our product.")
                     .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            SharedPreferences.Editor editor = prefs.edit();
-                            editor.putBoolean("acceptedToU", true);
-                            editor.apply();
+                            Preferences.putBool("acceptedToU", true);
                             Toast.makeText(MainActivity.this, "You accepted the Terms of Use and Privacy Policy", Toast.LENGTH_SHORT).show();
                         }
                     })
@@ -196,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
             gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
 
             // Read saved registration id from shared preferences.
-            gcmRegId = getSharedPreferences().getString(PREF_GCM_REG_ID, "");
+            gcmRegId = createPrefsIfNotExisting().getString(PREF_GCM_REG_ID, "");
 
             if (TextUtils.isEmpty(gcmRegId)) {
                 handler.sendEmptyMessage(MSG_REGISTER_WITH_GCM);
@@ -205,11 +233,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         setContentView(R.layout.activity_main);
         AdView mAdView = (AdView) findViewById(R.id.adView);
         TextView pugs = (TextView) findViewById(R.id.pugs);
-        if (readLicense(deviceId, confirmationID) == 1 || readLicense(deviceId, confirmationID) == 2) {
+        if (Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 1 || Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 2) {
             mAdView.destroy();
             pugs.setVisibility(View.GONE);
             mAdView.setVisibility(View.GONE);
@@ -229,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         mNavigationView = (NavigationView) findViewById(R.id.fuckyou);
-        if (readLicense(deviceId, confirmationID) == 1 || readLicense(deviceId, confirmationID) == 2) {
+        if (Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 1 || Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 2) {
             mNavigationView.getMenu().getItem(1).getSubMenu().getItem(1).setEnabled(true);
             LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mDrawerLayout.getLayoutParams();
             lp.setMargins(0, 0, 0, 0);
@@ -258,15 +285,14 @@ public class MainActivity extends AppCompatActivity {
                 menuItem.setCheckable(true);
                 menuItem.setChecked(true);
                 Iterator<MenuItem> it = items.iterator();
-                while (it.hasNext())
-                {
+                while (it.hasNext()) {
                     MenuItem item = it.next();
-                    if(!item.equals(menuItem)){
+                    if (!item.equals(menuItem)) {
                         item.setChecked(false);
                     }
                 }
                 items.add(menuItem);
-                mFragmentManager.beginTransaction().replace(R.id.containerView,getForId(menuItem.getItemId())).commit();
+                mFragmentManager.beginTransaction().replace(R.id.containerView, getForId(menuItem.getItemId())).commit();
                 return false;
             }
 
@@ -277,13 +303,31 @@ public class MainActivity extends AppCompatActivity {
          */
 
         android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
-        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this,mDrawerLayout, toolbar,R.string.app_name,
+        ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.app_name,
                 R.string.app_name);
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         mDrawerToggle.syncState();
+
+        lensDBHelper = new LensDatabaseHelper(this.getApplicationContext());
     }
+
+    /*public int readLicense(String deviceID, String confirmationID) {
+        int status;
+        if (confirmationID != null) {
+            SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
+            String dvcid = prefs.getString("device_id", null);
+            if (dvcid != null && dvcid.equals(deviceID)) {
+                status = prefs.getInt(deviceID, 0);
+            } else {
+                status = 0;
+            }
+        } else {
+            status = 0;
+        }
+        return status;
+    }*/
 
     public Fragment getForId(int id) {
         if (cache.get(id) == null) {
@@ -318,6 +362,9 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_item_filters:
                     cache.put(id, new FiltersTabFragment());
                     break;
+                case R.id.nav_item_lenses:
+                    cache.put(id, new LensesTabFragment());
+                    break;
             }
         }
         return cache.get(id);
@@ -329,23 +376,19 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_CHOOSE_DIR && resultCode == Activity.RESULT_OK) {
-                String newLocation = data.getData().toString().substring(7);
+            String newLocation = data.getData().toString().substring(7);
 
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(PREF_KEY_SAVE_LOCATION, newLocation);
-                editor.apply();
+            Preferences.putString(PREF_KEY_SAVE_LOCATION.key, newLocation);
 
-                //Preference pref = PreferenceFragmentCompat.findPreference(PREF_KEY_SAVE_LOCATION);
-                //pref.setSummary(newLocation);
-            }
+            //Preference pref = PreferenceFragmentCompat.findPreference(PREF_KEY_SAVE_LOCATION);
+            //pref.setSummary(newLocation);
+        }
         if (requestCode == REQUEST_HIDE_DIR && resultCode == Activity.RESULT_OK) {
-                String newHiddenLocation =  data.getData().toString().substring(7);
+            String newHiddenLocation = data.getData().toString().substring(7);
 
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString(PREF_KEY_HIDE_LOCATION, "Last hidden: " + newHiddenLocation);
-                editor.apply();
+            Preferences.putString(PREF_KEY_HIDE_LOCATION.key, "Last hidden: " + newHiddenLocation);
 
-                writeNoMediaFile(newHiddenLocation);
+            writeNoMediaFile(newHiddenLocation);
         }
     }
 
@@ -373,41 +416,40 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    public int readLicense(String deviceID, String confirmationID) {
-        int status;
-        if (confirmationID != null) {
-            SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
-            String dvcid = prefs.getString("device_id", null);
-            if (dvcid != null && dvcid.equals(deviceID)) {
-                status = prefs.getInt(deviceID, 0);
-            } else {
-                status = 0;
-            }
-        } else {
-            status = 0;
-        }
-        return status;
+    public void createDeviceId() {
+        if (deviceUuid != null)
+            return;
+
+        final TelephonyManager tm = (TelephonyManager) this.getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+        final String tmDevice, tmSerial, androidId;
+        tmDevice = "" + tm.getDeviceId();
+        tmSerial = "" + tm.getSimSerialNumber();
+        androidId = "" + android.provider.Settings.Secure.getString(getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+
+        deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
     }
 
     public String readStringPreference(String key) {
-        SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
+        SharedPreferences prefs = getPrefereces();
         String returned = prefs.getString(key, null);
         return returned;
     }
 
-    private SharedPreferences getSharedPreferences() {
-        if (prefs == null) {
-            prefs = getApplicationContext().getSharedPreferences(
-                    "com.marz.snapprefs_preferences", Context.MODE_PRIVATE);
-        }
+    private SharedPreferences createPrefsIfNotExisting() {
+        File prefsFile = new File(
+                Environment.getDataDirectory(), "data/"
+                + getPackageName() + "/shared_prefs/" + getPackageName()
+                + "_preferences" + ".xml");
+        prefsFile.setReadable(true, false);
+        Logger.log("Creating preference object : " + this.getPackageName());
+
+        prefs = this.getSharedPreferences(this.getPackageName() + "_preferences", Activity.MODE_WORLD_READABLE);
+
         return prefs;
     }
 
     public void saveInSharedPref(String result) {
-        // TODO Auto-generated method stub
-        SharedPreferences.Editor editor = getSharedPreferences().edit();
-        editor.putString(PREF_GCM_REG_ID, result);
-        editor.commit();
+        Preferences.putString(PREF_GCM_REG_ID, result);
     }
 
     private boolean isGooglePlayInstalled() {

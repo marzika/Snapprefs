@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:layout_margin="2dp"
+    android:background="@drawable/border"
+    android:padding="2dp"
+    android:clickable="true"
+    android:layout_width="75dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:duplicateParentState="true"
+        android:clickable="false">
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            app:srcCompat="@drawable/border"
+            android:duplicateParentState="true"
+            android:id="@+id/lensIconView"
+            android:layout_margin="0dp"
+            android:padding="0dp"
+            android:background="@drawable/aa_blank"
+            android:clickable="false" />
+
+    </FrameLayout>
+
+    <TextView
+        android:text="Unassigned"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/lensTextView"
+        android:textAlignment="center"
+        android:gravity="center_vertical|center_horizontal"
+        android:textScaleX="0.7"
+        android:scrollHorizontally="false"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:clickable="false"
+        android:editable="false"
+        android:focusable="false"
+        android:duplicateParentState="true" />
+</LinearLayout>

@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.marz.snapprefs.Util.FileUtils;
+import com.marz.snapprefs.Preferences.Prefs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,7 +52,7 @@ public class Stories {
 
                 for (int i = f.size() - 1; i >= 0; i--) {
                     Object o = f.get(i);
-                    if (o.getClass() == recentStory && Preferences.mHidePeople) {
+                    if (o.getClass() == recentStory && Preferences.getBool(Prefs.HIDE_PEOPLE)) {
                         String username = (String) XposedHelpers.callMethod(o, "b");
                         for (String person : peopleToHide) {
                             if (username.equals(person)) {
@@ -59,7 +60,7 @@ public class Stories {
                                 f.remove(i);
                             }
                         }
-                    } else if (o.getClass() == allStory && Preferences.mHidePeople) {
+                    } else if (o.getClass() == allStory && Preferences.getBool(Prefs.HIDE_PEOPLE)) {
                         Object friend = XposedHelpers.callMethod(o, "h");
                         String username = (String) XposedHelpers.callMethod(friend, "g");
                         for (String person : peopleToHide) {
@@ -68,9 +69,9 @@ public class Stories {
                                 f.remove(i);
                             }
                         }
-                    } else if (o.getClass() == liveStory && Preferences.mHideLive) {
+                    } else if (o.getClass() == liveStory && Preferences.getBool(Prefs.HIDE_LIVE)) {
                         f.remove(i);
-                    } else if (o.getClass() == discoverStory && Preferences.mDiscoverUI) {
+                    } else if (o.getClass() == discoverStory && Preferences.getBool(Prefs.DISCOVER_UI)) {
                         f.remove(i);
                     } else if (!types.contains(o.getClass())){
                         Logger.log("Found an unexpected entry at stories TYPE: " + o.getClass().getCanonicalName());
