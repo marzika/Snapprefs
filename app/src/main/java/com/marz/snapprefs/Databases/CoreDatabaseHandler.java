@@ -377,8 +377,8 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         return invocationResponse;
     }
 
-    public ArrayList<Object> performQueryForBuiltObjects( String tableName, String selection, String[] selectionArgs,
-                                                          String[] projection, String sortOrder, CallbackHandler callbackHandler) {
+    public ArrayList<Object> performQueryForBuiltObjects(String tableName, String selection, String[] selectionArgs,
+                                                         String[] projection, String sortOrder, CallbackHandler callbackHandler) {
         Cursor cursor = getDatabase().query(
                 tableName,                     // The table to query
                 projection,                               // The columns to return

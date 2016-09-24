@@ -22,7 +22,7 @@
             android:adjustViewBounds="true"
             app:srcCompat="@drawable/border"
             android:duplicateParentState="true"
-            android:id="@+id/lensIconButton"
+            android:id="@+id/lensIconView"
             android:layout_margin="0dp"
             android:padding="0dp"
             android:background="@drawable/aa_blank"

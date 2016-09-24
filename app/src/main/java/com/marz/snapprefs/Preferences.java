@@ -243,6 +243,7 @@ public class Preferences {
     public static void putBool(String key, boolean value) {
         SharedPreferences.Editor editor = MainActivity.prefs.edit();
         editor.putBoolean(key, value);
+
         if (editor.commit())
             preferenceMap.put(key, value);
 

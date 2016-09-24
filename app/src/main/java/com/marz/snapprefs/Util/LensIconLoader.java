@@ -26,12 +26,12 @@ public class LensIconLoader {
     public static class AsyncLensIconDownloader extends AsyncTask<Object, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Object... params) {
-            LensesFragment.LensButtonPair pair = (LensesFragment.LensButtonPair) params[0];
+            LensesFragment.LensContainerData pair = (LensesFragment.LensContainerData) params[0];
             Activity context = (Activity) params[1];
 
             final String url = pair.url;
             final LinearLayout inflatedLayout = pair.inflatedLayout;
-            final ImageView button = pair.button;
+            final ImageView button = pair.iconImageView;
             final TextView textView = pair.textView;
             final Bitmap bmp = retrieveAppropriateBitmap(url, context);
 
@@ -47,11 +47,6 @@ public class LensIconLoader {
                 public void run() {
                     Logger.log("Loading image: " + url);
                     button.setImageBitmap(bmp);
-                    button.invalidate();
-
-                    textView.setMaxWidth(imgSize);
-                    textView.invalidate();
-                    inflatedLayout.invalidate();
                 }
             });
 
