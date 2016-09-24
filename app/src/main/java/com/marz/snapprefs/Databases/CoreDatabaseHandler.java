@@ -46,7 +46,7 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
     }
 
     public void createIfNotExisting() {
-        if (writeableDatabase == null)
+        if (writeableDatabase == null || !writeableDatabase.isOpen())
             writeableDatabase = this.getWritableDatabase();
     }
 

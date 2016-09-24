@@ -35,10 +35,14 @@ import java.util.HashMap;
  * Created by Andre on 16/09/2016.
  */
 public class LensesFragment extends Fragment {
-    private static HashMap<String, LensButtonPair> iconMap = new HashMap<>();
-    private static final ArrayList<String> stringFilter = new ArrayList<String>() { {
-        add("code_scheduled_lens_-_"); add("len_"); add("code_special_lens_-_");
-    }};
+    private static final ArrayList<String> stringFilter = new ArrayList<String>() {
+        {
+            add("code_scheduled_lens_-_");
+            add("len_");
+            add("code_special_lens_-_");
+        }
+    };
+    private static HashMap<String, LensContainerData> iconMap = new HashMap<>();
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         int lensListSize = (int) MainActivity.lensDBHelper.getRowCount();
@@ -107,22 +111,11 @@ public class LensesFragment extends Fragment {
 
             for (Object lensObj : lensList) {
                 final LensData lensData = (LensData) lensObj;
+
+                // Set up Lens Container \\
                 final LinearLayout inflatedLayout = (LinearLayout) inflater.inflate(R.layout.lensholder_layout, gridLayout, false);
                 inflatedLayout.setBackgroundResource(lensData.mActive ? R.drawable.lens_bg_selected :
                         R.drawable.lens_bg_unselected);
-
-                ImageView iconButton = (ImageView) inflatedLayout.findViewById(R.id.lensIconButton);
-                TextView iconName = (TextView) inflatedLayout.findViewById(R.id.lensTextView);
-
-                String nameBuilder = lensData.mCode;
-
-                for( String filter : stringFilter)
-                    nameBuilder = nameBuilder.replace(filter, "");
-
-                nameBuilder = nameBuilder.replaceAll("_", " ");
-
-                iconName.setText(nameBuilder.trim());
-                iconName.setMaxWidth(50);
 
                 inflatedLayout.setTag(lensData.mCode);
                 inflatedLayout.setOnClickListener(new View.OnClickListener() {
@@ -142,21 +135,29 @@ public class LensesFragment extends Fragment {
                     }
                 });
 
-                iconButton.setMinimumHeight(50);
-                iconButton.setMinimumWidth(50);
-                iconButton.setTag(lensData.mCode);
+                ImageView iconImageView = (ImageView) inflatedLayout.findViewById(R.id.lensIconView);
 
-                LensButtonPair buttonPair = iconMap.get(lensData.mCode);
+                TextView iconName = (TextView) inflatedLayout.findViewById(R.id.lensTextView);
+                String nameBuilder = lensData.mCode;
 
-                if (buttonPair == null || buttonPair.bmp == null) {
-                buttonPair = new LensButtonPair(iconButton, null, lensData.mIconLink, lensData.mCode, iconName, inflatedLayout);
-                iconMap.put(lensData.mCode, buttonPair);
-                new LensIconLoader.AsyncLensIconDownloader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, buttonPair, context);
+                for (String filter : stringFilter)
+                    nameBuilder = nameBuilder.replace(filter, "");
+
+                nameBuilder = nameBuilder.replaceAll("_", " ");
+
+                iconName.setText(nameBuilder.trim());
+                iconName.setMaxWidth(5);
+
+                LensContainerData containerData = iconMap.get(lensData.mCode);
+                if (containerData == null || containerData.bmp == null) {
+                    containerData = new LensContainerData(inflatedLayout, iconImageView, iconName, lensData.mIconLink, null);
+                    iconMap.put(lensData.mCode, containerData);
+                    new LensIconLoader.AsyncLensIconDownloader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, containerData, context);
                 } else {
-                    iconButton.setImageBitmap(buttonPair.bmp);
-                    iconButton.invalidate();
+                    iconImageView.setImageBitmap(containerData.bmp);
+                    iconImageView.invalidate();
 
-                    iconName.setMaxWidth(buttonPair.bmp.getWidth());
+                    iconName.setMaxWidth(containerData.bmp.getWidth());
                     iconName.invalidate();
                     inflatedLayout.invalidate();
                 }
@@ -184,21 +185,19 @@ public class LensesFragment extends Fragment {
         }
     }
 
-    public static class LensButtonPair {
+    public static class LensContainerData {
         public LinearLayout inflatedLayout;
-        public ImageView button;
-        public Bitmap bmp;
-        public String url;
-        public String mCode;
+        public ImageView iconImageView;
         public TextView textView;
+        public String url;
+        public Bitmap bmp;
 
-        public LensButtonPair(ImageView button, Bitmap bmp, String url, String mCode, TextView textView, LinearLayout inflatedLayout) {
-            this.button = button;
-            this.bmp = bmp;
-            this.url = url;
-            this.mCode = mCode;
-            this.textView = textView;
+        public LensContainerData(LinearLayout inflatedLayout, ImageView iconImageView, TextView textView, String url, Bitmap bmp) {
             this.inflatedLayout = inflatedLayout;
+            this.iconImageView = iconImageView;
+            this.textView = textView;
+            this.url = url;
+            this.bmp = bmp;
         }
     }
 }
