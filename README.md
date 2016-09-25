@@ -35,7 +35,6 @@ Current features are:
   - Alignment(left, center, right)
   - Size(1-250)
   - Style(bold, italic, bold and italic, normal)
-  - Rainbow text(makes each letter separately colored)
   - Gradient
 - Background
   - Color(HSV)
