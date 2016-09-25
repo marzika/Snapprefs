@@ -130,9 +130,6 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
 
         Logger.log("Query count: " + cursor.getCount());
 
-        if (cursor.getCount() == 0)
-            return null;
-
         if (!cursor.moveToFirst()) {
             Logger.log("Error moving cursor to first row");
             return null;
@@ -167,9 +164,6 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         callbackHandler.addParams(cursor);
 
         Logger.log("Query count: " + cursor.getCount());
-
-        if (cursor.getCount() == 0)
-            return null;
 
         if (!cursor.moveToFirst()) {
             Logger.log("Error moving cursor to first row");
@@ -392,9 +386,6 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         callbackHandler.addParams(cursor);
 
         Logger.log("Query count: " + cursor.getCount());
-
-        if (cursor.getCount() == 0)
-            return null;
 
         if (!cursor.moveToFirst()) {
             Logger.log("Error moving cursor to first row");

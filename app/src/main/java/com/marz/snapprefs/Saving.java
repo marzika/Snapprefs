@@ -24,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -46,15 +45,12 @@ import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
 public class Saving {
     //public static final String SNAPCHAT_PACKAGE_NAME = "com.snapchat.android";
     public static Resources mSCResources;
-    public static Bitmap sentImage;
-    public static Uri videoUri;
     public static XC_LoadPackage.LoadPackageParam lpparam2;
     private static SimpleDateFormat dateFormat =
             new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.getDefault());
     private static SimpleDateFormat dateFormatSent =
             new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
     private static XModuleResources mResources;
-    private static HashSet<Object> spamGuardSet = new HashSet<>();
     private static ConcurrentHashMap<String, SnapData> hashSnapData = new ConcurrentHashMap<>();
     private static boolean printFlags = true;
     private static String currentSnapKey;
@@ -73,7 +69,7 @@ public class Saving {
             ClassLoader cl = lpparam.classLoader;
 
             /**
-             * Called whenever a video is decrypted by Snapchat
+             * Called whenever a video is decrypted by snapchat
              * Will pre-load the next snap in the list
              */
             findAndHookConstructor(Obfuscator.save.DECRYPTEDSNAPVIDEO_CLASS, cl, findClass(
@@ -96,8 +92,7 @@ public class Saving {
             /**
              * Called whenever a bitmap is set to the view (I believe)
              */
-            findAndHookMethod(Obfuscator.save.IMAGESNAPRENDERER_CLASS +
-                    "$1", cl, Obfuscator.save.IMAGESNAPRENDERER_NEW_BITMAP, Bitmap.class, new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.IMAGESNAPRENDERER_CLASS2, cl, Obfuscator.save.IMAGESNAPRENDERER_NEW_BITMAP, Bitmap.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     try {
@@ -131,7 +126,7 @@ public class Saving {
                 }
             });
 
-            findAndHookMethod(Obfuscator.save.SNAPPREVIEWFRAGMENT_CLASS, lpparam.classLoader, "l", new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.SNAPPREVIEWFRAGMENT_CLASS, lpparam.classLoader, Obfuscator.save.SNAPPREVIEWFRAGMENT_METHOD1, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     try {
@@ -154,7 +149,7 @@ public class Saving {
                     //Logger.afterHook("RECEIVEDSNAP - DisplayTime");
                     Double currentResult = (Double) param.getResult();
                     if (Preferences.getBool(Prefs.TIMER_UNLIMITED)) {
-                        findAndHookMethod("com.snapchat.android.ui.SnapTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
+                        findAndHookMethod(Obfuscator.save.CLASS_SNAP_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_SNAPTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
                         param.setResult((double) 9999.9F);
                     } else {
                         if ((double) Preferences.getInt(Prefs.TIMER_MINIMUM) !=
@@ -166,19 +161,19 @@ public class Saving {
                 }
             });
             if (Preferences.getBool(Prefs.HIDE_TIMER_SNAP)) {
-                findAndHookMethod("com.snapchat.android.ui.SnapTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
+                findAndHookMethod(Obfuscator.save.CLASS_SNAP_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_SNAPTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
             if (Preferences.getBool(Prefs.HIDE_TIMER_STORY)) {
-                findAndHookMethod("com.snapchat.android.ui.StoryTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
+                findAndHookMethod(Obfuscator.save.CLASS_STORY_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_STORYTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
             if (Preferences.getBool(Prefs.LOOPING_VIDS)) {
-                findAndHookMethod("com.snapchat.opera.shared.view.TextureVideoView", lpparam.classLoader, "start", new XC_MethodHook() {
+                findAndHookMethod(Obfuscator.save.CLASS_TEXTURE_VIDEO_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_TVV_START, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        callMethod(param.thisObject, "setLooping", true);
+                        callMethod(param.thisObject, Obfuscator.save.METHOD_TVV_SETLOOPING, true);
                     }
                 });
-                findAndHookMethod("com.snapchat.android.controller.countdown.SnapCountdownController ", lpparam.classLoader, "a", long.class, new XC_MethodHook() {
+                findAndHookMethod(Obfuscator.save.CLASS_SNAP_COUNTDOWN_CONTROLLER, lpparam.classLoader, Obfuscator.save.METHOD_SCC_VAR1, long.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         param.args[0] =
@@ -186,24 +181,8 @@ public class Saving {
                     }
                 });
             }
-            /**
-             * We hook SnapView.a to determine whether we have stopped viewing the Snap.
-             */
-            findAndHookMethod(Obfuscator.save.SNAPVIEW_CLASS, lpparam.classLoader, Obfuscator.save.SNAPVIEW_HIDE, findClass(Obfuscator.save.ENDREASON_CLASS, lpparam.classLoader), new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Logger.afterHook("SNAPVIEW - Hide");
-                    spamGuardSet.clear();
-                }
-            });
-            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", lpparam.classLoader, "a", findClass(Obfuscator.save.STORYVIEW_SHOW_FIRST, lpparam.classLoader), findClass("com.snapchat.android.ui.snapview.SnapViewSessionStopReason", lpparam.classLoader), int.class, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Logger.afterHook("StorySnapView - Hide1");
-                }
-            });
             //List<Bitmap> a = this.i.a(this.F.g(), ProfileImageSize.MEDIUM);
-            findAndHookMethod("com.snapchat.android.fragments.FriendMiniProfilePopupFragment", lpparam.classLoader, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_GET_CACHED_PROFILE_PICTURES, new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.CLASS_FRIEND_MINI_PROFILE_POPUP_FRAGMENT, lpparam.classLoader, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_GET_CACHED_PROFILE_PICTURES, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
                     View mini_profile_snapcode = (View) getObjectField(param.thisObject, Obfuscator.save.MINI_PROFILE_SNAPCODE);
@@ -235,16 +214,16 @@ public class Saving {
                                 NotificationUtils.showStatefulMessage("Error Saving Profile Images For " + username + "\nIf The Profile Image Is Not Blank Please Enable Debug Mode And Rep", ToastType.BAD, lpparam.classLoader);
                                 return false;
                             }
-                            int successCounter = 0;
+                            int succCounter = 0;
                             int sizeOfProfileImages = profileImages.size();
-                            for (int iterator = 0; iterator < sizeOfProfileImages; iterator++) {
-                                File f = new File(profileImagesFolder, username + "-" + iterator + ".jpg");
-                                if(SavingUtils.saveJPG(f, profileImages.get(iterator), HookMethods.context)) {
-                                    successCounter++;
+                            for (int iter = 0; iter < sizeOfProfileImages; iter++) {
+                                File f = new File(profileImagesFolder, username + "-" + iter + ".jpg");
+                                if(SavingUtils.saveJPG(f, profileImages.get(iter), HookMethods.context)) {
+                                    succCounter++;
                                 }
                             }
-                            Boolean succ = (successCounter == sizeOfProfileImages);
-                            NotificationUtils.showStatefulMessage("Saved " + successCounter + "/" + sizeOfProfileImages + " profile images.", succ ? ToastType.GOOD : ToastType.BAD, lpparam.classLoader);
+                            Boolean succ = (succCounter == sizeOfProfileImages);
+                            NotificationUtils.showStatefulMessage("Saved " + succCounter + "/" + sizeOfProfileImages + " profile images.", succ ? ToastType.GOOD : ToastType.BAD, lpparam.classLoader);
                             SavingUtils.vibrate(HookMethods.context, succ);
                             return true;
                         }
@@ -252,11 +231,11 @@ public class Saving {
                 }
             });
         } catch (Exception e) {
-            Logger.log("Error occurred: Snapprefs doesn't currently support this version, wait for an update", e);
+            Logger.log("Error occured: Snapprefs doesn't currently support this version, wait for an update", e);
 
             findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Toast.makeText((Context) param.thisObject, "This version of Snapchat is currently not supported by Snapprefs.", Toast.LENGTH_LONG)
+                    Toast.makeText((Context) param.thisObject, "This version of snapchat is currently not supported by Snapprefs.", Toast.LENGTH_LONG)
                             .show();
                 }
             });
@@ -267,15 +246,15 @@ public class Saving {
         try {
             Logger.printTitle("Handling SENT snap");
             Activity activity = (Activity) callMethod(snapPreviewFragment, "getActivity");
-            Object snapEditorView = getObjectField(snapPreviewFragment, "b");
-            Object mediaBryo = getObjectField(snapEditorView, "p");
+            Object snapEditorView = getObjectField(snapPreviewFragment, Obfuscator.save.OBJECT_SNAP_EDITOR_VIEW);
+            Object mediaBryo = getObjectField(snapEditorView, Obfuscator.save.OBJECT_MEDIABRYO);
 
             if (mediaBryo == null) {
                 Logger.printFinalMessage("MediaBryo not assigned - Halting process");
                 return;
             }
 
-            String mKey = (String) getObjectField(mediaBryo, "mClientId");
+            String mKey = (String) getObjectField(mediaBryo, Obfuscator.save.OBJECT_MCLIENTID);
             Logger.printMessage("mKey: " + mKey);
 
             SnapData snapData = hashSnapData.get(mKey);
@@ -299,7 +278,7 @@ public class Saving {
 
             if (bryoName.equals("VZ")) {
                 Logger.printMessage("Media Type: VIDEO");
-                Uri uri = (Uri) getObjectField(mediaBryo, "mVideoUri");
+                Uri uri = (Uri) getObjectField(mediaBryo, Obfuscator.save.OBJECT_MVIDEOURI);
 
                 if (uri == null)
                     response = SaveResponse.FAILED;
@@ -324,7 +303,7 @@ public class Saving {
                 }
             } else if (bryoName.equals("VC")) {
                 Logger.printMessage("Media Type: IMAGE");
-                Bitmap bmp = (Bitmap) callMethod(snapEditorView, "a", activity, true);
+                Bitmap bmp = (Bitmap) callMethod(snapEditorView, Obfuscator.save.METHOD_GET_SENT_BITMAP, activity, true);
                 if (bmp != null) {
                     Logger.printMessage("Sent image found - Trying to save");
                     response = saveSnap(SnapType.SENT, MediaType.IMAGE,
@@ -443,10 +422,20 @@ public class Saving {
         Logger.printTitle("Handling SnapData HEADER");
         Logger.printMessage("Header object: " + receivedSnap.getClass().getCanonicalName());
 
-        String mId = (String) getObjectField(receivedSnap, "mId");
-        SnapType snapType =
-                receivedSnap.getClass().getCanonicalName().equals("VK") ? SnapType.STORY :
-                        SnapType.SNAP;
+        String mId = (String) getObjectField(receivedSnap, Obfuscator.save.OBJECT_MID);
+        SnapType snapType = null;
+
+        String className = receivedSnap.getClass().getCanonicalName();
+
+        if(className.equals(Obfuscator.save.STORYSNAP_CLASS))
+            snapType = SnapType.STORY;
+        else if( className.equals(Obfuscator.save.RECEIVEDSNAP_CLASS))
+            snapType = SnapType.SNAP;
+        else
+        {
+            Logger.log("Obfuscator out of date for SnapType in SAVING CLASS");
+            return;
+        }
 
         Logger.printMessage("SnapType: " + snapType.name);
 
@@ -454,7 +443,7 @@ public class Saving {
         String strSender;
 
         if (snapType == SnapType.SNAP) {
-            mKey += (String) getObjectField(receivedSnap, "mCacheKeyInstanceSuffix");
+            mKey += (String) getObjectField(receivedSnap, Obfuscator.save.OBJECT_CACHEKEYSUFFIX);
             strSender = (String) getObjectField(receivedSnap, "mSender");
         } else
             strSender = (String) getObjectField(receivedSnap, "mUsername");
@@ -624,7 +613,7 @@ public class Saving {
         Logger.printMessage("Getting Bitmap");
 
         // Class: ahZ - holds the mKey for the payload
-        Object obj = getObjectField(param.thisObject, "b");
+        Object obj = getObjectField(param.thisObject, Obfuscator.save.OBJECT_KEYHOLDERCLASS);
         // Get the mKey out of ahZ
         String mKey = (String) getObjectField(obj, "mKey");
         Logger.printMessage("Key: " + mKey);
