@@ -162,11 +162,11 @@ public class Groups {
                 users.remove(0);
                 Group currentGroup = new Group(name, users);
                 if (numGroups == 3 && Preferences.getLicence() == 0) {
-                    NotificationUtils.showMessage("You cannot have more than 3 groups as a free user", Color.RED, NotificationUtils.LENGHT_SHORT, HookMethods.classLoader);
+                    NotificationUtils.showMessage("You cannot have more than 3 groups as a free user", Color.RED, NotificationUtils.LENGTH_SHORT, HookMethods.classLoader);
                     return;
                 }
                 if (Preferences.getLicence() != 0 && !Preferences.getBool(Preferences.Prefs.UNLIM_GROUPS)) {
-                    NotificationUtils.showMessage("You disabled the option to have more than 3 groups", Color.RED, NotificationUtils.LENGHT_SHORT, HookMethods.classLoader);
+                    NotificationUtils.showMessage("You disabled the option to have more than 3 groups", Color.RED, NotificationUtils.LENGTH_SHORT, HookMethods.classLoader);
                     return;
                 }
                 if (!groups.contains(currentGroup)) {

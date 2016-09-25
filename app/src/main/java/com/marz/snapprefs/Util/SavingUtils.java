@@ -241,9 +241,9 @@ public abstract class SavingUtils {
 
     public static int getToastLength() {
         if (Preferences.getInt(Prefs.TOAST_LENGTH) == Preferences.TOAST_LENGTH_SHORT) {
-            return NotificationUtils.LENGHT_SHORT;
+            return NotificationUtils.LENGTH_SHORT;
         } else {
-            return NotificationUtils.LENGHT_LONG;
+            return NotificationUtils.LENGTH_LONG;
         }
     }
 }
