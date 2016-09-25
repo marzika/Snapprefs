@@ -72,8 +72,9 @@ public class Saving {
              * Called whenever a video is decrypted by snapchat
              * Will pre-load the next snap in the list
              */
+        //UPDATED METHOD & CONTENT
             findAndHookConstructor(Obfuscator.save.DECRYPTEDSNAPVIDEO_CLASS, cl, findClass(
-                    Obfuscator.save.CACHE_CLASS, cl), String.class, Bitmap.class,
+                    Obfuscator.save.CACHE_CLASS, cl), String.class, Bitmap.class, String.class, long.class,
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -92,6 +93,7 @@ public class Saving {
             /**
              * Called whenever a bitmap is set to the view (I believe)
              */
+            // UPDATED METHOD & CONTENT
             findAndHookMethod(Obfuscator.save.IMAGESNAPRENDERER_CLASS2, cl, Obfuscator.save.IMAGESNAPRENDERER_NEW_BITMAP, Bitmap.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -106,6 +108,7 @@ public class Saving {
             /**
              * Called every time a snap is viewed - Quite reliable
              */
+        // UPDATED METHOD & CONTENT
             findAndHookMethod(Obfuscator.save.RECEIVEDSNAP_CLASS, cl, Obfuscator.save
                     .RECEIVEDSNAP_BEING_SEEN, boolean.class, new XC_MethodHook() {
                 @Override
@@ -126,6 +129,7 @@ public class Saving {
                 }
             });
 
+            // UPDATED METHOD & CONTENT
             findAndHookMethod(Obfuscator.save.SNAPPREVIEWFRAGMENT_CLASS, lpparam.classLoader, Obfuscator.save.SNAPPREVIEWFRAGMENT_METHOD1, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -143,6 +147,7 @@ public class Saving {
              * our limit and hide the counter if we need it.
              */
 
+            // UPDATED METHOD & CONTENT
             findAndHookMethod(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader, Obfuscator.save.RECEIVEDSNAP_DISPLAYTIME, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -161,18 +166,22 @@ public class Saving {
                 }
             });
             if (Preferences.getBool(Prefs.HIDE_TIMER_SNAP)) {
+                // UPDATED METHOD & CONTENT
                 findAndHookMethod(Obfuscator.save.CLASS_SNAP_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_SNAPTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
             if (Preferences.getBool(Prefs.HIDE_TIMER_STORY)) {
+                // UPDATED METHOD & CONTENT
                 findAndHookMethod(Obfuscator.save.CLASS_STORY_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_STORYTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
             if (Preferences.getBool(Prefs.LOOPING_VIDS)) {
+                // UPDATED METHOD & CONTENT
                 findAndHookMethod(Obfuscator.save.CLASS_TEXTURE_VIDEO_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_TVV_START, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         callMethod(param.thisObject, Obfuscator.save.METHOD_TVV_SETLOOPING, true);
                     }
                 });
+                // UPDATED METHOD & CONTENT
                 findAndHookMethod(Obfuscator.save.CLASS_SNAP_COUNTDOWN_CONTROLLER, lpparam.classLoader, Obfuscator.save.METHOD_SCC_VAR1, long.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -182,6 +191,7 @@ public class Saving {
                 });
             }
             //List<Bitmap> a = this.i.a(this.F.g(), ProfileImageSize.MEDIUM);
+            // UPDATED METHOD & CONTENT
             findAndHookMethod(Obfuscator.save.CLASS_FRIEND_MINI_PROFILE_POPUP_FRAGMENT, lpparam.classLoader, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_GET_CACHED_PROFILE_PICTURES, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
@@ -242,6 +252,7 @@ public class Saving {
         }
     }
 
+    // UPDATED
     public static void handleSentSnap(Object snapPreviewFragment, Context snapContext) {
         try {
             Logger.printTitle("Handling SENT snap");
@@ -418,6 +429,7 @@ public class Saving {
         }
     }
 
+    //UPDATED
     private static void handleSnapHeader(Context context, Object receivedSnap) throws Exception {
         Logger.printTitle("Handling SnapData HEADER");
         Logger.printMessage("Header object: " + receivedSnap.getClass().getCanonicalName());
@@ -496,6 +508,7 @@ public class Saving {
      * @param param
      * @throws Exception
      */
+    // UPDATED METHOD
     private static void handleVideoPayload(Context context, XC_MethodHook.MethodHookParam param)
             throws Exception {
 
@@ -522,7 +535,7 @@ public class Saving {
         // Grab the Key to Item Map (Contains file paths)
         @SuppressWarnings("unchecked")
         Map<String, Object> mKeyToItemMap =
-                (Map<String, Object>) getObjectField(mCache, "mKeyToItemMap");
+                (Map<String, Object>) getObjectField(mCache, Obfuscator.save.CACHE_KEYTOITEMMAP );
 
         if (mKeyToItemMap == null) {
             Logger.printFinalMessage("Mkey-Item Map not found");
@@ -539,7 +552,7 @@ public class Saving {
         }
 
         // Get the path of the video file
-        String mAbsoluteFilePath = (String) getObjectField(item, "mAbsoluteFilePath");
+        String mAbsoluteFilePath = (String) getObjectField(item, Obfuscator.save.CACHE_ITEM_PATH);
 
         if (mAbsoluteFilePath == null) {
             Logger.printFinalMessage("No path object found");
@@ -607,6 +620,7 @@ public class Saving {
      * @param param
      * @throws Exception
      */
+    // UPDATED TO LATEST
     public static void handleImagePayload(Context context, XC_MethodHook.MethodHookParam param)
             throws Exception {
         Logger.printTitle("Handling IMAGE Payload");
@@ -615,7 +629,7 @@ public class Saving {
         // Class: ahZ - holds the mKey for the payload
         Object obj = getObjectField(param.thisObject, Obfuscator.save.OBJECT_KEYHOLDERCLASS);
         // Get the mKey out of ahZ
-        String mKey = (String) getObjectField(obj, "mKey");
+        String mKey = (String) getObjectField(obj, Obfuscator.save.OBJECT_KEYHOLDER_KEY);
         Logger.printMessage("Key: " + mKey);
 
         // Find the snapData associated with the mKey
