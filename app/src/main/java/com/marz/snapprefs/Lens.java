@@ -28,14 +28,14 @@ public class Lens {
     public static Class PrepareStatus;
     public static Class LensClass;
     public static Object enumScheduledType;
-    public static Class atzClass;
+    public static Class lensListHolderClass;
     public static HashMap<String, LensData> lensDataMap = new HashMap<>();
 
     static void initLens(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
         lensPrepareState = findClass(Obfuscator.lens.LENSPREPARESTATECHANGE, lpparam.classLoader);
         PrepareStatus = findClass(Obfuscator.lens.STATECHANGEPREPARESTATUSENUM, lpparam.classLoader);
         LensClass = findClass(Obfuscator.lens.LENSCLASS, lpparam.classLoader);
-        atzClass = findClass(Obfuscator.lens.LENSCLASS_SECOND_CONSTRUCTOR_ARG, lpparam.classLoader);
+        lensListHolderClass = findClass(Obfuscator.lens.CLASS_LENSLIST_HOLDER, lpparam.classLoader);
         Class TypeClass = findClass(Obfuscator.lens.LENSCLASS + "$Type", lpparam.classLoader);
         enumScheduledType = getStaticObjectField(TypeClass, "SCHEDULED");
 
@@ -73,8 +73,8 @@ public class Lens {
             ArrayList<Object> activeLenses = new ArrayList<>();
             ArrayList<String> lensBlacklist = new ArrayList<>();
 
-            for (Object atzObj : a) {
-                Object lens = newInstance(LensClass, atzClass.cast(atzObj), enumScheduledType);
+            for (Object listObj : a) {
+                Object lens = newInstance(LensClass, lensListHolderClass.cast(listObj), enumScheduledType);
 
                 if (Preferences.getBool(Prefs.LENSES_COLLECT)) {
                     String url = (String) getObjectField(lens, "mIconLink");
@@ -103,8 +103,8 @@ public class Lens {
             ArrayList<Object> precachedLenses = new ArrayList<>();
             for (Object atzObj : a) {
                 Logger.log("Looped precached lens");
-                Object lens = newInstance(LensClass, atzClass.cast(atzObj), enumScheduledType);
-                activeLenses.add(lens);
+                Object lens = newInstance(LensClass, lensListHolderClass.cast(atzObj), enumScheduledType);
+                precachedLenses.add(lens);
             }
 
             if (Preferences.getBool(Prefs.LENSES_LOAD)) {
@@ -136,17 +136,6 @@ public class Lens {
 
     public static boolean callBoolMethod(Object object, String methodName) {
         return (boolean) callMethod(object, methodName);
-    }
-
-    public static void logCaller() {
-        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-
-        for (StackTraceElement element : stackTraceElements) {
-            String className = element.getClassName();
-            String methodName = element.getMethodName();
-
-            Logger.log("Caller: " + className + " -> " + methodName);
-        }
     }
 
     public static ArrayList<Object> buildModifiedList(ArrayList<Object> list, ArrayList<String> lensBlacklist) {
