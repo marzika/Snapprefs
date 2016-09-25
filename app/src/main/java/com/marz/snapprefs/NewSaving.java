@@ -164,7 +164,7 @@ public class NewSaving {
         if (mToastLength == TOAST_LENGTH_SHORT) {
             return NotificationUtils.LENGTH_SHORT;
         } else {
-            return NotificationUtils.LENGTH_SHORT;
+            return NotificationUtils.LENGTH_LONG;
         }
     }
 

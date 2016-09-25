@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="5sp"
         android:gravity="center_horizontal"
-        android:text="If you are downloading a Filter from an other source place it into /sdcard/Snapprefs/Filters/, requests can be made on G+"
+        android:text="If you are downloading a Filter from another source place it into /sdcard/Snapprefs/Filters/, requests can be made on G+"
         android:textAppearance="?android:attr/textAppearanceMedium" />
     <Button
         android:id="@+id/reload"

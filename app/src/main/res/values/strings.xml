@@ -58,9 +58,9 @@
     <string name="pref_speed_summary_on">Speed spoofing is enabled</string>
     <string name="pref_speed_summary_off">Speed spoofing is disabled</string>
     <string name="pref_sticker">Custom sticker</string>
-    <string name="pref_sticker_title">Enable custom stickers</string>
-    <string name="pref_sticker_summary_on">Custom sticker will be loaded</string>
-    <string name="pref_sticker_summary_off">Custom sticker will NOT be loaded</string>
+    <string name="pref_sticker_title">Enable Custom Stickers</string>
+    <string name="pref_sticker_summary_on">Custom stickers will be loaded</string>
+    <string name="pref_sticker_summary_off">Custom stickers will NOT be loaded</string>
     <string name="pref_sticker_readme_title">HOW TO USE</string>
     <string name="pref_sticker_readme_summary">To replace stickers, you have to first get SC\'s Emoji zips (can be found in their apk\'s assets folder), the PNG folder stores the previews of the stickers, the SVG folder contains the actual stickers. Each filename represents the unicode code of the Emoji, which they represent. To change the sticker, you have to replace the desired PNG and SVG in their zip, then place the zips in the /SDCARD/Snapprefs/Stickers/ folder (create them). Click here for a tutorial.</string>
     <string name="pref_sticker_readme_summary2">Example SVGs/PNGs can be found at https://github.com/Ranks/emojione</string>
@@ -128,9 +128,9 @@
     <string name="pref_save_snaps_videos">Video snaps</string>
     <string name="pref_save_stories_images">Image stories</string>
     <string name="pref_save_stories_videos">Video stories</string>
-    <string name="pref_save_sent_snaps_title">Sent snaps</string>
+    <string name="pref_save_sent_snaps_title">Sent Snaps</string>
     <string name="pref_save_sent_snaps_summary_on">Sent snaps will be saved</string>
-    <string name="pref_save_sent_snaps_summary_off">Sent snaps won\'t be saved</string>
+    <string name="pref_save_sent_snaps_summary_off">Sent snaps will not be saved</string>
     <string name="pref_save_snaps">Snap Save Mode</string>
     <string name="pref_save_story">Story Save Mode</string>
 
@@ -148,8 +148,8 @@
 
     <string-array name="pref_save_mode_entries">
         <item>Save Button</item>
-        <item>Sweep to save</item>
-        <item>Don\'t save</item>
+        <item>Sweep to Save</item>
+        <item>Don\'t Save</item>
         <item>Auto Save</item>
     </string-array>
 
@@ -169,13 +169,13 @@
     <string name="pref_timer_story_hide_title">Hide the Story Timer</string>
     <string name="pref_timer_story_hide_summary_off">It will NOT hide the timer while watching a story</string>
     <string name="pref_timer_story_hide_summary_on">It will hide the timer while watching a story</string>
-    <string name="pref_timer_unlimited_title">Unlimited viewing time</string>
+    <string name="pref_timer_unlimited_title">Unlimited Viewing Time</string>
     <string name="pref_timer_unlimited_summary_off">You will have limited viewing time, select below</string>
     <string name="pref_timer_unlimited_summary_on">You can watch the snap as long as you want</string>
-    <string name="pref_video_looping_title">Looping videos</string>
+    <string name="pref_video_looping_title">Looping Videos</string>
     <string name="pref_video_looping_summary_off">Videos will play once</string>
     <string name="pref_video_looping_summary_on">Videos will be looped for as long as you want</string>
-    <string name="pref_timer_minimum_title">Minimum timer duration</string>
+    <string name="pref_timer_minimum_title">Minimum Timer Duration</string>
     <string name="pref_forcenavbar_default" translatable="false">0</string>
     <string name="pref_timer_minimum_default_value" translatable="false">0</string>
     <string-array name="pref_timer_minimum_entries">
@@ -220,7 +220,7 @@
     <string name="pref_toasts_title">Show Toast Messages</string>
     <string name="pref_toasts_summary_on">Toast messages are enabled</string>
     <string name="pref_toasts_summary_off">Toast messages are disabled</string>
-    <string name="pref_vibration_title">Vibrate When Saved:</string>
+    <string name="pref_vibration_title">Vibrate When Saved</string>
     <string name="pref_vibration_summary_on">Vibration is enabled. Soft vibration means success, hard vibration means error.</string>
     <string name="pref_vibration_summary_off">Vibration is disabled</string>
     <string name="pref_toasts_duration_title">Toast Duration</string>
@@ -302,7 +302,7 @@
 
     <!-- Caption settings -->
     <string name="pref_caption">Unlimited Captions</string>
-    <string name="pref_caption_explanation">Note: unlimited captions works for BOTH snaps taken with Snapchat\'s camera and snaps shared from the Gallery, so it\'s NOT limited to shared snaps.</string>
+    <string name="pref_caption_explanation">Note: Unlimited captions works for BOTH snaps taken with Snapchat\'s camera and snaps shared from the Gallery, so it\'s NOT limited to shared snaps.</string>
 
     <string name="pref_caption_unlimited_vanilla_title">Unlimited Regular Captions</string>
     <string name="pref_caption_unlimited_vanilla_on">Regular captions are unlimited</string>
@@ -362,7 +362,7 @@
     <string name="pref_timercounter_cb_title">Enable Timer Counter</string>
     <string name="pref_save_chat_image_title">Enable Chat Media Saving</string>
     <string name="pref_save_chat_image_summary">When enabled open the chat image and tap and hold to save, for  videos use the button.</string>
-    <string name="pref_save_chat_text_title">Enable Chat text Auto-Save</string>
+    <string name="pref_save_chat_text_title">Enable Chat Text Auto-Save</string>
     <string name="pref_save_chat_text_summary">When enabled sent and received Chats will be saved automatically</string>
     <string name="pref_save_integration_title">Enable Snapchat integration</string>
     <string name="pref_save_integration_summary">When enabled you can launch Snapprefs\'s settings by pulling down Snapchat\'s settings bar and clicking on Snapprefs</string>

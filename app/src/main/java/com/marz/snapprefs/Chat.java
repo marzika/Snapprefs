@@ -275,7 +275,8 @@ public class Chat {
                                 Saving.createStatefulToast("Unhandled save response", NotificationUtils.ToastType.WARNING);
                             }
                         } catch (Exception e) {
-
+                            Logger.log("Error Saving Chat Image: ");
+                            e.printStackTrace();
                         }
                         return true;
                     }
@@ -338,7 +339,8 @@ public class Chat {
                                 Saving.createStatefulToast("Unhandled save response", NotificationUtils.ToastType.WARNING);
                             }
                         } catch (Exception e) {
-
+                            Logger.log("Error Saving Chat Video: ");
+                            e.printStackTrace();
                         }
                     }
                 });
