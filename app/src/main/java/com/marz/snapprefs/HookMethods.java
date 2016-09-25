@@ -281,7 +281,6 @@ public class HookMethods
                             if (Preferences.getBool(Prefs.INTEGRATION)) {
                                 HookedLayouts.initIntegration(lpparam, mResources);
                             }
-                            NotificationUtils.showStatefulMessage("refract004", NotificationUtils.ToastType.GOOD, lpparam.classLoader);
                             Misc.forceNavBar(lpparam, Preferences.getInt(Prefs.FORCE_NAVBAR));
                             getEditText(lpparam);
                             findAndHookMethod(Obfuscator.save.SCREENSHOTDETECTOR_CLASS, lpparam.classLoader, Obfuscator.save.SCREENSHOTDETECTOR_RUN, LinkedHashMap.class, XC_MethodReplacement.DO_NOTHING);
