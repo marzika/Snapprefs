@@ -76,7 +76,7 @@ public class Lens {
             for (Object atzObj : a) {
                 Object lens = newInstance(LensClass, atzClass.cast(atzObj), enumScheduledType);
 
-                if( Preferences.getBool(Prefs.LENSES_COLLECT) ) {
+                if (Preferences.getBool(Prefs.LENSES_COLLECT)) {
                     String url = (String) getObjectField(lens, "mIconLink");
                     Logger.log("Icon url: " + url);
                     String mCode = (String) getObjectField(lens, "mCode");
@@ -107,7 +107,7 @@ public class Lens {
                 activeLenses.add(lens);
             }
 
-            if( Preferences.getBool(Prefs.LENSES_LOAD)) {
+            if (Preferences.getBool(Prefs.LENSES_LOAD)) {
                 activeLenses = buildModifiedList(activeLenses, lensBlacklist);
                 precachedLenses = buildModifiedList(precachedLenses, lensBlacklist);
             }
@@ -152,6 +152,12 @@ public class Lens {
     public static ArrayList<Object> buildModifiedList(ArrayList<Object> list, ArrayList<String> lensBlacklist) {
         Logger.log("Original list size: " + list.size());
         ArrayList<Object> lensList = MainActivity.lensDBHelper.getAllExcept(lensBlacklist);
+
+        if (lensList == null) {
+            Logger.log("No lenses to load!");
+            return list;
+        }
+
         Logger.log("New lenses to load: " + lensList.size());
 
         for (Object lensObj : lensList) {

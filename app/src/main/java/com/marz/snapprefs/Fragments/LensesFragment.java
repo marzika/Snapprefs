@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.marz.snapprefs.Common;
 import com.marz.snapprefs.Databases.LensDatabaseHelper;
@@ -45,7 +46,7 @@ public class LensesFragment extends Fragment {
     private static HashMap<String, LensContainerData> iconMap = new HashMap<>();
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        int lensListSize = (int) MainActivity.lensDBHelper.getRowCount();
+        final int lensListSize = (int) MainActivity.lensDBHelper.getRowCount();
         int selectedLensSize = MainActivity.lensDBHelper.getActiveLensCount();
 
         View view = inflater.inflate(R.layout.lensloader_layout,
@@ -89,7 +90,10 @@ public class LensesFragment extends Fragment {
         lensLoaderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DialogHelper.lensDialog(getContext(), loadedLensesTextView, inflater, container);
+                if (lensListSize > 0)
+                    DialogHelper.lensDialog(getContext(), loadedLensesTextView, inflater, container);
+                else
+                    Toast.makeText(v.getContext(), "You've not collected any lenses!", Toast.LENGTH_SHORT).show();
             }
         });
         return view;
@@ -102,6 +106,11 @@ public class LensesFragment extends Fragment {
                 MainActivity.lensDBHelper = new LensDatabaseHelper(context);
 
             ArrayList<Object> lensList = MainActivity.lensDBHelper.getAllLenses();
+
+            if (lensList == null) {
+                Logger.log("Tried to create dialog with no lenses");
+                return;
+            }
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Select Lenses");
