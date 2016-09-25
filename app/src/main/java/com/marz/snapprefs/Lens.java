@@ -104,7 +104,7 @@ public class Lens {
             for (Object atzObj : a) {
                 Logger.log("Looped precached lens");
                 Object lens = newInstance(LensClass, atzClass.cast(atzObj), enumScheduledType);
-                activeLenses.add(lens);
+                precachedLenses.add(lens);
             }
 
             if (Preferences.getBool(Prefs.LENSES_LOAD)) {
