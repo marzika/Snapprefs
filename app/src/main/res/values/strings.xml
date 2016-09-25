@@ -244,7 +244,7 @@
     <string name="pref_sort_files_mode_title">Sort Files by Category</string>
     <string name="pref_sort_files_mode_summary_on">Snaps and Stories will be saved into different folders</string>
     <string name="pref_sort_files_mode_summary_off">Snaps and Stories will be saved into the same folder</string>
-    <string name="pref_sort_files_username_title">Sort files by sender</string>
+    <string name="pref_sort_files_username_title">Sort Files by Sender</string>
     <string name="pref_sort_files_username_summary_on">Files will be saved in a subfolder for each sender</string>
     <string name="pref_sort_files_username_summary_off">Files will be saved into the same folder for each sender</string>
 
