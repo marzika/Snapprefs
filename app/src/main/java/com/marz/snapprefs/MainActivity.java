@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         AdView mAdView = (AdView) findViewById(R.id.adView);
         TextView pugs = (TextView) findViewById(R.id.pugs);
-        if (Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 1 || Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 2) {
+        if (Preferences.getLicenceUsingID(deviceUuid.toString()) == 1 || Preferences.getLicenceUsingID(deviceUuid.toString()) == 2) {
             mAdView.destroy();
             pugs.setVisibility(View.GONE);
             mAdView.setVisibility(View.GONE);
@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         mNavigationView = (NavigationView) findViewById(R.id.fuckyou);
-        if (Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 1 || Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 2) {
+        if (Preferences.getLicenceUsingID(deviceUuid.toString()) == 1 || Preferences.getLicenceUsingID(deviceUuid.toString()) == 2) {
             mNavigationView.getMenu().getItem(1).getSubMenu().getItem(1).setEnabled(true);
             LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mDrawerLayout.getLayoutParams();
             lp.setMargins(0, 0, 0, 0);

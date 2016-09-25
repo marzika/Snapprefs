@@ -185,7 +185,7 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
     /**
      * DO NOT REMOVE - It is used as a callback from the core handler
      * @param cursor
-     * @return
+     * @return lensDataList
      */
     public ArrayList<LensData> getAllLensesFromCursor(Cursor cursor) {
         ArrayList<LensData> lensDataList = new ArrayList<>();
@@ -209,7 +209,7 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
     /**
      * DO NOT REMOVE - It is used as a callback from the core handler
      * @param cursor
-     * @return
+     * @return lensData
      */
     public LensData getLensFromCursor(Cursor cursor) {
         LensData lensData = new LensData();
