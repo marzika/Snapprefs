@@ -137,9 +137,6 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
         LensData lensData = (LensData) super.getBuiltContent(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE,
                 selectionArgs, sortOrder, fullProjection, callback);
 
-        if (lensData == null)
-            return null;
-
         Logger.log("Queried database to get lens: " + lensData.mCode);
         return lensData;
     }
