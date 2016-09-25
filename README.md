@@ -71,9 +71,9 @@ Credits
 
 [Snapshare for their amazing work](https://github.com/P1nGu1n/Snapshare)
 
-manvir for his inspiring [SnapColors app](http://repo.xposed.info/module/com.manvir.snapcolors)
+manvir for his inspirational [SnapColors app](http://repo.xposed.info/module/com.manvir.snapcolors)
 
-elesbb for his inspiring [SnapChat Full Caption app](http://repo.xposed.info/module/com.elesbb.snapchatfullcaption)
+elesbb for his inspirational [SnapChat Full Caption app](http://repo.xposed.info/module/com.elesbb.snapchatfullcaption)
 
 chiralcode for his [ColorPicker](https://github.com/chiralcode/Android-Color-Picker)
 
