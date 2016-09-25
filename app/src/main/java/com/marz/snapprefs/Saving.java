@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.SnapData.FlagState;
 import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.NotificationUtils.ToastType;
@@ -33,7 +34,6 @@ import java.util.regex.Pattern;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
-import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
@@ -68,7 +68,6 @@ public class Saving {
         lpparam2 = lpparam;
 
         if (mSCResources == null) mSCResources = snapContext.getResources();
-        Preferences.refreshPreferences();
 
         try {
             ClassLoader cl = lpparam.classLoader;
@@ -136,7 +135,7 @@ public class Saving {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     try {
-                        if( Preferences.mSaveSentSnaps )
+                        if( Preferences.getBool(Prefs.SAVE_SENT_SNAPS) )
                             handleSentSnap(param.thisObject, snapContext);
                     } catch (Exception e) {
                         Logger.log("Error getting sent media", e);
@@ -154,25 +153,25 @@ public class Saving {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     //Logger.afterHook("RECEIVEDSNAP - DisplayTime");
                     Double currentResult = (Double) param.getResult();
-                    if (Preferences.mTimerUnlimited) {
+                    if (Preferences.getBool(Prefs.TIMER_UNLIMITED)) {
                         findAndHookMethod("com.snapchat.android.ui.SnapTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
                         param.setResult((double) 9999.9F);
                     } else {
-                        if ((double) Preferences.mTimerMinimum !=
+                        if ((double) Preferences.getInt(Prefs.TIMER_MINIMUM) !=
                                 Preferences.TIMER_MINIMUM_DISABLED &&
-                                currentResult < (double) Preferences.mTimerMinimum) {
-                            param.setResult((double) Preferences.mTimerMinimum);
+                                currentResult < (double) Preferences.getInt(Prefs.TIMER_MINIMUM)) {
+                            param.setResult((double) Preferences.getInt(Prefs.TIMER_MINIMUM));
                         }
                     }
                 }
             });
-            if (Preferences.mHideTimer) {
+            if (Preferences.getBool(Prefs.HIDE_TIMER_SNAP)) {
                 findAndHookMethod("com.snapchat.android.ui.SnapTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
-            if (Preferences.mHideTimerStory) {
+            if (Preferences.getBool(Prefs.HIDE_TIMER_STORY)) {
                 findAndHookMethod("com.snapchat.android.ui.StoryTimerView", lpparam.classLoader, "onDraw", Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
-            if (Preferences.mLoopingVids) {
+            if (Preferences.getBool(Prefs.LOOPING_VIDS)) {
                 findAndHookMethod("com.snapchat.opera.shared.view.TextureVideoView", lpparam.classLoader, "start", new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -211,10 +210,12 @@ public class Saving {
                     mini_profile_snapcode.setOnLongClickListener(new View.OnLongClickListener() {
                         @Override
                         public boolean onLongClick(View v) {
-                            final File profileImagesFolder = new File(Preferences.mSavePath, "ProfileImages/");
-                            if(!profileImagesFolder.exists()){
-                                profileImagesFolder.mkdir();
+                            final File profileImagesFolder = new File(Preferences.getSavePath(), "ProfileImages/");
+                            if(!profileImagesFolder.exists() && !profileImagesFolder.mkdirs()){
+                                Logger.log("Error creating profile images folder");
+                                return false;
                             }
+
                             // ProfileImageUtils$ProfileImageSize inner class
                             Class<?> profileImageSizeClass = findClass(Obfuscator.save.PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS, lpparam.classLoader);
                             // F
@@ -227,9 +228,8 @@ public class Saving {
                             Object i = getObjectField(param.thisObject, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_FRIENDS_PROFILE_IMAGES_CACHE);
                             //^.a(F.g(), ProfileImageSize.MEDIUM)
                             List<Bitmap> profileImages = (List<Bitmap>) callMethod(i, Obfuscator.save.PROFILE_IMAGES_CACHE_GET_PROFILE_IMAGES, new Class[]{String.class, profileImageSizeClass}, username, MEDIUM);
-                            if (Preferences.debug) {
-                                XposedBridge.log("First Three Letters Of Username: " + username.substring(0, 3) + "\nInner Class: " + profileImageSizeClass + "\nFriend Object: " + friendObject + "\nUsername: " + username + "\nMedium: " + MEDIUM + "\n 'i' Object: " + i + "profileImages: " + profileImages);
-                            }
+                            Logger.log("First Three Letters Of Username: " + username.substring(0, 3) + "\nInner Class: " + profileImageSizeClass + "\nFriend Object: " + friendObject + "\nUsername: " + username + "\nMedium: " + MEDIUM + "\n 'i' Object: " + i + "profileImages: " + profileImages);
+
                             if(profileImages == null) {
                                 SavingUtils.vibrate(HookMethods.context, false);
                                 NotificationUtils.showStatefulMessage("Error Saving Profile Images For " + username + "\nIf The Profile Image Is Not Blank Please Enable Debug Mode And Rep", ToastType.BAD, lpparam.classLoader);
@@ -262,6 +262,7 @@ public class Saving {
             });
         }
     }
+
     public static void handleSentSnap(Object snapPreviewFragment, Context snapContext) {
         try {
             Logger.printTitle("Handling SENT snap");
@@ -365,11 +366,11 @@ public class Saving {
 
             if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
                 if (currentSnapData.getSnapType() == SnapType.STORY &&
-                        Preferences.mModeStory != Preferences.SAVE_S2S) {
+                        Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_S2S) {
                     Logger.printFinalMessage("Tried to perform story S2S from different mode");
                     return;
                 } else if (currentSnapData.getSnapType() == SnapType.SNAP &&
-                        Preferences.mModeSave != Preferences.SAVE_S2S) {
+                        Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_S2S) {
                     Logger.printFinalMessage("Tried to perform snap S2S from different mode");
                     return;
                 }
@@ -389,11 +390,11 @@ public class Saving {
 
             if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
                 if (currentSnapData.getSnapType() == SnapType.STORY &&
-                        Preferences.mModeStory != Preferences.SAVE_BUTTON) {
+                        Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_BUTTON) {
                     Logger.printFinalMessage("Tried to perform story button save from different mode");
                     return;
                 } else if (currentSnapData.getSnapType() == SnapType.SNAP
-                        && Preferences.mModeSave != Preferences.SAVE_BUTTON) {
+                        && Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_BUTTON) {
                     Logger.printFinalMessage("Tried to perform snap button save from different mode");
                     return;
                 }
@@ -707,15 +708,15 @@ public class Saving {
         Logger.printMessage("Passed payload checks");
 
         if (snapData.getSnapType() == SnapType.SNAP &&
-                (Preferences.mModeSave == Preferences.DO_NOT_SAVE ||
-                        Preferences.mModeSave == Preferences.SAVE_BUTTON ||
-                        Preferences.mModeSave == Preferences.SAVE_S2S)) {
+                (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.DO_NOT_SAVE ||
+                        Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON ||
+                        Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S)) {
             Logger.printMessage("Snap save mode check failed");
             return false;
         } else if (snapData.getSnapType() == SnapType.STORY &&
-                (Preferences.mModeStory == Preferences.DO_NOT_SAVE ||
-                        Preferences.mModeStory == Preferences.SAVE_BUTTON ||
-                        Preferences.mModeStory == Preferences.SAVE_S2S)) {
+                (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.DO_NOT_SAVE ||
+                        Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ||
+                        Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S)) {
             Logger.printMessage("Story save mode check failed");
             return false;
         }
@@ -948,7 +949,7 @@ public class Saving {
             File overlayFile =
                     new File(directory, filename + "_overlay" + MediaType.IMAGE.fileExtension);
 
-            if (Preferences.mOverlays) {
+            if (Preferences.getBool(Prefs.OVERLAYS)) {
                 if (overlayFile.exists()) {
                     Logger.printMessage("VideoOverlay already exists");
                     SavingUtils.vibrate(context, false);
@@ -985,13 +986,13 @@ public class Saving {
     }
 
     public static File createFileDir(String category, String sender) throws IOException {
-        File directory = new File(Preferences.mSavePath);
+        File directory = new File(Preferences.getSavePath());
 
-        if (Preferences.mSortByCategory || (Preferences.mSortByUsername && sender == null)) {
+        if (Preferences.getBool(Prefs.SORT_BY_CATEGORY) || (Preferences.getBool(Prefs.SORT_BY_USERNAME) && sender == null)) {
             directory = new File(directory, category);
         }
 
-        if (Preferences.mSortByUsername && sender != null) {
+        if (Preferences.getBool(Prefs.SORT_BY_USERNAME) && sender != null) {
             directory = new File(directory, sender);
         }
 

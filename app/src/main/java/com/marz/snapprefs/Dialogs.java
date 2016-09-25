@@ -13,12 +13,7 @@ import com.marz.snapprefs.Util.FileUtils;
 
 import java.util.Random;
 
-import de.robv.android.xposed.XSharedPreferences;
-
 public class Dialogs {
-
-    private static final String PACKAGE_NAME = HookMethods.class.getPackage().getName();
-    static XSharedPreferences prefs;
     static Random rColor = new Random();
     private static Context SnapContext;
     private static TextView editText;
@@ -30,8 +25,6 @@ public class Dialogs {
         builder.setTitle("Enter Speed(m/s)");
         LinearLayout linearLayout = new LinearLayout(SnapContext);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
-
-        Preferences.refreshPreferences();
 
         final EditText eText = new EditText(SnapContext);
         eText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
@@ -68,8 +61,6 @@ public class Dialogs {
         builder.setTitle("Enter Temperature value");
         LinearLayout linearLayout = new LinearLayout(SnapContext);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
-
-        Preferences.refreshPreferences();
 
         final EditText eText = new EditText(SnapContext);
         eText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);

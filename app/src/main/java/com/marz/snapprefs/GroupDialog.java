@@ -16,6 +16,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Preferences.Prefs;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -49,10 +51,10 @@ public class GroupDialog extends DialogFragment {
                             }
                         }
                 );
-        LinearLayout.LayoutParams linearParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams linearparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         LinearLayout v = new LinearLayout(HookMethods.SnapContext);
         v.setOrientation(LinearLayout.VERTICAL);
-        v.setLayoutParams(linearParams);
+        v.setLayoutParams(linearparams);
 
         final File[] files = Groups.groupsDir.listFiles();
         Arrays.sort(files);
@@ -93,10 +95,10 @@ public class GroupDialog extends DialogFragment {
         add.setText("Add new Group");
         add.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         boolean shouldShowAdd = true;
-        if (Groups.groups.size() == 3 && Preferences.mLicense == 0) {
+        if (Groups.groups.size() == 3 && Preferences.getLicence() == 0) {
             shouldShowAdd = false;
         }
-        if (Preferences.mLicense != 0 && Preferences.mUnlimGroups == false) {
+        if (Preferences.getLicence() != 0 && !Preferences.getBool(Prefs.UNLIM_GROUPS)) {
             shouldShowAdd = false;
         }
         if(shouldShowAdd){

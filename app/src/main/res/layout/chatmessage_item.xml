@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_marginTop="10dp">
+
+    <TextView android:id="@+id/text_list_date"
+        android:background="@color/primary_light"
+        android:text="Gabe can piss off"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="10px"
+        android:layout_marginTop="5px"/>
+    <TextView android:id="@+id/text_list_steps"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="10px"
+        android:layout_below="@+id/text_list_date"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="High Score"
+        android:id="@+id/text_high_score"
+        android:layout_gravity="right"
+        android:layout_alignTop="@+id/text_list_date"
+        android:layout_alignBottom="@+id/text_list_steps"
+        android:textAlignment="center"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="10px"
+        android:paddingLeft="10px"
+        android:paddingRight="10px"
+        android:layout_marginRight="25px"
+        android:visibility="gone" />
+</RelativeLayout>

@@ -7,6 +7,7 @@ import android.graphics.Color;
 import com.marz.snapprefs.HookMethods;
 import com.marz.snapprefs.Obfuscator;
 import com.marz.snapprefs.Preferences;
+import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.R;
 
 import de.robv.android.xposed.XposedHelpers;
@@ -64,7 +65,7 @@ public class NotificationUtils {
     }
 
     public static void showStatefulMessage(String message, ToastType type, ClassLoader cl) {
-        if (!Preferences.mToastEnabled)
+        if (!Preferences.getBool(Prefs.TOAST_ENABLED))
             return;
 
         NotificationUtils.showMessage(

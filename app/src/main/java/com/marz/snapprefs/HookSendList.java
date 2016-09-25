@@ -8,6 +8,8 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 
+import com.marz.snapprefs.Preferences.Prefs;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +26,6 @@ import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
 public class HookSendList {
 
     static void initSelectAll(final LoadPackageParam lpparam) {
-        Preferences.refreshPreferences();
         /**
          * This method gets called when the SendTo screen is shown. We hook it to display our checkbox.
          */
@@ -51,19 +52,19 @@ public class HookSendList {
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean set) {
                         Object hopefullySendToAdapter = getObjectField(param.thisObject, "f");
-                        Logger.log("SELECTALL: We have the ArrayAdapter", true);
+                        Logger.log("getBool(Prefs.SELECT_ALL): We have the ArrayAdapter", true);
                         final String adaptersType = getParameterTypes(new Object[]{hopefullySendToAdapter})[0].getCanonicalName();
                         final boolean isSendToAdapter = adaptersType.equals(Obfuscator.select.SENDTOADAPTER_CLASS);
 
                         if (hopefullySendToAdapter != null && isSendToAdapter) {
-                            Logger.log("SELECTALL: AA isn't null and is an AA", true);
+                            Logger.log("getBool(Prefs.SELECT_ALL): AA isn't null and is an AA", true);
                             Object aa = hopefullySendToAdapter;
                             ArrayList friendList;
                             Set FriendSet;
                             List StoryList;
 
                             try {
-                                Logger.log("SELECTALL: We are trying", true);
+                                Logger.log("getBool(Prefs.SELECT_ALL): We are trying", true);
                                 friendList = (ArrayList) getObjectField(aa, Obfuscator.select.SENDTOADAPTER_VAR_LIST); // e or f, was c, in SendToAdapter
                                 FriendSet = (Set) getObjectField(param.thisObject, Obfuscator.select.SENDTOFRAGMENT_VAR_SET); //in SendToFragment
                                 StoryList = (List) getObjectField(param.thisObject, Obfuscator.select.SENDTOFRAGMENT_VAR_ARRAYLIST);
@@ -75,12 +76,12 @@ public class HookSendList {
                                             FriendSet.add(thingToAdd);
                                         else
                                             FriendSet.remove(thingToAdd);
-                                    } else if (types[i].getCanonicalName().equals(Obfuscator.select.POSTTOSTORY_CLASS) && Preferences.selectStory == true) {
+                                    } else if (types[i].getCanonicalName().equals(Obfuscator.select.POSTTOSTORY_CLASS) && Preferences.getBool(Prefs.SELECT_VENUE)) {
                                         if (set)
                                             StoryList.add(thingToAdd);
                                         else
                                             StoryList.remove(thingToAdd);
-                                    } else if (types[i].getCanonicalName().equals(Obfuscator.select.POSTTOVENUE_CLASS) && Preferences.selectVenue == true) {
+                                    } else if (types[i].getCanonicalName().equals(Obfuscator.select.POSTTOVENUE_CLASS) && Preferences.getBool(Prefs.SELECT_VENUE)) {
                                         String mStoryId = (String) getObjectField(thingToAdd, "mStoryId");
                                         if(getObjectField(thingToAdd, "mStoryId").equals("edit") || mStoryId.contains("group_")) continue;
                                         if (set)

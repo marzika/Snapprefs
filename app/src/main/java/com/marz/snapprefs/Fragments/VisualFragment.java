@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -21,6 +20,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.marz.snapprefs.MainActivity;
 import com.marz.snapprefs.R;
 import com.marz.snapprefs.Util.DrawableManager;
 import com.marz.snapprefs.Util.FilterPreview;
@@ -46,8 +46,6 @@ public class VisualFragment extends Fragment {
     GridView gridView;
     public static FilterAdapter mAdapter;
     private static ArrayList<VisualFilter> filters = new ArrayList<>();
-
-    private static SharedPreferences prefs;
 
     private ProgressDialog mProgressDialog;
     private final String destination = Environment.getExternalStorageDirectory().getAbsolutePath()+"/Snapprefs/VisualFilters";
@@ -193,7 +191,7 @@ public class VisualFragment extends Fragment {
         }
     }
     public static void refreshPreferences() {
-        prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        SharedPreferences prefs = MainActivity.getPrefereces();
         mAmaro = prefs.getBoolean("AMARO", mAmaro);
         mF1997 = prefs.getBoolean("F1997", mF1997);
         mBrannan  = prefs.getBoolean("BRANNAN", mBrannan );

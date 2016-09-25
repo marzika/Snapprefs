@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.marz.snapprefs.Util.NotificationUtils;
+import com.marz.snapprefs.Preferences.Prefs;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -90,7 +91,7 @@ public class Chat {
 
                         ArrayList<Object> chatList = (ArrayList) param.getResult();
 
-                        if (!Preferences.mChatAutoSave)
+                        if (!Preferences.getBool(Prefs.CHAT_AUTO_SAVE))
                             return;
 
                         for (Object obj : chatList)
@@ -100,7 +101,7 @@ public class Chat {
     }
 
 
-    static void handleChatFeedItem(Object obj) {
+    private static void handleChatFeedItem(Object obj) {
         if (!obj.getClass().getName().equals("Wv"))
             return;
 
@@ -157,7 +158,7 @@ public class Chat {
     }
 
     static void performChatSave(ChatData chatData) throws IOException {
-        String savePath = Preferences.mSavePath + "/ChatLogs/" + chatData.getmOtherUser() + ".txt";
+        String savePath = Preferences.getSavePath() + "/ChatLogs/" + chatData.getmOtherUser() + ".txt";
 
         File outputFile = new File(savePath);
 

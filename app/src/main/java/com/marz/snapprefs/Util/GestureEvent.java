@@ -5,6 +5,7 @@ import android.view.View;
 
 import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.Preferences;
+import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Saving;
 
 /**
@@ -20,9 +21,9 @@ public class GestureEvent {
     public boolean onTouch(View v, MotionEvent event, Saving.SnapType type) {
         Logger.log("Touch: " + event.getAction());
 
-        if (type == Saving.SnapType.STORY && Preferences.mModeStory != Preferences.SAVE_S2S)
+        if (type == Saving.SnapType.STORY && Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_S2S)
             return false;
-        else if (type == Saving.SnapType.SNAP && Preferences.mModeSave != Preferences.SAVE_S2S)
+        else if (type == Saving.SnapType.SNAP && Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_S2S)
             return false;
 
         switch (event.getAction()) {
