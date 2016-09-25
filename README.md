@@ -18,6 +18,7 @@ Current features are:
   - Sweep to save
   - Save button
   - Autosave
+- Save profile images
 - Share from Gallery
 - Groups
 - Select All
