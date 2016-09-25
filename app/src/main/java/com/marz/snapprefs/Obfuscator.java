@@ -245,7 +245,7 @@ public class Obfuscator {
     public class lens {
         public static final String LENSCLASS = "com.snapchat.android.model.lenses.Lens";
 
-        public static final String LENSCLASS_SECOND_CONSTRUCTOR_ARG = "atz";
+        public static final String CLASS_LENSLIST_HOLDER = "aKF";
         public static final String LENSCALLBACK_CLASS = "AN";
         public static final String LENSCALLBACK_ONJSONRESULT_VAR2 = "Ae";
         //ScheduledLensesProvider class
