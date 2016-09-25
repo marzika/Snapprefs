@@ -22,9 +22,16 @@ package com.marz.snapprefs.Util;
  */
 
 import com.marz.snapprefs.Common;
+import com.marz.snapprefs.HookMethods;
+import com.marz.snapprefs.Obfuscator;
 
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
+
+import static de.robv.android.xposed.XposedHelpers.callMethod;
+import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
+import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.newInstance;
 
 /**
  * A set of commonly used utilities using the Xposed Framework.
@@ -96,5 +103,14 @@ public class XposedUtils {
     public static void log(String message, Throwable throwable) {
         log(message);
         log(throwable);
+    }
+    /**
+     * Sends a class to Bus.post()
+     *
+     * @param updateEvent   class to post -> newInstance(findClass("CLASSNAME", CLASSLOADER));
+     */
+    public static void sendToBus(Object updateEvent) {
+        Object bus = callStaticMethod(findClass(Obfuscator.bus.GETBUS_CLASS, HookMethods.classLoader), Obfuscator.bus.GETBUS_METHOD);
+        callMethod(bus, Obfuscator.bus.BUS_POST, updateEvent);
     }
 }
