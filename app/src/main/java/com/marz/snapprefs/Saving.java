@@ -189,12 +189,6 @@ public class Saving {
                     mini_profile_snapcode.setOnLongClickListener(new View.OnLongClickListener() {
                         @Override
                         public boolean onLongClick(View v) {
-                            final File profileImagesFolder = new File(Preferences.getSavePath(), "ProfileImages/");
-                            if(!profileImagesFolder.exists() && !profileImagesFolder.mkdirs()){
-                                Logger.log("Error creating profile images folder");
-                                return false;
-                            }
-
                             // ProfileImageUtils$ProfileImageSize inner class
                             Class<?> profileImageSizeClass = findClass(Obfuscator.save.PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS, lpparam.classLoader);
                             // F
@@ -207,7 +201,34 @@ public class Saving {
                             Object i = getObjectField(param.thisObject, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_FRIENDS_PROFILE_IMAGES_CACHE);
                             //^.a(F.g(), ProfileImageSize.MEDIUM)
                             List<Bitmap> profileImages = (List<Bitmap>) callMethod(i, Obfuscator.save.PROFILE_IMAGES_CACHE_GET_PROFILE_IMAGES, new Class[]{String.class, profileImageSizeClass}, username, MEDIUM);
-                            Logger.log("First Three Letters Of Username: " + username.substring(0, 3) + "\nInner Class: " + profileImageSizeClass + "\nFriend Object: " + friendObject + "\nUsername: " + username + "\nMedium: " + MEDIUM + "\n 'i' Object: " + i + "profileImages: " + profileImages);
+
+                            if(Preferences.getBool(Prefs.DEBUGGING)) {
+                                Logger.printTitle("Profile Image Saving Debug Information");
+                                Logger.printMessage("First Three Letters Of Profile Picutre Username: " + username.substring(0, 3));
+                                Logger.printMessage("Prfile Image Size Inner Class: " + profileImageSizeClass);
+                                Logger.printMessage("friendObject: " + friendObject);
+                                Logger.printMessage("Medium: " + MEDIUM);
+                                Logger.printMessage("'i' Object: " + i);
+                                Logger.printMessage("profileImages List Object: " + profileImages);
+                                if(profileImages != null) {
+                                    for (Bitmap a : profileImages) {
+                                        Logger.printMessage("Bitmap of 'profileImages': " + a);
+                                    }
+                                }
+                                Logger.printFilledRow();
+                            }
+                            String filePath = Preferences.getSavePath();
+                            if(Preferences.getBool(Prefs.SORT_BY_CATEGORY)) {
+                                filePath += "ProfileImages/";
+                            }
+                            if (Preferences.getBool(Prefs.SORT_BY_USERNAME)) {
+                                filePath += username;
+                            }
+                            final File profileImagesFolder = new File(Preferences.getSavePath(), "ProfileImages/");
+                            if(!profileImagesFolder.exists() && !profileImagesFolder.mkdirs()){
+                                Logger.log("Error creating profile images folder");
+                                return false;
+                            }
 
                             if(profileImages == null) {
                                 SavingUtils.vibrate(HookMethods.context, false);
@@ -216,9 +237,9 @@ public class Saving {
                             }
                             int succCounter = 0;
                             int sizeOfProfileImages = profileImages.size();
-                            for (int iter = 0; iter < sizeOfProfileImages; iter++) {
-                                File f = new File(profileImagesFolder, username + "-" + iter + ".jpg");
-                                if(SavingUtils.saveJPG(f, profileImages.get(iter), HookMethods.context)) {
+                            for (int iterator = 0; iterator < sizeOfProfileImages; iterator++) {
+                                File f = new File(profileImagesFolder, username + "-" + iterator + ".jpg");
+                                if(SavingUtils.saveJPG(f, profileImages.get(iterator), HookMethods.context)) {
                                     succCounter++;
                                 }
                             }
