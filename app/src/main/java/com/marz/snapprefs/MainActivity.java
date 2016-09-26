@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
     protected static final int MSG_REGISTER_WEB_SERVER_FAILURE = 104;
     private static final int REQUEST_CHOOSE_DIR = 1;
     private static final int REQUEST_HIDE_DIR = 2;
-    // Resgistration Id from GCM
+    // Registration Id from GCM
     private static final String PREF_GCM_REG_ID = "PREF_GCM_REG_ID";
     // Your project number and web server url. Please change below.
     private static final String GCM_SENDER_ID = "410204387699";
@@ -184,18 +184,18 @@ public class MainActivity extends AppCompatActivity {
             dialog.setCanceledOnTouchOutside(false);
             dialog.show();
 
-            Button privacypolicy = (Button) dialog.findViewById(R.id.privacypolicy);
+            Button privacyPolicy = (Button) dialog.findViewById(R.id.privacypolicy);
             Button tou = (Button) dialog.findViewById(R.id.tou);
             CheckBox accepted = (CheckBox) dialog.findViewById(R.id.readandaccepted);
 
-            privacypolicy.setOnClickListener(new View.OnClickListener() {
+            privacyPolicy.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     try {
                         Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://snapprefs.com/wp/privacy-policy/"));
                         startActivity(myIntent);
                     } catch (ActivityNotFoundException e) {
-                        Toast.makeText(MainActivity.this, "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "No application can handle this request." + " Please install a web browser", Toast.LENGTH_LONG).show();
                         e.printStackTrace();
                     }
                 }
@@ -207,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
                         Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://snapprefs.com/wp/terms-of-use/"));
                         startActivity(myIntent);
                     } catch (ActivityNotFoundException e) {
-                        Toast.makeText(MainActivity.this, "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
+                        Toast.makeText(MainActivity.this, "No application can handle this request." + " Please install a web browser", Toast.LENGTH_LONG).show();
                         e.printStackTrace();
                     }
                 }
@@ -236,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         AdView mAdView = (AdView) findViewById(R.id.adView);
         TextView pugs = (TextView) findViewById(R.id.pugs);
-        if (Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 1 || Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 2) {
+        if (Preferences.getLicenceUsingID(deviceUuid.toString()) == 1 || Preferences.getLicenceUsingID(deviceUuid.toString()) == 2) {
             mAdView.destroy();
             pugs.setVisibility(View.GONE);
             mAdView.setVisibility(View.GONE);
@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         mNavigationView = (NavigationView) findViewById(R.id.fuckyou);
-        if (Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 1 || Preferences.getLicenceUsingID(this.deviceUuid.toString()) == 2) {
+        if (Preferences.getLicenceUsingID(deviceUuid.toString()) == 1 || Preferences.getLicenceUsingID(deviceUuid.toString()) == 2) {
             mNavigationView.getMenu().getItem(1).getSubMenu().getItem(1).setEnabled(true);
             LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams) mDrawerLayout.getLayoutParams();
             lp.setMargins(0, 0, 0, 0);

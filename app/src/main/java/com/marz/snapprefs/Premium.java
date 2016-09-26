@@ -28,7 +28,7 @@ public class Premium {
     }
 
     static void initViewed(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
-        Class<?> receivedsnap = findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
-        findAndHookMethod(Obfuscator.save.USER_CLASS, lpparam.classLoader, "a", receivedsnap, XC_MethodReplacement.DO_NOTHING);
+        Class<?> recievedSnap = findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
+        findAndHookMethod(Obfuscator.save.USER_CLASS, lpparam.classLoader, "a", recievedSnap, XC_MethodReplacement.DO_NOTHING);
     }
 }

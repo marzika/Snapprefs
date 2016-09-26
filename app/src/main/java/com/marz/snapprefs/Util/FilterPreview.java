@@ -152,7 +152,7 @@ public class FilterPreview extends Activity {
         protected void onPostExecute(Boolean result) {
             progress.dismiss();
             if (result)
-                Toast.makeText(FilterPreview.this, "Saved succesfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(FilterPreview.this, "Saved successfully", Toast.LENGTH_SHORT).show();
             else
                 Toast.makeText(FilterPreview.this, "Failed to download filter!", Toast.LENGTH_LONG).show();
             DownloadedFiltersFragment.buttonReload.performClick();

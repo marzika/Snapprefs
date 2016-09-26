@@ -57,12 +57,10 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
-import static de.robv.android.xposed.XposedHelpers.callMethod;
 
 public class PaintTools {
     static int color = Color.RED;
@@ -89,11 +87,11 @@ public class PaintTools {
 
 
     public static void initPaint(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources mResources) {
-        final Bitmap[] bground = new Bitmap[1];
+        final Bitmap[] background = new Bitmap[1];
         findAndHookConstructor("com.snapchat.android.model.Mediabryo", lpparam.classLoader, findClass("com.snapchat.android.model.Mediabryo$a", lpparam.classLoader), new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                bground[0] = (Bitmap) getObjectField(param.thisObject, "mRawImageBitmap");
+                background[0] = (Bitmap) getObjectField(param.thisObject, "mRawImageBitmap");
             }
         });
         colorList.add(Color.RED);
@@ -205,9 +203,9 @@ public class PaintTools {
                         paint.setAlpha(alpha);
                     }
                     if (shouldBlur) {
-                        if (bground[0] != null) {
+                        if (background[0] != null) {
                             paint.setColor(0x00000000);
-                            paint.setShader(new BitmapShader(bground[0], Shader.TileMode.REPEAT, Shader.TileMode.REPEAT));
+                            paint.setShader(new BitmapShader(background[0], Shader.TileMode.REPEAT, Shader.TileMode.REPEAT));
                         } else {
                             paint.setColor(0xccFFFFFF);
                         }
@@ -240,7 +238,7 @@ public class PaintTools {
             @Override
             protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
                 if (!once){
-                    View colorpickerview = (View) getObjectField(param.thisObject, "h");
+                    View colorPickerView = (View) getObjectField(param.thisObject, "h");
                     outerOptionsLayout = new RelativeLayout(HookMethods.SnapContext);
                     final GridView innerOptionsView = new GridView(HookMethods.SnapContext);
                     innerOptionsView.setAdapter(new OptionsAdapter(HookMethods.SnapContext, mResources));
@@ -255,7 +253,7 @@ public class PaintTools {
                     outerOptionsLayout.setVisibility(View.VISIBLE);
                     outerOptionsLayout.setBackgroundDrawable(mResources.getDrawable(R.drawable.drawingbackground));
                     outerOptionsLayout.addView(innerOptionsView, GridLayout.LayoutParams.MATCH_PARENT, GridLayout.LayoutParams.MATCH_PARENT);
-                    ((RelativeLayout)colorpickerview.getParent().getParent()).addView(outerOptionsLayout, outerOptionsLayoutParams);
+                    ((RelativeLayout)colorPickerView.getParent().getParent()).addView(outerOptionsLayout, outerOptionsLayoutParams);
                     once = true;
                 }
             }

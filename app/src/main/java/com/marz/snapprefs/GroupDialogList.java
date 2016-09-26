@@ -43,11 +43,11 @@ public class GroupDialogList extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        LinearLayout.LayoutParams linearparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams linearParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         LinearLayout v = new LinearLayout(HookMethods.SnapContext);
         v.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         v.setOrientation(LinearLayout.VERTICAL);
-        v.setLayoutParams(linearparams);
+        v.setLayoutParams(linearParams);
 
         final EditText eText = new EditText(HookMethods.SnapContext);
         eText.setText(name);
@@ -99,24 +99,24 @@ public class GroupDialogList extends DialogFragment {
 
         eText.setVisibility(View.VISIBLE);
         alert.setView(v);
-        final AlertDialog adialog = alert.create();
-        adialog.setOnShowListener(new DialogInterface.OnShowListener() {
+        final AlertDialog alertDialog = alert.create();
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
 
             @Override
             public void onShow(DialogInterface dialog) {
-                adialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
+                alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (eText.length() != 0) {
                             FileUtils.deleteSDFile(new File(Groups.groupsDir + "/" + name));
-                            adialog.dismiss();
+                            alertDialog.dismiss();
                         } else {
                             Toast.makeText(HookMethods.SnapContext, "Name is empty", Toast.LENGTH_SHORT).show();
                         }
                         Groups.readGroups();
                     }
                 });
-                adialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (eText.length() != 0) {
@@ -134,7 +134,7 @@ public class GroupDialogList extends DialogFragment {
                                 File toWrite = new File(Groups.groupsDir + "/" + eText.getText().toString());
                                 FileUtils.writeToSDFile(selected, toWrite);
                                 Groups.sendStoriesUpdateEvent();
-                                adialog.dismiss();
+                                alertDialog.dismiss();
                             } else {
                                 Toast.makeText(HookMethods.SnapContext, "Select at least one user", Toast.LENGTH_SHORT).show();
                             }
@@ -145,6 +145,6 @@ public class GroupDialogList extends DialogFragment {
                 });
             }
         });
-        return adialog;
+        return alertDialog;
     }
 }

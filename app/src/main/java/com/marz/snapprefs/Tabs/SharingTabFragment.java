@@ -11,9 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.marz.snapprefs.Fragments.AboutFragment;
-import com.marz.snapprefs.Fragments.SupportFragment;
-import com.marz.snapprefs.Fragments.MainFragment;
 import com.marz.snapprefs.R;
 import com.marz.snapprefs.Settings.BaseSettings;
 
@@ -34,7 +31,7 @@ public class SharingTabFragment extends Fragment {
         viewPager = (ViewPager) x.findViewById(R.id.viewpager);
 
         /**
-         *Set an Apater for the View Pager
+         *Set an Adapter for the View Pager
          */
         viewPager.setAdapter(new MyAdapter(getChildFragmentManager()));
 

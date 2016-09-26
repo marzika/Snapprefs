@@ -30,9 +30,9 @@ public class Misc {
                     Canvas c = (Canvas) param.args[0];
                     long time = SystemClock.elapsedRealtime() - XposedHelpers.getLongField(param.thisObject, Obfuscator.timer.TAKESNAPBUTTON_TIME);
                     String t = String.valueOf(time / 1000);
-                    Rect rekt = new Rect();
-                    p.getTextBounds(t, 0, t.length(), rekt);
-                    c.drawText(t, XposedHelpers.getFloatField(param.thisObject, Obfuscator.timer.TAKESNAPBUTTON_X) - (rekt.width() / 2) - 5, XposedHelpers.getFloatField(param.thisObject, Obfuscator.timer.TAKESNAPBUTTON_Y) + (rekt.height() / 2) - 5, p);
+                    Rect rect = new Rect();
+                    p.getTextBounds(t, 0, t.length(), rect);
+                    c.drawText(t, XposedHelpers.getFloatField(param.thisObject, Obfuscator.timer.TAKESNAPBUTTON_X) - (rect.width() / 2) - 5, XposedHelpers.getFloatField(param.thisObject, Obfuscator.timer.TAKESNAPBUTTON_Y) + (rect.height() / 2) - 5, p);
                 }
             }
         });

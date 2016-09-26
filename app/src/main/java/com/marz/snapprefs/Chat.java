@@ -134,7 +134,7 @@ public class Chat {
         boolean mIsSavedByRecipient =
                 (boolean) XposedHelpers.getObjectField(obj, "mIsSavedByRecipient");
 
-        //Logger.log("IsSeen: " + isSeen +  "Are you the sender? " + areYouTheSender + "from: " + mSender + " to " + mRecipient + " isSavedBySender: " + mIsSavedBySender + " isSaveByReci: " + mIsSavedByRecipient );
+        //Logger.log("IsSeen: " + isSeen +  "Are you the sender? " + areYouTheSender + "from: " + mSender + " to " + mRecipient + " isSavedBySender: " + mIsSavedBySender + " isSaveByRecipient: " + mIsSavedByRecipient );
 
         if ((areYouTheSender && mIsSavedBySender) ||
                 (!areYouTheSender && mIsSavedByRecipient))
@@ -275,7 +275,8 @@ public class Chat {
                                 Saving.createStatefulToast("Unhandled save response", NotificationUtils.ToastType.WARNING);
                             }
                         } catch (Exception e) {
-
+                            Logger.log("Error Saving Chat Image: ");
+                            e.printStackTrace();
                         }
                         return true;
                     }
@@ -338,7 +339,8 @@ public class Chat {
                                 Saving.createStatefulToast("Unhandled save response", NotificationUtils.ToastType.WARNING);
                             }
                         } catch (Exception e) {
-
+                            Logger.log("Error Saving Chat Video: ");
+                            e.printStackTrace();
                         }
                     }
                 });
