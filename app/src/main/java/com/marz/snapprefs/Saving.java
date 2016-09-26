@@ -218,6 +218,11 @@ public class Saving {
                                 Logger.printFilledRow();
                             }
                             String filePath = SavingUtils.generateFilePath("ProfileImages", username);
+                            if(Preferences.getBool(Prefs.DEBUGGING)) {
+                                Logger.printTitle("Profile Image Saving Save Path Debug Information");
+                                Logger.printMessage("File Path: " + filePath);
+                                Logger.printFilledRow();
+                            }
                             final File profileImagesFolder = new File(filePath);
                             if(!profileImagesFolder.mkdirs() && !profileImagesFolder.exists() ){
                                 Logger.log("Error creating ProfileImages and/or Username folder");
