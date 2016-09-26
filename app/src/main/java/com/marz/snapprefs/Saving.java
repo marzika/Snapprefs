@@ -217,16 +217,10 @@ public class Saving {
                                 }
                                 Logger.printFilledRow();
                             }
-                            String filePath = Preferences.getSavePath();
-                            if(Preferences.getBool(Prefs.SORT_BY_CATEGORY)) {
-                                filePath += "ProfileImages/";
-                            }
-                            if (Preferences.getBool(Prefs.SORT_BY_USERNAME)) {
-                                filePath += username;
-                            }
-                            final File profileImagesFolder = new File(Preferences.getSavePath(), "ProfileImages/");
-                            if(!profileImagesFolder.exists() && !profileImagesFolder.mkdirs()){
-                                Logger.log("Error creating profile images folder");
+                            String filePath = SavingUtils.generateFilePath("ProfileImages", username);
+                            final File profileImagesFolder = new File(filePath);
+                            if(!profileImagesFolder.mkdirs() && !profileImagesFolder.exists() ){
+                                Logger.log("Error creating ProfileImages and/or Username folder");
                                 return false;
                             }
 

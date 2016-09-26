@@ -239,6 +239,9 @@ public abstract class SavingUtils {
         }
     }
 
+    public static String generateFilePath(String catagoryFolderName, String username) {
+        return Preferences.getSavePath() + (Preferences.getBool(Prefs.SORT_BY_CATEGORY) ? (catagoryFolderName + "/") : ("")) + (Preferences.getBool(Prefs.SORT_BY_USERNAME) ? (username + "/") : (""));
+    }
     public static int getToastLength() {
         if (Preferences.getInt(Prefs.TOAST_LENGTH) == Preferences.TOAST_LENGTH_SHORT) {
             return NotificationUtils.LENGTH_SHORT;
