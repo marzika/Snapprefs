@@ -15,19 +15,10 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.marz.snapprefs.Util.NotificationUtils;
-import com.marz.snapprefs.Preferences.Prefs;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -51,6 +42,7 @@ public class Chat {
 
     static void initTextSave(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes) {
         chatClass = XposedHelpers.findClass(Obfuscator.chat.CHAT_CLASS, lpparam.classLoader);
+        // UPDATED HOOK 9.39.5
         XposedHelpers.findAndHookMethod(Obfuscator.chat.MESSAGEVIEWHOLDER_CLASS, lpparam.classLoader, Obfuscator.chat.MESSAGEVIEWHOLDER_METHOD, boolean.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
@@ -71,20 +63,22 @@ public class Chat {
 
         XposedHelpers
                 .findAndHookConstructor(Obfuscator.chat.CONVERSATION_CLASS, lpparam.classLoader,
-                        String.class, String.class, String.class, findClass("Vr", cl), findClass("akm", cl), findClass("akh", cl),
-                        findClass("ahN", cl), findClass("com.snapchat.android.model.FriendManager", cl), findClass("com.squareup.otto.Bus", cl),
-                        findClass("aiu", cl), findClass("GS", cl), findClass("So", cl), new XC_MethodHook() {
+                        String.class, String.class, String.class, findClass(Obfuscator.chat.CONVERSATION_VAR3, cl), findClass(Obfuscator.chat.BUS_CLASS, cl), new XC_MethodHook() {
                             @Override
                             protected void afterHookedMethod(MethodHookParam param)
                                     throws Throwable {
-                                if (myUsername == null)
-                                    myUsername = (String) XposedHelpers.getObjectField(param.thisObject, "mMyUsername");
+                                if (myUsername == null) {
+                                    Object obj = getObjectField(param.thisObject, Obfuscator.chat.USERNAME_HOLDER_CLASS);
+                                    myUsername = (String) XposedHelpers.getObjectField(obj, Obfuscator.chat.HOLDER_USERNAME);
+                                }
                             }
                         });
 
 
-        XposedHelpers
-                .findAndHookMethod(Obfuscator.chat.CONVERSATION_CLASS, lpparam.classLoader, "w", new XC_MethodHook() {
+        // Broken in 9.39.5
+        // TODO Fix the chat system using onJsonRequest hooking
+        /*XposedHelpers
+                .findAndHookMethod(Obfuscator.chat.CONVERSATION_CLASS, lpparam.classLoader, Obfuscator.chat.SORTED_CHAT_LIST, new XC_MethodHook() {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                         //Logger.log("###grabbing all chats###");
@@ -97,12 +91,12 @@ public class Chat {
                         for (Object obj : chatList)
                             handleChatFeedItem(obj);
                     }
-                });
+                });*/
     }
 
 
-    private static void handleChatFeedItem(Object obj) {
-        if (!obj.getClass().getName().equals("Wv"))
+    /*private static void handleChatFeedItem(Object obj) {
+        if (!obj.getClass().getName().equals(Obfuscator.chat.CHAT_FEED_ITEM))
             return;
 
         String mId = (String) XposedHelpers.getObjectField(obj, "mId");
@@ -134,7 +128,7 @@ public class Chat {
         boolean mIsSavedByRecipient =
                 (boolean) XposedHelpers.getObjectField(obj, "mIsSavedByRecipient");
 
-        //Logger.log("IsSeen: " + isSeen +  "Are you the sender? " + areYouTheSender + "from: " + mSender + " to " + mRecipient + " isSavedBySender: " + mIsSavedBySender + " isSaveByRecipient: " + mIsSavedByRecipient );
+        //Logger.log("IsSeen: " + isSeen +  "Are you the sender? " + areYouTheSender + "from: " + mSender + " to " + mRecipient + " isSavedBySender: " + mIsSavedBySender + " isSaveByReci: " + mIsSavedByRecipient );
 
         if ((areYouTheSender && mIsSavedBySender) ||
                 (!areYouTheSender && mIsSavedByRecipient))
@@ -216,7 +210,7 @@ public class Chat {
         }
 
         return false;
-    }
+    }*/
 
     static void initImageSave(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes) {
         /**
@@ -224,7 +218,7 @@ public class Chat {
          * then we get the properties and save the actual Image.
          */
         final Object[] chatMediaArr = new Object[1];
-        findAndHookMethod("com.snapchat.android.ui.ImageResourceView", lpparam.classLoader, "setChatMedia", findClass("com.snapchat.android.model.chat.ChatMedia", lpparam.classLoader), findClass("com.snapchat.android.ui.SnapchatResource.a", lpparam.classLoader), new XC_MethodHook() {
+        findAndHookMethod("com.snapchat.android.ui.ImageResourceView", lpparam.classLoader, "setChatMedia", findClass(Obfuscator.chat.CHAT_MEDIA_CLASS, lpparam.classLoader), findClass("com.snapchat.android.ui.SnapchatResource.a", lpparam.classLoader), new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 chatMediaArr[0] = param.args[0];
@@ -275,8 +269,7 @@ public class Chat {
                                 Saving.createStatefulToast("Unhandled save response", NotificationUtils.ToastType.WARNING);
                             }
                         } catch (Exception e) {
-                            Logger.log("Error Saving Chat Image: ");
-                            e.printStackTrace();
+
                         }
                         return true;
                     }
@@ -329,8 +322,8 @@ public class Chat {
                                 Logger.printFinalMessage("Saved Chat video");
                                 Saving.createStatefulToast("Saved Chat video", NotificationUtils.ToastType.GOOD);
                             }else if (response == Saving.SaveResponse.EXISTING) {
-                                    Logger.printFinalMessage("Chat video exists");
-                                    Saving.createStatefulToast("Chat video exists", NotificationUtils.ToastType.WARNING);
+                                Logger.printFinalMessage("Chat video exists");
+                                Saving.createStatefulToast("Chat video exists", NotificationUtils.ToastType.WARNING);
                             } else if (response == Saving.SaveResponse.FAILED) {
                                 Logger.printFinalMessage("Error saving Chat video");
                                 Saving.createStatefulToast("Error saving Chat video", NotificationUtils.ToastType.BAD);
@@ -339,8 +332,7 @@ public class Chat {
                                 Saving.createStatefulToast("Unhandled save response", NotificationUtils.ToastType.WARNING);
                             }
                         } catch (Exception e) {
-                            Logger.log("Error Saving Chat Video: ");
-                            e.printStackTrace();
+
                         }
                     }
                 });
