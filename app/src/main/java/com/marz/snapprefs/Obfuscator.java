@@ -348,17 +348,17 @@ public class Obfuscator {
         //public static final String DISCOVERSTORY_CLASS = "aay"; new story type "featured?" TODO: look into it
     }
     public class groups {
-        public static final String STORY_CLASS = "Vp";
-        public static final String STORYARRAY_CLASS = "Zx";
+        public static final String STORY_CLASS = "apb";//prev. Vp
+        public static final String STORYARRAY_CLASS = "ase";//prev. Zx
         public static final String STORYARRAY_METHOD = "a";
-        public static final String STORYSECTION_CLASS = "OP";
+        public static final String STORYSECTION_CLASS = "afe";//prev. OP
         public static final String INTERFACE = "BS";
-        public static final String GETFRIENDMANAGER_METHOD = "e";
-        public static final String GETUSERNAME_METHOD = "g";
+        public static final String GETFRIENDMANAGER_METHOD = "h";//prev. e
+        public static final String GETUSERNAME_METHOD = "d";//prev. g
     }
     public class bus {
         public static final String UPDATEEVENT_CLASS = "Ds";
-        public static final String GETBUS_CLASS = "RX";
+        public static final String GETBUS_CLASS = "aju";//prev. RX
         public static final String GETBUS_METHOD = "a";
         public static final String BUS_POST = "a";
     }

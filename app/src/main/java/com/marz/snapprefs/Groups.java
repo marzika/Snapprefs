@@ -63,11 +63,14 @@ public class Groups {
                 param.setResult(newResult);
             }
         });
+
+        //TODO UPDATE THE CONTENTS OF THIS HOOK
+        // Andre: I'm not sure on how it works
         XposedHelpers.findAndHookMethod(Obfuscator.groups.STORYSECTION_CLASS, lpparam.classLoader, "a", findClass("android.support.v7.widget.RecyclerView$u", lpparam.classLoader), int.class, new XC_MethodHook() {
 
             @Override
             protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
-                Object element = callMethod(XposedHelpers.getObjectField(param.thisObject, "f"), "get", param.args[1]);
+                Object element = callMethod(XposedHelpers.getObjectField(param.thisObject, "c"), "get", param.args[1]);
                 if (XposedHelpers.getAdditionalInstanceField(element, "editGroups") != null) {
                     CheckBox k = (CheckBox) XposedHelpers.getObjectField(param.args[0], "j");
                     k.setVisibility(View.GONE);
@@ -126,6 +129,7 @@ public class Groups {
         });
     }
 
+    // Updated method & content 9.39.5
     public static void readFriendList(ClassLoader classLoader, Group selectedGroup) {
         final Object friendManager = callStaticMethod(findClass("com.snapchat.android.model.FriendManager", classLoader), Obfuscator.groups.GETFRIENDMANAGER_METHOD);
         List friends = (List) XposedHelpers.getObjectField(XposedHelpers.getObjectField(friendManager, "mOutgoingFriendsListMap"), "mList");
@@ -179,6 +183,7 @@ public class Groups {
     }
 
     public static void sendStoriesUpdateEvent() {
+        //TODO updateEvent NOT FOUND
         Object updateEvent = newInstance(findClass(Obfuscator.bus.UPDATEEVENT_CLASS, HookMethods.classLoader));
         Object bus = callStaticMethod(findClass(Obfuscator.bus.GETBUS_CLASS, HookMethods.classLoader), Obfuscator.bus.GETBUS_METHOD);
         callMethod(bus, Obfuscator.bus.BUS_POST, updateEvent);
