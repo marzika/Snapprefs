@@ -217,7 +217,7 @@ public class Saving {
                                 }
                                 Logger.printFilledRow();
                             }
-                            String filePath = SavingUtils.generateFilePath("ProfileImages", username);
+                            String filePath = SavingUtils.generateFilePath("/ProfileImages", username);
                             if(Preferences.getBool(Prefs.DEBUGGING)) {
                                 Logger.printTitle("Profile Image Saving Save Path Debug Information");
                                 Logger.printMessage("File Path: " + filePath);
