@@ -72,11 +72,11 @@ public class Groups {
             protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
                 Object element = callMethod(XposedHelpers.getObjectField(param.thisObject, "c"), "get", param.args[1]);
                 if (XposedHelpers.getAdditionalInstanceField(element, "editGroups") != null) {
-                    CheckBox k = (CheckBox) XposedHelpers.getObjectField(param.args[0], "j");
+                    CheckBox k = (CheckBox) XposedHelpers.getObjectField(param.args[0], "a");
                     k.setVisibility(View.GONE);
                     k.setOnCheckedChangeListener(null);
                     k.setOnClickListener(null);
-                    ((View) XposedHelpers.getObjectField(param.args[0], "a")).setOnClickListener(new View.OnClickListener() {
+                    ((View) XposedHelpers.getObjectField(param.args[0], "itemView")).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             FragmentTransaction ft = HookMethods.SnapContext.getFragmentManager().beginTransaction();
@@ -102,7 +102,7 @@ public class Groups {
                 }
                 //Here change this color if you want
 //                ((View) XposedHelpers.getObjectField(param.args[0], "a")).setBackgroundColor(0xFF66FA77);
-                final CheckBox check = (CheckBox) XposedHelpers.getObjectField(param.args[0], "j");
+                final CheckBox check = (CheckBox) XposedHelpers.getObjectField(param.args[0], "a");
                 if (!checks.containsKey(group.name)) {
                     checks.put(group.name, false);
                 } else {
@@ -114,11 +114,11 @@ public class Groups {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         finalChecks.put(group.name, isChecked);
-                        List f = (List) XposedHelpers.getObjectField(param.thisObject, "f");
+                        List f = (List) XposedHelpers.getObjectField(param.thisObject, "c");
                         for (String user : group.users) {
                             for (Object ii : f) {
                                 if (Friend.isInstance(ii) && ((String) XposedHelpers.getObjectField(ii, "mUsername")).equalsIgnoreCase(user)) {
-                                    callMethod(XposedHelpers.getObjectField(param.thisObject, "k"), "a", new Class[]{int.class, findClass(Obfuscator.groups.INTERFACE, lpparam.classLoader), boolean.class}, callMethod(param.args[0], "d"), ii, isChecked);
+                                    callMethod(XposedHelpers.getObjectField(param.thisObject, "h"), "a", new Class[]{int.class, findClass(Obfuscator.groups.INTERFACE, lpparam.classLoader), boolean.class}, callMethod(param.args[0], "getAdapterPosition"), ii, isChecked);
                                     break;
                                 }
                             }
@@ -183,7 +183,6 @@ public class Groups {
     }
 
     public static void sendStoriesUpdateEvent() {
-        //TODO updateEvent NOT FOUND
         Object updateEvent = newInstance(findClass(Obfuscator.bus.UPDATEEVENT_CLASS, HookMethods.classLoader));
         Object bus = callStaticMethod(findClass(Obfuscator.bus.GETBUS_CLASS, HookMethods.classLoader), Obfuscator.bus.GETBUS_METHOD);
         callMethod(bus, Obfuscator.bus.BUS_POST, updateEvent);

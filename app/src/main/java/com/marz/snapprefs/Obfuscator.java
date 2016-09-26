@@ -187,11 +187,11 @@ public class Obfuscator {
     public class datasaving {
         public static final String DSNAPDOWNLOADER_CLASS = "KL";
         public static final String DSNAPDOWNLOADER_DOWNLOADSNAP = "a";
-        public static final String DOWNLOADREQUEST_CLASS = "com.snapchat.android.networkmanager.DownloadRequest";
+        public static final String DOWNLOADREQUEST_CLASS = "com.snapchat.android.app.shared.framework.network.manager";//prev. com.snapchat.android.networkmanager.DownloadRequest
         public static final String DYNAMICBYTEBUFFER_CLASS = "aku";
         public static final String NETWORKRESULT_CLASS = "Ae";
-        public static final String DSNAPDOWNLOAD_CLASS = "KP$a";
-        public static final String DSNAPDOWNLOAD_PARAM = "mp";
+        public static final String DSNAPDOWNLOAD_CLASS = "Df$a";//prev. KP$a
+        public static final String DSNAPDOWNLOAD_PARAM = "mz";//prev. mp
         public static final String DSNAPINTRODOWNLOAD_CLASS = "LR$1";
         public static final String LIVESTORYPRELOAD_CLASS = "ZO";
         public static final String LIVESTORYPRELOAD_METHOD = "H_";
@@ -352,7 +352,7 @@ public class Obfuscator {
         public static final String STORYARRAY_CLASS = "ase";//prev. Zx
         public static final String STORYARRAY_METHOD = "a";
         public static final String STORYSECTION_CLASS = "afe";//prev. OP
-        public static final String INTERFACE = "BS";
+        public static final String INTERFACE = "Ml";//prev. BS
         public static final String GETFRIENDMANAGER_METHOD = "h";//prev. e
         public static final String GETUSERNAME_METHOD = "d";//prev. g
     }
