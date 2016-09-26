@@ -58,10 +58,10 @@ public class FriendListDialog extends DialogFragment {
                             }
                         }
                 );
-        LinearLayout.LayoutParams linearparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams linearParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         LinearLayout v = new LinearLayout(HookMethods.SnapContext);
         v.setOrientation(LinearLayout.VERTICAL);
-        v.setLayoutParams(linearparams);
+        v.setLayoutParams(linearParams);
 
         mRecyclerView = new RecyclerView(HookMethods.SnapContext);
 

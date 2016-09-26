@@ -301,7 +301,7 @@ public class NowPlaying {
                 jsonString = response.toString();
             } catch (Throwable t) {
                 t.printStackTrace();
-                Logger.log("Failed to retrieve track info from spotify!");
+                Logger.log("Failed to retrieve track info from Spotify!");
                 Logger.log(t);
                 return null;
             }
@@ -318,7 +318,7 @@ public class NowPlaying {
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
-                Logger.log("Failed to parse response from spotify!");
+                Logger.log("Failed to parse response from Spotify!");
                 Logger.log(e);
                 return null;
             }
@@ -339,7 +339,7 @@ public class NowPlaying {
                 return bmp;
             } catch (Exception e) {
                 e.printStackTrace();
-                Logger.log("Failed to retrieve album art from spotify!");
+                Logger.log("Failed to retrieve album art from Spotify!");
                 Logger.log(e);
                 return null;
             } finally {

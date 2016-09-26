@@ -162,9 +162,9 @@ public class NewSaving {
 
     private static int getToastLength() {
         if (mToastLength == TOAST_LENGTH_SHORT) {
-            return NotificationUtils.LENGHT_SHORT;
+            return NotificationUtils.LENGTH_SHORT;
         } else {
-            return NotificationUtils.LENGHT_LONG;
+            return NotificationUtils.LENGTH_LONG;
         }
     }
 

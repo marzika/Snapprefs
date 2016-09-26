@@ -45,8 +45,8 @@ public class FileUtils {
             in.close();
             out.flush();
             out.close();
-        } catch (FileNotFoundException fnfe1) {
-            fnfe1.printStackTrace();
+        } catch (FileNotFoundException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
