@@ -98,7 +98,7 @@ public class GooglePlusFragment extends Fragment {
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                             context);
 
-                    // set prompts.xml to alertdialog builder
+                    // set prompts.xml to AlertDialogBuilder
                     alertDialogBuilder.setView(promptsView);
 
                     final EditText userInput = (EditText) promptsView

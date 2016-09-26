@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.DebugHelper;
+import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import java.io.File;

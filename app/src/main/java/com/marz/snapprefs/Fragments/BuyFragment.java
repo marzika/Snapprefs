@@ -11,11 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.marz.snapprefs.BuildConfig;
-import com.marz.snapprefs.Obfuscator;
 import com.marz.snapprefs.R;
 
 
@@ -34,7 +31,7 @@ public class BuyFragment extends Fragment {
                     Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=H523TP8ZJH9XY"));
                     startActivity(myIntent);
                 } catch (ActivityNotFoundException e) {
-                    Toast.makeText(getActivity().getApplicationContext(), "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity().getApplicationContext(), "No application can handle this request." + " Please install a web browser", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }
@@ -45,7 +42,7 @@ public class BuyFragment extends Fragment {
                     Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2AS727Q2CL7AS"));
                     startActivity(myIntent);
                 } catch (ActivityNotFoundException e) {
-                    Toast.makeText(getActivity().getApplicationContext(), "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity().getApplicationContext(), "No application can handle this request." + " Please install a web browser", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }

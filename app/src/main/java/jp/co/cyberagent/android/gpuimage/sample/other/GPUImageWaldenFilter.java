@@ -1,6 +1,5 @@
 package jp.co.cyberagent.android.gpuimage.sample.other;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 

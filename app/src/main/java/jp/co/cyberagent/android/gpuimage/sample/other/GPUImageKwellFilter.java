@@ -1,6 +1,5 @@
 package jp.co.cyberagent.android.gpuimage.sample.other;
 
-import android.content.Context;
 import android.graphics.BitmapFactory;
 
 import jp.co.cyberagent.android.gpuimage.GPUImageTwoInputFilter;

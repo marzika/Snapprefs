@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/default_gap_2x"
-                android:text="Click to visit the official XDA thread"
+                android:text="Tap to visit the official XDA thread"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <ImageButton
@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/default_gap_2x"
-                android:text="Click to visit the official G+ page"
+                android:text="Tap to visit the official G+ page"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <ImageButton
@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="@dimen/default_gap_2x"
-                android:text="Click to visit the official Reddit subreddit"
+                android:text="Tap to visit the official Reddit subreddit"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <ImageButton
