@@ -316,9 +316,9 @@ public class Obfuscator {
         public static final String CONVERSATION_LOADOLDCHATS = "a";
         public static final String MESSAGEVIEWHOLDER_CLASS = "com.snapchat.android.fragments.chat.MessageViewHolder";
         public static final String MESSAGEVIEWHOLDER_METHOD = "b";
-        public static final String MESSAGEVIEWHOLDER_VAR1 = "G";
+        public static final String MESSAGEVIEWHOLDER_VAR1 = "z";//prev. G
         public static final String MESSAGEVIEWHOLDER_VAR2 = "d";
-        public static final String MESSAGEVIEWHOLDER_ISSAVED = "ax_";
+        public static final String MESSAGEVIEWHOLDER_ISSAVED = "E_";//prev. ax_
         public static final String MESSAGEVIEWHOLDER_ISFAILED = "N";
         public static final String MESSAGEVIEWHOLDER_SAVE = "x";
         public static final String CHATLAYOUT_CLASS = "Nd";

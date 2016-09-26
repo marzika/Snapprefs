@@ -38,7 +38,7 @@ public class Groups {
 
     public static void initGroups(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         readGroups();
-        final Class<?> Friend = findClass("com.snapchat.android.model.Friend", lpparam.classLoader);
+        final Class<?> Friend = findClass(Obfuscator.select.FRIEND_CLASS, lpparam.classLoader);
         final Class<?> Ly = findClass(Obfuscator.groups.STORY_CLASS, lpparam.classLoader);
 
         XposedHelpers.findAndHookMethod(Obfuscator.groups.STORYARRAY_CLASS, lpparam.classLoader, Obfuscator.groups.STORYARRAY_METHOD, new XC_MethodHook() {
