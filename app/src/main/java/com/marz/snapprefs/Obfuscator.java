@@ -40,14 +40,14 @@ public class Obfuscator {
         //User class
         public static final String USER_CLASS = "VU"; //+
         //ReceivedSnap class
-        public static final String RECEIVEDSNAP_CLASS = "RB"; //+ prev Vt
+        public static final String RECEIVEDSNAP_CLASS = "Sc"; //+ prev Vt
         public static final String OBJECT_MID = "mId";
         public static final String OBJECT_CACHEKEYSUFFIX = "mCacheKeyInstanceSuffix";
-        public static final String RECEIVEDSNAP_BEING_SEEN = "c"; //+
+        public static final String RECEIVEDSNAP_BEING_SEEN = "c"; // prev. d
         // ReceivedSnap.getCanonicalDisplayTime()
-        public static final String RECEIVEDSNAP_DISPLAYTIME = "G";
+        public static final String RECEIVEDSNAP_DISPLAYTIME = "d";//prev. G
         //StorySnap class
-        public static final String STORYSNAP_CLASS = "Po"; //+ prev VK
+        public static final String STORYSNAP_CLASS = "PO"; //+ prev VK
         //SnapView class
         public static final String SNAPVIEW_CLASS = "com.snapchat.android.ui.snapview.SnapView";
         //SnapView.show(ReceivedSnap, ChronologicalSnapProvider, Booleans(?))
@@ -68,7 +68,7 @@ public class Obfuscator {
         public static final String SNAPVIEW_HIDE = "a";
         //SnapPreviewFragment class
         public static final String SNAPPREVIEWFRAGMENT_CLASS = "com.snapchat.android.preview.SnapPreviewFragment";
-        public static final String SNAPPREVIEWFRAGMENT_METHOD1 = "l";
+        public static final String SNAPPREVIEWFRAGMENT_METHOD1 = "a";//prev. l
         //ImageResourceView class
         public static final String IMAGERESOURCEVIEW_CLASS = "com.snapchat.android.ui.ImageResourceView";
         //imageResource instance variable name in ui.ImageResourceView
@@ -81,7 +81,7 @@ public class Obfuscator {
         public static final String SNAP_ISSCREENSHOTTED = "at";
         //public static final String SNAP_ISSCREENSHOTTED2 = "au";
         //Snap.getTimestamp()
-        public static final String SNAP_GETTIMESTAMP = "S";
+        public static final String SNAP_GETTIMESTAMP = "i";//prev. S
         //EndReason class
         public static final String ENDREASON_CLASS = "rm";
         //ImageResource -> Aw prev. avg, apz --  mIsSavedByRecipient:Z
@@ -106,15 +106,15 @@ public class Obfuscator {
         //SentSnap Bitmap method
         public static final String SENT_METHOD = "a";
         //ImagesnapRenderer
-        public static final String IMAGESNAPRENDERER_CLASS = "aqe";
+        public static final String IMAGESNAPRENDERER_CLASS = "ard";//prev YI
         public static final String IMAGESNAPRENDERER_CLASS2 = IMAGESNAPRENDERER_CLASS + "$1";
         public static final String IMAGESNAPRENDERER_NEW_BITMAP = "a";
         // Inside IMAGESNAPRENDERER, Object is of type extending mediabryo and contains mKey
-        public static final String OBJECT_KEYHOLDERCLASS = "b"; //.prev ahZ
+        public static final String OBJECT_KEYHOLDERCLASS = "SY"; //.prev ahZ
         public static final String OBJECT_KEYHOLDER_KEY = "b"; //.prev ahZ
 
-        public static final String DECRYPTEDSNAPVIDEO_CLASS = "RG";//.prev UZ
-        public static final String CACHE_CLASS = "all";//.prev ahZ
+        public static final String DECRYPTEDSNAPVIDEO_CLASS = "Sh";//.prev UZ
+        public static final String CACHE_CLASS = "amh";//.prev ahZ
         public static final String CACHE_KEYTOITEMMAP = "b"; //.prev mKeyToItemMap
         public static final String CACHE_ITEM_PATH = "a";
         //ImagesnapRenderer.start()
@@ -122,7 +122,7 @@ public class Obfuscator {
         //ImageView instance in ImageSnapRenderer
         public static final String IMAGESNAPRENDERER_VAR_IMAGEVIEW = "a";//AspectMaintainedImageView!!
         //SnapImageBryo - JPEG_ENCODING_QUALITY
-        public static final String SNAPIMAGEBRYO_CLASS = "VC";
+        public static final String SNAPIMAGEBRYO_CLASS = "aph";//prev. VC
         //VideoSnapRenderer.start()
         public static final String VIDEOSNAPRENDERER_CLASS = "YK";
         //VideoSnapRenderer.show()
@@ -138,8 +138,8 @@ public class Obfuscator {
         //stories_mystoryoverlaysave_icon
         public static final String STORIES_MYOVERLAYSAVE_ICON = "0x7f02030e";
         // Get Username function of Friend Class
-        public static final String GET_FRIEND_USERNAME = "g";
-        public static final String CLASS_FRIEND_MINI_PROFILE_POPUP_FRAGMENT = "apU";//Prev com.snapchat.android.fragments.FriendMiniProfilePopupFragment
+        public static final String GET_FRIEND_USERNAME = "f";//prev. g
+        public static final String CLASS_FRIEND_MINI_PROFILE_POPUP_FRAGMENT = "aqT";//prev. com.snapchat.android.fragments.FriendMiniProfilePopupFragment
         // com.snapchat.android.fragments.FriendMiniProfilePopupFragment Friend Field
         public static final String FRIEND_MINI_PROFILE_POPUP_FRIEND_FIELD = "i";// Prev F
         // com.snapchat.android.fragments.FriendMiniProfilePopupFragement getCachedProfilePicutres method
@@ -175,7 +175,8 @@ public class Obfuscator {
         //Inside SnapPreviewFragment
         public static final String OBJECT_SNAP_EDITOR_VIEW = "b";
         //Inside SnapEditorView
-        public static final String OBJECT_MEDIABRYO = "r"; //.prev p
+        public static final String OBJECT_MEDIABRYO = "p"; //.prev p
+        public static final String CLASS_MEDIABRYO_VIDEO = "apx";//prev. VZ
         public static final String METHOD_GET_SENT_BITMAP = "a";
         //Inside MediaBryo
         public static final String OBJECT_MCLIENTID = "mClientId";
@@ -248,9 +249,9 @@ public class Obfuscator {
     public class lens {
         public static final String LENSCLASS = "com.snapchat.android.model.lenses.Lens";
 
-        public static final String CLASS_LENSLIST_HOLDER = "aKF";//.prev atz
+        public static final String CLASS_LENSLIST_TYPE = "aLo";//.prev atz
         public static final String LENSCALLBACK_CLASS = "BT";//.prev AN
-        public static final String LENSCALLBACK_ONJSONRESULT_VAR2 = "Ae";
+        public static final String LENSCALLBACK_ONJSONRESULT_VAR2 = "Qq";//.prev Ae
         //ScheduledLensesProvider class
         public static final String LENSESPROVIDER_CLASS = "wr";
         //getLenses()

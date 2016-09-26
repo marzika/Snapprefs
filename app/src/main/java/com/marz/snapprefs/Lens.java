@@ -28,14 +28,14 @@ public class Lens {
     public static Class PrepareStatus;
     public static Class LensClass;
     public static Object enumScheduledType;
-    public static Class lensListHolderClass;
+    public static Class lensListTypeClass;
     public static HashMap<String, LensData> lensDataMap = new HashMap<>();
 
     static void initLens(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
         lensPrepareState = findClass(Obfuscator.lens.LENSPREPARESTATECHANGE, lpparam.classLoader);
         PrepareStatus = findClass(Obfuscator.lens.STATECHANGEPREPARESTATUSENUM, lpparam.classLoader);
         LensClass = findClass(Obfuscator.lens.LENSCLASS, lpparam.classLoader);
-        lensListHolderClass = findClass(Obfuscator.lens.CLASS_LENSLIST_HOLDER, lpparam.classLoader);
+        lensListTypeClass = findClass(Obfuscator.lens.CLASS_LENSLIST_TYPE, lpparam.classLoader);
         Class TypeClass = findClass(Obfuscator.lens.LENSCLASS + "$Type", lpparam.classLoader);
         enumScheduledType = getStaticObjectField(TypeClass, "SCHEDULED");
 
@@ -43,7 +43,7 @@ public class Lens {
             MainActivity.lensDBHelper = new LensDatabaseHelper(snapContext);
 
         // TODO Allow for this to be toggled
-        findAndHookMethod("com.snapchat.android.database.SharedPreferenceKey", lpparam.classLoader, "getBoolean", boolean.class, new XC_MethodHook() {
+        findAndHookMethod("com.snapchat.android.app.shared.persistence.sharedprefs.SharedPreferenceKey", lpparam.classLoader, "getBoolean", boolean.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(XC_MethodHook.MethodHookParam methodHookParam) throws Throwable {
                 if (getObjectField(methodHookParam.thisObject, "b").equals("is_device_whitelisted_for_lenses_on_backend")) {
@@ -52,7 +52,7 @@ public class Lens {
             }
         });
 
-        findAndHookMethod(Obfuscator.lens.LENSCALLBACK_CLASS, lpparam.classLoader, "onJsonResult", Object.class, findClass("Ae", lpparam.classLoader), new XC_MethodReplacement() {
+        findAndHookMethod(Obfuscator.lens.LENSCALLBACK_CLASS, lpparam.classLoader, "onJsonResult", Object.class, findClass(Obfuscator.lens.LENSCALLBACK_ONJSONRESULT_VAR2, lpparam.classLoader), new XC_MethodReplacement() {
             @Override
             protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
                 onJsonResultRebuilt(param, param.args[0], param.args[1]);
@@ -74,7 +74,7 @@ public class Lens {
             ArrayList<String> lensBlacklist = new ArrayList<>();
 
             for (Object listObj : a) {
-                Object lens = newInstance(LensClass, lensListHolderClass.cast(listObj), enumScheduledType);
+                Object lens = newInstance(LensClass, lensListTypeClass.cast(listObj), enumScheduledType);
 
                 if (Preferences.getBool(Prefs.LENSES_COLLECT)) {
                     String url = (String) getObjectField(lens, "mIconLink");
@@ -101,9 +101,9 @@ public class Lens {
             Logger.log("Precached lens size: " + a.size());
 
             ArrayList<Object> precachedLenses = new ArrayList<>();
-            for (Object atzObj : a) {
+            for (Object lensParentObj : a) {
                 Logger.log("Looped precached lens");
-                Object lens = newInstance(LensClass, lensListHolderClass.cast(atzObj), enumScheduledType);
+                Object lens = newInstance(LensClass, lensListTypeClass.cast(lensParentObj), enumScheduledType);
                 precachedLenses.add(lens);
             }
 
@@ -115,12 +115,12 @@ public class Lens {
             Logger.log("Finished list building");
             Logger.log("Building method params");
             Object callback = getObjectField(param.thisObject, "mCallback");
-            Object atRg = callMethod(arg1, "g");
-            Object atRe = callMethod(arg1, "e");
-            Object longValue = callMethod(atRe, "longValue");
+            Object arg1g = callMethod(arg1, "g");
+            Object arg1e = callMethod(arg1, "e");
+            Object longValue = callMethod(arg1e, "longValue");
             Logger.log("Ready to call");
             try {
-                callMethod(callback, "a", activeLenses, precachedLenses, atRg, longValue);
+                callMethod(callback, "a", activeLenses, precachedLenses, arg1g, longValue);
                 Logger.log("Called method... Returning");
             } catch (Exception e) {
                 Logger.log("Error calling method", e);
