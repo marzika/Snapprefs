@@ -89,10 +89,10 @@ public class Obfuscator {
         public static final String IMAGERESOURCE_VAR_CHATMEDIA = "c";
         //.model.chat.Chat -> zV.2
         //Chat.getTimeStamp()
-        public static final String CHAT_GETTIMESTAMP = "S";
+        public static final String CHAT_GETTIMESTAMP = "i";//prev. S
         //.model.chat.StatefulChatFeedItem
         //StatefulChatFeedItem.getSender()
-        public static final String STATEFULCHATFEEDITEM_GETSENDER = "i";
+        public static final String STATEFULCHATFEEDITEM_GETSENDER = "m";//prev. i
         //ScreenshotDetector class -> datetaken
         public static final String SCREENSHOTDETECTOR_CLASS = "Zm";
         //ScreenshotDetector.run(List)
@@ -307,7 +307,7 @@ public class Obfuscator {
     }
     public class chat { //9.31.1.0
         public static final String CHAT_CLASS = "com.snapchat.android.model.chat.Chat";
-        public static final String CONVERSATION_CLASS = "com.snapchat.android.model.chat.ChatConversation";
+        public static final String CONVERSATION_CLASS = "Ig";//prev. com.snapchat.android.model.chat.ChatConversation
         public static final String CHATFEEDITEM_CLASS = "com.snapchat.android.model.chat.ChatFeedItem";
         public static final String CONVERSATION_LOADOLDCHATS = "a";
         public static final String MESSAGEVIEWHOLDER_CLASS = "com.snapchat.android.fragments.chat.MessageViewHolder";
@@ -315,9 +315,16 @@ public class Obfuscator {
         public static final String MESSAGEVIEWHOLDER_VAR1 = "G";
         public static final String MESSAGEVIEWHOLDER_VAR2 = "d";
         public static final String MESSAGEVIEWHOLDER_ISSAVED = "ax_";
-        public static final String MESSAGEVIEWHOLDER_ISFAILED = "N";
-        public static final String MESSAGEVIEWHOLDER_SAVE = "x";
-        public static final String CHATLAYOUT_CLASS = "Nd";
+        public static final String MESSAGEVIEWHOLDER_ISFAILED = "N_";//prev. N
+        public static final String MESSAGEVIEWHOLDER_SAVE = "e";//prev. x
+        public static final String CHATLAYOUT_CLASS = "Kc";//prev. Nd
+        public static final String BUS_CLASS = "com.squareup.otto";
+        public static final String CONVERSATION_VAR3 = "Ea";//prev. Vr
+        public static final String USERNAME_HOLDER_CLASS = "B";
+        public static final String HOLDER_USERNAME = "e";
+        public static final String SORTED_CHAT_LIST = "L";//prev. w
+        public static final String CHAT_FEED_ITEM = "Ii";//prev. Wv
+        public static final String CHAT_MEDIA_CLASS = "com.snapchat.android.app.feature.messaging.chat.model2.ChatMedia";
     }
     public class notification {
         public static final String NOTIFICATION_CLASS_1 = "vz";
