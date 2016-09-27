@@ -215,23 +215,23 @@ public class Obfuscator {
         //SendToFragment class
         public static final String SENDTOFRAGMENT_CLASS = "com.snapchat.android.fragments.sendto.SendToFragment";
         //SendToFragment.AddToList()
-        public static final String SENDTOFRAGMENT_ADDTOLIST = "l";
+        public static final String SENDTOFRAGMENT_ADDTOLIST = "b";//prev. l
         //TopView instance variable in SendToFragment
-        public static final String SENDTOFRAGMENT_VAR_TOPVIEW = "e";
+        public static final String SENDTOFRAGMENT_VAR_TOPVIEW = "f";//prev. e
         //FriendHashSet instance variable in SendToFragment
-        public static final String SENDTOFRAGMENT_VAR_SET = "l";
+        public static final String SENDTOFRAGMENT_VAR_SET = "m";//prev. l
         //ArrayList instance variable in SendToFragment
-        public static final String SENDTOFRAGMENT_VAR_ARRAYLIST = "n";
+        public static final String SENDTOFRAGMENT_VAR_ARRAYLIST = "p";//prev n
         //SendToAdapter class
-        public static final String SENDTOADAPTER_CLASS = "OP";
+        public static final String SENDTOADAPTER_CLASS = "afe";//prev OP
         //List instance variable in SendToAdapter
-        public static final String SENDTOADAPTER_VAR_LIST = "e";
+        public static final String SENDTOADAPTER_VAR_LIST = "c";//prev e
         //Friend class
         public static final String FRIEND_CLASS = "com.snapchat.android.model.Friend";
         //PostToStory class
-        public static final String POSTTOSTORY_CLASS = "Vl";
+        public static final String POSTTOSTORY_CLASS = "aoZ";//prev. Vl
         //PostToVenue class
-        public static final String POSTTOVENUE_CLASS = "Vp";
+        public static final String POSTTOVENUE_CLASS = "apb";//prev. Vp
     }
     public class sharing {
         //cameraStateEvent class
