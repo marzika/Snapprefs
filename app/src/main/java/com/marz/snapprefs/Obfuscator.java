@@ -381,11 +381,11 @@ public class Obfuscator {
         public static final String OVERLAY_FIELD = "y";
     }
     public class friendmojis {
-        public static final String ON_FRIENDS_UPDATE_METHOD = "w";
+        public static final String ON_FRIENDS_UPDATE_METHOD = "u";//prev. w
         public static final String FRIEND_MANAGER_CLASS = "com.snapchat.android.model.FriendManager";
         public static final String FRIENDS_MAP_FIELD = "mOutgoingFriendsListMap";
         public static final String GET_VALUES_METHOD = "b";
-        public static final String IS_IT_ME_METHOD = "k";
-        public static final String GET_FRIENDMOJI_STRING_METHOD = "o";
+        public static final String IS_IT_ME_METHOD = "n";//prev. k
+        public static final String GET_FRIENDMOJI_STRING_METHOD = "q";//Prev. o
     }
 }
