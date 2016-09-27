@@ -185,10 +185,11 @@ public class Obfuscator {
 
     }
     public class datasaving {
-        public static final String DSNAPDOWNLOADER_CLASS = "KL";
+        public static final String DSNAPDOWNLOADER_CLASS = "Df$a";//Prev. KL
         public static final String DSNAPDOWNLOADER_DOWNLOADSNAP = "a";
         public static final String DOWNLOADREQUEST_CLASS = "com.snapchat.android.app.shared.framework.network.manager";//prev. com.snapchat.android.networkmanager.DownloadRequest
         public static final String DYNAMICBYTEBUFFER_CLASS = "aku";
+        public static final String DOWNLOADREQUEST_HOLDER_CLASS = "Qq";
         public static final String NETWORKRESULT_CLASS = "Ae";
         public static final String DSNAPDOWNLOAD_CLASS = "Df$a";//prev. KP$a
         public static final String DSNAPDOWNLOAD_PARAM = "mz";//prev. mp
