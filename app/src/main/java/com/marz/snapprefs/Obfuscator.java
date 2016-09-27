@@ -307,8 +307,8 @@ public class Obfuscator {
         public static final String TAKESNAPBUTTON_BLEAN1 = "c";
         public static final String TAKESNAPBUTTON_BLEAN2 = "e";
         public static final String TAKESNAPBUTTON_TIME = "b";
-        public static final String TAKESNAPBUTTON_X = "n";
-        public static final String TAKESNAPBUTTON_Y = "o";
+        public static final String TAKESNAPBUTTON_X = "o";//prev. n
+        public static final String TAKESNAPBUTTON_Y = "p";//prev. o
     }
     public class chat { //9.31.1.0
         public static final String CHAT_CLASS = "com.snapchat.android.model.chat.Chat";
