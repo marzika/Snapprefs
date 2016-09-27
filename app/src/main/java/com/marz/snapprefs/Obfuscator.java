@@ -283,9 +283,9 @@ public class Obfuscator {
         //onSnapCapturedEvent first param
         public static final String CAPTURED_FIRST = "azW";//prev. ajD
         //public.xml - battery_view
-        public static final int BATTERY_VIEW = 2130968596;
+        public static final int BATTERY_VIEW = 2130968600;
         //public.xml - battery_icon
-        public static final int BATTERY_ICON = 2131689648;
+        public static final int BATTERY_ICON = 2131689687;
     }
     public class visualfilters {
         public static final String FILTERS_CLASS = "Oz";//prev. afg
