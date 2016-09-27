@@ -20,10 +20,10 @@ package com.marz.snapprefs;
 
 public class Obfuscator {
     public static final int SUPPORTED_VERSION_CODE = 847;
-    public static final String SUPPORTED_VERSION_CODENAME = "9.31.1.0";
-    public static final String ROOTDETECTOR_CLASS = "ali";
+    public static final String SUPPORTED_VERSION_CODENAME = "9.39.5.0";
+    public static final String ROOTDETECTOR_CLASS = "aAY";//prev. ali
     public static final String[] ROOTDETECTOR_METHODS= {"b", "c", "d", "e"};
-    public static final String FRIENDS_BF= "j";
+    public static final String FRIENDS_BF= "l";//prev. j
 
     /**
      * Check if Snapprefs is compatible with this Snapchat version.
@@ -38,7 +38,7 @@ public class Obfuscator {
     public class save {
 
         //User class
-        public static final String USER_CLASS = "VU"; //+
+        public static final String USER_CLASS = "DP"; //prev. VU
         //ReceivedSnap class
         public static final String RECEIVEDSNAP_CLASS = "Sc"; //+ prev Vt
         public static final String OBJECT_MID = "mId";
@@ -94,13 +94,13 @@ public class Obfuscator {
         //StatefulChatFeedItem.getSender()
         public static final String STATEFULCHATFEEDITEM_GETSENDER = "i";
         //ScreenshotDetector class -> datetaken
-        public static final String SCREENSHOTDETECTOR_CLASS = "Zm";
+        public static final String SCREENSHOTDETECTOR_CLASS = "Tk";//prev. Zm
         //ScreenshotDetector.run(List)
         public static final String SCREENSHOTDETECTOR_RUN = "a";
         //SnapStateMessage class
-        public static final String SNAPSTATEMESSAGE_CLASS = "auW";
+        public static final String SNAPSTATEMESSAGE_CLASS = "aNt";//prev. auW
         //SnapStateMessage.setScreenshotCount(Long)
-        public static final String SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT = "b";
+        public static final String SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT = "a";//prev. b
         //SentSnap Bitmap class
         public static final String SENT_CLASS = "UW";
         //SentSnap Bitmap method
@@ -208,7 +208,7 @@ public class Obfuscator {
         public static final String LOCATION_GETLOCATION = "c";
         public static final String WEATHER_CLASS = "Wa";
         public static final String WEATHER_FIRST = "avT";
-        public static final String BATTERY_FILTER = "UQ";
+        public static final String BATTERY_FILTER = "Pc";//prev. UQ
         public static final String BATTERY_FULL_ENUM = "FULL";
     }
     public class select {
@@ -372,13 +372,13 @@ public class Obfuscator {
     }
     public class flash {
         public static final String ISVISIBLE_FIELD = "mIsVisible";
-        public static final String SWIPELAYOUT_FIELD = "n";
-        public static final String GETRESID_METHOD = "e";
+        public static final String SWIPELAYOUT_FIELD = "p";//prev. n
+        public static final String GETRESID_OBJECT = "g";//prev. e
         public static final String ISSCROLLED_METHOD = "c";
-        public static final String KEYEVENT_CLASS = "CX";
+        public static final String KEYEVENT_CLASS = "Xk";//prev. CX
         public static final String KEYCODE_FIELD = "a";
-        public static final String FLASH_METHOD = "b";
-        public static final String OVERLAY_FIELD = "y";
+        public static final String FLASH_METHOD = "a";//prev. b
+        public static final String OVERLAY_FIELD = "z";//prev. y
     }
     public class friendmojis {
         public static final String ON_FRIENDS_UPDATE_METHOD = "u";//prev. w
@@ -387,5 +387,9 @@ public class Obfuscator {
         public static final String GET_VALUES_METHOD = "b";
         public static final String IS_IT_ME_METHOD = "n";//prev. k
         public static final String GET_FRIENDMOJI_STRING_METHOD = "q";//Prev. o
+    }
+    public class misc {
+        public static final String CAPTIONVIEW = "UA";
+        public static final String CAPTIONVIEW_TEXT_LIMITER = "d";
     }
 }

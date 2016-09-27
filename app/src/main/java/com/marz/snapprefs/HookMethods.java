@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.DebugHelper;
-import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import java.io.File;
@@ -283,6 +281,7 @@ public class HookMethods
                             }
                             Misc.forceNavBar(lpparam, Preferences.getInt(Prefs.FORCE_NAVBAR));
                             getEditText(lpparam);
+                            // COMPLETED 9.39.5
                             findAndHookMethod(Obfuscator.save.SCREENSHOTDETECTOR_CLASS, lpparam.classLoader, Obfuscator.save.SCREENSHOTDETECTOR_RUN, LinkedHashMap.class, XC_MethodReplacement.DO_NOTHING);
                             findAndHookMethod(Obfuscator.save.SNAPSTATEMESSAGE_CLASS, lpparam.classLoader, Obfuscator.save.SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT, Long.class, new XC_MethodHook() {
                                 @Override
@@ -310,6 +309,8 @@ public class HookMethods
         });*/
 
                     //Showing lenses or not
+                    // Old code - Used when share button was placed above the TAKE PICTURE button
+                    /*
                     findAndHookMethod(Obfuscator.icons.ICON_HANDLER_CLASS, lpparam.classLoader, Obfuscator.icons.SHOW_LENS, boolean.class, boolean.class, new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) {
@@ -329,11 +330,13 @@ public class HookMethods
                             if (HookedLayouts.upload != null)
                                 HookedLayouts.upload.setVisibility(View.VISIBLE);
                         }
-                    });
+                    });*/
+                    // COMPLETED 9.39.5
                     for (String s : Obfuscator.ROOTDETECTOR_METHODS) {
                         findAndHookMethod(Obfuscator.ROOTDETECTOR_CLASS, lpparam.classLoader, s, XC_MethodReplacement.returnConstant(false));
                         Logger.log("ROOTCHECK: " + s, true);
                     }
+                    // External class - Belongs to android
                     findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) {
@@ -347,6 +350,7 @@ public class HookMethods
                         }
                     });
 
+                    // COMPLETED 9.39.5
                     final Class<?> receivedSnapClass =
                             findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
                     try {
@@ -369,9 +373,19 @@ public class HookMethods
                     } /*For viewing longer videos?*/
 
                     if (Preferences.getBool(Prefs.CAPTION_UNLIMITED_VANILLA)) {
-                        findAndHookMethod("com.snapchat.android.ui.caption.CaptionEditText", lpparam.classLoader, "n", XC_MethodReplacement.DO_NOTHING);
+                        // New unlimited captions function
+                        // COMPLETED 9.39.5
+                        XposedHelpers.findAndHookMethod(Obfuscator.misc.CAPTIONVIEW, lpparam.classLoader, Obfuscator.misc.CAPTIONVIEW_TEXT_LIMITER, Integer.class, new XC_MethodHook() {
+                            @Override
+                            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                                param.args[0] = 999999999;
+                            }
+                        });
+
+                        //findAndHookMethod("com.snapchat.android.ui.caption.CaptionEditText", lpparam.classLoader, "n", XC_MethodReplacement.DO_NOTHING);
                     }
                     // VanillaCaptionEditText was moved from an inner-class to a separate class in 8.1.0
+                    // TODO Find below class - ENTIRE PACKAGE REFACTORED
                     String vanillaCaptionEditTextClassName =
                             "com.snapchat.android.ui.caption.VanillaCaptionEditText";
                     hookAllConstructors(findClass(vanillaCaptionEditTextClassName, lpparam.classLoader), new XC_MethodHook() {
@@ -394,6 +408,7 @@ public class HookMethods
                     });
 
                     // FatCaptionEditText was moved from an inner-class to a separate class in 8.1.0
+                    // TODO Find below class - ENTIRE PACKAGE REFACTORED
                     String fatCaptionEditTextClassName =
                             "com.snapchat.android.ui.caption.FatCaptionEditText";
                     hookAllConstructors(findClass(fatCaptionEditTextClassName, lpparam.classLoader), new XC_MethodHook() {
@@ -418,6 +433,7 @@ public class HookMethods
                     Sharing.initSharing(lpparam, mResources);
                     //SNAPPREFS
                     if (Preferences.getBool(Prefs.HIDE_BF)) {
+                        // COMPLETED 9.39.5
                         findAndHookMethod("com.snapchat.android.model.Friend", lpparam.classLoader, Obfuscator.FRIENDS_BF, new XC_MethodReplacement() {
                             @Override
                             protected Object replaceHookedMethod(MethodHookParam param) {
@@ -442,6 +458,7 @@ public class HookMethods
                     if (Preferences.getBool(Prefs.SELECT_ALL)) {
                         HookSendList.initSelectAll(lpparam);
                     }
+                    //Completed 9.39.5
                     findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "onKeyDownEvent", XposedHelpers.findClass(Obfuscator.flash.KEYEVENT_CLASS, lpparam.classLoader), new XC_MethodHook() {
                         public boolean frontFlash = false;
                         public long lastChange = System.currentTimeMillis();
@@ -451,7 +468,7 @@ public class HookMethods
                             //this.mIsVisible && this.n.e() != 0 && this.n.e() != 2 && !this.n.c()
                             boolean isVisible = XposedHelpers.getBooleanField(param.thisObject, Obfuscator.flash.ISVISIBLE_FIELD);
                             Object swipeLayout = XposedHelpers.getObjectField(param.thisObject, Obfuscator.flash.SWIPELAYOUT_FIELD);
-                            int resId = (int) XposedHelpers.callMethod(swipeLayout, Obfuscator.flash.GETRESID_METHOD);
+                            int resId = (int) XposedHelpers.getObjectField(swipeLayout, Obfuscator.flash.GETRESID_OBJECT);
                             boolean c = (boolean) XposedHelpers.callMethod(swipeLayout, Obfuscator.flash.ISSCROLLED_METHOD);
                             if (isVisible && resId != 0 && resId != 2 && !c) {
                                 int keycode = XposedHelpers.getIntField(param.args[0], Obfuscator.flash.KEYCODE_FIELD);
@@ -517,7 +534,8 @@ public class HookMethods
         });
         //Used to emulate the battery status as being FULL -> above 90%
         final Class<?> batteryInfoProviderEnum =
-                findClass("com.snapchat.android.app.shared.model.filter.BatteryLevel", lpparam.classLoader);
+                    findClass("com.snapchat.android.app.shared.feature.preview.model.filter.BatteryLevel", lpparam.classLoader); //prev. com.snapchat.android.app.shared.model.filter.BatteryLevel
+
         findAndHookMethod(Obfuscator.spoofing.BATTERY_FILTER, lpparam.classLoader, "a", new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
@@ -528,6 +546,7 @@ public class HookMethods
     }
 
     public void getEditText(LoadPackageParam lpparam) {
+        //TODO Find below hook - ENTIRE PACKAGE REFACTOR
         this.CaptionEditText =
                 XposedHelpers.findClass("com.snapchat.android.ui.caption.CaptionEditText", lpparam.classLoader);
         XposedBridge.hookAllConstructors(this.CaptionEditText, new XC_MethodHook() {

@@ -32,7 +32,6 @@ public class Misc {
                     String t = String.valueOf(time / 1000);
                     Rect rect = new Rect();
                     p.getTextBounds(t, 0, t.length(), rect);
-                    // TAKESNAPBUTTON_X -> Not sure if changed
                     c.drawText(t, XposedHelpers.getFloatField(param.thisObject, Obfuscator.timer.TAKESNAPBUTTON_X) - (rect.width() / 2) - 5, XposedHelpers.getFloatField(param.thisObject, Obfuscator.timer.TAKESNAPBUTTON_Y) + (rect.height() / 2) - 5, p);
                 }
             }
