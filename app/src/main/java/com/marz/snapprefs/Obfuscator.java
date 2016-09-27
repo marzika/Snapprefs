@@ -273,22 +273,22 @@ public class Obfuscator {
     }
     public class filters {
         //FilterLoader class
-        public static final String LOADER_CLASS = "afM";
+        public static final String LOADER_CLASS = "axF";//prev. afM
         //FilterLoader First Param
-        public static final String LOADER_FIRST = "SP";
+        public static final String LOADER_FIRST = "amH";//prev. SP
         //added instance
-        public static final String FILTER_CLASS = "adG";
+        public static final String FILTER_CLASS = "avV";//prev. adG
         //called Object
-        public static final String OBJECT_CLASS = "afy";
+        public static final String OBJECT_CLASS = "awU";//prev. afy
         //onSnapCapturedEvent first param
-        public static final String CAPTURED_FIRST = "ajD";
+        public static final String CAPTURED_FIRST = "azW";//prev. ajD
         //public.xml - battery_view
         public static final int BATTERY_VIEW = 2130968596;
         //public.xml - battery_icon
         public static final int BATTERY_ICON = 2131689648;
     }
     public class visualfilters {
-        public static final String FILTERS_CLASS = "afg";
+        public static final String FILTERS_CLASS = "Oz";//prev. afg
         public static final String FILTERSLOADER_CLASS = "afh";
         public static final String FILTERSLOADER_2_CLASS = "afn";
         public static final String SETFILTER_B_CLASS = "rA";
