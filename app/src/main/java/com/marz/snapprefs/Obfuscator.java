@@ -364,7 +364,7 @@ public class Obfuscator {
         public static final String BUS_POST = "a";
     }
     public class navbar {
-        public static final String FORCENAVBAR_CLASS = "SM";
+        public static final String FORCENAVBAR_CLASS = "aMV"; // prev. SM
         public static final String FORCENAVBAR_METHOD = "a";
     }
     public class paint{
