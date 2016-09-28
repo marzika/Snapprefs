@@ -133,12 +133,10 @@ public class Stickers {
             }
         });*/
 
-        //TODO Major refactor - Check for functionality
-        //Prev. com.snapchat.android.ui.stickers.preview.PreviewSticker
-        //TODO Look into classes Vu.g->Vr
-
-        //TODO FUCK THIS METHOD
-            XposedHelpers.findAndHookMethod("com.snapchat.android.app.shared.ui.stickers.preview.PreviewSticker", lpparam.classLoader, "onTouchEvent", MotionEvent.class, new XC_MethodHook() {
+        //TODO: Vj = regular emoji sticker
+        //TODO: Vj.k -> akQ = aet
+        //TODO: akQ.f -> akV = agm aka FastZippedAssetReader -- MINOR REFACTOR HERE
+        XposedHelpers.findAndHookMethod("Vu", lpparam.classLoader, "a", MotionEvent.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     if (XposedHelpers.getAdditionalInstanceField(param.thisObject, "scale") == null)
@@ -146,20 +144,20 @@ public class Stickers {
                     float diff = ((ImageView) param.thisObject).getScaleY() - (float) XposedHelpers.getAdditionalInstanceField(param.thisObject, "scale");
                     if (diff > .5F && !isResizing) {
                         XposedHelpers.setAdditionalInstanceField(param.thisObject, "scale", ((ImageView) param.thisObject).getScaleY());
-                        Object aet = XposedHelpers.getObjectField(param.thisObject, "l");
-                        Object agm = XposedHelpers.getObjectField(aet, "a");
                         byte[] bArr = null;
                         try{
-                            //This is fucking me over
-                            bArr = (byte[]) XposedHelpers.callMethod(agm, "b", XposedHelpers.callMethod(aet, "b", XposedHelpers.getObjectField(param.thisObject, "c"))+".svg");
-                        }catch (NoSuchMethodError e){
+                            Object aet = XposedHelpers.getObjectField(param.thisObject, "k");
+                            Object agm = XposedHelpers.getObjectField(aet, "f");
+                            bArr = (byte[]) XposedHelpers.callMethod(agm, "a", XposedHelpers.callMethod(aet, "b", XposedHelpers.getObjectField(param.thisObject, "l"))+".svg");
+                        }catch (NoSuchMethodError | NoSuchFieldError e2){
                             Logger.log("Scaling non-emoji sticker", true);
                             return;
                         }
                         Object gz = newInstance(findClass(Obfuscator.stickers.SVG_CLASS, lpparam.classLoader));//new. hc
                         Object svg = XposedHelpers.callMethod(gz, "a", new ByteArrayInputStream(bArr));//new.
-                        Bitmap emoji = Bitmap.createBitmap((int) (((ImageView) param.thisObject).getHeight() * ((ImageView) param.thisObject).getScaleY()), (int) (((ImageView) param.thisObject).getHeight() * ((ImageView) param.thisObject).getScaleY()), Bitmap.Config.ARGB_8888);
-                        new ResizeTask(param.thisObject, svg, emoji).execute();
+                        ImageView previevStickerView = (ImageView) XposedHelpers.getObjectField(param.thisObject, "f");
+                        Bitmap emoji = Bitmap.createBitmap((int) (previevStickerView.getHeight() * previevStickerView.getScaleY()), (int) (previevStickerView.getHeight() * previevStickerView.getScaleY()), Bitmap.Config.ARGB_8888);
+                        new ResizeTask(previevStickerView, svg, emoji).execute();
                     }
                 }
             });
