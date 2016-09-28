@@ -101,12 +101,12 @@ public class PaintTools {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 Object i = XposedHelpers.getObjectField(param.thisObject, "j");
                 if (i != null && type != null && type != DrawingType.DEFAULT) {//only if there is object being drawn
-                    XposedHelpers.callMethod(i, "a", param.args[0], param.args[1]);
+                    XposedHelpers.callMethod(i, "b", param.args[0], param.args[1]);//was a
                 }
             }
         });
         //it's not normally method onMove but i made it work like that xD (normally it just sets start of drawing)
-        XposedHelpers.findAndHookMethod(Obfuscator.paint.LEGACYCANVASVIEW_A, lpparam.classLoader, "a", float.class, float.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod(Obfuscator.paint.LEGACYCANVASVIEW_A, lpparam.classLoader, "b", float.class, float.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
                 if (type == DrawingType.DEFAULT || type == null) return;
@@ -166,7 +166,7 @@ public class PaintTools {
             }
         });
 
-        XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, Context.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, Context.class, boolean.class,new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (param.args[0] != null) {
@@ -222,7 +222,7 @@ public class PaintTools {
             }
         });
 
-        findAndHookMethod("com.snapchat.android.analytics.AnalyticsEvents", lpparam.classLoader, "i", new XC_MethodHook() {
+        findAndHookMethod("com.snapchat.android.analytics.AnalyticsEvents", lpparam.classLoader, "h", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 try{
@@ -234,11 +234,11 @@ public class PaintTools {
             }
         });
         once = false;
-        XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.ColorPickerView", lpparam.classLoader, Context.class, AttributeSet.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookConstructor("com.snapchat.android.app.shared.feature.preview.ui.view.ColorPickerView", lpparam.classLoader, Context.class, AttributeSet.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
                 if (!once){
-                    View colorPickerView = (View) getObjectField(param.thisObject, "h");
+                    View colorPickerView = (View) getObjectField(param.thisObject, "i");
                     outerOptionsLayout = new RelativeLayout(HookMethods.SnapContext);
                     final GridView innerOptionsView = new GridView(HookMethods.SnapContext);
                     innerOptionsView.setAdapter(new OptionsAdapter(HookMethods.SnapContext, mResources));
