@@ -386,8 +386,38 @@ public class HookMethods
                         //findAndHookMethod("com.snapchat.android.ui.caption.CaptionEditText", lpparam.classLoader, "n", XC_MethodReplacement.DO_NOTHING);
                     }
                     // VanillaCaptionEditText was moved from an inner-class to a separate class in 8.1.0
-                    // TODO Find below class - ENTIRE PACKAGE REFACTORED
-                    String vanillaCaptionEditTextClassName =
+                    // TODO Find below class - ENTIRE PACKAGE REFACTORED - DONE?
+                    String snapCaptionView =
+                            "com.snapchat.android.app.shared.ui.caption.SnapCaptionView";
+                    hookAllConstructors(findClass(snapCaptionView, lpparam.classLoader), new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) {
+                            if (Preferences.getBool(Prefs.CAPTION_UNLIMITED_VANILLA)) {
+                                XposedUtils.log("Unlimited vanilla captions - 1");
+                                EditText vanillaCaptionEditText = (EditText) param.thisObject;
+                                // Set single lines mode to false
+                                vanillaCaptionEditText.setSingleLine(false);
+                                vanillaCaptionEditText.setFilters(new InputFilter[0]);
+                                // Remove actionDone IME option, by only setting flagNoExtractUi
+                                vanillaCaptionEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+                                // Remove listener hiding keyboard when enter is pressed by setting the listener to null
+                                vanillaCaptionEditText.setOnEditorActionListener(null);
+                                // Remove listener for cutting of text when the first line is full by setting the text change listeners list to null
+                                setObjectField(vanillaCaptionEditText, "mListeners", null);
+                            }
+                        }
+                    });
+                    XposedHelpers.findAndHookMethod("com.snapchat.android.app.shared.ui.caption.SnapCaptionView", lpparam.classLoader, "onCreateInputConnection", EditorInfo.class, new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            if (Preferences.getBool(Prefs.CAPTION_UNLIMITED_VANILLA)) {
+                                XposedUtils.log("Unlimited vanilla captions - 2");
+                                EditorInfo editorInfo = (EditorInfo) param.args[0];
+                                editorInfo.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI;
+                            }
+                        }
+                    });
+                    /*String vanillaCaptionEditTextClassName =
                             "com.snapchat.android.ui.caption.VanillaCaptionEditText";
                     hookAllConstructors(findClass(vanillaCaptionEditTextClassName, lpparam.classLoader), new XC_MethodHook() {
                         @Override
@@ -430,7 +460,7 @@ public class HookMethods
                                 setObjectField(fatCaptionEditText, "mListeners", null);
                             }
                         }
-                    });
+                    });*/
                     //SNAPSHARE
                     Sharing.initSharing(lpparam, mResources);
                     //SNAPPREFS
