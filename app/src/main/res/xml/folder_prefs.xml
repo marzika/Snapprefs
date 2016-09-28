@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:defaultValue="-1"
+        android:key="pref_key_hide_location"
+        android:persistent="true"
+        android:title="@string/pref_hide_location_title" />
+    <Preference
+        android:defaultValue="-1"
+        android:key="pref_key_save_location"
+        android:persistent="true"
+        android:title="@string/pref_save_location_title" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_key_sort_files_mode"
+        android:summaryOff="@string/pref_sort_files_mode_summary_off"
+        android:summaryOn="@string/pref_sort_files_mode_summary_on"
+        android:title="@string/pref_sort_files_mode_title" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_key_sort_files_username"
+        android:summaryOff="@string/pref_sort_files_username_summary_off"
+        android:summaryOn="@string/pref_sort_files_username_summary_on"
+        android:title="@string/pref_sort_files_username_title" />
+</PreferenceScreen>

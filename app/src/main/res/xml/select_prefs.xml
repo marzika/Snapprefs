@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_selectall"
+        android:summary="@string/select_text_summary"
+        android:title="@string/select_text" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_selectstory"
+        android:summary="@string/selectstory_text_summary"
+        android:title="@string/selectstory_text" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_selectvenue"
+        android:summary="@string/selectvenue_text_summary"
+        android:title="@string/selectvenue_text" />
+</PreferenceScreen>

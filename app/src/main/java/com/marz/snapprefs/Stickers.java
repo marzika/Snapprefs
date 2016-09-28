@@ -2,34 +2,35 @@ package com.marz.snapprefs;
 
 import android.content.Context;
 import android.content.res.XModuleResources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.os.AsyncTask;
 import android.os.Environment;
+import android.view.MotionEvent;
+import android.widget.ImageView;
 
 import com.marz.snapprefs.Util.BiHashMap;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.newInstance;
 
 public class Stickers {
     private static BiHashMap<String, String> emojiNames = new BiHashMap<>();
     private static ArrayList<String> existing = new ArrayList<>();
+    static boolean isResizing = false;
 
     private static void initEmojiNames() {
         emojiNames.put("sticker1", "1f550");
@@ -57,21 +58,25 @@ public class Stickers {
         emojiNames.put("sticker23", "1f566");
     }
     static void initStickers(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
+
         initEmojiNames();//init unicode-cool name map
         //List single emojis
-        File myFile = new File(Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/");
+        /*File myFile = new File(Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/");
         File[] files = myFile.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String filename) {
                 return filename.endsWith(".svg") && new File(dir, filename.substring(0, filename.lastIndexOf(".")) + ".png").exists();
             }
         });
+
+        if( files == null )
+
         for (File f : files) {
             String s = f.getName().substring(0, f.getName().lastIndexOf("."));
             existing.add(s);
         }
         //This method loads contents of a zip
-        XposedHelpers.findAndHookMethod("Gn", lpparam.classLoader, "a", new XC_MethodReplacement() {
+        XposedHelpers.findAndHookMethod(Obfuscator.stickers.ASSETREADER_CLASS, lpparam.classLoader, Obfuscator.stickers.ASSETREADER_READ, new XC_MethodReplacement() {
             @Override
             protected Object replaceHookedMethod(MethodHookParam methodHookParam) throws Throwable {
                 if (XposedHelpers.getBooleanField(methodHookParam.thisObject, "mIsUnzipped"))
@@ -88,13 +93,10 @@ public class Stickers {
                 ZipEntry entry;
                 ByteArrayOutputStream output = new ByteArrayOutputStream();
                 HashMap mAssets = (HashMap) XposedHelpers.getObjectField(methodHookParam.thisObject, "mAssets");
-                Class<?> gna = lpparam.classLoader.loadClass("Gn$a");
-                Constructor<?> constructor = XposedHelpers.findConstructorBestMatch(gna, lpparam.classLoader.loadClass("Gn"), byte[].class, int.class, int.class);
                 while ((entry = zis.getNextEntry()) != null) {
                     String coolName = entry.getName().substring(0, entry.getName().lastIndexOf("."));
                     String type = entry.getName().substring(entry.getName().lastIndexOf("."));
                     String unicodeName = coolName;
-                    int offset = output.size();
                     int length = 0;
                     if (emojiNames.containsKey(coolName)) {
                         unicodeName = emojiNames.get(coolName);
@@ -103,11 +105,9 @@ public class Stickers {
                     }
                     if (existing.contains(unicodeName)) {
                         byte[] bytes = readFile(unicodeName + type);
-                        length = bytes.length;
                         output.write(bytes, 0, bytes.length);
                     } else if (existing.contains(coolName)) {
                         byte[] bytes = readFile(coolName + type);
-                        length = bytes.length;
                         output.write(bytes, 0, bytes.length);
                     } else {
                         int i;
@@ -117,36 +117,67 @@ public class Stickers {
                             output.write(buffer, 0, i);
                         }
                     }
-                    Object inst = null;
-                    try {
-                        inst = constructor.newInstance(methodHookParam.thisObject, null, offset, length);
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                    }
-                    mAssets.put(unicodeName + type, inst);
+                    mAssets.put(unicodeName + type, output.toByteArray());
                 }
-                byte[] mBuffer = output.toByteArray();
-                XposedHelpers.setObjectField(methodHookParam.thisObject, "mBuffer", mBuffer);
                 output.close();
-                Field f = gna.getDeclaredField("data");
-                for (Object e : mAssets.entrySet()) {
-                    f.set(((Map.Entry) e).getValue(), mBuffer);
-
-                }
+                zis.close();
+                is.close();
                 XposedHelpers.setBooleanField(methodHookParam.thisObject, "mIsUnzipped", true);
+                AtomicBoolean mIsUnzipping = (AtomicBoolean) XposedHelpers.getObjectField(methodHookParam.thisObject, "mIsUnzipping");
+                mIsUnzipping.set(false);
+                synchronized (mIsUnzipping) {
+                    XposedHelpers.callMethod(mIsUnzipping, "notifyAll");
+                }
+
                 return null;
             }
-        });
+        });*/
+
+            XposedHelpers.findAndHookMethod("com.snapchat.android.ui.stickers.preview.PreviewSticker", lpparam.classLoader, "onTouchEvent", MotionEvent.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    if (XposedHelpers.getAdditionalInstanceField(param.thisObject, "scale") == null)
+                        XposedHelpers.setAdditionalInstanceField(param.thisObject, "scale", 1.0F);
+                    float diff = ((ImageView) param.thisObject).getScaleY() - (float) XposedHelpers.getAdditionalInstanceField(param.thisObject, "scale");
+                    if (diff > .5F && !isResizing) {
+                        XposedHelpers.setAdditionalInstanceField(param.thisObject, "scale", ((ImageView) param.thisObject).getScaleY());
+                        Object aet = XposedHelpers.getObjectField(param.thisObject, "l");
+                        Object agm = XposedHelpers.getObjectField(aet, "a");
+                        byte[] bArr = null;
+                        try{
+                            bArr = (byte[]) XposedHelpers.callMethod(agm, "b", XposedHelpers.callMethod(aet, "b", XposedHelpers.getObjectField(param.thisObject, "c"))+".svg");
+                        }catch (NoSuchMethodError e){
+                            Logger.log("Scaling non-emoji sticker", true);
+                            return;
+                        }
+                        Object gz = newInstance(findClass(Obfuscator.stickers.SVG_CLASS, lpparam.classLoader));
+                        Object svg = XposedHelpers.callMethod(gz, "a", new ByteArrayInputStream(bArr));
+                        Bitmap emoji = Bitmap.createBitmap((int) (((ImageView) param.thisObject).getHeight() * ((ImageView) param.thisObject).getScaleY()), (int) (((ImageView) param.thisObject).getHeight() * ((ImageView) param.thisObject).getScaleY()), Bitmap.Config.ARGB_8888);
+                        new ResizeTask(param.thisObject, svg, emoji).execute();
+                    }
+                }
+            });
 
             findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "open", String.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     Logger.log("Open asset: " + param.args[0], true);
                     String str = (String) param.args[0];
-                    if (str.contains("twitter_emojis_")) {
+                    if (str.contains("twemoji_2_")) {
                         String url = Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/" + str;
-                        Logger.log("Sdcard path: " + url, true);
-                        File file = new File(url);
+                        File file;
+                        try {
+                            Logger.log("Sdcard path: " + url, true);
+                            file = new File(url);
+                        } catch (Exception e){
+                            Logger.log("Stickers file/folder not found", true);
+                            return;
+                        }
+
+                        if( !file.exists() ) {
+                            Logger.log( "Error loading STICKERS file: " + str );
+                            return;
+                        }
                         InputStream is = null;
                         is = new BufferedInputStream(new FileInputStream(file));
                         param.setResult(is);
@@ -173,5 +204,30 @@ public class Stickers {
             //Logger.log("INSTALL HANDLEEXTERNALSTORAGE TO FIX THE ISSUE -- FileUtils: File SDread failed " + e.toString(), true);
         }
         return data;
+    }
+    static class ResizeTask extends AsyncTask<Void, Void, Void> {
+
+        private final Object thisObject;
+        private final Object svg;
+        private final Bitmap emoji;
+
+        public ResizeTask(Object thisObject, Object svg, Bitmap emoji) {
+            this.thisObject = thisObject;
+            this.svg = svg;
+            this.emoji = emoji;
+            isResizing = true;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            XposedHelpers.callMethod(svg, "a", new Canvas(emoji));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            ((ImageView) thisObject).setImageBitmap(emoji);
+            isResizing = false;
+        }
     }
 }

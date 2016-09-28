@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/nav_item_main"
+        android:icon="@drawable/main"
+        android:title="Main Menu" />
+    <item
+        android:id="@+id/nav_item_deluxe_section"
+        android:title="Premium / Deluxe">
+        <menu>
+            <item
+                android:id="@+id/nav_item_buy"
+                android:icon="@drawable/premium_buy"
+                android:title="Buy / Activate membership" />
+            <item
+                android:id="@+id/nav_item_deluxe"
+                android:enabled="false"
+                android:icon="@drawable/premium"
+                android:title="Premium &amp; Deluxe settings" />
+        </menu>
+</item>
+    <item
+        android:id="@+id/nav_item_settings"
+        android:title="Settings">
+    <menu>
+        <item
+            android:id="@+id/nav_item_general"
+            android:icon="@drawable/general"
+            android:title="General" />
+        <item
+            android:id="@+id/nav_item_saving"
+            android:icon="@drawable/save"
+            android:title="Saving" />
+        <item
+            android:id="@+id/nav_item_text"
+            android:icon="@drawable/text"
+            android:title="Text customization" />
+        <item
+            android:id="@+id/nav_item_spoofing"
+            android:icon="@drawable/spoofing"
+            android:title="Spoofing" />
+        <item
+            android:id="@+id/nav_item_sharing"
+            android:icon="@drawable/share"
+            android:title="Sharing" />
+        <item
+            android:id="@+id/nav_item_data"
+            android:icon="@drawable/data_save"
+            android:title="Data saving" />
+        <item
+            android:id="@+id/nav_item_filters"
+            android:icon="@drawable/filter"
+            android:title="Visual Filters / Filters" />
+        <item
+            android:id="@+id/nav_item_lenses"
+            android:icon="@drawable/lenses"
+            android:title="Lens Collector / Loader" />
+    </menu>
+</item>
+</menu>

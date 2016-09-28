@@ -13,6 +13,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 /**
@@ -29,7 +32,28 @@ public class FileUtils {
         }
     }
 
-    public static void writeToSDFile(String data, String filename) {
+    public static void saveStream(InputStream in, File outputPath) {
+        OutputStream out;
+        try {
+            out = new FileOutputStream(outputPath);
+
+            byte[] buffer = new byte[2048];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            in.close();
+            out.flush();
+            out.close();
+        } catch (FileNotFoundException fileNotFoundException) {
+            fileNotFoundException.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void writeToSDFolder(String data, String filename) {
         try {
             File myFile = new File(Environment.getExternalStorageDirectory() + "/Snapprefs/" + filename + ".txt");
             myFile.createNewFile();
@@ -40,11 +64,11 @@ public class FileUtils {
             myOutWriter.close();
             fOut.close();
         } catch (Exception e) {
-            Logger.log("FileUtils: File SDwrite failed: " + e.toString());
+            Logger.log("FileUtils: File SDFolderwrite failed: " + e.toString());
         }
     }
 
-    public static String readFromSDFile(String filename) {
+    public static String readFromSDFolder(String filename) {
         String aBuffer = "";
         try {
             File myFile = new File(Environment.getExternalStorageDirectory() + "/Snapprefs/" + filename + ".txt");
@@ -57,9 +81,13 @@ public class FileUtils {
                 aBuffer += aDataRow + "\n";
             }
             myReader.close();
+        } catch (FileNotFoundException e) {
+            Logger.log("FILE NOT FOUND - ARE YOU SURE YOU CREATED IT?", true);
         } catch (Exception e) {
             Logger.log("INSTALL HANDLEEXTERNALSTORAGE TO FIX THE ISSUE -- FileUtils: File SDread failed " + e.toString(), true);
         }
+        if (aBuffer.equalsIgnoreCase(""))
+            aBuffer = "0";
         return aBuffer;
     }
 
@@ -90,5 +118,69 @@ public class FileUtils {
         }
 
         return ret;
+    }
+
+    public static String readFromSD(File fileToRead) {
+        String aBuffer = "";
+        try {
+            FileInputStream fIn = new FileInputStream(fileToRead);
+            BufferedReader myReader = new BufferedReader(
+                    new InputStreamReader(fIn));
+            String aDataRow = "";
+            while ((aDataRow = myReader.readLine()) != null) {
+                aBuffer += aDataRow + "\n";
+            }
+            myReader.close();
+        } catch (Exception e) {
+            aBuffer = "0";
+            Logger.log("readFromSD error: " + e.toString(), true);
+        }
+        return aBuffer;
+    }
+
+    public static void writeToSDFile(String data, File fileToWrite) {
+        try {
+            new File(Environment.getExternalStorageDirectory() + "/Snapprefs/Groups/").mkdir();
+            fileToWrite.createNewFile();
+            FileOutputStream fOut = new FileOutputStream(fileToWrite);
+            OutputStreamWriter myOutWriter =
+                    new OutputStreamWriter(fOut);
+            myOutWriter.append(data);
+            myOutWriter.close();
+            fOut.close();
+        } catch (Exception e) {
+            Logger.log("FileUtils: File SDwrite failed: " + e.toString());
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteSDFile(File fileToDelete) {
+        fileToDelete.delete();
+    }
+
+    public static Object readObjectFile(File f) {
+        try {
+            ObjectInputStream stream = new ObjectInputStream(new FileInputStream(f));
+            Object result = stream.readObject();
+            stream.close();
+            return result;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void writeObjectFile(File f, Object obj) {
+        try {
+            if (!f.exists()) f.createNewFile();
+            ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(f));
+            stream.writeObject(obj);
+            stream.flush();
+            stream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

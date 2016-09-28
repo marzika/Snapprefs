@@ -27,7 +27,7 @@ import com.coremedia.iso.boxes.TrackHeaderBox;
 import com.googlecode.mp4parser.DataSource;
 import com.googlecode.mp4parser.FileDataSourceImpl;
 import com.googlecode.mp4parser.util.Matrix;
-import com.marz.snapprefs.Common;
+import com.marz.snapprefs.Preferences;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -78,7 +78,7 @@ public class VideoUtils {
                 // Determine the way to rotate
                 if (((rotation % 180 == 90) && (width < height)) || ((rotation % 180 == 0) && (width > height))) {
                     // Add rotation according to the settings
-                    rotation += Common.ROTATION_MODE;
+                    rotation += Preferences.getInt(Preferences.Prefs.ROTATION_MODE);
                     Matrix matrix = getMatrixFromDegrees(rotation);
                     XposedUtils.log("Rotation changed from " + getStringFromMatrix(currentMatrix) + " to " + getStringFromMatrix(matrix));
 

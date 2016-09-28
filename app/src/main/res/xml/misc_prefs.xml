@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_hidelive"
+        android:summary="@string/hidelive_summary"
+        android:title="@string/hidelive_text" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_hidepeople"
+        android:summary="@string/hidepeople_summary"
+        android:title="@string/hidepeople_text" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_hidebf"
+        android:summary="@string/hidebf_summary"
+        android:title="@string/hidebf_text" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_key_paint_checkbox"
+        android:summaryOff="@string/pref_paint_cb_summary_off"
+        android:summaryOn="@string/pref_paint_cb_summary_on"
+        android:title="@string/pref_paint_cb_title" />
+    <com.marz.snapprefs.BetterListPreference
+        android:defaultValue="@string/pref_forcenavbar_default"
+        android:dialogTitle="@string/pref_forcenavbar_title"
+        android:entries="@array/pref_forcenavbar_entries"
+        android:entryValues="@array/pref_forcenavbar_values"
+        android:key="pref_key_forcenavbar"
+        android:title="@string/pref_forcenavbar_title" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_key_timercounter"
+        android:summary="@string/pref_timercounter_cb_summary"
+        android:title="@string/pref_timercounter_cb_title" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_key_integration"
+        android:summary="@string/pref_save_integration_summary"
+        android:title="@string/pref_save_integration_title" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_launcher"
+        android:title="@string/hide_text" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_key_debug"
+        android:title="@string/debug_text" />
+</PreferenceScreen>

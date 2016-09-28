@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_viewed"
+        android:summaryOff="@string/pref_viewed_summary_off"
+        android:summaryOn="@string/pref_viewed_summary_on"
+        android:title="@string/pref_viewed_title" />
+    <Preference
+        android:key="pref_viewed_readme"
+        android:summary="@string/pref_viewed_readme_summary"
+        android:title="@string/pref_discover_readme_title" />
+</PreferenceScreen>

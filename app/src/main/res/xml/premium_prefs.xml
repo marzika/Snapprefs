@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_typing"
+        android:title="@string/pref_typing_title" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_groups_unlim"
+        android:title="@string/pref_group_unlim_title" />
+</PreferenceScreen>

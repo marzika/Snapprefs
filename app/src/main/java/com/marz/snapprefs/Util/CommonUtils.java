@@ -37,6 +37,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * A set of commonly used utilities.
@@ -150,4 +153,13 @@ public class CommonUtils {
             activity.startActivity(intent);
         }
     }
+
+    public static String sha256(String input) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        MessageDigest md;
+        md = MessageDigest.getInstance("SHA-256");
+        md.update(input.getBytes("UTF-8")); // Change this to "UTF-16" if needed
+        byte[] digest = md.digest();
+        return String.format("%064x", new java.math.BigInteger(1, digest));
+    }
+
 }

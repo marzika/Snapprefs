@@ -23,12 +23,12 @@ public class Premium {
     }
 
     static void initTyping(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
-        findAndHookMethod("com.snapchat.android.model.chat.ChatConversation", lpparam.classLoader, "e", boolean.class, XC_MethodReplacement.DO_NOTHING);
-        findAndHookMethod("com.snapchat.android.model.chat.ChatConversation", lpparam.classLoader, "b", boolean.class, XC_MethodReplacement.DO_NOTHING);
+        findAndHookMethod("com.snapchat.android.model.chat.ChatConversation", lpparam.classLoader, "f", boolean.class, XC_MethodReplacement.DO_NOTHING);
+        findAndHookMethod("com.snapchat.android.model.chat.ChatConversation", lpparam.classLoader, "c", boolean.class, XC_MethodReplacement.DO_NOTHING);
     }
 
     static void initViewed(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
-        Class<?> receivedsnap = findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
-        findAndHookMethod(Obfuscator.save.USER_CLASS, lpparam.classLoader, "a", receivedsnap, boolean.class, XC_MethodReplacement.DO_NOTHING);
+        Class<?> recievedSnap = findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
+        findAndHookMethod(Obfuscator.save.USER_CLASS, lpparam.classLoader, "a", recievedSnap, XC_MethodReplacement.DO_NOTHING);
     }
 }

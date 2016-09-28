@@ -38,8 +38,8 @@ public class MapsActivity extends Activity {
 
             @Override
             public void onMapLongClick(LatLng location) {
-                FileUtils.writeToSDFile(String.valueOf(location.latitude), "latitude");
-                FileUtils.writeToSDFile(String.valueOf(location.longitude), "longitude");
+                FileUtils.writeToSDFolder(String.valueOf(location.latitude), "latitude");
+                FileUtils.writeToSDFolder(String.valueOf(location.longitude), "longitude");
                 Toast.makeText(MapsActivity.this, "Spoofing location for " + location.toString(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -94,7 +94,7 @@ public class MapsActivity extends Activity {
                 Toast.makeText(getBaseContext(), "No Location found", Toast.LENGTH_SHORT).show();
             }
             // Adding Markers on Google Map for each matching address
-            Address address = (Address) addresses.get(0);
+            Address address = addresses.get(0);
 
             // Creating an instance of GeoPoint, to display in Google Map
             LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());

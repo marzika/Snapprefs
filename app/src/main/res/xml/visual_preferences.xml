@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="AMARO"
+                android:title="AMARO" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="F1997"
+                android:title="F1997" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="BRANNAN"
+                android:title="BRANNAN" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="EARLYBIRD"
+                android:title="EARLYBIRD" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="HEFE"
+                android:title="HEFE" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="HUDSON"
+                android:title="HUDSON" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="INKWELL"
+                android:title="INKWELL" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="LOMO"
+                android:title="LOMO" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="LORD_KELVIN"
+                android:title="LORD_KELVIN" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="NASHVILLE"
+                android:title="NASHVILLE" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="RISE"
+                android:title="RISE" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="SIERRA"
+                android:title="SIERRA" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="SUTRO"
+                android:title="SUTRO" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="TOASTER"
+                android:title="TOASTER" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="VALENCIA"
+                android:title="VALENCIA" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="WALDEN"
+                android:title="WALDEN" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="XPROLL"
+                android:title="XPROLL" />
+</PreferenceScreen>

@@ -19,7 +19,7 @@
 package com.marz.snapprefs;
 
 import android.content.Context;
-import android.preference.ListPreference;
+import android.support.v7.preference.ListPreference;
 import android.util.AttributeSet;
 
 /**
