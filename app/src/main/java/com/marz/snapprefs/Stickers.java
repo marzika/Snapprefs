@@ -133,7 +133,12 @@ public class Stickers {
             }
         });*/
 
-            XposedHelpers.findAndHookMethod("com.snapchat.android.ui.stickers.preview.PreviewSticker", lpparam.classLoader, "onTouchEvent", MotionEvent.class, new XC_MethodHook() {
+        //TODO Major refactor - Check for functionality
+        //Prev. com.snapchat.android.ui.stickers.preview.PreviewSticker
+        //TODO Look into classes Vu.g->Vr
+
+        //TODO FUCK THIS METHOD
+            XposedHelpers.findAndHookMethod("com.snapchat.android.app.shared.ui.stickers.preview.PreviewSticker", lpparam.classLoader, "onTouchEvent", MotionEvent.class, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     if (XposedHelpers.getAdditionalInstanceField(param.thisObject, "scale") == null)
@@ -145,13 +150,14 @@ public class Stickers {
                         Object agm = XposedHelpers.getObjectField(aet, "a");
                         byte[] bArr = null;
                         try{
+                            //This is fucking me over
                             bArr = (byte[]) XposedHelpers.callMethod(agm, "b", XposedHelpers.callMethod(aet, "b", XposedHelpers.getObjectField(param.thisObject, "c"))+".svg");
                         }catch (NoSuchMethodError e){
                             Logger.log("Scaling non-emoji sticker", true);
                             return;
                         }
-                        Object gz = newInstance(findClass(Obfuscator.stickers.SVG_CLASS, lpparam.classLoader));
-                        Object svg = XposedHelpers.callMethod(gz, "a", new ByteArrayInputStream(bArr));
+                        Object gz = newInstance(findClass(Obfuscator.stickers.SVG_CLASS, lpparam.classLoader));//new. hc
+                        Object svg = XposedHelpers.callMethod(gz, "a", new ByteArrayInputStream(bArr));//new.
                         Bitmap emoji = Bitmap.createBitmap((int) (((ImageView) param.thisObject).getHeight() * ((ImageView) param.thisObject).getScaleY()), (int) (((ImageView) param.thisObject).getHeight() * ((ImageView) param.thisObject).getScaleY()), Bitmap.Config.ARGB_8888);
                         new ResizeTask(param.thisObject, svg, emoji).execute();
                     }

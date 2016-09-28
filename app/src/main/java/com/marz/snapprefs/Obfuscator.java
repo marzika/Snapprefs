@@ -20,10 +20,10 @@ package com.marz.snapprefs;
 
 public class Obfuscator {
     public static final int SUPPORTED_VERSION_CODE = 847;
-    public static final String SUPPORTED_VERSION_CODENAME = "9.31.1.0";
-    public static final String ROOTDETECTOR_CLASS = "ali";
+    public static final String SUPPORTED_VERSION_CODENAME = "9.39.5.0";
+    public static final String ROOTDETECTOR_CLASS = "aAY";//prev. ali
     public static final String[] ROOTDETECTOR_METHODS= {"b", "c", "d", "e"};
-    public static final String FRIENDS_BF= "j";
+    public static final String FRIENDS_BF= "l";//prev. j
 
     /**
      * Check if Snapprefs is compatible with this Snapchat version.
@@ -38,16 +38,16 @@ public class Obfuscator {
     public class save {
 
         //User class
-        public static final String USER_CLASS = "VU"; //+
+        public static final String USER_CLASS = "DP"; //prev. VU
         //ReceivedSnap class
-        public static final String RECEIVEDSNAP_CLASS = "RB"; //+ prev Vt
+        public static final String RECEIVEDSNAP_CLASS = "Sc"; //+ prev Vt
         public static final String OBJECT_MID = "mId";
         public static final String OBJECT_CACHEKEYSUFFIX = "mCacheKeyInstanceSuffix";
-        public static final String RECEIVEDSNAP_BEING_SEEN = "c"; //+
+        public static final String RECEIVEDSNAP_BEING_SEEN = "c"; // prev. d
         // ReceivedSnap.getCanonicalDisplayTime()
-        public static final String RECEIVEDSNAP_DISPLAYTIME = "G";
+        public static final String RECEIVEDSNAP_DISPLAYTIME = "d";//prev. G
         //StorySnap class
-        public static final String STORYSNAP_CLASS = "Po"; //+ prev VK
+        public static final String STORYSNAP_CLASS = "PO"; //+ prev VK
         //SnapView class
         public static final String SNAPVIEW_CLASS = "com.snapchat.android.ui.snapview.SnapView";
         //SnapView.show(ReceivedSnap, ChronologicalSnapProvider, Booleans(?))
@@ -68,7 +68,7 @@ public class Obfuscator {
         public static final String SNAPVIEW_HIDE = "a";
         //SnapPreviewFragment class
         public static final String SNAPPREVIEWFRAGMENT_CLASS = "com.snapchat.android.preview.SnapPreviewFragment";
-        public static final String SNAPPREVIEWFRAGMENT_METHOD1 = "l";
+        public static final String SNAPPREVIEWFRAGMENT_METHOD1 = "a";//prev. l
         //ImageResourceView class
         public static final String IMAGERESOURCEVIEW_CLASS = "com.snapchat.android.ui.ImageResourceView";
         //imageResource instance variable name in ui.ImageResourceView
@@ -81,7 +81,7 @@ public class Obfuscator {
         public static final String SNAP_ISSCREENSHOTTED = "at";
         //public static final String SNAP_ISSCREENSHOTTED2 = "au";
         //Snap.getTimestamp()
-        public static final String SNAP_GETTIMESTAMP = "S";
+        public static final String SNAP_GETTIMESTAMP = "i";//prev. S
         //EndReason class
         public static final String ENDREASON_CLASS = "rm";
         //ImageResource -> Aw prev. avg, apz --  mIsSavedByRecipient:Z
@@ -94,27 +94,27 @@ public class Obfuscator {
         //StatefulChatFeedItem.getSender()
         public static final String STATEFULCHATFEEDITEM_GETSENDER = "i";
         //ScreenshotDetector class -> datetaken
-        public static final String SCREENSHOTDETECTOR_CLASS = "Zm";
+        public static final String SCREENSHOTDETECTOR_CLASS = "Tk";//prev. Zm
         //ScreenshotDetector.run(List)
         public static final String SCREENSHOTDETECTOR_RUN = "a";
         //SnapStateMessage class
-        public static final String SNAPSTATEMESSAGE_CLASS = "auW";
+        public static final String SNAPSTATEMESSAGE_CLASS = "aNt";//prev. auW
         //SnapStateMessage.setScreenshotCount(Long)
-        public static final String SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT = "b";
+        public static final String SNAPSTATEMESSAGE_SETSCREENSHOTCOUNT = "a";//prev. b
         //SentSnap Bitmap class
         public static final String SENT_CLASS = "UW";
         //SentSnap Bitmap method
         public static final String SENT_METHOD = "a";
         //ImagesnapRenderer
-        public static final String IMAGESNAPRENDERER_CLASS = "aqe";
+        public static final String IMAGESNAPRENDERER_CLASS = "ard";//prev YI
         public static final String IMAGESNAPRENDERER_CLASS2 = IMAGESNAPRENDERER_CLASS + "$1";
         public static final String IMAGESNAPRENDERER_NEW_BITMAP = "a";
         // Inside IMAGESNAPRENDERER, Object is of type extending mediabryo and contains mKey
-        public static final String OBJECT_KEYHOLDERCLASS = "b"; //.prev ahZ
+        public static final String OBJECT_KEYHOLDERCLASS = "SY"; //.prev ahZ
         public static final String OBJECT_KEYHOLDER_KEY = "b"; //.prev ahZ
 
-        public static final String DECRYPTEDSNAPVIDEO_CLASS = "RG";//.prev UZ
-        public static final String CACHE_CLASS = "all";//.prev ahZ
+        public static final String DECRYPTEDSNAPVIDEO_CLASS = "Sh";//.prev UZ
+        public static final String CACHE_CLASS = "amh";//.prev ahZ
         public static final String CACHE_KEYTOITEMMAP = "b"; //.prev mKeyToItemMap
         public static final String CACHE_ITEM_PATH = "a";
         //ImagesnapRenderer.start()
@@ -122,7 +122,7 @@ public class Obfuscator {
         //ImageView instance in ImageSnapRenderer
         public static final String IMAGESNAPRENDERER_VAR_IMAGEVIEW = "a";//AspectMaintainedImageView!!
         //SnapImageBryo - JPEG_ENCODING_QUALITY
-        public static final String SNAPIMAGEBRYO_CLASS = "VC";
+        public static final String SNAPIMAGEBRYO_CLASS = "aph";//prev. VC
         //VideoSnapRenderer.start()
         public static final String VIDEOSNAPRENDERER_CLASS = "YK";
         //VideoSnapRenderer.show()
@@ -138,8 +138,8 @@ public class Obfuscator {
         //stories_mystoryoverlaysave_icon
         public static final String STORIES_MYOVERLAYSAVE_ICON = "0x7f02030e";
         // Get Username function of Friend Class
-        public static final String GET_FRIEND_USERNAME = "g";
-        public static final String CLASS_FRIEND_MINI_PROFILE_POPUP_FRAGMENT = "apU";//Prev com.snapchat.android.fragments.FriendMiniProfilePopupFragment
+        public static final String GET_FRIEND_USERNAME = "f";//prev. g
+        public static final String CLASS_FRIEND_MINI_PROFILE_POPUP_FRAGMENT = "aqT";//prev. com.snapchat.android.fragments.FriendMiniProfilePopupFragment
         // com.snapchat.android.fragments.FriendMiniProfilePopupFragment Friend Field
         public static final String FRIEND_MINI_PROFILE_POPUP_FRIEND_FIELD = "i";// Prev F
         // com.snapchat.android.fragments.FriendMiniProfilePopupFragement getCachedProfilePicutres method
@@ -175,7 +175,8 @@ public class Obfuscator {
         //Inside SnapPreviewFragment
         public static final String OBJECT_SNAP_EDITOR_VIEW = "b";
         //Inside SnapEditorView
-        public static final String OBJECT_MEDIABRYO = "r"; //.prev p
+        public static final String OBJECT_MEDIABRYO = "p"; //.prev p
+        public static final String CLASS_MEDIABRYO_VIDEO = "apx";//prev. VZ
         public static final String METHOD_GET_SENT_BITMAP = "a";
         //Inside MediaBryo
         public static final String OBJECT_MCLIENTID = "mClientId";
@@ -184,13 +185,14 @@ public class Obfuscator {
 
     }
     public class datasaving {
-        public static final String DSNAPDOWNLOADER_CLASS = "KL";
+        public static final String DSNAPDOWNLOADER_CLASS = "Df$a";//Prev. KL
         public static final String DSNAPDOWNLOADER_DOWNLOADSNAP = "a";
-        public static final String DOWNLOADREQUEST_CLASS = "com.snapchat.android.networkmanager.DownloadRequest";
+        public static final String DOWNLOADREQUEST_CLASS = "com.snapchat.android.app.shared.framework.network.manager";//prev. com.snapchat.android.networkmanager.DownloadRequest
         public static final String DYNAMICBYTEBUFFER_CLASS = "aku";
+        public static final String DOWNLOADREQUEST_HOLDER_CLASS = "Qq";
         public static final String NETWORKRESULT_CLASS = "Ae";
-        public static final String DSNAPDOWNLOAD_CLASS = "KP$a";
-        public static final String DSNAPDOWNLOAD_PARAM = "mp";
+        public static final String DSNAPDOWNLOAD_CLASS = "Df$a";//prev. KP$a
+        public static final String DSNAPDOWNLOAD_PARAM = "mz";//prev. mp
         public static final String DSNAPINTRODOWNLOAD_CLASS = "LR$1";
         public static final String LIVESTORYPRELOAD_CLASS = "ZO";
         public static final String LIVESTORYPRELOAD_METHOD = "H_";
@@ -206,30 +208,30 @@ public class Obfuscator {
         public static final String LOCATION_GETLOCATION = "c";
         public static final String WEATHER_CLASS = "Wa";
         public static final String WEATHER_FIRST = "avT";
-        public static final String BATTERY_FILTER = "UQ";
+        public static final String BATTERY_FILTER = "Pc";//prev. UQ
         public static final String BATTERY_FULL_ENUM = "FULL";
     }
     public class select {
         //SendToFragment class
         public static final String SENDTOFRAGMENT_CLASS = "com.snapchat.android.fragments.sendto.SendToFragment";
         //SendToFragment.AddToList()
-        public static final String SENDTOFRAGMENT_ADDTOLIST = "l";
+        public static final String SENDTOFRAGMENT_ADDTOLIST = "b";//prev. l
         //TopView instance variable in SendToFragment
-        public static final String SENDTOFRAGMENT_VAR_TOPVIEW = "e";
+        public static final String SENDTOFRAGMENT_VAR_TOPVIEW = "f";//prev. e
         //FriendHashSet instance variable in SendToFragment
-        public static final String SENDTOFRAGMENT_VAR_SET = "l";
+        public static final String SENDTOFRAGMENT_VAR_SET = "m";//prev. l
         //ArrayList instance variable in SendToFragment
-        public static final String SENDTOFRAGMENT_VAR_ARRAYLIST = "n";
+        public static final String SENDTOFRAGMENT_VAR_ARRAYLIST = "p";//prev n
         //SendToAdapter class
-        public static final String SENDTOADAPTER_CLASS = "OP";
+        public static final String SENDTOADAPTER_CLASS = "afe";//prev OP
         //List instance variable in SendToAdapter
-        public static final String SENDTOADAPTER_VAR_LIST = "e";
+        public static final String SENDTOADAPTER_VAR_LIST = "c";//prev e
         //Friend class
         public static final String FRIEND_CLASS = "com.snapchat.android.model.Friend";
         //PostToStory class
-        public static final String POSTTOSTORY_CLASS = "Vl";
+        public static final String POSTTOSTORY_CLASS = "aoZ";//prev. Vl
         //PostToVenue class
-        public static final String POSTTOVENUE_CLASS = "Vp";
+        public static final String POSTTOVENUE_CLASS = "apb";//prev. Vp
     }
     public class sharing {
         //cameraStateEvent class
@@ -248,9 +250,9 @@ public class Obfuscator {
     public class lens {
         public static final String LENSCLASS = "com.snapchat.android.model.lenses.Lens";
 
-        public static final String CLASS_LENSLIST_HOLDER = "aKF";
-        public static final String LENSCALLBACK_CLASS = "AN";
-        public static final String LENSCALLBACK_ONJSONRESULT_VAR2 = "Ae";
+        public static final String CLASS_LENSLIST_TYPE = "aLo";//.prev atz
+        public static final String LENSCALLBACK_CLASS = "BT";//.prev AN
+        public static final String LENSCALLBACK_ONJSONRESULT_VAR2 = "Qq";//.prev Ae
         //ScheduledLensesProvider class
         public static final String LENSESPROVIDER_CLASS = "wr";
         //getLenses()
@@ -271,22 +273,22 @@ public class Obfuscator {
     }
     public class filters {
         //FilterLoader class
-        public static final String LOADER_CLASS = "afM";
+        public static final String LOADER_CLASS = "axF";//prev. afM
         //FilterLoader First Param
-        public static final String LOADER_FIRST = "SP";
+        public static final String LOADER_FIRST = "amH";//prev. SP
         //added instance
-        public static final String FILTER_CLASS = "adG";
+        public static final String FILTER_CLASS = "avV";//prev. adG
         //called Object
-        public static final String OBJECT_CLASS = "afy";
+        public static final String OBJECT_CLASS = "awU";//prev. afy
         //onSnapCapturedEvent first param
-        public static final String CAPTURED_FIRST = "ajD";
+        public static final String CAPTURED_FIRST = "azW";//prev. ajD
         //public.xml - battery_view
-        public static final int BATTERY_VIEW = 2130968596;
+        public static final int BATTERY_VIEW = 2130968600;
         //public.xml - battery_icon
-        public static final int BATTERY_ICON = 2131689648;
+        public static final int BATTERY_ICON = 2131689687;
     }
     public class visualfilters {
-        public static final String FILTERS_CLASS = "afg";
+        public static final String FILTERS_CLASS = "Oz";//prev. afg
         public static final String FILTERSLOADER_CLASS = "afh";
         public static final String FILTERSLOADER_2_CLASS = "afn";
         public static final String SETFILTER_B_CLASS = "rA";
@@ -305,12 +307,12 @@ public class Obfuscator {
         public static final String TAKESNAPBUTTON_BLEAN1 = "c";
         public static final String TAKESNAPBUTTON_BLEAN2 = "e";
         public static final String TAKESNAPBUTTON_TIME = "b";
-        public static final String TAKESNAPBUTTON_X = "n";
-        public static final String TAKESNAPBUTTON_Y = "o";
+        public static final String TAKESNAPBUTTON_X = "o";//prev. n
+        public static final String TAKESNAPBUTTON_Y = "p";//prev. o
     }
     public class chat { //9.31.1.0
         public static final String CHAT_CLASS = "com.snapchat.android.model.chat.Chat";
-        public static final String CONVERSATION_CLASS = "com.snapchat.android.model.chat.ChatConversation";
+        public static final String CONVERSATION_CLASS = "Ig";//prev. com.snapchat.android.model.chat.ChatConversation
         public static final String CHATFEEDITEM_CLASS = "com.snapchat.android.model.chat.ChatFeedItem";
         public static final String CONVERSATION_LOADOLDCHATS = "a";
         public static final String MESSAGEVIEWHOLDER_CLASS = "com.snapchat.android.fragments.chat.MessageViewHolder";
@@ -318,9 +320,16 @@ public class Obfuscator {
         public static final String MESSAGEVIEWHOLDER_VAR1 = "G";
         public static final String MESSAGEVIEWHOLDER_VAR2 = "d";
         public static final String MESSAGEVIEWHOLDER_ISSAVED = "ax_";
-        public static final String MESSAGEVIEWHOLDER_ISFAILED = "N";
-        public static final String MESSAGEVIEWHOLDER_SAVE = "x";
-        public static final String CHATLAYOUT_CLASS = "Nd";
+        public static final String MESSAGEVIEWHOLDER_ISFAILED = "N_";//prev. N
+        public static final String MESSAGEVIEWHOLDER_SAVE = "e";//prev. x
+        public static final String CHATLAYOUT_CLASS = "Kc";//prev. Nd
+        public static final String BUS_CLASS = "com.squareup.otto";
+        public static final String CONVERSATION_VAR3 = "Ea";//prev. Vr
+        public static final String USERNAME_HOLDER_CLASS = "B";
+        public static final String HOLDER_USERNAME = "e";
+        public static final String SORTED_CHAT_LIST = "L";//prev. w
+        public static final String CHAT_FEED_ITEM = "Ii";//prev. Wv
+        public static final String CHAT_MEDIA_CLASS = "com.snapchat.android.app.feature.messaging.chat.model2.ChatMedia";
     }
     public class notification {
         public static final String NOTIFICATION_CLASS_1 = "vz";
@@ -340,22 +349,22 @@ public class Obfuscator {
         //public static final String DISCOVERSTORY_CLASS = "aay"; new story type "featured?" TODO: look into it
     }
     public class groups {
-        public static final String STORY_CLASS = "Vp";
-        public static final String STORYARRAY_CLASS = "Zx";
+        public static final String STORY_CLASS = "apb";//prev. Vp
+        public static final String STORYARRAY_CLASS = "ase";//prev. Zx
         public static final String STORYARRAY_METHOD = "a";
-        public static final String STORYSECTION_CLASS = "OP";
-        public static final String INTERFACE = "BS";
-        public static final String GETFRIENDMANAGER_METHOD = "e";
-        public static final String GETUSERNAME_METHOD = "g";
+        public static final String STORYSECTION_CLASS = "afe";//prev. OP
+        public static final String INTERFACE = "Ml";//prev. BS
+        public static final String GETFRIENDMANAGER_METHOD = "h";//prev. e
+        public static final String GETUSERNAME_METHOD = "d";//prev. g
     }
     public class bus {
         public static final String UPDATEEVENT_CLASS = "Ds";
-        public static final String GETBUS_CLASS = "RX";
+        public static final String GETBUS_CLASS = "aju";//prev. RX
         public static final String GETBUS_METHOD = "a";
         public static final String BUS_POST = "a";
     }
     public class navbar {
-        public static final String FORCENAVBAR_CLASS = "SM";
+        public static final String FORCENAVBAR_CLASS = "aMV"; // prev. SM
         public static final String FORCENAVBAR_METHOD = "a";
     }
     public class paint{
@@ -363,20 +372,24 @@ public class Obfuscator {
     }
     public class flash {
         public static final String ISVISIBLE_FIELD = "mIsVisible";
-        public static final String SWIPELAYOUT_FIELD = "n";
-        public static final String GETRESID_METHOD = "e";
+        public static final String SWIPELAYOUT_FIELD = "p";//prev. n
+        public static final String GETRESID_OBJECT = "g";//prev. e
         public static final String ISSCROLLED_METHOD = "c";
-        public static final String KEYEVENT_CLASS = "CX";
+        public static final String KEYEVENT_CLASS = "Xk";//prev. CX
         public static final String KEYCODE_FIELD = "a";
-        public static final String FLASH_METHOD = "b";
-        public static final String OVERLAY_FIELD = "y";
+        public static final String FLASH_METHOD = "a";//prev. b
+        public static final String OVERLAY_FIELD = "z";//prev. y
     }
     public class friendmojis {
-        public static final String ON_FRIENDS_UPDATE_METHOD = "w";
+        public static final String ON_FRIENDS_UPDATE_METHOD = "u";//prev. w
         public static final String FRIEND_MANAGER_CLASS = "com.snapchat.android.model.FriendManager";
         public static final String FRIENDS_MAP_FIELD = "mOutgoingFriendsListMap";
         public static final String GET_VALUES_METHOD = "b";
-        public static final String IS_IT_ME_METHOD = "k";
-        public static final String GET_FRIENDMOJI_STRING_METHOD = "o";
+        public static final String IS_IT_ME_METHOD = "n";//prev. k
+        public static final String GET_FRIENDMOJI_STRING_METHOD = "q";//Prev. o
+    }
+    public class misc {
+        public static final String CAPTIONVIEW = "UA";
+        public static final String CAPTIONVIEW_TEXT_LIMITER = "d";
     }
 }

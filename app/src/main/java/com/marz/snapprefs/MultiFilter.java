@@ -49,7 +49,7 @@ public class MultiFilter {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (((boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, "nowPlaying"))) {
                     MotionEvent event = (MotionEvent) param.args[0];
-                    View view = (View) callMethod(param.thisObject, "d");
+                    View view = (View) callMethod(param.thisObject, "c");//prev. d
                     if (event.getRawY() > view.getHeight()/2) {
                         param.setResult(true);
                         NowPlaying.changeLayout();
@@ -68,8 +68,10 @@ public class MultiFilter {
                         return;
                     }
                     Object elObj = XposedHelpers.newInstance(el, param.args[1]);
+                    //TODO Get battery_view id
                     View view = (View) XposedHelpers.callMethod(param.args[1], "a", new Class[]{int.class, ViewGroup.class, boolean.class}, Obfuscator.filters.BATTERY_VIEW, null, false); //battery_view 2130968587
                     XposedHelpers.setObjectField(elObj, "a", view);
+                    //TODO get battery_icon id
                     ImageView image = (ImageView) XposedHelpers.callMethod(view, "findViewById", Obfuscator.filters.BATTERY_ICON);
                     image.setImageBitmap(NowPlaying.getBitmap());
                     image.setTranslationY(0);
@@ -97,8 +99,10 @@ public class MultiFilter {
             return;
         }
         Object elObj = XposedHelpers.newInstance(el, param.args[1]);
+        //TODO Get battery_view id
         View view = (View) XposedHelpers.callMethod(param.args[1], "a", new Class[]{int.class, ViewGroup.class, boolean.class}, Obfuscator.filters.BATTERY_VIEW, null, false); //battery_view 2130968587
         XposedHelpers.setObjectField(elObj, "a", view);
+        //TODO get battery_icon id
         ImageView image = (ImageView) XposedHelpers.callMethod(view, "findViewById", Obfuscator.filters.BATTERY_ICON); //"Battery" - battery_icon
         image.setImageBitmap(bitmap);
         image.setTranslationY(0);
