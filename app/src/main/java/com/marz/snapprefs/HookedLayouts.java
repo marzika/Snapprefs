@@ -78,7 +78,7 @@ public class HookedLayouts {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 TableLayout navigation =
-                        (TableLayout) ((LinearLayout) XposedHelpers.getObjectField(param.thisObject, "C")).getChildAt(0);
+                        (TableLayout) ((LinearLayout) XposedHelpers.getObjectField(param.thisObject, "z")).getChildAt(0);//prev. C
                 ImageView orig =
                         (ImageView) ((TableRow) navigation.getChildAt(0)).getChildAt(0);
                 TextView orig1 =
@@ -93,6 +93,7 @@ public class HookedLayouts {
                 textView.setText("Open Snapprefs");
                 textView.setTextColor(orig1.getCurrentTextColor());
                 textView.setTextSize(24);
+
                 textView.setLayoutParams(orig1.getLayoutParams());
                 row.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -291,6 +292,7 @@ public class HookedLayouts {
         });
     }
 
+    //TODO refresh button position when preference is changed
     public static void refreshButtonPreferences() {
         int horizontalPosition = Preferences.getBool(Prefs.BUTTON_POSITION) ? Gravity.START : Gravity.END;
         final FrameLayout.LayoutParams layoutParams =
@@ -311,7 +313,6 @@ public class HookedLayouts {
 
             HookedLayouts.saveStoryButton.setLayoutParams(layoutParams);
         }
-
     }
 
     public static void addIcons(XC_InitPackageResources.InitPackageResourcesParam resparam,
@@ -460,7 +461,8 @@ public class HookedLayouts {
                     outerOptionsLayout.setVisibility(View.GONE);
             }
         };
-        findAndHookMethod("com.snapchat.android.analytics.ui.StickerPickerAnalytics", lpparam.classLoader, "a", hideLayout);
+        findAndHookMethod("com.snapchat.android.analytics.ui.StickerPickerAnalytics", lpparam.classLoader, "b", hideLayout);//prev. a
+        //TODO Find the new representation of this method
         findAndHookMethod("com.snapchat.android.ui.caption.SnapCaptionView", lpparam.classLoader, "a", boolean.class, hideLayout);
     }
 
@@ -531,7 +533,6 @@ public class HookedLayouts {
 
                                         @Override
                                         public void onColorSelected(int color) {
-                                            // TODO Auto-generated method stub
                                             HookMethods.editText.setTextColor(color);
                                         }
                                     });
@@ -539,7 +540,6 @@ public class HookedLayouts {
 
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int which) {
-                                    // TODO Auto-generated method stub
                                     HookMethods.editText.setTextColor(Color.WHITE);
                                     HookMethods.editText.setAlpha(1);
                                 }
@@ -561,12 +561,10 @@ public class HookedLayouts {
 
                                 @Override
                                 public void onStartTrackingTouch(SeekBar arg0) {
-                                    // TODO Auto-generated method stub
                                 }
 
                                 @Override
                                 public void onStopTrackingTouch(SeekBar arg0) {
-                                    // TODO Auto-generated method stub
                                 }
 
                             });

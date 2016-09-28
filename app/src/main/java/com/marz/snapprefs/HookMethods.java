@@ -350,6 +350,7 @@ public class HookMethods
                         }
                     });
 
+                    //Gabe is a douche
                     // COMPLETED 9.39.5
                     final Class<?> receivedSnapClass =
                             findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
@@ -407,6 +408,7 @@ public class HookMethods
                         }
                     });
 
+                    //This is all Gabe's fault
                     // FatCaptionEditText was moved from an inner-class to a separate class in 8.1.0
                     // TODO Find below class - ENTIRE PACKAGE REFACTORED
                     String fatCaptionEditTextClassName =
@@ -493,6 +495,7 @@ public class HookMethods
 
     private void addFilter(LoadPackageParam lpparam) {
         //Replaces the batteryfilter with our custom one
+        //Pedro broke this part - He didn't really.
         findAndHookMethod(ImageView.class, "setImageResource", int.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) {
