@@ -288,12 +288,12 @@ public class Obfuscator {
     public class visualfilters {
         public static final String FILTERS_CLASS = "On";//prev. afg
         public static final String FILTERSLOADER_CLASS = "awB";//prev. afh
-        public static final String FILTERSLOADER_2_CLASS = "afn";
+        public static final String FILTERSLOADER_2_CLASS = "awH";//prev. afn
         public static final String SETFILTER_B_CLASS = "sK";//prev. rA
         public static final String GREYSCALE_CLASS = "axc";//prev. afJ
         public static final String ADDFILTER_CLASS = "axd";//prev. afK
         public static final String ADDFILTER_PARAM = "axa";//prev. afH
-        public static final String ADDER_3_PARAM = "afn"; //TODO: find this
+        public static final String ADDER_3_PARAM = "awH";
         public static final String ADDER_CLASS = "awC"; //prev. afi
         public static final String ADDER_PARAM = "awL"; //prev afr
         public static final String SNAPCHAPTUREDEVENT_CLASS = "azW";//prev. ajD

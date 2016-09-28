@@ -116,7 +116,7 @@ public class VisualFilters {
 
     public static void initVisualFilters(final XC_LoadPackage.LoadPackageParam lpparam){
         setPreferences();
-        XposedHelpers.findAndHookMethod(Obfuscator.visualfilters.ANNOTATEDMEDIABRYO, lpparam.classLoader, "d", XposedHelpers.findClass(Obfuscator.save.SENT_CLASS, lpparam.classLoader), new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod(Obfuscator.visualfilters.FILTERMETRICSPROVIDER_CLASS, lpparam.classLoader, "d", XposedHelpers.findClass(Obfuscator.visualfilters.ANNOTATEDMEDIABRYO, lpparam.classLoader), new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 if (param.hasThrowable()) {
@@ -139,7 +139,6 @@ public class VisualFilters {
             }
         });
         //change getName method of filters
-        //prev. afo
         findAndHookMethod(Obfuscator.visualfilters.VISUALFILTERBASE, lpparam.classLoader, "a", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -215,7 +214,7 @@ public class VisualFilters {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (context == null) {
-                    context = (Context) XposedHelpers.getObjectField(param.thisObject, "g");
+                    context = (Context) XposedHelpers.getObjectField(param.thisObject, "b");
                 }
             }
         });
@@ -267,8 +266,8 @@ public class VisualFilters {
             }
         });
         //title nullifier
-        //prev. e
-        findAndHookMethod(Obfuscator.visualfilters.FILTERSLOADER_CLASS, lpparam.classLoader, "e", new XC_MethodHook() {
+
+        findAndHookMethod(Obfuscator.visualfilters.FILTERSLOADER_CLASS, lpparam.classLoader, "d", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (XposedHelpers.getAdditionalInstanceField(param.thisObject, FILTER_TITLE) != null) {
@@ -279,7 +278,7 @@ public class VisualFilters {
             }
         });
         //title fade out
-        //prev. h
+
         findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, "g", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -290,7 +289,7 @@ public class VisualFilters {
             }
         });
         //title animation reset
-        //prev. i
+
         findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, "h", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
