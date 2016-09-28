@@ -201,14 +201,15 @@ public class Obfuscator {
     }
     public class spoofing {
         //SpeedometerView class
-        public static final String SPEEDOMETERVIEW_CLASS = "adL";
+        public static final String SPEEDOMETERVIEW_CLASS = "awa";
         //SpeedometerView.setSpeed(Float)
         public static final String SPEEDOMETERVIEW_SETSPEED = "a";
-        public static final String LOCATION_CLASS = "Up";
-        public static final String LOCATION_GETLOCATION = "c";
-        public static final String WEATHER_CLASS = "Wa";
-        public static final String WEATHER_FIRST = "avT";
-        public static final String BATTERY_FILTER = "Pc";//prev. UQ
+        public static final String LOCATION_CLASS = "Rm";
+        public static final String LOCATION_GETLOCATION = "a";
+        public static final String LOCATION_GETLOCATION_PARAM = "Rl";
+        public static final String WEATHER_CLASS = "apy";
+        public static final String WEATHER_FIRST = "aPd";
+        public static final String BATTERY_FILTER = "Pc";
         public static final String BATTERY_FULL_ENUM = "FULL";
     }
     public class select {
@@ -235,17 +236,13 @@ public class Obfuscator {
     }
     public class sharing {
         //cameraStateEvent class
-        public static final String CAMERASTATEEVENT_CLASS = "ajd";
+        public static final String CAMERASTATEEVENT_CLASS = "azr";
         //snapCapturedEvent class
         public static final String SNAPCAPTUREDEVENT_CLASS = "bhv"; //prev. bhv, bfy ->from LandingPageActivity$8
         //snapCaptureContext class
         public static final String SNAPCAPTURECONTEXT_CLASS = "com.snapchat.android.util.eventbus.SnapCaptureContext";
-        //BusProvider class
-        public static final String BUSPROVIDER_CLASS = "bey";
-        //BussProvider.returnBus()
-        public static final String BUSPROVIDER_RETURNBUS = "a";
         //aa_chat_camera_upload
-        public static final String UPLOAD_ICON = "0x7f020022";
+        public static final String UPLOAD_ICON = "0x7f02001a";
     }
     public class lens {
         public static final String LENSCLASS = "com.snapchat.android.model.lenses.Lens";
