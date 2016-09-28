@@ -285,18 +285,23 @@ public class Obfuscator {
         public static final int BATTERY_ICON = 2131689687;
     }
     public class visualfilters {
-        public static final String FILTERS_CLASS = "Oz";//prev. afg
-        public static final String FILTERSLOADER_CLASS = "afh";
-        public static final String FILTERSLOADER_2_CLASS = "afn";
-        public static final String SETFILTER_B_CLASS = "rA";
-        public static final String GREYSCALE_CLASS = "afJ";
-        public static final String ADDFILTER_CLASS = "afK";
-        public static final String ADDFILTER_PARAM = "afH";
-        public static final String ADDER_3_PARAM = "afn"; //TODO: find this
-        public static final String ADDER_CLASS = "afi"; //TODO: find this
-        public static final String ADDER_PARAM = "afr";
-        public static final String SNAPCHAPTUREDEVENT_CLASS = "ajD";
-        public static final String FILTERMETRICSPROVIDER_CLASS = "wg";
+        public static final String FILTERS_CLASS = "On";//prev. afg
+        public static final String FILTERSLOADER_CLASS = "awB";
+        public static final String FILTERSLOADER_2_CLASS = "awH";
+        public static final String SETFILTER_B_CLASS = "sK";
+        public static final String GREYSCALE_CLASS = "axc";
+        public static final String ADDFILTER_CLASS = "axd";
+        public static final String ADDFILTER_PARAM = "axa";
+        public static final String ADDER_3_PARAM = "awH"; //TODO: find this
+        public static final String ADDER_CLASS = "awC"; //TODO: find this
+        public static final String ADDER_PARAM = "awL";
+        public static final String SNAPCHAPTUREDEVENT_CLASS = "azW";
+        public static final String FILTERMETRICSPROVIDER_CLASS = "yo";
+        public static final String ANNOTATEDMEDIABRYO = "com.snapchat.android.model.AnnotatedMediabryo";
+        public static final String VISUALFILTERBASE = "awI";
+        public static final String FILTER_GETVIEW = "c";
+        public static final String BRYO_SNAPTYPE = "com.snapchat.android.app.feature.messaging.chat.type.SnapType";
+        public static final String VISUALFILTER_TYPE = "com.snapchat.android.app.shared.feature.preview.model.filter.VisualFilterType";
     }
     public class timer {
         public static final String TAKESNAPBUTTON_CLASS = "com.snapchat.android.ui.camera.TakeSnapButton";
