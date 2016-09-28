@@ -33,7 +33,7 @@ public class MainTabFragment extends Fragment {
         viewPager = (ViewPager) x.findViewById(R.id.viewpager);
 
         /**
-         *Set an Apater for the View Pager
+         *Set an Adapter for the View Pager
          */
         viewPager.setAdapter(new MyAdapter(getChildFragmentManager()));
 

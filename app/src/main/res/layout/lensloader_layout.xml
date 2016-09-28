@@ -159,6 +159,6 @@
         android:background="@drawable/border"
         android:checked="true"
         android:padding="10dp"
-        android:text="Lens Auto Enable" />
+        android:text="Enable Lenses When Collected" />
 
 </RelativeLayout>

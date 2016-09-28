@@ -16,15 +16,6 @@ package com.marz.snapprefs.Util;
  * limitations under the License.
  */
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
 
 /**
  * <p>Operations on {@link java.lang.String} that are

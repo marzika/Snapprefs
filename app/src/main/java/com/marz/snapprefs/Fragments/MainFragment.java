@@ -3,7 +3,6 @@ package com.marz.snapprefs.Fragments;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -36,7 +35,7 @@ public class MainFragment extends Fragment {
                     Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SL45E99ZBUUCQ"));
                     startActivity(myIntent);
                 } catch (ActivityNotFoundException e) {
-                    Toast.makeText(getActivity().getApplicationContext(), "No application can handle this request." + " Please install a webbrowser", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity().getApplicationContext(), "No application can handle this request." + " Please install a web browser", Toast.LENGTH_LONG).show();
                     e.printStackTrace();
                 }
             }

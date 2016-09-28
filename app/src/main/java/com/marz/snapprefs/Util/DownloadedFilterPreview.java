@@ -106,7 +106,7 @@ public class DownloadedFilterPreview extends Activity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         FileUtils.deleteSDFile(toDelete);
-                        Toast.makeText(getApplication(), "Succesfully deleted " + toDelete.getName(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplication(), "Successfully deleted " + toDelete.getName(), Toast.LENGTH_SHORT).show();
                         dialog.cancel();
                         DownloadedFiltersFragment.buttonReload.performClick();
                         finish();

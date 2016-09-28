@@ -266,7 +266,7 @@ public class Preferences {
     /**
      * This method should be used exclusively in the Snapprefs threads - Not on a snapchat thread
      *
-     * @param deviceId
+     * @param deviceId The ID of the device
      * @return
      */
     public static int getLicenceUsingID(String deviceId) {
