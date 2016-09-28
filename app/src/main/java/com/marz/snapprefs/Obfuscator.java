@@ -292,8 +292,8 @@ public class Obfuscator {
         public static final String GREYSCALE_CLASS = "axc";
         public static final String ADDFILTER_CLASS = "axd";
         public static final String ADDFILTER_PARAM = "axa";
-        public static final String ADDER_3_PARAM = "awH"; //TODO: find this
-        public static final String ADDER_CLASS = "awC"; //TODO: find this
+        public static final String ADDER_3_PARAM = "awH";
+        public static final String ADDER_CLASS = "awC";
         public static final String ADDER_PARAM = "awL";
         public static final String SNAPCHAPTUREDEVENT_CLASS = "azW";
         public static final String FILTERMETRICSPROVIDER_CLASS = "yo";
