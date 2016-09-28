@@ -266,7 +266,7 @@ public class Obfuscator {
         //read()
         public static final String ASSETREADER_READ = "a";
         //SVG class
-        public static final String SVG_CLASS = "gZ";
+        public static final String SVG_CLASS = "hc";//prev gZ
     }
     public class filters {
         //FilterLoader class
