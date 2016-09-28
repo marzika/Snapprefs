@@ -51,7 +51,7 @@ public class HookSendList {
                 selectAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean set) {
-                        Object hopefullySendToAdapter = getObjectField(param.thisObject, "f");
+                        Object hopefullySendToAdapter = getObjectField(param.thisObject, "g");
                         Logger.log("getBool(Prefs.SELECT_ALL): We have the ArrayAdapter", true);
                         final String adaptersType = getParameterTypes(new Object[]{hopefullySendToAdapter})[0].getCanonicalName();
                         final boolean isSendToAdapter = adaptersType.equals(Obfuscator.select.SENDTOADAPTER_CLASS);

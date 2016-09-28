@@ -72,7 +72,7 @@ public class Saving {
              * Called whenever a video is decrypted by snapchat
              * Will pre-load the next snap in the list
              */
-        //UPDATED METHOD & CONTENT
+            // UPDATED METHOD & CONTENT 9.39.5
             findAndHookConstructor(Obfuscator.save.DECRYPTEDSNAPVIDEO_CLASS, cl, findClass(
                     Obfuscator.save.CACHE_CLASS, cl), String.class, Bitmap.class, String.class, long.class,
                     new XC_MethodHook() {
@@ -93,7 +93,7 @@ public class Saving {
             /**
              * Called whenever a bitmap is set to the view (I believe)
              */
-            // UPDATED METHOD & CONTENT
+            // UPDATED METHOD & CONTENT 9.39.5
             findAndHookMethod(Obfuscator.save.IMAGESNAPRENDERER_CLASS2, cl, Obfuscator.save.IMAGESNAPRENDERER_NEW_BITMAP, Bitmap.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -108,7 +108,7 @@ public class Saving {
             /**
              * Called every time a snap is viewed - Quite reliable
              */
-        // UPDATED METHOD & CONTENT
+        // UPDATED METHOD & CONTENT 9.39.5
             findAndHookMethod(Obfuscator.save.RECEIVEDSNAP_CLASS, cl, Obfuscator.save
                     .RECEIVEDSNAP_BEING_SEEN, boolean.class, new XC_MethodHook() {
                 @Override
@@ -129,8 +129,8 @@ public class Saving {
                 }
             });
 
-            // UPDATED METHOD & CONTENT
-            findAndHookMethod(Obfuscator.save.SNAPPREVIEWFRAGMENT_CLASS, lpparam.classLoader, Obfuscator.save.SNAPPREVIEWFRAGMENT_METHOD1, new XC_MethodHook() {
+            // UPDATED METHOD & CONTENT 9.39.5
+            findAndHookMethod(Obfuscator.save.SNAPPREVIEWFRAGMENT_CLASS, lpparam.classLoader, Obfuscator.save.SNAPPREVIEWFRAGMENT_METHOD1, boolean.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     try {
@@ -147,7 +147,7 @@ public class Saving {
              * our limit and hide the counter if we need it.
              */
 
-            // UPDATED METHOD & CONTENT
+            // UPDATED METHOD & CONTENT 9.39.5
             findAndHookMethod(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader, Obfuscator.save.RECEIVEDSNAP_DISPLAYTIME, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -191,7 +191,7 @@ public class Saving {
                 });
             }
             //List<Bitmap> a = this.i.a(this.F.g(), ProfileImageSize.MEDIUM);
-            // UPDATED METHOD & CONTENT
+            // UPDATED METHOD & CONTENT 9.39.5
             findAndHookMethod(Obfuscator.save.CLASS_FRIEND_MINI_PROFILE_POPUP_FRAGMENT, lpparam.classLoader, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_GET_CACHED_PROFILE_PICTURES, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
@@ -243,7 +243,7 @@ public class Saving {
         } catch (Exception e) {
             Logger.log("Error occured: Snapprefs doesn't currently support this version, wait for an update", e);
 
-            findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.LANDINGPAGEACTIVITY_CLASS, lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Toast.makeText((Context) param.thisObject, "This version of snapchat is currently not supported by Snapprefs.", Toast.LENGTH_LONG)
                             .show();
@@ -252,7 +252,7 @@ public class Saving {
         }
     }
 
-    // UPDATED
+    // UPDATED 9.39.5
     public static void handleSentSnap(Object snapPreviewFragment, Context snapContext) {
         try {
             Logger.printTitle("Handling SENT snap");
@@ -287,7 +287,7 @@ public class Saving {
             Logger.printMessage("Saving with filename: " + filename);
             Logger.printMessage("MediaBryo Type: " + bryoName);
 
-            if (bryoName.equals("VZ")) {
+            if (bryoName.equals(Obfuscator.save.CLASS_MEDIABRYO_VIDEO)) {
                 Logger.printMessage("Media Type: VIDEO");
                 Uri uri = (Uri) getObjectField(mediaBryo, Obfuscator.save.OBJECT_MVIDEOURI);
 
@@ -312,7 +312,7 @@ public class Saving {
                     response = saveSnap(SnapType.SENT, MediaType.VIDEO,
                             snapContext, null, videoStream, filename, null);
                 }
-            } else if (bryoName.equals("VC")) {
+            } else if (bryoName.equals(Obfuscator.save.SNAPIMAGEBRYO_CLASS)) {
                 Logger.printMessage("Media Type: IMAGE");
                 Bitmap bmp = (Bitmap) callMethod(snapEditorView, Obfuscator.save.METHOD_GET_SENT_BITMAP, activity, true);
                 if (bmp != null) {
@@ -429,7 +429,7 @@ public class Saving {
         }
     }
 
-    //UPDATED
+    //UPDATED to 9.39.5
     private static void handleSnapHeader(Context context, Object receivedSnap) throws Exception {
         Logger.printTitle("Handling SnapData HEADER");
         Logger.printMessage("Header object: " + receivedSnap.getClass().getCanonicalName());
@@ -508,13 +508,13 @@ public class Saving {
      * @param param
      * @throws Exception
      */
-    // UPDATED METHOD
+    // UPDATED METHOD 9.39.5
     private static void handleVideoPayload(Context context, XC_MethodHook.MethodHookParam param)
             throws Exception {
 
         Logger.printTitle("Handling VIDEO Payload");
 
-        // Grab the MediaCache - Class: ahJ
+        // Grab the MediaCache - Class: ahm
         Object mCache = param.args[0];
 
         if (mCache == null) {
@@ -522,7 +522,7 @@ public class Saving {
             return;
         }
 
-        // Grab the MediaKey - Variable: ahJ.mKey
+        // Grab the MediaKey - Variable: ahm.mKey
         String mKey = (String) param.args[1];
 
         if (mKey == null) {
@@ -620,7 +620,7 @@ public class Saving {
      * @param param
      * @throws Exception
      */
-    // UPDATED TO LATEST
+    // UPDATED TO LATEST 9.39.5
     public static void handleImagePayload(Context context, XC_MethodHook.MethodHookParam param)
             throws Exception {
         Logger.printTitle("Handling IMAGE Payload");
