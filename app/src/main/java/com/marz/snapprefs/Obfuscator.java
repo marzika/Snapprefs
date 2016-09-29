@@ -257,6 +257,8 @@ public class Obfuscator {
 
         public static final String LENSPREPARESTATECHANGE = "com.snapchat.android.util.eventbus.LensPrepareStateChangedEvent";
         public static final String STATECHANGEPREPARESTATUSENUM = LENSPREPARESTATECHANGE + "$PrepareStatus";
+        public static final String AUTHENTICATION_CLASS = "arS";//prev. Zq
+        public static final String SIGNITURE_CHECK_METHOD = "a";
     }
     public class stickers {
         //FastZippedAssetReader class
