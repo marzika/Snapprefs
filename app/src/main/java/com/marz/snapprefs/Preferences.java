@@ -449,7 +449,7 @@ public class Preferences {
         SAVEMODE_STORY("pref_key_save_story", SAVE_AUTO),
         TOAST_LENGTH("pref_key_toasts_duration", TOAST_LENGTH_LONG),
         TIMER_MINIMUM("pref_key_timer_minimum", TIMER_MINIMUM_DISABLED),
-        FORCE_NAVBAR("pref_key_force_navbar", 0),
+        FORCE_NAVBAR("pref_key_forcenavbar", 0),
         CUSTOM_FILTER_TYPE("pref_key_filter_type", 0),
         LICENCE(DEVICE_ID.key, 0),
         ROTATION_MODE("pref_rotation", Common.ROTATION_CW),
