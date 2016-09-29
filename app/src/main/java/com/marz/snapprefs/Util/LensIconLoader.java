@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.marz.snapprefs.Fragments.LensesFragment;
 import com.marz.snapprefs.Logger;
+import com.marz.snapprefs.MainActivity;
 import com.marz.snapprefs.Preferences;
 
 import java.io.File;
@@ -77,6 +78,13 @@ public class LensIconLoader {
 
         Bitmap bmp = getBitmapFromURL(url, 1);
         SavingUtils.savePNGAsync(iconFile, bmp, context, false);
+
+
+        File nomediaFile = new File( Preferences.getSavePath(), "/LensIcon/.nomedia");
+
+        if( !nomediaFile.exists() )
+            MainActivity.writeNoMediaFile(Preferences.getSavePath() + "/LensIcon/");
+
         return bmp;
     }
 
