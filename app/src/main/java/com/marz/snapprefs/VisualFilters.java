@@ -172,7 +172,7 @@ public class VisualFilters {
                     if (XposedHelpers.getAdditionalInstanceField(afh, FILTER_TYPE) != null) return;
                     Class<?> afn = lpparam.classLoader.loadClass(Obfuscator.visualfilters.FILTERSLOADER_2_CLASS);
                     Class<?> afi = lpparam.classLoader.loadClass(Obfuscator.visualfilters.ADDER_CLASS);
-                    Object grey = XposedHelpers.callStaticMethod(lpparam.classLoader.loadClass("com.snapchat.android.app.shared.model.filter.VisualFilterType"), "valueOf", "GREYSCALE");
+                    Object grey = XposedHelpers.callStaticMethod(lpparam.classLoader.loadClass(Obfuscator.visualfilters.VISUALFILTER_TYPE), "valueOf", "GREYSCALE");
                     if (afn.isInstance(afh)) {
                         Object visualFilterType = XposedHelpers.getObjectField(afh, "b");
                         if (visualFilterType == grey) {
@@ -181,7 +181,7 @@ public class VisualFilters {
                                 if(added.contains(fType.toString())){
                                     continue;
                                 }
-                                Object filter = XposedHelpers.newInstance(lpparam.classLoader.loadClass(Obfuscator.visualfilters.ADDER_3_PARAM), new Class[]{lpparam.classLoader.loadClass("com.snapchat.android.app.shared.model.filter.VisualFilterType")}, grey);
+                                Object filter = XposedHelpers.newInstance(lpparam.classLoader.loadClass(Obfuscator.visualfilters.ADDER_3_PARAM), new Class[]{lpparam.classLoader.loadClass(Obfuscator.visualfilters.VISUALFILTER_TYPE)}, grey);
                                 XposedHelpers.setAdditionalInstanceField(filter, FILTER_TYPE, fType);
                                 Object wrapper = XposedHelpers.newInstance(fk, new Class[]{lpparam.classLoader.loadClass(Obfuscator.visualfilters.FILTERS_CLASS)}, filter);
                                 XposedHelpers.callMethod(param.thisObject, "a", wrapper);
@@ -231,6 +231,7 @@ public class VisualFilters {
             }
         });
         //Add filter title
+
         findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, Obfuscator.visualfilters.FILTER_GETVIEW, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -265,6 +266,7 @@ public class VisualFilters {
             }
         });
         //title nullifier
+
         findAndHookMethod(Obfuscator.visualfilters.FILTERSLOADER_CLASS, lpparam.classLoader, "d", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -276,6 +278,7 @@ public class VisualFilters {
             }
         });
         //title fade out
+
         findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, "g", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -286,6 +289,7 @@ public class VisualFilters {
             }
         });
         //title animation reset
+
         findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, "h", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -296,6 +300,7 @@ public class VisualFilters {
                 }
             }
         });
+        //Updated 9.39.5
         findAndHookMethod(Obfuscator.save.LANDINGPAGEACTIVITY_CLASS, lpparam.classLoader, "onSnapCapturedEvent", findClass(Obfuscator.visualfilters.SNAPCHAPTUREDEVENT_CLASS, lpparam.classLoader), new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
