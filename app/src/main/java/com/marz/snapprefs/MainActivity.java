@@ -396,7 +396,7 @@ public class MainActivity extends AppCompatActivity {
      * @param directoryPath The full path to the directory to place the .nomedia file
      * @return Returns true if the file was successfully written or appears to already exist
      */
-    public boolean writeNoMediaFile(String directoryPath) {
+    public static boolean writeNoMediaFile(String directoryPath) {
         String storageState = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(storageState)) {
             try {
