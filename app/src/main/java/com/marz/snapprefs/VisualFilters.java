@@ -172,7 +172,7 @@ public class VisualFilters {
                     if (XposedHelpers.getAdditionalInstanceField(afh, FILTER_TYPE) != null) return;
                     Class<?> afn = lpparam.classLoader.loadClass(Obfuscator.visualfilters.FILTERSLOADER_2_CLASS);
                     Class<?> afi = lpparam.classLoader.loadClass(Obfuscator.visualfilters.ADDER_CLASS);
-                    Object grey = XposedHelpers.callStaticMethod(lpparam.classLoader.loadClass("com.snapchat.android.app.shared.model.filter.VisualFilterType"), "valueOf", "GREYSCALE");
+                    Object grey = XposedHelpers.callStaticMethod(lpparam.classLoader.loadClass("com.snapchat.android.app.shared.feature.preview.model.filter.VisualFilterType"), "valueOf", "GREYSCALE");
                     if (afn.isInstance(afh)) {
                         Object visualFilterType = XposedHelpers.getObjectField(afh, "b");
                         if (visualFilterType == grey) {

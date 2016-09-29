@@ -150,14 +150,14 @@ public class HookedLayouts {
         });
     }
 
-    public static void addShareIcon(XC_InitPackageResources.InitPackageResourcesParam resparam) {
+    public static void addShareIcon(final XC_InitPackageResources.InitPackageResourcesParam resparam) {
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "camera_preview", new XC_LayoutInflated() {
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
                 final RelativeLayout relativeLayout =
                         (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("camera_preview_layout", "id", Common.PACKAGE_SNAP));
-                final RelativeLayout.LayoutParams layoutParams =
-                        new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("camera_take_snap_button", "id", Common.PACKAGE_SNAP)).getLayoutParams());
-
+                //final RelativeLayout.LayoutParams lParams =
+                //        new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("camera_take_snap_button", "id", Common.PACKAGE_SNAP)).getLayoutParams());
+                final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams((int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP)), (int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP)));
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 layoutParams.rightMargin = px(50);
                 layoutParams.topMargin = -px(12);
@@ -461,7 +461,7 @@ public class HookedLayouts {
                     outerOptionsLayout.setVisibility(View.GONE);
             }
         };
-        findAndHookMethod("com.snapchat.android.analytics.ui.StickerPickerAnalytics", lpparam.classLoader, "b", hideLayout);//prev. a
+        findAndHookMethod("com.snapchat.android.app.shared.analytics.ui.StickerPickerAnalytics", lpparam.classLoader, "b", hideLayout);//prev. a
         //TODO Find the new representation of this method - DONE?
         findAndHookMethod("TX", lpparam.classLoader, "c", hideLayout);
     }

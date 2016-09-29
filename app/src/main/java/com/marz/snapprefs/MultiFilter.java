@@ -47,17 +47,22 @@ public class MultiFilter {
         findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, "a", MotionEvent.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                if (((boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, "nowPlaying"))) {
-                    MotionEvent event = (MotionEvent) param.args[0];
-                    View view = (View) callMethod(param.thisObject, "c");//prev. d
-                    if (event.getRawY() > view.getHeight()/2) {
-                        param.setResult(true);
-                        NowPlaying.changeLayout();
-                        view.invalidate();
+                try {
+                    if (((boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, "nowPlaying"))) {
+                        MotionEvent event = (MotionEvent) param.args[0];
+                        View view = (View) callMethod(param.thisObject, "c");//prev. d
+                        if (event.getRawY() > view.getHeight()/2) {
+                            param.setResult(true);
+                            NowPlaying.changeLayout();
+                            view.invalidate();
+                        }
+                    }
+                } catch (NullPointerException e) {
+                        //ignore, click doesn't happens on the NowPlaying filter
                     }
                 }
             }
-        });
+        );
         findAndHookMethod(Obfuscator.filters.LOADER_CLASS, lpparam.classLoader, "a", Context.class, findClass(Obfuscator.filters.LOADER_FIRST, lpparam.classLoader), new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {

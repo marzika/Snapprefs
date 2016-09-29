@@ -92,7 +92,7 @@ public class Obfuscator {
         public static final String CHAT_GETTIMESTAMP = "S";
         //.model.chat.StatefulChatFeedItem
         //StatefulChatFeedItem.getSender()
-        public static final String STATEFULCHATFEEDITEM_GETSENDER = "i";
+        public static final String STATEFULCHATFEEDITEM_GETSENDER = "m";
         //ScreenshotDetector class -> datetaken
         public static final String SCREENSHOTDETECTOR_CLASS = "Tk";//prev. Zm
         //ScreenshotDetector.run(List)
@@ -155,7 +155,7 @@ public class Obfuscator {
         public static final String METHOD_SNAPTIMERVIEW_ONDRAW = "onDraw";
 
         // StoryTimerView class
-        public static final String CLASS_STORY_TIMER_VIEW = "com.snapchat.framework.ui.views.ConcentricTimerView"; //Prev com.snapchat.android.ui.StoryTimerView
+        public static final String CLASS_STORY_TIMER_VIEW = "com.snapchat.android.framework.ui.views.ConcentricTimerView"; //Prev com.snapchat.android.ui.StoryTimerView
         public static final String METHOD_STORYTIMERVIEW_ONDRAW = "onDraw";
 
         // TextureVideoView
@@ -270,7 +270,7 @@ public class Obfuscator {
     }
     public class filters {
         //FilterLoader class
-        public static final String LOADER_CLASS = "axF";//prev. afM
+        public static final String LOADER_CLASS = "axf";//prev. afM
         //FilterLoader First Param
         public static final String LOADER_FIRST = "amH";//prev. SP
         //added instance
@@ -312,20 +312,21 @@ public class Obfuscator {
         public static final String TAKESNAPBUTTON_X = "o";//prev. n
         public static final String TAKESNAPBUTTON_Y = "p";//prev. o
     }
-    public class chat { //9.31.1.0
-        public static final String CHAT_CLASS = "com.snapchat.android.model.chat.Chat";
+    public class chat {
+        public static final String CHAT_CLASS = "Ie";
         public static final String CONVERSATION_CLASS = "Ig";//prev. com.snapchat.android.model.chat.ChatConversation
         public static final String CHATFEEDITEM_CLASS = "com.snapchat.android.model.chat.ChatFeedItem";
         public static final String CONVERSATION_LOADOLDCHATS = "a";
-        public static final String MESSAGEVIEWHOLDER_CLASS = "com.snapchat.android.fragments.chat.MessageViewHolder";
+        public static final String MESSAGEVIEWHOLDER_CLASS = "com.snapchat.android.app.feature.messaging.chat.impl.viewholder.MessageViewHolder";
         public static final String MESSAGEVIEWHOLDER_METHOD = "b";
-        public static final String MESSAGEVIEWHOLDER_VAR1 = "G";
+        public static final String MESSAGEVIEWHOLDER_VAR1 = "z";
         public static final String MESSAGEVIEWHOLDER_VAR2 = "d";
-        public static final String MESSAGEVIEWHOLDER_ISSAVED = "ax_";
+        public static final String MESSAGEVIEWHOLDER_ISSAVED = "E_";
         public static final String MESSAGEVIEWHOLDER_ISFAILED = "N_";//prev. N
         public static final String MESSAGEVIEWHOLDER_SAVE = "e";//prev. x
         public static final String CHATLAYOUT_CLASS = "Kc";//prev. Nd
-        public static final String BUS_CLASS = "com.squareup.otto";
+        public static final String CHATLAYOUT_INSTANTIATEITEM = "instantiateItem";//prev. Nd
+        public static final String BUS_CLASS = "com.squareup.otto.Bus";
         public static final String CONVERSATION_VAR3 = "Ea";//prev. Vr
         public static final String USERNAME_HOLDER_CLASS = "B";
         public static final String HOLDER_USERNAME = "e";
@@ -343,11 +344,17 @@ public class Obfuscator {
         public static final String RECORDING_VIDEO = "h";
     }
     public class stories {
-        public static final String RECENTSTORY_CLASS = "Qp";
-        public static final String ALLSTORY_CLASS = "PT";
+        public static final String RECENTSTORY_CLASS = "ahd";
+        public static final String RECENTSTORY_GETUSERNAME = "d";
+        public static final String ALLSTORY_CLASS = "agD";
+        public static final String ALLSTORY_GETFRIEND = "h";
         public static final String LIVESTORY_CLASS = "aaF";
         public static final String DISCOVERSTORY_CLASS = "Le";
         public static final String STORYLIST = "g";
+        public static final String RECENTSTORIES_CLASS = "com.snapchat.android.fragments.stories.StoriesFragment";
+        public static final String STORIES_FRAGMENT_POPULATEARRAY = "c";
+        public static final String FRIENDMANAGER_CLASS = "com.snapchat.android.model.FriendManager";
+        public static final String FRIENDMANAGER_RETURNINSTANCE = "h";
         //public static final String DISCOVERSTORY_CLASS = "aay"; new story type "featured?" TODO: look into it
     }
     public class groups {
@@ -370,7 +377,7 @@ public class Obfuscator {
         public static final String FORCENAVBAR_METHOD = "a";
     }
     public class paint{
-        public static final String LEGACYCANVASVIEW_A = "BZ";
+        public static final String LEGACYCANVASVIEW_A = "OF";
     }
     public class flash {
         public static final String ISVISIBLE_FIELD = "mIsVisible";
