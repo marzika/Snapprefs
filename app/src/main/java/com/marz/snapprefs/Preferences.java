@@ -370,7 +370,7 @@ public class Preferences {
         // FORMAT: PREF_NAME("pref_key", defaultvalue)
         // Default value cannot be null as it's used to determine the preference type
         // You could add a third TYPE field which you can use to check against in the InitialiseListener method
-        CUSTOM_FILTER("pref_key_force_navbar", false),
+        CUSTOM_FILTER("pref_key_custom_filter_checkbox", false),
         PAINT_TOOLS("pref_key_paint_checkbox", true),
         MULTI_FILTER("pref_key_multi_filter_checkbox", true),
         TIMER_UNLIMITED("pref_key_timer_unlimited", true),
@@ -449,7 +449,7 @@ public class Preferences {
         SAVEMODE_STORY("pref_key_save_story", SAVE_AUTO),
         TOAST_LENGTH("pref_key_toasts_duration", TOAST_LENGTH_LONG),
         TIMER_MINIMUM("pref_key_timer_minimum", TIMER_MINIMUM_DISABLED),
-        FORCE_NAVBAR("pref_key_force_navbar", 0),
+        FORCE_NAVBAR("pref_key_forcenavbar", 0),
         CUSTOM_FILTER_TYPE("pref_key_filter_type", 0),
         LICENCE(DEVICE_ID.key, 0),
         ROTATION_MODE("pref_rotation", Common.ROTATION_CW),
