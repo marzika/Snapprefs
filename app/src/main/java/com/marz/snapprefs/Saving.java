@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.SnapData.FlagState;
+import com.marz.snapprefs.Util.CommonUtils;
 import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.NotificationUtils.ToastType;
 import com.marz.snapprefs.Util.SavingUtils;
@@ -22,6 +23,8 @@ import com.marz.snapprefs.Util.SavingUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -199,12 +202,6 @@ public class Saving {
                     mini_profile_snapcode.setOnLongClickListener(new View.OnLongClickListener() {
                         @Override
                         public boolean onLongClick(View v) {
-                            final File profileImagesFolder = new File(Preferences.getSavePath(), "ProfileImages/");
-                            if(!profileImagesFolder.exists() && !profileImagesFolder.mkdirs()){
-                                Logger.log("Error creating profile images folder");
-                                return false;
-                            }
-
                             // ProfileImageUtils$ProfileImageSize inner class
                             Class<?> profileImageSizeClass = findClass(Obfuscator.save.PROFILE_IMAGE_UTILS_PROFILE_IMAGE_SIZE_INNER_CLASS, lpparam.classLoader);
                             // F
@@ -217,7 +214,27 @@ public class Saving {
                             Object i = getObjectField(param.thisObject, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_FRIENDS_PROFILE_IMAGES_CACHE);
                             //^.a(F.g(), ProfileImageSize.MEDIUM)
                             List<Bitmap> profileImages = (List<Bitmap>) callMethod(i, Obfuscator.save.PROFILE_IMAGES_CACHE_GET_PROFILE_IMAGES, new Class[]{String.class, profileImageSizeClass}, username, MEDIUM);
-                            Logger.log("First Three Letters Of Username: " + username.substring(0, 3) + "\nInner Class: " + profileImageSizeClass + "\nFriend Object: " + friendObject + "\nUsername: " + username + "\nMedium: " + MEDIUM + "\n 'i' Object: " + i + "profileImages: " + profileImages);
+                            String filePath = SavingUtils.generateFilePath("ProfileImages", username);
+                            if(Preferences.getBool(Prefs.DEBUGGING)) {
+                                Logger.printTitle("Profile Image Saving Debug Information");
+                                Logger.printMessage("Profile Image Size Inner Class: " + profileImageSizeClass);
+                                Logger.printMessage("friendObject: " + friendObject);
+                                Logger.printMessage("Medium: " + MEDIUM);
+                                Logger.printMessage("'i' Object: " + i);
+                                Logger.printMessage("profileImages List Object: " + profileImages);
+                                Logger.printFilledRow();
+
+                                Logger.printTitle("Profile Image Saving Save Path Debug Information");
+                                Logger.printMessage("Sort by Category Pref: " + Preferences.getBool(Prefs.SORT_BY_CATEGORY));
+                                Logger.printMessage("Sort by Username Pref: " + Preferences.getBool(Prefs.SORT_BY_USERNAME));
+                                Logger.printMessage("File Path: " + filePath);
+                                Logger.printFilledRow();
+                            }
+                            final File profileImagesFolder = new File(filePath);
+                            if(!profileImagesFolder.mkdirs() && !profileImagesFolder.exists() ){
+                                Logger.log("Error creating ProfileImages and/or Username folder");
+                                return false;
+                            }
 
                             if(profileImages == null) {
                                 SavingUtils.vibrate(HookMethods.context, false);
@@ -226,9 +243,23 @@ public class Saving {
                             }
                             int succCounter = 0;
                             int sizeOfProfileImages = profileImages.size();
-                            for (int iter = 0; iter < sizeOfProfileImages; iter++) {
-                                File f = new File(profileImagesFolder, username + "-" + iter + ".jpg");
-                                if(SavingUtils.saveJPG(f, profileImages.get(iter), HookMethods.context)) {
+                            for (int iterator = 0; iterator < sizeOfProfileImages; iterator++) {
+                                Bitmap bmp = profileImages.get(iterator);
+                                File f = null;
+                                try {
+                                    f = new File(profileImagesFolder, username + "-" + iterator + "-" + CommonUtils.sha256(bmp) + ".jpg");
+                                } catch (NoSuchAlgorithmException e) {
+                                    e.printStackTrace();
+                                }
+                                if(f == null) {
+                                    NotificationUtils.showStatefulMessage("File f is null!", ToastType.BAD, lpparam.classLoader);
+                                    return false;
+                                }
+                                if(f.exists()) {
+                                    NotificationUtils.showStatefulMessage("Profile Images already Exist.", ToastType.BAD, lpparam.classLoader);
+                                    return true;
+                                }
+                                if(SavingUtils.saveJPG(f, profileImages.get(iterator), HookMethods.context)) {
                                     succCounter++;
                                 }
                             }

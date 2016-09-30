@@ -36,7 +36,7 @@ public class Stories {
 
     static void initStories(final XC_LoadPackage.LoadPackageParam lpparam) {
         readBlockedList();
-        findAndHookMethod("com.snapchat.android.fragments.stories.StoriesFragment", lpparam.classLoader, "D", new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.stories.RECENTSTORIES_CLASS, lpparam.classLoader, Obfuscator.stories.STORIES_FRAGMENT_POPULATEARRAY, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 ArrayList f = (ArrayList) XposedHelpers.getObjectField(param.thisObject, Obfuscator.stories.STORYLIST);
@@ -53,7 +53,7 @@ public class Stories {
                 for (int i = f.size() - 1; i >= 0; i--) {
                     Object o = f.get(i);
                     if (o.getClass() == recentStory && Preferences.getBool(Prefs.HIDE_PEOPLE)) {
-                        String username = (String) XposedHelpers.callMethod(o, "b");
+                        String username = (String) XposedHelpers.callMethod(o, Obfuscator.stories.RECENTSTORY_GETUSERNAME);
                         for (String person : peopleToHide) {
                             if (username.equals(person)) {
                                 Logger.log("removing from recents" + username);
@@ -61,8 +61,8 @@ public class Stories {
                             }
                         }
                     } else if (o.getClass() == allStory && Preferences.getBool(Prefs.HIDE_PEOPLE)) {
-                        Object friend = XposedHelpers.callMethod(o, "h");
-                        String username = (String) XposedHelpers.callMethod(friend, "g");
+                        Object friend = XposedHelpers.callMethod(o, Obfuscator.stories.ALLSTORY_GETFRIEND);
+                        String username = (String) XposedHelpers.callMethod(friend, Obfuscator.save.GET_FRIEND_USERNAME);
                         for (String person : peopleToHide) {
                             if (username.equals(person)) {
                                 Logger.log("removing " + username);
@@ -83,11 +83,11 @@ public class Stories {
     }
 
     private static void readFriendList(ClassLoader classLoader) {
-        final Object friendManager = XposedHelpers.callStaticMethod(XposedHelpers.findClass("com.snapchat.android.model.FriendManager", classLoader), "e");
+        final Object friendManager = XposedHelpers.callStaticMethod(XposedHelpers.findClass(Obfuscator.stories.FRIENDMANAGER_CLASS, classLoader), Obfuscator.stories.FRIENDMANAGER_RETURNINSTANCE);
         List friends = (List) XposedHelpers.getObjectField(XposedHelpers.getObjectField(friendManager, "mOutgoingFriendsListMap"), "mList");
         friendList.clear();
         for (int i = 0; i <= friends.size() - 1; i++) {
-            String username = (String) XposedHelpers.callMethod(friends.get(i), "g");
+            String username = (String) XposedHelpers.callMethod(friends.get(i), Obfuscator.save.GET_FRIEND_USERNAME);
             if (peopleToHide.contains(username)) {
                 friendList.add(new Friend(username, true));
             } else {

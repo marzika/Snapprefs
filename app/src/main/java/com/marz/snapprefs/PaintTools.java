@@ -238,7 +238,7 @@ public class PaintTools {
             @Override
             protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
                 if (!once){
-                    View colorPickerView = (View) getObjectField(param.thisObject, "i");
+                    View colorPickerView = (View) getObjectField(param.thisObject, "j");
                     outerOptionsLayout = new RelativeLayout(HookMethods.SnapContext);
                     final GridView innerOptionsView = new GridView(HookMethods.SnapContext);
                     innerOptionsView.setAdapter(new OptionsAdapter(HookMethods.SnapContext, mResources));

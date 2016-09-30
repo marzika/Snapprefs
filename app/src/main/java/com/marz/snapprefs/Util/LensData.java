@@ -9,7 +9,7 @@ import com.marz.snapprefs.Databases.LensDatabaseHelper.LensEntry;
  */
 public class LensData {
     public String mCode;
-    public String mGplayIapId;
+    //public String mGplayIapId;
     public String mHintId;
     //public Map<String, String> mHintTranslations;
     public String mIconLink;
@@ -29,7 +29,7 @@ public class LensData {
     {
         ContentValues contentValues = new ContentValues();
         contentValues.put(LensEntry.COLUMN_NAME_MCODE, mCode);
-        contentValues.put(LensEntry.COLUMN_NAME_GPLAYID, mGplayIapId);
+        //contentValues.put(LensEntry.COLUMN_NAME_GPLAYID, mGplayIapId);
         contentValues.put(LensEntry.COLUMN_NAME_MHINTID, mHintId);
         contentValues.put(LensEntry.COLUMN_NAME_MICONLINK, mIconLink);
         contentValues.put(LensEntry.COLUMN_NAME_MID, mId);

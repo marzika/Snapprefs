@@ -376,7 +376,7 @@ public class HookMethods
                     if (Preferences.getBool(Prefs.CAPTION_UNLIMITED_VANILLA)) {
                         // New unlimited captions function
                         // COMPLETED 9.39.5
-                        XposedHelpers.findAndHookMethod(Obfuscator.misc.CAPTIONVIEW, lpparam.classLoader, Obfuscator.misc.CAPTIONVIEW_TEXT_LIMITER, Integer.class, new XC_MethodHook() {
+                        XposedHelpers.findAndHookMethod(Obfuscator.misc.CAPTIONVIEW, lpparam.classLoader, Obfuscator.misc.CAPTIONVIEW_TEXT_LIMITER, int.class, new XC_MethodHook() {
                             @Override
                             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                                 param.args[0] = 999999999;
@@ -581,7 +581,7 @@ public class HookMethods
     public void getEditText(LoadPackageParam lpparam) {
         //TODO Find below hook - ENTIRE PACKAGE REFACTOR
         this.CaptionEditText =
-                XposedHelpers.findClass("com.snapchat.android.ui.caption.CaptionEditText", lpparam.classLoader);
+                XposedHelpers.findClass("com.snapchat.android.app.shared.ui.caption.SnapCaptionView", lpparam.classLoader);
         XposedBridge.hookAllConstructors(this.CaptionEditText, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param)

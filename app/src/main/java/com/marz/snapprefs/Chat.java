@@ -224,7 +224,7 @@ public class Chat {
                 chatMediaArr[0] = param.args[0];
             }
         });
-        findAndHookMethod(Obfuscator.chat.CHATLAYOUT_CLASS, lpparam.classLoader, "a", ViewGroup.class, int.class, new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.chat.CHATLAYOUT_CLASS, lpparam.classLoader, Obfuscator.chat.CHATLAYOUT_INSTANTIATEITEM, ViewGroup.class, int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 List chatMediaList = (List) getObjectField(param.thisObject, "a");
@@ -240,7 +240,7 @@ public class Chat {
                     @Override
                     public boolean onLongClick(View v) {
                         Logger.log("----------------------- SNAPPREFS ------------------------", false);
-                        Logger.log("Long press on chat image detected");
+                        Logger.log("Button press on chat image detected");
 
                         Bitmap chatImage = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
                         Logger.log("We have the chat image", true);
@@ -277,7 +277,7 @@ public class Chat {
             }
         });
         final Class<?> TextureVideoView = findClass("com.snapchat.opera.shared.view.TextureVideoView", lpparam.classLoader);
-        final Class<?> CenterCropTextureVideoView = findClass("com.snapchat.android.ui.chat.ChatVideoFullScreenView", lpparam.classLoader);
+        final Class<?> CenterCropTextureVideoView = findClass("com.snapchat.android.app.feature.messaging.chat.view2.ChatVideoFullScreenView", lpparam.classLoader);
         hookAllConstructors(CenterCropTextureVideoView, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
