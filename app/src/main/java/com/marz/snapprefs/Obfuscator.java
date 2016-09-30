@@ -193,9 +193,9 @@ public class Obfuscator {
         public static final String NETWORKRESULT_CLASS = "Ae";
         public static final String DSNAPDOWNLOAD_CLASS = "Df$a";//prev. KP$a
         public static final String DSNAPDOWNLOAD_PARAM = "mz";//prev. mp
-        public static final String DSNAPINTRODOWNLOAD_CLASS = "LR$1";
-        public static final String LIVESTORYPRELOAD_CLASS = "ZO";
-        public static final String LIVESTORYPRELOAD_METHOD = "H_";
+        public static final String DSNAPINTRODOWNLOAD_CLASS = "Df$a";
+        public static final String LIVESTORYPRELOAD_CLASS = "asx";
+        public static final String LIVESTORYPRELOAD_METHOD = "d";
         public static final String STORYPRELOAD_CLASS = "aaF";
         public static final String STORYPRELOAD_METHOD = "H_";
     }
