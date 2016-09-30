@@ -165,7 +165,7 @@ public class Lens {
     public static Object buildModifiedLens(LensData lensData) {
         Object lens = newInstance(LensClass, lensData.mId, lensData.mCode, enumScheduledType, lensData.mIconLink, null);
         setObjectField(lens, "mHintId", lensData.mHintId);
-        setObjectField(lens, "mGplayIapId", lensData.mGplayIapId);
+        //setObjectField(lens, "mGplayIapId", lensData.mGplayIapId);
         setObjectField(lens, "mIsBackSection", false);
         setObjectField(lens, "mIsFeatured", true);
         setObjectField(lens, "mIsLoading", true);
@@ -185,7 +185,7 @@ public class Lens {
         LensData lensData = new LensData();
         lensData.mId = (String) getObjectField(lens, "mId");
         lensData.mCode = (String) getObjectField(lens, "mCode");
-        lensData.mGplayIapId = (String) getObjectField(lens, "mGplayIapId");
+        //lensData.mGplayIapId = (String) getObjectField(lens, "mGplayIapId");
         lensData.mHintId = (String) getObjectField(lens, "mHintId");
         //lensData.mHintTranslations = (Map<String, String>) getObjectField(lens, "mHintTranslations");
         lensData.mIconLink = (String) getObjectField(lens, "mIconLink");
