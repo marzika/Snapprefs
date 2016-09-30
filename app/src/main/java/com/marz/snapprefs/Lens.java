@@ -28,6 +28,7 @@ public class Lens {
     public static Class PrepareStatus;
     public static Class LensClass;
     public static Object enumScheduledType;
+    public static Object enumSelfieLens;
     public static Class lensListTypeClass;
     public static HashMap<String, LensData> lensDataMap = new HashMap<>();
 
@@ -38,6 +39,8 @@ public class Lens {
         lensListTypeClass = findClass(Obfuscator.lens.CLASS_LENSLIST_TYPE, lpparam.classLoader);
         Class TypeClass = findClass(Obfuscator.lens.LENSCLASS + "$Type", lpparam.classLoader);
         enumScheduledType = getStaticObjectField(TypeClass, "SCHEDULED");
+        Class LensCategoryClass = findClass("com.looksery.sdk.domain.Category", lpparam.classLoader);
+        enumSelfieLens = getStaticObjectField(LensCategoryClass, "SELFIE");
 
         if (MainActivity.lensDBHelper == null)
             MainActivity.lensDBHelper = new LensDatabaseHelper(snapContext);
@@ -163,7 +166,9 @@ public class Lens {
     }
 
     public static Object buildModifiedLens(LensData lensData) {
-        Object lens = newInstance(LensClass, lensData.mId, lensData.mCode, enumScheduledType, lensData.mIconLink, null);
+        ArrayList mCategory = new ArrayList();
+        mCategory.add(enumSelfieLens);
+        Object lens = newInstance(LensClass, lensData.mId, lensData.mCode, enumScheduledType, lensData.mIconLink, null, mCategory);
         setObjectField(lens, "mHintId", lensData.mHintId);
         //setObjectField(lens, "mGplayIapId", lensData.mGplayIapId);
         setObjectField(lens, "mIsBackSection", false);
