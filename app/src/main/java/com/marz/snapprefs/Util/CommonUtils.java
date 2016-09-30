@@ -25,12 +25,14 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.widget.Toast;
 
 import com.marz.snapprefs.R;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -160,6 +162,20 @@ public class CommonUtils {
         md.update(input.getBytes("UTF-8")); // Change this to "UTF-16" if needed
         byte[] digest = md.digest();
         return String.format("%064x", new java.math.BigInteger(1, digest));
+    }
+
+    // Based off of http://stackoverflow.com/questions/15158651/generate-a-md5-sum-from-an-android-bitmap-object
+    public static String sha256(Bitmap bmp) throws NoSuchAlgorithmException{
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] bitmapBytes = baos.toByteArray();
+        MessageDigest digest = MessageDigest.getInstance("SHA256");
+        byte [] hashedBmp = digest.digest(bitmapBytes);
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i  = 0; i < 10; i++) {
+            stringBuilder.append(Integer.toString((hashedBmp[i] & 0xff) + 0x100, 16).substring(1));
+        }
+        return stringBuilder.toString();
     }
 
 }
