@@ -3,6 +3,8 @@ package com.marz.snapprefs;
 import android.content.Context;
 import android.content.res.XModuleResources;
 
+import java.util.List;
+
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
@@ -29,12 +31,13 @@ public class Premium {
 
     static void initTyping(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
         //TODO Check function and types
-        findAndHookMethod(Obfuscator.chat.CONVERSATION_CLASS, lpparam.classLoader, "f", boolean.class, XC_MethodReplacement.DO_NOTHING);
-        findAndHookMethod(Obfuscator.chat.CONVERSATION_CLASS, lpparam.classLoader, "c", boolean.class, XC_MethodReplacement.DO_NOTHING);
+        findAndHookMethod(Obfuscator.chat.ISTYPING_CLASS, lpparam.classLoader, Obfuscator.chat.ISTYPING_METHOD, String.class, List.class, XC_MethodReplacement.DO_NOTHING);
+        //prev. c
+        findAndHookMethod(Obfuscator.chat.CONVERSATION_CLASS, lpparam.classLoader, "t", XC_MethodReplacement.DO_NOTHING);
     }
 
     static void initViewed(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
         Class<?> recievedSnap = findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader);
-        findAndHookMethod(Obfuscator.save.USER_CLASS, lpparam.classLoader, "a", recievedSnap, XC_MethodReplacement.DO_NOTHING);
+        findAndHookMethod(Obfuscator.premium.SNAP_UPDATE_CLASS, lpparam.classLoader, "a", recievedSnap, XC_MethodReplacement.DO_NOTHING);
     }
 }

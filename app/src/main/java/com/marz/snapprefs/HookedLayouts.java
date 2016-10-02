@@ -160,7 +160,7 @@ public class HookedLayouts {
                 final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams((int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP)), (int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP)));
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                 layoutParams.rightMargin = px(50);
-                layoutParams.topMargin = -px(12);
+                layoutParams.topMargin = px(12);
                 upload = new ImageButton(HookMethods.SnapContext);
                 upload.setLayoutParams(layoutParams);
                 upload.setBackgroundColor(0);

@@ -19,11 +19,11 @@ import com.marz.snapprefs.Util.CommonUtils;
 import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.NotificationUtils.ToastType;
 import com.marz.snapprefs.Util.SavingUtils;
+import com.marz.snapprefs.Util.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
@@ -60,6 +61,7 @@ public class Saving {
     private static Context relativeContext;
     //TODO implement user selected save mode
     private static boolean asyncSaveMode = true;
+    private static Class storyClass;
 
     static void initSaving(final XC_LoadPackage.LoadPackageParam lpparam,
                            final XModuleResources modRes, final Context snapContext) {
@@ -71,6 +73,8 @@ public class Saving {
         try {
             ClassLoader cl = lpparam.classLoader;
 
+            storyClass = findClass(Obfuscator.save.STORYSNAP_CLASS, cl);
+            
             /**
              * Called whenever a video is decrypted by snapchat
              * Will pre-load the next snap in the list
@@ -93,6 +97,25 @@ public class Saving {
                         }
                     });
 
+            // Potential video saving system
+            findAndHookMethod("arh$a", lpparam.classLoader, "a", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    Logger.log("Doing something? ");
+                    Object arh = param.getResult();
+                    Logger.log("arh String: " + getObjectField(arh, "d"));
+                    Logger.log("BItmap? " + (getObjectField(arh, "f") != null ));
+                }
+            });
+            findAndHookMethod("gz", lpparam.classLoader, "a", Bitmap.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+
+                    Logger.log("Doing shit twith the image? " + param.getClass().getCanonicalName());
+                }
+            });
             /**
              * Called whenever a bitmap is set to the view (I believe)
              */
@@ -108,6 +131,14 @@ public class Saving {
                 }
             });
 
+            findAndHookMethod("awx", lpparam.classLoader, "onStart", findClass("awo", lpparam.classLoader), new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    Logger.log("Starting shit bruh");
+                }
+            });
+
             /**
              * Called every time a snap is viewed - Quite reliable
              */
@@ -120,6 +151,7 @@ public class Saving {
 
                     boolean isBeingViewed = (boolean) param.args[0];
 
+                    Logger.log("Viewing snap: " + isBeingViewed);
                     if (isBeingViewed) {
                         Object obj = param.thisObject;
 
@@ -132,6 +164,51 @@ public class Saving {
                 }
             });
 
+            findAndHookMethod("atz$2", lpparam.classLoader, "onStart", findClass("awo", lpparam.classLoader), new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    Logger.log("More testing");
+                }
+            });
+
+            findAndHookMethod("Sc", lpparam.classLoader, "isLoaded", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+
+                    boolean isLoaded = (boolean) param.getResult();
+
+                    if( isLoaded && param.thisObject.getClass().getCanonicalName().equals(Obfuscator.save.STORYSNAP_CLASS) )
+                    {
+                        try {
+                        handleSnapHeader(snapContext, param.thisObject);
+                        } catch (Exception e) {
+                            Logger.log("Exception handling STORY HEADER\n" + e.getMessage());
+                        }
+                    }
+                }
+            });
+            XposedHelpers.findAndHookMethod("com.snapchat.android.stories.ui.ExplorerStorySnapView", lpparam.classLoader, "onStartViewingSnap", XposedHelpers.findClass("Sd", lpparam.classLoader), new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+
+                    Object obj1 = getObjectField(param.thisObject, "e");
+                    Object obj2 = getObjectField(obj1, "C");
+
+                    Logger.log("Getting snap class1: " + obj1.getClass().getCanonicalName());
+                    Logger.log("Getting snap class2: " + obj2.getClass().getCanonicalName());
+                }
+            });
+
+            findAndHookMethod("Sc", lpparam.classLoader, "b", long.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    Logger.log("I think it had been viewed");
+                }
+            });
             // UPDATED METHOD & CONTENT 9.39.5
             findAndHookMethod(Obfuscator.save.SNAPPREVIEWFRAGMENT_CLASS, lpparam.classLoader, Obfuscator.save.SNAPPREVIEWFRAGMENT_METHOD1, boolean.class, new XC_MethodHook() {
                 @Override
@@ -561,7 +638,8 @@ public class Saving {
             return;
         }
 
-        Logger.printMessage("Key: " + mKey);
+        String parsedKey = StringUtils.parseVideoKey(mKey);
+        Logger.printMessage("Key: " + parsedKey);
 
         // Grab the Key to Item Map (Contains file paths)
         @SuppressWarnings("unchecked")
@@ -604,12 +682,8 @@ public class Saving {
         } else
             Logger.printMessage("Path: " + mAbsoluteFilePath);
 
-        // Split the mKey as story videos are post-fixed with an extra code
-        if (mKey.contains("#"))
-            mKey = mKey.split("#")[0];
-
         // Get the snapdata associated with the mKey above
-        SnapData snapData = hashSnapData.get(mKey);
+        SnapData snapData = hashSnapData.get(parsedKey);
 
         // Print the snapdata's current flags
         printFlags(snapData);
@@ -621,8 +695,8 @@ public class Saving {
         } else if (snapData == null) {
             // If the snapdata doesn't exist, create a new one with the provided mKey
             Logger.printMessage("No SnapData found for Payload... Creating new");
-            snapData = new SnapData(mKey);
-            hashSnapData.put(mKey, snapData);
+            snapData = new SnapData(parsedKey);
+            hashSnapData.put(parsedKey, snapData);
             Logger.printMessage("Hash Size: " + hashSnapData.size());
         }
 
@@ -658,9 +732,9 @@ public class Saving {
         Logger.printMessage("Getting Bitmap");
 
         // Class: ahZ - holds the mKey for the payload
-        Object obj = getObjectField(param.thisObject, Obfuscator.save.OBJECT_KEYHOLDERCLASS);
+        Object keyholder = getObjectField(param.thisObject, Obfuscator.save.OBJECT_KEYHOLDERCLASSOBJECT);
         // Get the mKey out of ahZ
-        String mKey = (String) getObjectField(obj, Obfuscator.save.OBJECT_KEYHOLDER_KEY);
+        String mKey = (String) getObjectField(keyholder, Obfuscator.save.OBJECT_KEYHOLDER_KEY);
         Logger.printMessage("Key: " + mKey);
 
         // Find the snapData associated with the mKey

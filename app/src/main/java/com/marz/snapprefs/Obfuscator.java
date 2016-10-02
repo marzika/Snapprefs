@@ -110,7 +110,7 @@ public class Obfuscator {
         public static final String IMAGESNAPRENDERER_CLASS2 = IMAGESNAPRENDERER_CLASS + "$1";
         public static final String IMAGESNAPRENDERER_NEW_BITMAP = "a";
         // Inside IMAGESNAPRENDERER, Object is of type extending mediabryo and contains mKey
-        public static final String OBJECT_KEYHOLDERCLASS = "SY"; //.prev ahZ
+        public static final String OBJECT_KEYHOLDERCLASSOBJECT = "b"; //.prev b
         public static final String OBJECT_KEYHOLDER_KEY = "b"; //.prev ahZ
 
         public static final String DECRYPTEDSNAPVIDEO_CLASS = "Sh";//.prev UZ
@@ -336,10 +336,12 @@ public class Obfuscator {
         public static final String SORTED_CHAT_LIST = "L";//prev. w
         public static final String CHAT_FEED_ITEM = "Ii";//prev. Wv
         public static final String CHAT_MEDIA_CLASS = "com.snapchat.android.app.feature.messaging.chat.model2.ChatMedia";
+        public static final String ISTYPING_CLASS = "FI";
+        public static final String ISTYPING_METHOD = "a";
     }
     public class notification {
-        public static final String NOTIFICATION_CLASS_1 = "vz";
-        public static final String NOTIFICATION_CLASS_2 = "ajh";
+        public static final String NOTIFICATION_CLASS_1 = "xH";//prev. vz
+        public static final String NOTIFICATION_CLASS_2 = "azz";//prev. ajh
     }
     public class icons {
         public static final String ICON_HANDLER_CLASS = "Em";
@@ -403,5 +405,8 @@ public class Obfuscator {
     public class misc {
         public static final String CAPTIONVIEW = "UA";
         public static final String CAPTIONVIEW_TEXT_LIMITER = "d";
+    }
+    public class premium {
+        public static final String SNAP_UPDATE_CLASS = "zT";
     }
 }
