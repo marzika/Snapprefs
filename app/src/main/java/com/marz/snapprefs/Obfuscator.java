@@ -405,6 +405,8 @@ public class Obfuscator {
     public class misc {
         public static final String CAPTIONVIEW = "UA";
         public static final String CAPTIONVIEW_TEXT_LIMITER = "d";
+        public static final String PREFERENCES_CLASS = "SU";
+        public static final String GETUSERNAME_METHOD = "C";
     }
     public class premium {
         public static final String SNAP_UPDATE_CLASS = "zT";

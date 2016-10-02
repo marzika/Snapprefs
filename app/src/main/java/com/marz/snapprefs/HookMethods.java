@@ -522,6 +522,11 @@ public class HookMethods
         }
     }
 
+    public static String getSCUsername(ClassLoader cl)
+    {
+        Object scPreferenceHandler = findClass(Obfuscator.misc.PREFERENCES_CLASS, cl);
+        return (String) callMethod(scPreferenceHandler, Obfuscator.misc.GETUSERNAME_METHOD);
+    }
 
     private void addFilter(LoadPackageParam lpparam) {
         //Replaces the batteryfilter with our custom one

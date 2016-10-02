@@ -74,7 +74,7 @@ public class Saving {
             ClassLoader cl = lpparam.classLoader;
 
             storyClass = findClass(Obfuscator.save.STORYSNAP_CLASS, cl);
-            
+
             /**
              * Called whenever a video is decrypted by snapchat
              * Will pre-load the next snap in the list
@@ -97,8 +97,53 @@ public class Saving {
                         }
                     });
 
+            /*findAndHookMethod("abJ", lpparam.classLoader, "a", storyClass, boolean.class, new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+
+                    Object PO = param.args[0];
+                    Logger.log("What's this for: " + param.args[1]);
+
+                    Log.d("snapprefs", "Starting system");
+                    if( PO != null )
+                    {
+                        String mId = (String) getObjectField(PO, "mId");
+                        Log.d("snapprefs", "mId: " + mId);
+                        Object mediaCache = getObjectField(param.thisObject, "b");
+
+                        if( mediaCache == null )
+                            Log.d("snapprefs", "Null Cache");
+
+                        Map<String, ?> map = (Map<String, ?>) getObjectField(mediaCache, "d");
+
+                        Log.d("snapprefs", "CacheSize: " + map.size());
+
+                        for( Object obj : map.keySet() )
+                        {
+                            Log.d("snapprefs", "Map key: " + obj.toString());
+                            Object QX = map.get(obj);
+                            Log.d("snapprefs", "QXNull? " + (QX == null));
+
+                            Log.d("snapprefs", "Str1: " + getObjectField(QX, "a"));
+                            Log.d("snapprefs", "Str2: " + getObjectField(QX, "b"));
+                            Log.d("snapprefs", "bool: " + getObjectField(QX, "f"));
+
+                            Object QU = getObjectField(QX, "c");
+                            Log.d("snapprefs", "QUNull? " + (QU == null));
+                            Log.d("snapprefs", "QUPath: " + callMethod(QU, "getStorageLocation"));
+
+
+                        }
+                    } else
+                        Logger.log("Null PO");
+
+
+                    Log.d("snapprefs", "Ended system");
+                }
+            });*/
             // Potential video saving system
-            findAndHookMethod("arh$a", lpparam.classLoader, "a", new XC_MethodHook() {
+            /*findAndHookMethod("arh$a", lpparam.classLoader, "a", new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
@@ -107,15 +152,15 @@ public class Saving {
                     Logger.log("arh String: " + getObjectField(arh, "d"));
                     Logger.log("BItmap? " + (getObjectField(arh, "f") != null ));
                 }
-            });
-            findAndHookMethod("gz", lpparam.classLoader, "a", Bitmap.class, new XC_MethodHook() {
+            });*/
+            /*findAndHookMethod("gz", lpparam.classLoader, "a", Bitmap.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
 
                     Logger.log("Doing shit twith the image? " + param.getClass().getCanonicalName());
                 }
-            });
+            });*/
             /**
              * Called whenever a bitmap is set to the view (I believe)
              */
@@ -124,6 +169,8 @@ public class Saving {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     try {
+                        Logger.logStackTrace();
+
                         handleImagePayload(snapContext, param);
                     } catch (Exception e) {
                         Logger.log("Exception handling Image Payload\n" + e.getMessage());
@@ -142,7 +189,7 @@ public class Saving {
             /**
              * Called every time a snap is viewed - Quite reliable
              */
-        // UPDATED METHOD & CONTENT 9.39.5
+            // UPDATED METHOD & CONTENT 9.39.5
             findAndHookMethod(Obfuscator.save.RECEIVEDSNAP_CLASS, cl, Obfuscator.save
                     .RECEIVEDSNAP_BEING_SEEN, boolean.class, new XC_MethodHook() {
                 @Override
@@ -179,10 +226,9 @@ public class Saving {
 
                     boolean isLoaded = (boolean) param.getResult();
 
-                    if( isLoaded && param.thisObject.getClass().getCanonicalName().equals(Obfuscator.save.STORYSNAP_CLASS) )
-                    {
+                    if (isLoaded && param.thisObject.getClass().getCanonicalName().equals(Obfuscator.save.STORYSNAP_CLASS)) {
                         try {
-                        handleSnapHeader(snapContext, param.thisObject);
+                            handleSnapHeader(snapContext, param.thisObject);
                         } catch (Exception e) {
                             Logger.log("Exception handling STORY HEADER\n" + e.getMessage());
                         }
@@ -214,7 +260,7 @@ public class Saving {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     try {
-                        if( Preferences.getBool(Prefs.SAVE_SENT_SNAPS) )
+                        if (Preferences.getBool(Prefs.SAVE_SENT_SNAPS))
                             handleSentSnap(param.thisObject, snapContext);
                     } catch (Exception e) {
                         Logger.log("Error getting sent media", e);
@@ -292,7 +338,7 @@ public class Saving {
                             //^.a(F.g(), ProfileImageSize.MEDIUM)
                             List<Bitmap> profileImages = (List<Bitmap>) callMethod(i, Obfuscator.save.PROFILE_IMAGES_CACHE_GET_PROFILE_IMAGES, new Class[]{String.class, profileImageSizeClass}, username, MEDIUM);
                             String filePath = SavingUtils.generateFilePath("ProfileImages", username);
-                            if(Preferences.getBool(Prefs.DEBUGGING)) {
+                            if (Preferences.getBool(Prefs.DEBUGGING)) {
                                 Logger.printTitle("Profile Image Saving Debug Information");
                                 Logger.printMessage("Profile Image Size Inner Class: " + profileImageSizeClass);
                                 Logger.printMessage("friendObject: " + friendObject);
@@ -308,12 +354,12 @@ public class Saving {
                                 Logger.printFilledRow();
                             }
                             final File profileImagesFolder = new File(filePath);
-                            if(!profileImagesFolder.mkdirs() && !profileImagesFolder.exists() ){
+                            if (!profileImagesFolder.mkdirs() && !profileImagesFolder.exists()) {
                                 Logger.log("Error creating ProfileImages and/or Username folder");
                                 return false;
                             }
 
-                            if(profileImages == null) {
+                            if (profileImages == null) {
                                 SavingUtils.vibrate(HookMethods.context, false);
                                 NotificationUtils.showStatefulMessage("Error Saving Profile Images For " + username + "\nIf The Profile Image Is Not Blank Please Enable Debug Mode And Rep", ToastType.BAD, lpparam.classLoader);
                                 return false;
@@ -328,15 +374,15 @@ public class Saving {
                                 } catch (NoSuchAlgorithmException e) {
                                     e.printStackTrace();
                                 }
-                                if(f == null) {
+                                if (f == null) {
                                     NotificationUtils.showStatefulMessage("File f is null!", ToastType.BAD, lpparam.classLoader);
                                     return false;
                                 }
-                                if(f.exists()) {
+                                if (f.exists()) {
                                     NotificationUtils.showStatefulMessage("Profile Images already Exist.", ToastType.BAD, lpparam.classLoader);
                                     return true;
                                 }
-                                if(SavingUtils.saveJPG(f, profileImages.get(iterator), HookMethods.context)) {
+                                if (SavingUtils.saveJPG(f, profileImages.get(iterator), HookMethods.context)) {
                                     succCounter++;
                                 }
                             }
@@ -547,12 +593,11 @@ public class Saving {
 
         String className = receivedSnap.getClass().getCanonicalName();
 
-        if(className.equals(Obfuscator.save.STORYSNAP_CLASS))
+        if (className.equals(Obfuscator.save.STORYSNAP_CLASS))
             snapType = SnapType.STORY;
-        else if( className.equals(Obfuscator.save.RECEIVEDSNAP_CLASS))
+        else if (className.equals(Obfuscator.save.RECEIVEDSNAP_CLASS))
             snapType = SnapType.SNAP;
-        else
-        {
+        else {
             Logger.log("Obfuscator out of date for SnapType in SAVING CLASS");
             return;
         }
@@ -644,7 +689,7 @@ public class Saving {
         // Grab the Key to Item Map (Contains file paths)
         @SuppressWarnings("unchecked")
         Map<String, Object> mKeyToItemMap =
-                (Map<String, Object>) getObjectField(mCache, Obfuscator.save.CACHE_KEYTOITEMMAP );
+                (Map<String, Object>) getObjectField(mCache, Obfuscator.save.CACHE_KEYTOITEMMAP);
 
         if (mKeyToItemMap == null) {
             Logger.printFinalMessage("Mkey-Item Map not found");
@@ -762,8 +807,7 @@ public class Saving {
             return;
         }
 
-        if( originalBmp.isRecycled() )
-        {
+        if (originalBmp.isRecycled()) {
             Logger.printFinalMessage("Bitmap is already recycled");
             snapData.addFlag(FlagState.FAILED);
             createStatefulToast("Error saving image", ToastType.BAD);
