@@ -66,11 +66,11 @@ public class Groups {
 
         //TODO UPDATE THE CONTENTS OF THIS HOOK
         // Andre: I'm not sure on how it works
-        XposedHelpers.findAndHookMethod(Obfuscator.groups.STORYSECTION_CLASS, lpparam.classLoader, "a", findClass("android.support.v7.widget.RecyclerView$u", lpparam.classLoader), int.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod(Obfuscator.groups.STORYSECTION_CLASS, lpparam.classLoader, "onBindViewHolder", findClass("android.support.v7.widget.RecyclerView$u", lpparam.classLoader), int.class, new XC_MethodHook() {
 
             @Override
             protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
-                Object element = callMethod(XposedHelpers.getObjectField(param.thisObject, "c"), "get", param.args[1]);
+                Object element = callMethod(XposedHelpers.getObjectField(param.thisObject, "a"), "get", param.args[1]);
                 if (XposedHelpers.getAdditionalInstanceField(element, "editGroups") != null) {
                     CheckBox k = (CheckBox) XposedHelpers.getObjectField(param.args[0], "a");
                     k.setVisibility(View.GONE);
