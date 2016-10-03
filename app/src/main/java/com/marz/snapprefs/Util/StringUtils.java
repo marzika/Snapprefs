@@ -659,4 +659,15 @@ public class StringUtils {
         }
         return str;
     }
+
+    public static String parseVideoKey( String input )
+    {
+        String stage1 = input.replace("https://app.snapchat.com/bq/auth_story_blobs", "");
+        String[] stage2 = stage1.split("#");
+
+        if( stage2.length > 0 )
+            return stage2[0];
+
+        return stage1;
+    }
 }

@@ -62,6 +62,14 @@ public class Lens {
                 return null;
             }
         });
+
+        //Bypasses signiture checking
+        findAndHookMethod(Obfuscator.lens.AUTHENTICATION_CLASS, lpparam.classLoader, Obfuscator.lens.SIGNITURE_CHECK_METHOD, LensClass, String.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                param.setResult(true);
+            }
+        });
     }
 
     public static void onJsonResultRebuilt(XC_MethodHook.MethodHookParam param, Object arg1, Object arg2) {

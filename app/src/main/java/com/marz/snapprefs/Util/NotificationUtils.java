@@ -10,6 +10,8 @@ import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.R;
 
+import java.util.Map;
+
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_InitPackageResources;
 
@@ -39,29 +41,33 @@ public class NotificationUtils {
         Object a = XposedHelpers.callStaticMethod(XposedHelpers.findClass(Obfuscator.notification.NOTIFICATION_CLASS_1, classLoader), "a");
         //Object CHAT_V2 = XposedHelpers.getStaticObjectField(XposedHelpers.findClass("com.snapchat.android.util.debug.FeatureFlagManager$FeatureFlag", classLoader), "CHAT_V2");
         //if ((boolean) (XposedHelpers.callStaticMethod(XposedHelpers.findClass("com.snapchat.android.util.debug.FeatureFlagManager", classLoader), "b", new Class[]{XposedHelpers.findClass("com.snapchat.android.util.debug.FeatureFlagManager$FeatureFlag", classLoader)}, CHAT_V2))) {
-        if (XposedHelpers.getObjectField(a, "c") != null) {
-            aVar = XposedHelpers.callMethod(XposedHelpers.getObjectField(a, "b"), "get", XposedHelpers.getObjectField(a, "c"));
+
+        String notifyString = (String) XposedHelpers.getObjectField(a, "c");
+
+        if (notifyString != null) {
+            Map<String, ?> notifyMap = (Map<String, ?>) XposedHelpers.getObjectField(a, "b");
+            aVar = notifyMap.get(notifyString);
         }
         if (aVar == null) {
             //aVar = XposedHelpers.callMethod(a, "b");
-            aVar = XposedHelpers.newInstance(XposedHelpers.findClass("vz$a", classLoader), XposedHelpers.getObjectField(a, "c"));
+            aVar = XposedHelpers.newInstance(XposedHelpers.findClass(Obfuscator.notification.NOTIFICATION_CLASS_1 + "$a", classLoader), notifyString);
         }
         //} else {
         //    aVar = XposedHelpers.callMethod(a, "b");
         //}
-        Object xu = XposedHelpers.newInstance(XposedHelpers.findClass(Obfuscator.notification.NOTIFICATION_CLASS_2, classLoader), new Class[]{String.class, String.class, int.class}, string, XposedHelpers.getObjectField(aVar, "a"), color);
-        XposedHelpers.setObjectField(xu, "alternateNotificationPanel", null);
-        XposedHelpers.setBooleanField(xu, "hideTitleBar", true);
-        XposedHelpers.setBooleanField(xu, "dismissCurrentNotification", true);
+        Object notificationMaker = XposedHelpers.newInstance(XposedHelpers.findClass(Obfuscator.notification.NOTIFICATION_CLASS_2, classLoader), new Class[]{String.class, String.class, int.class}, string, XposedHelpers.getObjectField(aVar, "a"), color);
+        XposedHelpers.setObjectField(notificationMaker, "alternateNotificationPanel", null);
+        XposedHelpers.setBooleanField(notificationMaker, "hideTitleBar", true);
+        XposedHelpers.setBooleanField(notificationMaker, "dismissCurrentNotification", true);
         if (duration != -1)
-            XposedHelpers.setLongField(xu, "duration", duration);
+            XposedHelpers.setLongField(notificationMaker, "duration", duration);
         if (icon != -1)
-            XposedHelpers.setIntField(xu, "iconRes", icon);
+            XposedHelpers.setIntField(notificationMaker, "iconRes", icon);
         if (textColor != -1)
-            XposedHelpers.setIntField(xu, "textColor", textColor);
+            XposedHelpers.setIntField(notificationMaker, "textColor", textColor);
         if (title != null)
-            XposedHelpers.setObjectField(xu, "primaryText", title);
-        XposedHelpers.callMethod(XposedHelpers.getObjectField(a, "a"), "a", xu);
+            XposedHelpers.setObjectField(notificationMaker, "primaryText", title);
+        XposedHelpers.callMethod(XposedHelpers.getObjectField(a, "a"), "a", notificationMaker);
     }
 
     public static void showStatefulMessage(String message, ToastType type, ClassLoader cl) {
@@ -82,7 +88,7 @@ public class NotificationUtils {
 
         private int color;
 
-        private ToastType(int color) {
+        ToastType(int color) {
             this.color = color;
         }
     }
