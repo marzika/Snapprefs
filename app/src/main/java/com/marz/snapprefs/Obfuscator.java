@@ -138,7 +138,7 @@ public class Obfuscator {
         //stories_mystoryoverlaysave_icon
         public static final String STORIES_MYOVERLAYSAVE_ICON = "0x7f02030e";
         // Get Username function of Friend Class
-        public static final String GET_FRIEND_USERNAME = "f";//prev. g
+        public static final String GET_FRIEND_USERNAME = "d";//prev. g
         public static final String CLASS_FRIEND_MINI_PROFILE_POPUP_FRAGMENT = "aqT";//prev. com.snapchat.android.fragments.FriendMiniProfilePopupFragment
         // com.snapchat.android.fragments.FriendMiniProfilePopupFragment Friend Field
         public static final String FRIEND_MINI_PROFILE_POPUP_FRIEND_FIELD = "i";// Prev F
