@@ -28,6 +28,8 @@ public class Logger {
 
     public static final String LOG_TAG = "SnapPrefs: ";
     private static int printWidth = 70;
+    private static boolean defaultForced = false;
+    private static boolean defaultPrefix = true;
 
     /**
      * Restrict instantiation of this class, it only contains static methods.
@@ -67,35 +69,54 @@ public class Logger {
 
     public static void afterHook( String message )
     {
-        log( "AfterHook: " + message );
+        log( "AfterHook: " + message, defaultPrefix, defaultForced);
     }
 
     public static void beforeHook( String message )
     {
-        log( "BeforeHook: " + message );
+        log( "BeforeHook: " + message, defaultPrefix, defaultForced);
     }
 
+    /**
+     * Prints a title in a line width of at least {@link #printWidth} with areas before and after filled with '#'s
+     *
+     * @param message The message to print in the title
+     */
     public static void printTitle( String message )
     {
-        log( "" );
+        log( "", defaultPrefix, defaultForced);
         printFilledRow();
         printMessage( message );
         printFilledRow();
     }
+
+    /**
+     * Prints a message with left and right aligned '#'s, to be used with {@link #printTitle(String)} and {@link #printFilledRow()}
+     *
+     * @param message The message to print between the '#'s
+     */
     public static void printMessage( String message )
     {
-        log( "#" + StringUtils.center( message, printWidth ) + "#" );
+        log( "#" + StringUtils.center( message, printWidth ) + "#", defaultPrefix, defaultForced);
     }
 
+    /**
+     * Prints a message using @printMessage and then prints a filled row with @printFilledRow
+     *
+     * @param message The final message that is going to be printed
+     */
     public static void printFinalMessage( String message )
     {
         printMessage( message );
         printFilledRow();
     }
 
+    /**
+     * Print a '#' Filled row of width {@link #printWidth}
+     */
     public static void printFilledRow()
     {
-        log( StringUtils.repeat( "#", printWidth + 2 ) );
+        log( StringUtils.repeat( "#", printWidth + 2 ), defaultPrefix, defaultForced);
     }
     /**
      * Write debug information to the Xposed Log if enabled.
@@ -104,7 +125,7 @@ public class Logger {
      * @param prefix  Whether it should be prefixed by the log-tag
      */
     public static void log(String message, boolean prefix) {
-        log(message, prefix, false);
+        log(message, prefix, defaultForced);
     }
 
     /**
@@ -114,7 +135,7 @@ public class Logger {
      * @param message The message you want to log
      */
     public static void log(String message) {
-        log(message, true);
+        log(message, defaultPrefix, defaultForced);
     }
 
     /**
@@ -132,8 +153,6 @@ public class Logger {
         }
     }
 
-
-
     /**
      * Write a throwable with a message to the Xposed Log, even when debugging is disabled.
      *
@@ -145,10 +164,13 @@ public class Logger {
         log(throwable);
     }
 
+    /**
+     * Logs the current stack trace(ie. the chain of calls to get where you are now)
+     */
     public static void logStackTrace() {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
 
         for(StackTraceElement traceElement : stackTraceElements)
-            Logger.log("Stack trace: [Class: " + traceElement.getClassName() + "] [Method: " + traceElement.getMethodName() + "]");
+            Logger.log("Stack trace: [Class: " + traceElement.getClassName() + "] [Method: " + traceElement.getMethodName() + "]", defaultPrefix, defaultForced);
     }
 }
