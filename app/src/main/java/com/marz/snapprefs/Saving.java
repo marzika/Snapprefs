@@ -42,6 +42,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
+import static com.marz.snapprefs.HookMethods.context;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
@@ -164,74 +165,68 @@ public class Saving {
                     if (!(image instanceof Bitmap))
                         return;
 
-                    assignImageToStorySnap((Bitmap) image, storySnap);
+                    String mKey = (String) getObjectField(storySnap, "mId");
 
-                    Object peekedStory = storyQueue.peek();
-
-                    //TODO add null handling
-                    if( peekedStory == null )
-                        return;
-
-                    String peekedKey = (String) getObjectField(peekedStory, "mId");
-                    Log.d("snapprefs", "PeekedKey: " + peekedKey);
-
-
-                    if( getAdditionalInstanceField(peekedStory, "AllowSave") == null ) {
-                        Log.d("snapprefs", "Not allowed to save");
-                        return;
-                    }
-
-                    image = getAdditionalInstanceField(peekedStory, "SnapImage");
-
-                    if( image == null )
+                    if( hashSnapData.containsKey(mKey) )
                     {
-                        Log.d("snapprefs", "Tried to save null image");
+                        Log.d("snapprefs", "Already contains key");
+                        NotificationUtils.showStatefulMessage("Image already exists", ToastType.WARNING, lpparam.classLoader);
                         return;
                     }
 
-                    Log.d("snapprefs", "Saving image");
-                    shouldAllowSave = true;
-                    handleImagePayload(snapContext, peekedKey, (Bitmap) image);
-                    storyQueue.poll();
+                    SnapData snapData = new SnapData(mKey);
+                    snapData.setMediaType(MediaType.IMAGE);
+                    snapData.setSnapType(SnapType.STORY);
+                    snapData.setBmpImage(((Bitmap)image).copy(Bitmap.Config.ARGB_8888, false));
+                    snapData.setStrSender((String) getObjectField(storySnap, "mUsername"));
 
+                    long lngTimestamp = (Long) callMethod(storySnap, Obfuscator.save.SNAP_GETTIMESTAMP);
+                    Date timestamp = new Date(lngTimestamp);
+                    String strTimestamp = dateFormat.format(timestamp);
+
+                    snapData.setStrTimestamp(strTimestamp);
+
+                    hashSnapData.put(mKey, snapData);
                 }
             });
-
-            findAndHookMethod("auy", cl, "a", findClass("PO", cl), findClass("com.snapchat.android.richmedia.model.RichMediaStackPosition", cl),
-                    findClass("asT", cl), boolean.class, new XC_MethodHook() {
-                        @Override
-                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            super.afterHookedMethod(param);
-                            Object storySnap = param.args[0];
-                            Object asT = param.args[2];
-                            int currentLevel = (int) callMethod(asT, "c", storySnap);
-                            Log.d("snapprefs", "Current level being saved: " + levelToSave);
-                            Log.d("snapprefs", "Key: " + getObjectField(storySnap, "mId"));
-                            Log.d("snapprefs", "KeyLevel: " + currentLevel);
-
-                            if( shouldAllowSave )
-                            {
-                                shouldAllowSave = false;
-                                setAdditionalInstanceField(storySnap, "AllowSave", true);
-                            }
-
-                            if (!storyQueue.contains(storySnap)) {
-                                Log.d("snapprefs", "Adding to queue: " + getObjectField(storySnap, "mId"));
-                                storyQueue.add(storySnap);
-                            }
-                        }
-                    });
 
             findAndHookMethod("apn", cl, "a", findClass("PO", cl), new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     super.afterHookedMethod(param);
-                    Log.d("snapprefs", "Called apn.a(PO)");
-                    Log.d("snapprefs", "ArgKey: " + getObjectField(param.args[0], "mId"));
-                    Log.d("snapprefs", "RetKey: " + getObjectField(param.getResult(), "mId"));
+                    Object storySnap = param.args[0];
 
-                    Log.d("snapprefs", "ArgSave: " + getAdditionalInstanceField(param.args[0], "AllowSave"));
-                    Log.d("snapprefs", "ArgSave: " + getAdditionalInstanceField(param.getResult(), "AllowSave"));
+                    String mKey = (String) getObjectField(storySnap, "mId");
+                    SnapData snapData = hashSnapData.get(mKey);
+
+                    if( snapData == null )
+                    {
+                        Log.d("snapprefs", "Story key doesn't exist");
+                        return;
+                    }
+
+                    File directory;
+
+                    try {
+                        directory = createFileDir(SnapType.STORY.subdir, snapData.getStrSender());
+                    } catch (IOException e) {
+                        Logger.log(e);
+                        return;
+                    }
+
+                    String filename = snapData.getStrSender() + "_" + snapData.getStrTimestamp();
+
+
+                    File imageFile = new File(directory, filename + MediaType.IMAGE.fileExtension);
+                    if (imageFile.exists()) {
+                        Log.d("snapprefs", "Image already exists: " + filename);
+                        SavingUtils.vibrate(context, false);
+                        return;
+                    }
+
+                    SavingUtils.saveJPGAsync(imageFile, snapData.getBmpImage(), snapContext);
+                    NotificationUtils.showStatefulMessage("Saved image", ToastType.GOOD, lpparam.classLoader);
+                    Log.d("snapprefs", "Successfully saved image!");
                 }
             });
 
@@ -365,7 +360,7 @@ public class Saving {
                             }
 
                             if (profileImages == null) {
-                                SavingUtils.vibrate(HookMethods.context, false);
+                                SavingUtils.vibrate(context, false);
                                 NotificationUtils.showStatefulMessage("Error Saving Profile Images For " + username + "\nIf The Profile Image Is Not Blank Please Enable Debug Mode And Rep", ToastType.BAD, lpparam.classLoader);
                                 return false;
                             }
@@ -387,13 +382,13 @@ public class Saving {
                                     NotificationUtils.showStatefulMessage("Profile Images already Exist.", ToastType.BAD, lpparam.classLoader);
                                     return true;
                                 }
-                                if (SavingUtils.saveJPG(f, profileImages.get(iterator), HookMethods.context)) {
+                                if (SavingUtils.saveJPG(f, profileImages.get(iterator), context)) {
                                     succCounter++;
                                 }
                             }
                             Boolean succ = (succCounter == sizeOfProfileImages);
                             NotificationUtils.showStatefulMessage("Saved " + succCounter + "/" + sizeOfProfileImages + " profile images.", succ ? ToastType.GOOD : ToastType.BAD, lpparam.classLoader);
-                            SavingUtils.vibrate(HookMethods.context, succ);
+                            SavingUtils.vibrate(context, succ);
                             return true;
                         }
                     });
