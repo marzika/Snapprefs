@@ -222,7 +222,20 @@ public class Saving {
                         }
                     });
 
-            HookMethods.hookAllMethods("apn", cl, true, true);
+            findAndHookMethod("apn", cl, "a", findClass("PO", cl), new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    Log.d("snapprefs", "Called apn.a(PO)");
+                    Log.d("snapprefs", "ArgKey: " + getObjectField(param.args[0], "mId"));
+                    Log.d("snapprefs", "RetKey: " + getObjectField(param.getResult(), "mId"));
+
+                    Log.d("snapprefs", "ArgSave: " + getAdditionalInstanceField(param.args[0], "AllowSave"));
+                    Log.d("snapprefs", "ArgSave: " + getAdditionalInstanceField(param.getResult(), "AllowSave"));
+                }
+            });
+
+            //HookMethods.hookAllMethods("apn", cl, true, true);
             /**
              * Called every time a snap is viewed - Quite reliable
              */
