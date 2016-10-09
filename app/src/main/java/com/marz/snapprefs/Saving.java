@@ -10,7 +10,9 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Preferences.Prefs;
@@ -27,24 +29,27 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
-import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
+import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
 
 public class Saving {
     //public static final String SNAPCHAT_PACKAGE_NAME = "com.snapchat.android";
@@ -62,6 +67,12 @@ public class Saving {
     //TODO implement user selected save mode
     private static boolean asyncSaveMode = true;
     private static Class storyClass;
+    private static Object enum_NO_AUTO_ADVANCE;
+    private static Object enum_TOP_SNAP;
+    private static boolean shouldAllowSave = true;
+    private static Queue<Object> storyQueue = new LinkedList<>();
+
+    private static int levelToSave = -1;
 
     static void initSaving(final XC_LoadPackage.LoadPackageParam lpparam,
                            final XModuleResources modRes, final Context snapContext) {
@@ -74,6 +85,11 @@ public class Saving {
             ClassLoader cl = lpparam.classLoader;
 
             storyClass = findClass(Obfuscator.save.STORYSNAP_CLASS, cl);
+
+            Class AdvanceType = findClass(Obfuscator.misc.ADVANCE_TYPE_CLASS, cl);
+            enum_NO_AUTO_ADVANCE = Enum.valueOf(AdvanceType, "NO_AUTO_ADVANCE");
+            Class RichMediaStackPosition = findClass("com.snapchat.android.richmedia.model.RichMediaStackPosition", cl);
+            enum_TOP_SNAP = Enum.valueOf(RichMediaStackPosition, "TOP_SNAP");
 
             /**
              * Called whenever a video is decrypted by snapchat
@@ -97,95 +113,116 @@ public class Saving {
                         }
                     });
 
-            /*findAndHookMethod("abJ", lpparam.classLoader, "a", storyClass, boolean.class, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-
-                    Object PO = param.args[0];
-                    Logger.log("What's this for: " + param.args[1]);
-
-                    Log.d("snapprefs", "Starting system");
-                    if( PO != null )
-                    {
-                        String mId = (String) getObjectField(PO, "mId");
-                        Log.d("snapprefs", "mId: " + mId);
-                        Object mediaCache = getObjectField(param.thisObject, "b");
-
-                        if( mediaCache == null )
-                            Log.d("snapprefs", "Null Cache");
-
-                        Map<String, ?> map = (Map<String, ?>) getObjectField(mediaCache, "d");
-
-                        Log.d("snapprefs", "CacheSize: " + map.size());
-
-                        for( Object obj : map.keySet() )
-                        {
-                            Log.d("snapprefs", "Map key: " + obj.toString());
-                            Object QX = map.get(obj);
-                            Log.d("snapprefs", "QXNull? " + (QX == null));
-
-                            Log.d("snapprefs", "Str1: " + getObjectField(QX, "a"));
-                            Log.d("snapprefs", "Str2: " + getObjectField(QX, "b"));
-                            Log.d("snapprefs", "bool: " + getObjectField(QX, "f"));
-
-                            Object QU = getObjectField(QX, "c");
-                            Log.d("snapprefs", "QUNull? " + (QU == null));
-                            Log.d("snapprefs", "QUPath: " + callMethod(QU, "getStorageLocation"));
-
-
-                        }
-                    } else
-                        Logger.log("Null PO");
-
-
-                    Log.d("snapprefs", "Ended system");
-                }
-            });*/
-            // Potential video saving system
-            /*findAndHookMethod("arh$a", lpparam.classLoader, "a", new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-                    Logger.log("Doing something? ");
-                    Object arh = param.getResult();
-                    Logger.log("arh String: " + getObjectField(arh, "d"));
-                    Logger.log("BItmap? " + (getObjectField(arh, "f") != null ));
-                }
-            });*/
-            /*findAndHookMethod("gz", lpparam.classLoader, "a", Bitmap.class, new XC_MethodHook() {
+            findAndHookMethod("aGg", cl, "b", String.class, Object.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
 
-                    Logger.log("Doing shit twith the image? " + param.getClass().getCanonicalName());
+                    String key = (String) param.args[0];
+                    Logger.log("snapprefs: ENUMkey: " + key);
+                    if (key.equals("auto_advance_mode"))
+                        param.args[1] = enum_NO_AUTO_ADVANCE;
                 }
-            });*/
-            /**
-             * Called whenever a bitmap is set to the view (I believe)
-             */
-            // UPDATED METHOD & CONTENT 9.39.5
-            findAndHookMethod(Obfuscator.save.IMAGESNAPRENDERER_CLASS2, cl, Obfuscator.save.IMAGESNAPRENDERER_NEW_BITMAP, Bitmap.class, new XC_MethodHook() {
+            });
+
+            findAndHookMethod("com.snapchat.android.stories.viewer.StoryViewerMediaCache", cl, "a",
+                    String.class, findClass("aGg", cl), ImageView.class, findClass("aEm$a", cl), new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            Object godPacket = param.args[1];
+                            Object storySnap = callMethod(godPacket, "a", "STORY_REPLY_SNAP");
+                            setAdditionalInstanceField(param.args[2], "StorySnap", storySnap);
+                            Log.d("snapprefs", "StoryViewerMediaCache.a : KEY " + getObjectField(storySnap, "mId"));
+                            Log.d("snapprefs", "Str: " + param.args[0]);
+                        }
+                    });
+
+            findAndHookConstructor("gC", cl, ImageView.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    try {
-                        Logger.logStackTrace();
+                    super.beforeHookedMethod(param);
+                    Object storySnap = getAdditionalInstanceField(param.args[0], "StorySnap");
 
-                        handleImagePayload(snapContext, param);
-                    } catch (Exception e) {
-                        Logger.log("Exception handling Image Payload\n" + e.getMessage());
+                    if (storySnap != null) {
+                        setAdditionalInstanceField(param.thisObject, "StorySnap", storySnap);
+                        Log.d("snapprefs", "Key: " + getObjectField(storySnap, "mId"));
                     }
                 }
             });
-
-            findAndHookMethod("awx", lpparam.classLoader, "onStart", findClass("awo", lpparam.classLoader), new XC_MethodHook() {
+            findAndHookMethod("gC", cl, "onResourceReady", Object.class, findClass("gt", cl), new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-                    Logger.log("Starting shit bruh");
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+                    Object storySnap = getAdditionalInstanceField(param.thisObject, "StorySnap");
+
+                    if (storySnap == null)
+                        return;
+
+                    Object image = param.args[0];
+
+                    if (!(image instanceof Bitmap))
+                        return;
+
+                    assignImageToStorySnap((Bitmap) image, storySnap);
+
+                    Object peekedStory = storyQueue.peek();
+
+                    //TODO add null handling
+                    if( peekedStory == null )
+                        return;
+
+                    String peekedKey = (String) getObjectField(peekedStory, "mId");
+                    Log.d("snapprefs", "PeekedKey: " + peekedKey);
+
+
+                    if( getAdditionalInstanceField(peekedStory, "AllowSave") == null ) {
+                        Log.d("snapprefs", "Not allowed to save");
+                        return;
+                    }
+
+                    image = getAdditionalInstanceField(peekedStory, "SnapImage");
+
+                    if( image == null )
+                    {
+                        Log.d("snapprefs", "Tried to save null image");
+                        return;
+                    }
+
+                    Log.d("snapprefs", "Saving image");
+                    shouldAllowSave = true;
+                    handleImagePayload(snapContext, peekedKey, (Bitmap) image);
+                    storyQueue.poll();
+
                 }
             });
 
+            findAndHookMethod("auy", cl, "a", findClass("PO", cl), findClass("com.snapchat.android.richmedia.model.RichMediaStackPosition", cl),
+                    findClass("asT", cl), boolean.class, new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            super.afterHookedMethod(param);
+                            Object storySnap = param.args[0];
+                            Object asT = param.args[2];
+                            int currentLevel = (int) callMethod(asT, "c", storySnap);
+                            Log.d("snapprefs", "Current level being saved: " + levelToSave);
+                            Log.d("snapprefs", "Key: " + getObjectField(storySnap, "mId"));
+                            Log.d("snapprefs", "KeyLevel: " + currentLevel);
+
+                            if( shouldAllowSave )
+                            {
+                                shouldAllowSave = false;
+                                setAdditionalInstanceField(storySnap, "AllowSave", true);
+                            }
+
+                            if (!storyQueue.contains(storySnap)) {
+                                Log.d("snapprefs", "Adding to queue: " + getObjectField(storySnap, "mId"));
+                                storyQueue.add(storySnap);
+                            }
+                        }
+                    });
+
+            HookMethods.hookAllMethods("apn", cl, true, true);
             /**
              * Called every time a snap is viewed - Quite reliable
              */
@@ -208,51 +245,6 @@ public class Saving {
                             Logger.log("Exception handling HEADER\n" + e.getMessage());
                         }
                     }
-                }
-            });
-
-            findAndHookMethod("atz$2", lpparam.classLoader, "onStart", findClass("awo", lpparam.classLoader), new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-                    Logger.log("More testing");
-                }
-            });
-
-            findAndHookMethod("Sc", lpparam.classLoader, "isLoaded", new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-
-                    boolean isLoaded = (boolean) param.getResult();
-
-                    if (isLoaded && param.thisObject.getClass().getCanonicalName().equals(Obfuscator.save.STORYSNAP_CLASS)) {
-                        try {
-                            handleSnapHeader(snapContext, param.thisObject);
-                        } catch (Exception e) {
-                            Logger.log("Exception handling STORY HEADER\n" + e.getMessage());
-                        }
-                    }
-                }
-            });
-            XposedHelpers.findAndHookMethod("com.snapchat.android.stories.ui.ExplorerStorySnapView", lpparam.classLoader, "onStartViewingSnap", XposedHelpers.findClass("Sd", lpparam.classLoader), new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-
-                    Object obj1 = getObjectField(param.thisObject, "e");
-                    Object obj2 = getObjectField(obj1, "C");
-
-                    Logger.log("Getting snap class1: " + obj1.getClass().getCanonicalName());
-                    Logger.log("Getting snap class2: " + obj2.getClass().getCanonicalName());
-                }
-            });
-
-            findAndHookMethod("Sc", lpparam.classLoader, "b", long.class, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-                    Logger.log("I think it had been viewed");
                 }
             });
             // UPDATED METHOD & CONTENT 9.39.5
@@ -394,6 +386,8 @@ public class Saving {
                     });
                 }
             });
+
+            //HookMethods.hookAllMethods("Ce", cl, true);
         } catch (Exception e) {
             Logger.log("Error occured: Snapprefs doesn't currently support this version, wait for an update", e);
 
@@ -404,6 +398,24 @@ public class Saving {
                 }
             });
         }
+    }
+
+    public static void assignImageToStorySnap(Bitmap image, Object storySnap)
+    {
+        String mKey = (String) getObjectField(storySnap, "mId");
+
+        for(Object queueSnap : storyQueue)
+        {
+            String queueKey = (String) getObjectField(queueSnap, "mId");
+
+            if(queueKey.equals(mKey)) {
+                setAdditionalInstanceField(queueSnap, "SnapImage", image);
+                Log.d("snapprefs", "Assigned image to: " + getObjectField(storySnap, "mId"));
+                return;
+            }
+        }
+
+        Log.d("snapprefs", "Couldn't assign Image");
     }
 
     // UPDATED 9.39.5
@@ -773,15 +785,29 @@ public class Saving {
     // UPDATED TO LATEST 9.39.5
     public static void handleImagePayload(Context context, XC_MethodHook.MethodHookParam param)
             throws Exception {
-        Logger.printTitle("Handling IMAGE Payload");
-        Logger.printMessage("Getting Bitmap");
-
         // Class: ahZ - holds the mKey for the payload
         Object keyholder = getObjectField(param.thisObject, Obfuscator.save.OBJECT_KEYHOLDERCLASSOBJECT);
         // Get the mKey out of ahZ
         String mKey = (String) getObjectField(keyholder, Obfuscator.save.OBJECT_KEYHOLDER_KEY);
-        Logger.printMessage("Key: " + mKey);
 
+        Bitmap bmp = (Bitmap) param.args[1];
+
+        handleImagePayload(context, mKey, bmp);
+    }
+
+    public static void handleImagePayload(Context context, String mKey, Bitmap originalBmp)
+            throws Exception {
+        Logger.printTitle("Handling IMAGE Payload");
+
+        if (mKey == null) {
+            Logger.printFinalMessage("Image Payload Null Key");
+            return;
+        } else if (originalBmp == null) {
+            Logger.printFinalMessage("Tried to attach Null Bitmap");
+            return;
+        }
+
+        Logger.printMessage("Key: " + mKey);
         // Find the snapData associated with the mKey
         SnapData snapData = hashSnapData.get(mKey);
 
@@ -797,14 +823,6 @@ public class Saving {
             snapData = new SnapData(mKey);
             hashSnapData.put(mKey, snapData);
             Logger.printMessage("Hash Size: " + hashSnapData.size());
-        }
-
-        // Get the bitmap payload
-        Bitmap originalBmp = (Bitmap) param.args[0];
-
-        if (originalBmp == null) {
-            Logger.printFinalMessage("Tried to attach Null Bitmap");
-            return;
         }
 
         if (originalBmp.isRecycled()) {

@@ -36,6 +36,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.marz.snapprefs.Databases.LensDatabaseHelper;
 import com.marz.snapprefs.Tabs.BuyTabFragment;
 import com.marz.snapprefs.Tabs.DataTabFragment;
 import com.marz.snapprefs.Tabs.DeluxeTabFragment;
@@ -47,7 +48,6 @@ import com.marz.snapprefs.Tabs.SavingTabFragment;
 import com.marz.snapprefs.Tabs.SharingTabFragment;
 import com.marz.snapprefs.Tabs.SpoofingTabFragment;
 import com.marz.snapprefs.Tabs.TextTabFragment;
-import com.marz.snapprefs.Databases.LensDatabaseHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -148,9 +148,17 @@ public class MainActivity extends AppCompatActivity {
         ChangeLog cl = new ChangeLog(context);
         createDeviceId();
 
+        /*Obfuscator.writeGsonFile();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Obfuscator.readJsonFile();
+
         if (cl.isFirstRun()) {
             cl.getLogDialog().show();
-        }
+        }*/
 
         Logger.log("MainActivity: createPrefsIfNotExisting");
         createPrefsIfNotExisting();

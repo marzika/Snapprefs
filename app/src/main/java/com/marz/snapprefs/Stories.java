@@ -25,6 +25,8 @@ import de.robv.android.xposed.callbacks.XC_LayoutInflated;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
 
 /**
  * Created by MARZ on 2016. 04. 12..
@@ -78,6 +80,21 @@ public class Stories {
                     }
                 }
                 XposedHelpers.setObjectField(param.thisObject, Obfuscator.stories.STORYLIST, f);
+            }
+        });
+
+        Class ExitEventTypeClass = findClass("com.snapchat.android.framework.analytics.perf.ExitEvent", lpparam.classLoader);
+        final Object ExitEvent_AUTO_ADVANCE = getStaticObjectField(ExitEventTypeClass, "AUTO_ADVANCE");
+        findAndHookMethod("atJ", lpparam.classLoader, "a", ExitEventTypeClass, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                Object exitEvent = param.args[0];
+
+                if( exitEvent == ExitEvent_AUTO_ADVANCE ) {
+                    Logger.log("Skipped auto advance");
+                    param.setResult(null);
+                }
             }
         });
     }
