@@ -160,8 +160,8 @@ public class Obfuscator implements Serializable {
         //stories_mystoryoverlaysave_icon
         public final static String STORIES_MYOVERLAYSAVE_ICON = "0x7f02030e";
         // Get Username function of Friend Class
-        public final static String GET_FRIEND_USERNAME = "f";//prev. g
-        public final static String CLASS_FRIEND_MINI_PROFILE_POPUP_FRAGMENT = "aqT";//prev. com.snapchat.android.fragments.FriendMiniProfilePopupFragment
+        public static final String GET_FRIEND_USERNAME = "d";//prev. g
+        public static final String CLASS_FRIEND_MINI_PROFILE_POPUP_FRAGMENT = "aqT";//prev. com.snapchat.android.fragments.FriendMiniProfilePopupFragment
         // com.snapchat.android.fragments.FriendMiniProfilePopupFragment Friend Field
         public final static String FRIEND_MINI_PROFILE_POPUP_FRIEND_FIELD = "i";// Prev F
         // com.snapchat.android.fragments.FriendMiniProfilePopupFragement getCachedProfilePicutres method
