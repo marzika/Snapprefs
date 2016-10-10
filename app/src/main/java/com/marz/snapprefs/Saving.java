@@ -139,12 +139,12 @@ public class Saving {
                             Object godPacket = param.args[1];
                             Object storySnap = callMethod(godPacket, "a", "STORY_REPLY_SNAP");
 
-                            View view = (View) param.args[2];
+                            /*View view = (View) param.args[2];
 
                             RelativeLayout relativeLayout = (RelativeLayout) view.findViewById(+2131689491);
 
                             if( relativeLayout != null )
-                                HookedLayouts.assignImageButton(relativeLayout);
+                                HookedLayouts.assignImageButton(relativeLayout);*/
 
                             setAdditionalInstanceField(param.args[2], "StorySnap", storySnap);
                             Log.d("snapprefs", "StoryViewerMediaCache.a : KEY " + getObjectField(storySnap, "mId"));
