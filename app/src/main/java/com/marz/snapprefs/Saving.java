@@ -12,8 +12,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Preferences.Prefs;
@@ -66,6 +66,7 @@ public class Saving {
     private static Context relativeContext;
     //TODO implement user selected save mode
     private static boolean asyncSaveMode = true;
+    private static boolean hasAssignedButtonsAndGestures = false;
     private static Object enum_NO_AUTO_ADVANCE;
 
     static void initSaving(final XC_LoadPackage.LoadPackageParam lpparam,
@@ -139,14 +140,25 @@ public class Saving {
                             Object godPacket = param.args[1];
                             Object storySnap = callMethod(godPacket, "a", "STORY_REPLY_SNAP");
 
-                            /*View view = (View) param.args[2];
+                            View view = (View) param.args[2];
 
-                            RelativeLayout relativeLayout = (RelativeLayout) view.findViewById(+2131689491);
+                            FrameLayout frameLayout = scanForStoryContainer(view);
 
-                            if( relativeLayout != null )
-                                HookedLayouts.assignImageButton(relativeLayout);*/
+                            if (frameLayout != null) {
+                                Object parent = frameLayout.getParent();
 
-                            setAdditionalInstanceField(param.args[2], "StorySnap", storySnap);
+                                if( parent == null )
+                                    return;
+
+                                if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON )
+                                    HookedLayouts.assignImageButton((FrameLayout) parent);
+                                else if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S )
+                                {
+                                    HookedLayouts.assignGestures((FrameLayout) parent);
+                                }
+                            }
+
+                            setAdditionalInstanceField(view, "StorySnap", storySnap);
                             Log.d("snapprefs", "StoryViewerMediaCache.a : KEY " + getObjectField(storySnap, "mId"));
                             Log.d("snapprefs", "Str: " + param.args[0]);
                             Log.d("snapprefs", "### END StoryViewerMediaCache ###");
@@ -388,6 +400,32 @@ public class Saving {
                 }
             });
         }
+    }
+
+    public static FrameLayout scanForStoryContainer(View view)
+    {
+        Object parent = view.getParent();
+
+        if( parent != null )
+        {
+            if( parent instanceof View )
+            {
+                int id = ((View)parent).getId();
+                Logger.log("Scanned ID: " + id);
+
+                if( id == +2131689491) {
+                    Logger.log("Found Opera container");
+                    return (FrameLayout) parent;
+                }
+                else {
+                    Logger.log("Failed scan attempt");
+                    return scanForStoryContainer((View) parent);
+                }
+            }
+        }
+
+        Logger.log("Null scan attempt");
+        return null;
     }
 
     // UPDATED 9.39.5

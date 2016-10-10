@@ -247,7 +247,7 @@ public class HookedLayouts {
                     }
                 });
 
-                frameLayout.addView(saveStoryButton);
+                //frameLayout.addView(saveStoryButton);
 
                 saveStoryButton.bringToFront();
                 overlay_group.bringToFront();
@@ -310,6 +310,30 @@ public class HookedLayouts {
         });
     }
 
+    public static void assignImageButton(FrameLayout frameLayout)
+    {
+        Object parent = saveStoryButton.getParent();
+
+        if( parent != null )
+            ((FrameLayout) parent).removeView(saveStoryButton);
+
+        frameLayout.addView(saveStoryButton);
+        saveStoryButton.bringToFront();
+        Logger.log("brought to front");
+    }
+
+    public static void assignGestures(FrameLayout frameLayout)
+    {
+        final GestureEvent gestureEvent = new GestureEvent();
+        frameLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S &&
+                        gestureEvent.onTouch(v, event, Saving.SnapType.STORY);
+
+            }
+        });
+    }
     public static void initParents( View view )
     {
         if( view.getParent() != null ) {
