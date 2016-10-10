@@ -664,7 +664,9 @@ public class StringUtils {
     {
         String finalOutput = input;
 
-        if( finalOutput.contains("encoding=compressed") )
+        if( finalOutput.contains("https://app.snapchat.com/bq/auth_story_blobs") )
+            finalOutput = finalOutput.replace("https://app.snapchat.com/bq/auth_story_blobs", "");
+        else if( finalOutput.contains("encoding=compressed") )
         {
             String[] split = input.split("encoding=compressed");
 
