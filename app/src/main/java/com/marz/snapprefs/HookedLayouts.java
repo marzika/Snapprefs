@@ -20,6 +20,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -44,10 +45,10 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.GestureEvent;
 import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.TypefaceUtil;
-import com.marz.snapprefs.Preferences.Prefs;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -164,10 +165,10 @@ public class HookedLayouts {
                 upload = new ImageButton(HookMethods.SnapContext);
                 upload.setLayoutParams(layoutParams);
                 upload.setBackgroundColor(0);
-                Drawable uploadimg =
+                Drawable uploading =
                         HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.sharing.UPLOAD_ICON.substring(2), 16));
                 //upload.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
-                upload.setImageDrawable(uploadimg);
+                upload.setImageDrawable(uploading);
                 upload.setScaleX((float) 0.55);
                 upload.setScaleY((float) 0.55);
                 upload.setOnClickListener(new View.OnClickListener() {
@@ -191,7 +192,7 @@ public class HookedLayouts {
             XModuleResources mResources, final Context localContext
     ) {
         final GestureEvent gestureEvent = new GestureEvent();
-        Logger.log("Adding Save Buttons", false, true);
+        Logger.log("Adding Save Buttons");
 /*
         int intIconID = resparam.res.getIdentifier("aa_snap_preview_save", "drawable", Common
                 .PACKAGE_SNAP);
@@ -216,10 +217,15 @@ public class HookedLayouts {
             @Override
             public void handleLayoutInflated(LayoutInflatedParam liparam)
                     throws Throwable {
+
+
                 Logger.log("Updating view_story_snap.snap_container layout");
-                final FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(
+
+                final RelativeLayout frameLayout = (RelativeLayout) liparam.view.findViewById(
                         liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP)
-                ).getParent();
+                ).getRootView();
+
+                Logger.log("Root view: " + frameLayout);
 
                 ViewGroup overlay_group = (ViewGroup) liparam.view.findViewById(
                         liparam.res.getIdentifier("my_story_swipe_layout", "id", Common.PACKAGE_SNAP));
@@ -243,12 +249,23 @@ public class HookedLayouts {
 
                 frameLayout.addView(saveStoryButton);
 
+                saveStoryButton.bringToFront();
                 overlay_group.bringToFront();
 
                 saveStoryButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Saving.performButtonSave();
+                    }
+                });
+
+                saveStoryButton.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                    @Override
+                    public void onFocusChange(View view, boolean b) {
+                        Logger.log("Focus? " + b);
+
+                        if( !b )
+                            saveStoryButton.bringToFront();
                     }
                 });
             }
@@ -280,6 +297,7 @@ public class HookedLayouts {
                     }
                 });
                 frameLayout.addView(saveSnapButton);
+                saveSnapButton.bringToFront();
 
                 saveSnapButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -290,6 +308,31 @@ public class HookedLayouts {
                 });
             }
         });
+    }
+
+    public static void initParents( View view )
+    {
+        if( view.getParent() != null ) {
+            View viewParent = (View) view.getParent();
+            Log.d("snapprefs", "ViewId: " + viewParent.getId());
+
+            initParents(viewParent);
+        }
+    }
+
+    public static void initView( View view )
+    {
+        Log.d("snapprefs", "ID: " + view.getId());
+
+        if( view instanceof ViewGroup )
+        {
+            for( int i = 0; i < ((ViewGroup) view).getChildCount(); i++)
+            {
+                View obj = ((ViewGroup) view).getChildAt(i);
+
+                Log.d("snapprefs", "ViewId: " + obj.getId());
+            }
+        }
     }
 
     //TODO refresh button position when preference is changed

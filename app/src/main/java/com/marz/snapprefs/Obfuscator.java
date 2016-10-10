@@ -431,6 +431,7 @@ public class Obfuscator implements Serializable {
         public final static String GETUSERNAME_METHOD = "C";
 
         public final static String ADVANCE_TYPE_CLASS = "aFl";
+        public final static String NO_AUTO_ADVANCE_OBJECT = "a";
     }
     public static class premium implements Serializable {
         public final static String SNAP_UPDATE_CLASS = "zT";

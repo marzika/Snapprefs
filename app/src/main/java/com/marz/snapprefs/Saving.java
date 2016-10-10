@@ -29,11 +29,9 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,13 +65,7 @@ public class Saving {
     private static Context relativeContext;
     //TODO implement user selected save mode
     private static boolean asyncSaveMode = true;
-    private static Class storyClass;
     private static Object enum_NO_AUTO_ADVANCE;
-    private static Object enum_TOP_SNAP;
-    private static boolean shouldAllowSave = true;
-    private static Queue<Object> storyQueue = new LinkedList<>();
-
-    private static int levelToSave = -1;
 
     static void initSaving(final XC_LoadPackage.LoadPackageParam lpparam,
                            final XModuleResources modRes, final Context snapContext) {
@@ -85,12 +77,9 @@ public class Saving {
         try {
             ClassLoader cl = lpparam.classLoader;
 
-            storyClass = findClass(Obfuscator.save.STORYSNAP_CLASS, cl);
-
+            Class storyClass = findClass(Obfuscator.save.STORYSNAP_CLASS, cl);
             Class AdvanceType = findClass(Obfuscator.misc.ADVANCE_TYPE_CLASS, cl);
-            enum_NO_AUTO_ADVANCE = Enum.valueOf(AdvanceType, "NO_AUTO_ADVANCE");
-            Class RichMediaStackPosition = findClass("com.snapchat.android.richmedia.model.RichMediaStackPosition", cl);
-            enum_TOP_SNAP = Enum.valueOf(RichMediaStackPosition, "TOP_SNAP");
+            enum_NO_AUTO_ADVANCE = getStaticObjectField(AdvanceType, Obfuscator.misc.NO_AUTO_ADVANCE_OBJECT);
 
             /**
              * Called whenever a video is decrypted by snapchat
@@ -448,24 +437,6 @@ public class Saving {
                 }
             });
         }
-    }
-
-    public static void assignImageToStorySnap(Bitmap image, Object storySnap)
-    {
-        String mKey = (String) getObjectField(storySnap, "mId");
-
-        for(Object queueSnap : storyQueue)
-        {
-            String queueKey = (String) getObjectField(queueSnap, "mId");
-
-            if(queueKey.equals(mKey)) {
-                setAdditionalInstanceField(queueSnap, "SnapImage", image);
-                Log.d("snapprefs", "Assigned image to: " + getObjectField(storySnap, "mId"));
-                return;
-            }
-        }
-
-        Log.d("snapprefs", "Couldn't assign Image");
     }
 
     // UPDATED 9.39.5

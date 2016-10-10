@@ -83,7 +83,7 @@ public class LensIconLoader {
         File nomediaFile = new File( Preferences.getSavePath(), "/LensIcon/.nomedia");
 
         if( !nomediaFile.exists() )
-            MainActivity.writeNoMediaFile(Preferences.getSavePath() + "/LensIcon/");
+            MainActivity.writeNoMediaFile(Preferences.getSavePath() + "/LensIcon");
 
         return bmp;
     }
