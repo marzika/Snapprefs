@@ -103,6 +103,21 @@ public class Saving {
                         }
                     });
 
+            /**
+            * Called whenever a bitmap is set to the view (I believe)
+            **/
+            // UPDATED METHOD & CONTENT 9.39.5
+            findAndHookMethod(Obfuscator.save.IMAGESNAPRENDERER_CLASS2, cl, Obfuscator.save.IMAGESNAPRENDERER_NEW_BITMAP, Bitmap.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    try {
+                        handleImagePayload(snapContext, param);
+                    } catch (Exception e) {
+                        Logger.log("Exception handling Image Payload", e);
+                    }
+                }
+            });
+
             findAndHookMethod("aGg", cl, "b", String.class, Object.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -816,7 +831,7 @@ public class Saving {
         // Get the mKey out of ahZ
         String mKey = (String) getObjectField(keyholder, Obfuscator.save.OBJECT_KEYHOLDER_KEY);
 
-        Bitmap bmp = (Bitmap) param.args[1];
+        Bitmap bmp = (Bitmap) param.args[0];
 
         handleImagePayload(context, mKey, bmp);
     }
