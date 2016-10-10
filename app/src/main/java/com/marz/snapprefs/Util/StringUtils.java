@@ -660,14 +660,18 @@ public class StringUtils {
         return str;
     }
 
-    public static String parseVideoKey( String input )
+    public static String stripKey( String input )
     {
-        String stage1 = input.replace("https://app.snapchat.com/bq/auth_story_blobs", "");
-        String[] stage2 = stage1.split("#");
+        if( input.contains("encoding=compressed") )
+        {
+            String[] split = input.split("encoding=compressed");
 
-        if( stage2.length > 0 )
-            return stage2[0];
+            if( split.length > 0 )
+                return split[split.length - 1];
+            else
+                return input;
+        }
 
-        return stage1;
+        return input;
     }
 }

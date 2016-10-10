@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Preferences.Prefs;
@@ -137,6 +138,14 @@ public class Saving {
                             Log.d("snapprefs", "### START StoryViewerMediaCache ###");
                             Object godPacket = param.args[1];
                             Object storySnap = callMethod(godPacket, "a", "STORY_REPLY_SNAP");
+
+                            View view = (View) param.args[2];
+
+                            RelativeLayout relativeLayout = (RelativeLayout) view.findViewById(+2131689491);
+
+                            if( relativeLayout != null )
+                                HookedLayouts.assignImageButton(relativeLayout);
+
                             setAdditionalInstanceField(param.args[2], "StorySnap", storySnap);
                             Log.d("snapprefs", "StoryViewerMediaCache.a : KEY " + getObjectField(storySnap, "mId"));
                             Log.d("snapprefs", "Str: " + param.args[0]);
@@ -175,82 +184,8 @@ public class Saving {
                     }
 
                     handleSnapHeader(snapContext, storySnap);
-
-                    /*String mKey = (String) getObjectField(storySnap, "mId");
-                    Log.d("snapprefs", "mKey: " + mKey);
-
-                    SnapData snapData = hashSnapData.get(mKey);
-
-                    if( snapData != null && snapData.hasFlag(FlagState.SAVED))
-                    {
-                        if( snapData == null )
-                            Log.d("snapprefs", "Null Snapdata");
-                        else
-                            Log.d("snapprefs", "Snap Already Saved");
-
-                        return;
-                    } else if (snapData == null)
-                    {
-                        snapData = new SnapData(mKey);
-                        hashSnapData.put(mKey, snapData);
-                    }
-
-                    snapData.setSnapType(SnapType.STORY);
-                    String mSender = (String) getObjectField(storySnap, "mUsername");
-
-                    long lngTimestamp = (Long) callMethod(storySnap, Obfuscator.save.SNAP_GETTIMESTAMP);
-                    Date timestamp = new Date(lngTimestamp);
-                    String strTimestamp = dateFormat.format(timestamp);
-
-                    snapData.setStrTimestamp(strTimestamp);
-
-                    snapData.setHeader(mKey, mKey, mSender, strTimestamp, SnapType.STORY);
-                    snapData.setMediaType(MediaType.IMAGE);
-
-                    if(snapData.hasFlag(FlagState.COMPLETED))
-                    {
-                        //SaveResponse response = saveReceivedSnap(snapContext, snapData);
-                    }*/
                 }
             });
-
-            /*findAndHookMethod("apn", cl, "a", findClass("PO", cl), new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-                    Log.d("snapprefs", "### START apn a ###");
-                    Object storySnap = param.args[0];
-
-                    Log.d("snapprefs", "Story1: " + getObjectField(storySnap, "mId"));
-
-                    String mKey = (String) getObjectField(storySnap, "mId");
-
-                    if( hashSnapData.containsKey(mKey) )
-                    {
-                        Log.d("snapprefs", "Already contains key");
-                        NotificationUtils.showStatefulMessage("Image already exists", ToastType.WARNING, lpparam.classLoader);
-
-                        Log.d("snapprefs", "### RETURNED apn a ###");
-                        return;
-                    }
-
-                    SnapData snapData = new SnapData(mKey);
-                    snapData.setMediaType(MediaType.IMAGE);
-                    snapData.setSnapType(SnapType.STORY);
-                    snapData.setStrSender((String) getObjectField(storySnap, "mUsername"));
-
-                    long lngTimestamp = (Long) callMethod(storySnap, Obfuscator.save.SNAP_GETTIMESTAMP);
-                    Date timestamp = new Date(lngTimestamp);
-                    String strTimestamp = dateFormat.format(timestamp);
-
-                    snapData.setStrTimestamp(strTimestamp);
-
-                    hashSnapData.put(mKey, snapData);
-                    Log.d("snapprefs", "Created SnapData with key: " + snapData.getmKey());
-
-                    Log.d("snapprefs", "### END apn a ###");
-                }
-            });*/
 
             findAndHookMethod("gC", cl, "onResourceReady", Object.class, findClass("gt", cl), new XC_MethodHook() {
                 @Override
@@ -272,6 +207,7 @@ public class Saving {
                     }
 
                     String mKey = (String) getObjectField(storySnap, "mId");
+
                     handleImagePayload(snapContext, mKey, (Bitmap) image );
                 }
             });
@@ -736,7 +672,7 @@ public class Saving {
             return;
         }
 
-        String parsedKey = StringUtils.parseVideoKey(mKey);
+        String parsedKey = StringUtils.stripKey(mKey);
         Logger.printMessage("Key: " + parsedKey);
 
         // Grab the Key to Item Map (Contains file paths)
@@ -824,7 +760,7 @@ public class Saving {
      * @throws Exception
      */
     // UPDATED TO LATEST 9.39.5
-    public static void handleImagePayload(Context context, XC_MethodHook.MethodHookParam param)
+    private static void handleImagePayload(Context context, XC_MethodHook.MethodHookParam param)
             throws Exception {
         // Class: ahZ - holds the mKey for the payload
         Object keyholder = getObjectField(param.thisObject, Obfuscator.save.OBJECT_KEYHOLDERCLASSOBJECT);
@@ -836,7 +772,7 @@ public class Saving {
         handleImagePayload(context, mKey, bmp);
     }
 
-    public static void handleImagePayload(Context context, String mKey, Bitmap originalBmp)
+    private static void handleImagePayload(Context context, String mKey, Bitmap originalBmp)
             throws Exception {
         Logger.printTitle("Handling IMAGE Payload");
 
