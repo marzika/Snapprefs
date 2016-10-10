@@ -662,16 +662,24 @@ public class StringUtils {
 
     public static String stripKey( String input )
     {
-        if( input.contains("encoding=compressed") )
+        String finalOutput = input;
+
+        if( finalOutput.contains("encoding=compressed") )
         {
             String[] split = input.split("encoding=compressed");
 
             if( split.length > 0 )
-                return split[split.length - 1];
-            else
-                return input;
+                finalOutput = split[split.length - 1];
         }
 
-        return input;
+        if( finalOutput.contains("#") )
+        {
+            String[] split = finalOutput.split("#");
+
+            if( split.length > 0 )
+                finalOutput = split[0];
+        }
+
+        return finalOutput;
     }
 }
