@@ -120,7 +120,6 @@ public class Saving {
                     super.beforeHookedMethod(param);
 
                     String key = (String) param.args[0];
-                    Logger.log("snapprefs: ENUMkey: " + key);
                     if (key.equals("auto_advance_mode"))
                         param.args[1] = enum_NO_AUTO_ADVANCE;
                 }
@@ -131,11 +130,13 @@ public class Saving {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                             super.beforeHookedMethod(param);
+                            Log.d("snapprefs", "### START StoryViewerMediaCache ###");
                             Object godPacket = param.args[1];
                             Object storySnap = callMethod(godPacket, "a", "STORY_REPLY_SNAP");
                             setAdditionalInstanceField(param.args[2], "StorySnap", storySnap);
                             Log.d("snapprefs", "StoryViewerMediaCache.a : KEY " + getObjectField(storySnap, "mId"));
                             Log.d("snapprefs", "Str: " + param.args[0]);
+                            Log.d("snapprefs", "### END StoryViewerMediaCache ###");
                         }
                     });
 
@@ -143,27 +144,80 @@ public class Saving {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
+
                     Object storySnap = getAdditionalInstanceField(param.args[0], "StorySnap");
 
                     if (storySnap != null) {
+                        Log.d("snapprefs", "### START gC <INIT> ###");
                         setAdditionalInstanceField(param.thisObject, "StorySnap", storySnap);
                         Log.d("snapprefs", "Key: " + getObjectField(storySnap, "mId"));
+                        Log.d("snapprefs", "### END gC <INIT> ###");
                     }
+
                 }
             });
-            findAndHookMethod("gC", cl, "onResourceReady", Object.class, findClass("gt", cl), new XC_MethodHook() {
+
+            findAndHookMethod("asT", cl, "i", storyClass, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
-                    Object storySnap = getAdditionalInstanceField(param.thisObject, "StorySnap");
+                    Log.d("snapprefs", "asT.i");
 
-                    if (storySnap == null)
+                    Object storySnap = param.args[0];
+
+                    if( storySnap == null ) {
+                        Log.d("snapprefs", "Null StorySnap");
                         return;
+                    }
 
-                    Object image = param.args[0];
+                    handleSnapHeader(snapContext, storySnap);
 
-                    if (!(image instanceof Bitmap))
+                    /*String mKey = (String) getObjectField(storySnap, "mId");
+                    Log.d("snapprefs", "mKey: " + mKey);
+
+                    SnapData snapData = hashSnapData.get(mKey);
+
+                    if( snapData != null && snapData.hasFlag(FlagState.SAVED))
+                    {
+                        if( snapData == null )
+                            Log.d("snapprefs", "Null Snapdata");
+                        else
+                            Log.d("snapprefs", "Snap Already Saved");
+
                         return;
+                    } else if (snapData == null)
+                    {
+                        snapData = new SnapData(mKey);
+                        hashSnapData.put(mKey, snapData);
+                    }
+
+                    snapData.setSnapType(SnapType.STORY);
+                    String mSender = (String) getObjectField(storySnap, "mUsername");
+
+                    long lngTimestamp = (Long) callMethod(storySnap, Obfuscator.save.SNAP_GETTIMESTAMP);
+                    Date timestamp = new Date(lngTimestamp);
+                    String strTimestamp = dateFormat.format(timestamp);
+
+                    snapData.setStrTimestamp(strTimestamp);
+
+                    snapData.setHeader(mKey, mKey, mSender, strTimestamp, SnapType.STORY);
+                    snapData.setMediaType(MediaType.IMAGE);
+
+                    if(snapData.hasFlag(FlagState.COMPLETED))
+                    {
+                        //SaveResponse response = saveReceivedSnap(snapContext, snapData);
+                    }*/
+                }
+            });
+
+            /*findAndHookMethod("apn", cl, "a", findClass("PO", cl), new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    Log.d("snapprefs", "### START apn a ###");
+                    Object storySnap = param.args[0];
+
+                    Log.d("snapprefs", "Story1: " + getObjectField(storySnap, "mId"));
 
                     String mKey = (String) getObjectField(storySnap, "mId");
 
@@ -171,13 +225,14 @@ public class Saving {
                     {
                         Log.d("snapprefs", "Already contains key");
                         NotificationUtils.showStatefulMessage("Image already exists", ToastType.WARNING, lpparam.classLoader);
+
+                        Log.d("snapprefs", "### RETURNED apn a ###");
                         return;
                     }
 
                     SnapData snapData = new SnapData(mKey);
                     snapData.setMediaType(MediaType.IMAGE);
                     snapData.setSnapType(SnapType.STORY);
-                    snapData.setBmpImage(((Bitmap)image).copy(Bitmap.Config.ARGB_8888, false));
                     snapData.setStrSender((String) getObjectField(storySnap, "mUsername"));
 
                     long lngTimestamp = (Long) callMethod(storySnap, Obfuscator.save.SNAP_GETTIMESTAMP);
@@ -187,46 +242,33 @@ public class Saving {
                     snapData.setStrTimestamp(strTimestamp);
 
                     hashSnapData.put(mKey, snapData);
-                }
-            });
+                    Log.d("snapprefs", "Created SnapData with key: " + snapData.getmKey());
 
-            findAndHookMethod("apn", cl, "a", findClass("PO", cl), new XC_MethodHook() {
+                    Log.d("snapprefs", "### END apn a ###");
+                }
+            });*/
+
+            findAndHookMethod("gC", cl, "onResourceReady", Object.class, findClass("gt", cl), new XC_MethodHook() {
                 @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-                    Object storySnap = param.args[0];
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+                    Object storySnap = getAdditionalInstanceField(param.thisObject, "StorySnap");
+
+                    if (storySnap == null) {
+                        return;
+                    }
+
+                    Log.d("snapprefs", "### START gC onResourceReady ###");
+
+                    Object image = param.args[0];
+
+                    if (!(image instanceof Bitmap)) {
+                        Log.d("snapprefs", "### RETURNED gC onResourceReady - Not bitmap ###");
+                        return;
+                    }
 
                     String mKey = (String) getObjectField(storySnap, "mId");
-                    SnapData snapData = hashSnapData.get(mKey);
-
-                    if( snapData == null )
-                    {
-                        Log.d("snapprefs", "Story key doesn't exist");
-                        return;
-                    }
-
-                    File directory;
-
-                    try {
-                        directory = createFileDir(SnapType.STORY.subdir, snapData.getStrSender());
-                    } catch (IOException e) {
-                        Logger.log(e);
-                        return;
-                    }
-
-                    String filename = snapData.getStrSender() + "_" + snapData.getStrTimestamp();
-
-
-                    File imageFile = new File(directory, filename + MediaType.IMAGE.fileExtension);
-                    if (imageFile.exists()) {
-                        Log.d("snapprefs", "Image already exists: " + filename);
-                        SavingUtils.vibrate(context, false);
-                        return;
-                    }
-
-                    SavingUtils.saveJPGAsync(imageFile, snapData.getBmpImage(), snapContext);
-                    NotificationUtils.showStatefulMessage("Saved image", ToastType.GOOD, lpparam.classLoader);
-                    Log.d("snapprefs", "Successfully saved image!");
+                    handleImagePayload(snapContext, mKey, (Bitmap) image );
                 }
             });
 
@@ -605,21 +647,26 @@ public class Saving {
 
     //UPDATED to 9.39.5
     private static void handleSnapHeader(Context context, Object receivedSnap) throws Exception {
+
         Logger.printTitle("Handling SnapData HEADER");
         Logger.printMessage("Header object: " + receivedSnap.getClass().getCanonicalName());
 
         String mId = (String) getObjectField(receivedSnap, Obfuscator.save.OBJECT_MID);
-        SnapType snapType = null;
+
+        SnapType snapType;
 
         String className = receivedSnap.getClass().getCanonicalName();
 
-        if (className.equals(Obfuscator.save.STORYSNAP_CLASS))
-            snapType = SnapType.STORY;
-        else if (className.equals(Obfuscator.save.RECEIVEDSNAP_CLASS))
-            snapType = SnapType.SNAP;
-        else {
-            Logger.log("Obfuscator out of date for SnapType in SAVING CLASS");
-            return;
+        switch (className) {
+            case Obfuscator.save.STORYSNAP_CLASS:
+                snapType = SnapType.STORY;
+                break;
+            case Obfuscator.save.RECEIVEDSNAP_CLASS:
+                snapType = SnapType.SNAP;
+                break;
+            default:
+                Logger.log("Obfuscator out of date for SnapType in SAVING CLASS");
+                return;
         }
 
         Logger.printMessage("SnapType: " + snapType.name);

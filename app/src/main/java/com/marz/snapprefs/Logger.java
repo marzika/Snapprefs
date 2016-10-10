@@ -47,6 +47,7 @@ public class Logger {
         try {
             if (!Preferences.getBool(Preferences.Prefs.DEBUGGING) && !forced)
                 return;
+
         } catch( Throwable t)
         {
             Log.d("SNAPPREFS", "Tried to log before fully loaded: ["  + message + "]");
@@ -61,7 +62,7 @@ public class Logger {
             XposedBridge.log(message);
         } catch( Throwable e)
         {
-            Log.d("SNAPPREFS", message);
+            Log.d("snapprefs", message);
         }
     }
 
@@ -148,7 +149,9 @@ public class Logger {
     public static void logStackTrace() {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
 
-        for(StackTraceElement traceElement : stackTraceElements)
-            Logger.log("Stack trace: [Class: " + traceElement.getClassName() + "] [Method: " + traceElement.getMethodName() + "]");
+        for(StackTraceElement traceElement : stackTraceElements) {
+            Class tracedClass = traceElement.getClass();
+            Log.d("snapprefs", "Stack trace: [Class: " + traceElement.getClassName() + "] [Method: " + traceElement.getMethodName() + "]");
+        }
     }
 }
