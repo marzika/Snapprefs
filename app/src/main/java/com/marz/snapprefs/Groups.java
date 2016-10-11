@@ -70,7 +70,7 @@ public class Groups {
 
             @Override
             protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
-                Object element = callMethod(XposedHelpers.getObjectField(param.thisObject, "a"), "get", param.args[1]);
+                Object element = callMethod(XposedHelpers.getObjectField(param.thisObject, "c"), "get", param.args[1]);
                 if (XposedHelpers.getAdditionalInstanceField(element, "editGroups") != null) {
                     CheckBox k = (CheckBox) XposedHelpers.getObjectField(param.args[0], "a");
                     k.setVisibility(View.GONE);
