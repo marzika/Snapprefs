@@ -18,6 +18,9 @@
     <string name="hidebf_text">Hide Best-Friends</string>
     <string name="hidebf_summary">Hides your Best-Friends from you</string>
 
+    <string name="auto_advance_title">Disable Auto-Advance</string>
+    <string name="auto_advance_summary">Disables the story Auto-Advance function</string>
+
     <string name="hidelive_text">Hide Live stories</string>
     <string name="hidelive_summary">Hides the Live stories section on the Stories screen</string>
     <string name="hidepeople_text">Hide People From Stories</string>

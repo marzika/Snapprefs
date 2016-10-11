@@ -52,6 +52,8 @@ import com.marz.snapprefs.Util.TypefaceUtil;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
@@ -60,6 +62,7 @@ import de.robv.android.xposed.callbacks.XC_LayoutInflated;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+import static de.robv.android.xposed.XposedHelpers.findClass;
 
 /**
  * Created by MARZ on 2016. 04. 08..
@@ -72,6 +75,7 @@ public class HookedLayouts {
     public static boolean setInt = true;
     public static ImageButton saveSnapButton;
     public static ImageButton saveStoryButton;
+    public static Class OperaPageViewLayoutsClass;
 
     public static void initIntegration(XC_LoadPackage.LoadPackageParam lpparam,
                                        final XModuleResources mResources) {
@@ -204,70 +208,24 @@ public class HookedLayouts {
             throw new NullPointerException("Button Image not found");
 
         int horizontalPosition = Preferences.getBool(Prefs.BUTTON_POSITION) ? Gravity.START : Gravity.END;
+
         final FrameLayout.LayoutParams layoutParams =
                 new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
                         FrameLayout.LayoutParams.WRAP_CONTENT,
                         Gravity.BOTTOM | horizontalPosition);
 
-        //stories_mystoryoverlaysave_icon
+        saveStoryButton = new ImageButton(localContext);
+        saveStoryButton.setLayoutParams(layoutParams);
+        saveStoryButton.setBackgroundColor(0);
+        saveStoryButton.setImageBitmap(saveImg);
+        saveStoryButton.setAlpha(0.8f);
+        saveStoryButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ?
+                View.VISIBLE : View.INVISIBLE);
 
-        //final Bitmap saveImg = BitmapFactory.decodeResource( mResources, R.mipmap.snap_button );
-
-        resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_story_snap", new XC_LayoutInflated() {
+        saveStoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void handleLayoutInflated(LayoutInflatedParam liparam)
-                    throws Throwable {
-
-
-                Logger.log("Updating view_story_snap.snap_container layout");
-
-                final RelativeLayout frameLayout = (RelativeLayout) liparam.view.findViewById(
-                        liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP)
-                ).getRootView();
-
-                Logger.log("Root view: " + frameLayout);
-
-                ViewGroup overlay_group = (ViewGroup) liparam.view.findViewById(
-                        liparam.res.getIdentifier("my_story_swipe_layout", "id", Common.PACKAGE_SNAP));
-
-                saveStoryButton = new ImageButton(localContext);
-                saveStoryButton.setLayoutParams(layoutParams);
-                saveStoryButton.setBackgroundColor(0);
-                saveStoryButton.setImageBitmap(saveImg);
-                saveStoryButton.setAlpha(0.8f);
-                saveStoryButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ?
-                        View.VISIBLE : View.INVISIBLE);
-
-                frameLayout.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S &&
-                                gestureEvent.onTouch(v, event, Saving.SnapType.STORY);
-
-                    }
-                });
-
-                //frameLayout.addView(saveStoryButton);
-
-                saveStoryButton.bringToFront();
-                overlay_group.bringToFront();
-
-                saveStoryButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Saving.performButtonSave();
-                    }
-                });
-
-                saveStoryButton.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                    @Override
-                    public void onFocusChange(View view, boolean b) {
-                        Logger.log("Focus? " + b);
-
-                        if( !b )
-                            saveStoryButton.bringToFront();
-                    }
-                });
+            public void onClick(View v) {
+                Saving.performButtonSave();
             }
         });
 
@@ -310,7 +268,7 @@ public class HookedLayouts {
         });
     }
 
-    public static void assignImageButton(FrameLayout frameLayout)
+    public static void assignImageButton(FrameLayout frameLayout, ClassLoader cl)
     {
         Object parent = saveStoryButton.getParent();
 
@@ -318,7 +276,10 @@ public class HookedLayouts {
             ((FrameLayout) parent).removeView(saveStoryButton);
 
         frameLayout.addView(saveStoryButton);
+
         saveStoryButton.bringToFront();
+        saveStoryButton.invalidate();
+        frameLayout.invalidate();
         Logger.log("brought to front");
     }
 

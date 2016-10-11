@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -454,6 +455,10 @@ public class MainActivity extends AppCompatActivity {
         prefs = this.getSharedPreferences(this.getPackageName() + "_preferences", Activity.MODE_WORLD_READABLE);
 
         return prefs;
+    }
+
+    public static boolean isNetworkAvailable(final Context context) {
+        return ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo() != null;
     }
 
     public void saveInSharedPref(String result) {

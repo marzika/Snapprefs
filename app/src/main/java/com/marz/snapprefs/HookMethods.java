@@ -524,7 +524,9 @@ public class HookMethods
                     });
                     //disable auto advance
                     //search for "AUTO_ADVANCE_RECENT_UPDATES"
-                    XposedHelpers.findAndHookMethod("aty", lpparam.classLoader, "a", XC_MethodReplacement.returnConstant(false));
+
+                    if( Preferences.getBool(Prefs.AUTO_ADVANCE))
+                        XposedHelpers.findAndHookMethod("aty", lpparam.classLoader, "a", XC_MethodReplacement.returnConstant(false));
 
                 }
             });
@@ -535,8 +537,16 @@ public class HookMethods
 
     public static String getSCUsername(ClassLoader cl)
     {
-        Object scPreferenceHandler = findClass(Obfuscator.misc.PREFERENCES_CLASS, cl);
-        return (String) callMethod(scPreferenceHandler, Obfuscator.misc.GETUSERNAME_METHOD);
+        Class scPreferenceHandler = findClass(Obfuscator.misc.PREFERENCES_CLASS, cl);
+        try {
+            return (String) callMethod(scPreferenceHandler.newInstance(), Obfuscator.misc.GETUSERNAME_METHOD);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
     private void addFilter(LoadPackageParam lpparam) {

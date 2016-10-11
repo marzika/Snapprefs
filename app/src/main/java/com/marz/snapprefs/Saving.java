@@ -79,7 +79,7 @@ public class Saving {
         try {
             ClassLoader cl = lpparam.classLoader;
 
-            Class storyClass = findClass(Obfuscator.save.STORYSNAP_CLASS, cl);
+            final Class storyClass = findClass(Obfuscator.save.STORYSNAP_CLASS, cl);
             Class AdvanceType = findClass(Obfuscator.misc.ADVANCE_TYPE_CLASS, cl);
             enum_NO_AUTO_ADVANCE = getStaticObjectField(AdvanceType, Obfuscator.misc.NO_AUTO_ADVANCE_OBJECT);
 
@@ -140,25 +140,15 @@ public class Saving {
                             Object godPacket = param.args[1];
                             Object storySnap = callMethod(godPacket, "a", "STORY_REPLY_SNAP");
 
-                            View view = (View) param.args[2];
+                            String storyUsername = (String) callMethod(godPacket, "d", "POSTER_USERNAME");
 
-                            FrameLayout frameLayout = scanForStoryContainer(view);
-
-                            if (frameLayout != null) {
-                                Object parent = frameLayout.getParent();
-
-                                if( parent == null )
-                                    return;
-
-                                if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON )
-                                    HookedLayouts.assignImageButton((FrameLayout) parent);
-                                else if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S )
-                                {
-                                    HookedLayouts.assignGestures((FrameLayout) parent);
-                                }
+                            if( storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader)))
+                            {
+                                Logger.log("Story is yours");
+                                return;
                             }
 
-                            setAdditionalInstanceField(view, "StorySnap", storySnap);
+                            setAdditionalInstanceField(param.args[2], "StorySnap", storySnap);
                             Log.d("snapprefs", "StoryViewerMediaCache.a : KEY " + getObjectField(storySnap, "mId"));
                             Log.d("snapprefs", "Str: " + param.args[0]);
                             Log.d("snapprefs", "### END StoryViewerMediaCache ###");
@@ -174,6 +164,26 @@ public class Saving {
 
                     if (storySnap != null) {
                         Log.d("snapprefs", "### START gC <INIT> ###");
+
+                        String storyUsername = (String) getObjectField(storySnap, "mUsername");
+
+                        if( storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader)))
+                        {
+                            Logger.log("Story is yours");
+                            return;
+                        }
+
+                        View view = (View) param.args[0];
+
+                        FrameLayout snapContainer = scanForStoryContainer(view);
+
+                        if (snapContainer != null) {
+                            if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON )
+                                HookedLayouts.assignImageButton(snapContainer, lpparam.classLoader);
+                            else if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S )
+                                HookedLayouts.assignGestures(snapContainer);
+                        }
+
                         setAdditionalInstanceField(param.thisObject, "StorySnap", storySnap);
                         Log.d("snapprefs", "Key: " + getObjectField(storySnap, "mId"));
                         Log.d("snapprefs", "### END gC <INIT> ###");
@@ -192,6 +202,14 @@ public class Saving {
 
                     if( storySnap == null ) {
                         Log.d("snapprefs", "Null StorySnap");
+                        return;
+                    }
+
+                    String storyUsername = (String) getObjectField(storySnap, "mUsername");
+
+                    if( storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader)))
+                    {
+                        Logger.log("Story is yours");
                         return;
                     }
 
@@ -215,6 +233,14 @@ public class Saving {
 
                     if (!(image instanceof Bitmap)) {
                         Log.d("snapprefs", "### RETURNED gC onResourceReady - Not bitmap ###");
+                        return;
+                    }
+
+                    String storyUsername = (String) getObjectField(storySnap, "mUsername");
+
+                    if( storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader)))
+                    {
+                        Logger.log("Story is yours");
                         return;
                     }
 
