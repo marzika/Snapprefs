@@ -264,8 +264,8 @@ public class Obfuscator implements Serializable {
         //snapCaptureContext class
         public final static String SNAPCAPTURECONTEXT_CLASS = "com.snapchat.android.util.eventbus.SnapCaptureContext";
         //aa_chat_camera_upload
+        public final static String UPLOAD_ICON = "0x7f02001a";
 
-        public static final String UPLOAD_ICON = "0x7f02001a";
         //API, SCREENSHOT # TAKE_PHOTO_METHOD
         public static final String TAKE_PHOTO_METHOD = "com.snapchat.android.camera.TakePhotoCallback.TAKE_PHOTO_METHOD";
     }
@@ -313,26 +313,25 @@ public class Obfuscator implements Serializable {
         public final static String SNAPCHAPTUREDEVENT_CLASS = "";
     }
     public static class visualfilters {
-        public static final String FILTERS_CLASS = "On";//prev. afg
-        public static final String FILTERSLOADER_CLASS = "awB";//prev. afh
-        public static final String FILTERSLOADER_2_CLASS = "awH";//prev. afn
-        public static final String SETFILTER_B_CLASS = "sK";//prev. rA
-        public static final String GREYSCALE_CLASS = "axc";//prev. afJ
-        public static final String ADDFILTER_CLASS = "axd";//prev. afK
-        public static final String ADDFILTER_PARAM = "axa";//prev. afH
-        public static final String ADDER_3_PARAM = "awH";
-        public static final String ADDER_CLASS = "awC"; //prev. afi
-        public static final String ADDER_PARAM = "awL"; //prev afr
-        public static final String SNAPCHAPTUREDEVENT_CLASS = "azW";//prev. ajD
-        public static final String FILTERMETRICSPROVIDER_CLASS = "yo";
-        public static final String ANNOTATEDMEDIABRYO = "com.snapchat.android.model.AnnotatedMediabryo";
-        public static final String VISUALFILTERBASE = "awI";
-        public static final String FILTER_GETVIEW = "c";
-        public static final String BRYO_SNAPTYPE = "com.snapchat.android.app.feature.messaging.chat.type.SnapType";
-        public static final String VISUALFILTER_TYPE = "com.snapchat.android.app.shared.feature.preview.model.filter.VisualFilterType";
-        public static final String VISUAL_FILTER_TYPE_CHECK_METHOD = "y";
+        public final static String FILTERS_CLASS = "On";//prev. afg
+        public final static String FILTERSLOADER_CLASS = "awB";//prev. afh
+        public final static String FILTERSLOADER_2_CLASS = "awH";//prev. afn
+        public final static String SETFILTER_B_CLASS = "sK";//prev. rA
+        public final static String GREYSCALE_CLASS = "axc";//prev. afJ
+        public final static String ADDFILTER_CLASS = "axd";//prev. afK
+        public final static String ADDFILTER_PARAM = "axa";//prev. afH
+        public final static String ADDER_3_PARAM = "awH";
+        public final static String ADDER_CLASS = "awC"; //prev. afi
+        public final static String ADDER_PARAM = "awL"; //prev afr
+        public final static String SNAPCHAPTUREDEVENT_CLASS = "azW";//prev. ajD
+        public final static String FILTERMETRICSPROVIDER_CLASS = "yo";
+        public final static String ANNOTATEDMEDIABRYO = "com.snapchat.android.model.AnnotatedMediabryo";
+        public final static String VISUALFILTERBASE = "awI";
+        public final static String FILTER_GETVIEW = "c";
+        public final static String BRYO_SNAPTYPE = "com.snapchat.android.app.feature.messaging.chat.type.SnapType";
+        public final static String VISUALFILTER_TYPE = "com.snapchat.android.app.shared.feature.preview.model.filter.VisualFilterType";
+        public static final String VISUAL_FILTER_TYPE_CHECK_METHOD = "e";
     }
-
     public static class timer {
         public final static String TAKESNAPBUTTON_CLASS = "com.snapchat.android.ui.camera.TakeSnapButton";
         public final static String TAKESNAPBUTTON_ONDRAW = "onDraw";
@@ -341,6 +340,7 @@ public class Obfuscator implements Serializable {
         public final static String TAKESNAPBUTTON_TIME = "b";
         public final static String TAKESNAPBUTTON_X = "o";//prev. n
         public final static String TAKESNAPBUTTON_Y = "p";//prev. o
+    }
     public static class chat {
         public final static String CHAT_CLASS = "Ie";
         public final static String CONVERSATION_CLASS = "Ig";//prev. com.snapchat.android.model.chat.ChatConversation

@@ -62,6 +62,7 @@ import de.robv.android.xposed.callbacks.XC_InitPackageResources;
 import de.robv.android.xposed.callbacks.XC_LayoutInflated;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
+import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 
@@ -269,34 +270,29 @@ public class HookedLayouts {
         });
     }
 
-    public static void assignImageButton(FrameLayout frameLayout, Context context)
+    public static void assignImageButton(FrameLayout frameLayout, Context context, ClassLoader cl)
     {
         Object parent = saveStoryButton.getParent();
 
         if( parent != null )
             ((FrameLayout) parent).removeView(saveStoryButton);
 
-        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        int width = metrics.widthPixels;
-        int height = metrics.heightPixels;
-        int newWidth = width - 100;
-        int newHeight = height - 100;
-        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) saveStoryButton.getLayoutParams();
-
-        layoutParams.setMargins(newWidth,
-                newHeight,
-                0,
-                0);
-
-        Logger.log("Button position: " + newWidth + "  " + newHeight);
-
-        saveStoryButton.setLayoutParams(layoutParams);
+        Logger.log("Frame type: " + frameLayout);
 
         frameLayout.addView(saveStoryButton);
 
+        final FrameLayout.LayoutParams layoutParams =
+                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT,
+                        Gravity.BOTTOM | Gravity.END);
+
+        layoutParams.setMargins(600, 500, 0, 0);
+
+        FrameLayout.LayoutParams newParams = (FrameLayout.LayoutParams) callMethod(frameLayout, "generateLayoutParams", layoutParams);
+
+        saveStoryButton.setLayoutParams(newParams);
         saveStoryButton.bringToFront();
         saveStoryButton.invalidate();
-        frameLayout.invalidate();
         Logger.log("brought to front");
     }
 

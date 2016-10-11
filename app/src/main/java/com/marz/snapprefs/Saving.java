@@ -178,12 +178,13 @@ public class Saving {
 
                         FrameLayout snapContainer = scanForStoryContainer(view);
 
+                        s
                         if (snapContainer != null) {
                             if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ) {
                                 ViewParent parent = snapContainer.getParent();
 
                                 if( parent != null && parent instanceof FrameLayout )
-                                    HookedLayouts.assignImageButton((FrameLayout) parent, snapContext);
+                                    HookedLayouts.assignImageButton((FrameLayout) parent, snapContext, lpparam.classLoader);
                             }
                             else if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S )
                                 HookedLayouts.assignGestures(snapContainer);
