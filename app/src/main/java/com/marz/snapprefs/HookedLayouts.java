@@ -20,6 +20,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -268,12 +269,28 @@ public class HookedLayouts {
         });
     }
 
-    public static void assignImageButton(FrameLayout frameLayout, ClassLoader cl)
+    public static void assignImageButton(FrameLayout frameLayout, Context context)
     {
         Object parent = saveStoryButton.getParent();
 
         if( parent != null )
             ((FrameLayout) parent).removeView(saveStoryButton);
+
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        int width = metrics.widthPixels;
+        int height = metrics.heightPixels;
+        int newWidth = width - 100;
+        int newHeight = height - 100;
+        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) saveStoryButton.getLayoutParams();
+
+        layoutParams.setMargins(newWidth,
+                newHeight,
+                0,
+                0);
+
+        Logger.log("Button position: " + newWidth + "  " + newHeight);
+
+        saveStoryButton.setLayoutParams(layoutParams);
 
         frameLayout.addView(saveStoryButton);
 

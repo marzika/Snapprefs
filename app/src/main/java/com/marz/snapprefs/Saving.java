@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -178,8 +179,12 @@ public class Saving {
                         FrameLayout snapContainer = scanForStoryContainer(view);
 
                         if (snapContainer != null) {
-                            if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON )
-                                HookedLayouts.assignImageButton(snapContainer, lpparam.classLoader);
+                            if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ) {
+                                ViewParent parent = snapContainer.getParent();
+
+                                if( parent != null && parent instanceof FrameLayout )
+                                    HookedLayouts.assignImageButton((FrameLayout) parent, snapContext);
+                            }
                             else if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S )
                                 HookedLayouts.assignGestures(snapContainer);
                         }
