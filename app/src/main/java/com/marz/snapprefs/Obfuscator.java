@@ -243,6 +243,8 @@ public class Obfuscator {
         public static final String SNAPCAPTURECONTEXT_CLASS = "com.snapchat.android.util.eventbus.SnapCaptureContext";
         //aa_chat_camera_upload
         public static final String UPLOAD_ICON = "0x7f02001a";
+        //API, SCREENSHOT # TAKE_PHOTO_METHOD
+        public static final String TAKE_PHOTO_METHOD = "com.snapchat.android.camera.TakePhotoCallback.TAKE_PHOTO_METHOD";
     }
     public class lens {
         public static final String LENSCLASS = "com.snapchat.android.model.lenses.Lens";
