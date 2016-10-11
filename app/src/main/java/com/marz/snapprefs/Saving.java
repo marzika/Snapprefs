@@ -178,7 +178,7 @@ public class Saving {
 
                         FrameLayout snapContainer = scanForStoryContainer(view);
 
-                        s
+                        
                         if (snapContainer != null) {
                             if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ) {
                                 ViewParent parent = snapContainer.getParent();
