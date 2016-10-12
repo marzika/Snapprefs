@@ -116,7 +116,7 @@ public class VisualFilters {
 
     public static void initVisualFilters(final XC_LoadPackage.LoadPackageParam lpparam){
         setPreferences();
-        XposedHelpers.findAndHookMethod(Obfuscator.visualfilters.FILTERMETRICSPROVIDER_CLASS, lpparam.classLoader, Obfuscator.visualfilters.VISUAL_FILTER_TYPE_CHECK_METHOD, XposedHelpers.findClass(Obfuscator.visualfilters.ANNOTATEDMEDIABRYO, lpparam.classLoader), new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod(Obfuscator.visualfilters.FILTERMETRICSPROVIDER_CLASS, lpparam.classLoader, Obfuscator.visualfilters.VISUAL_FILTER_TYPE_CHECK_METHOD, XposedHelpers.findClass("Oi", lpparam.classLoader), new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 if (param.hasThrowable()) {
