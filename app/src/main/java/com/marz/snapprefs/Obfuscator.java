@@ -373,6 +373,7 @@ public class Obfuscator {
         public static final String INTERFACE = "Ml";//prev. BS
         public static final String GETFRIENDMANAGER_METHOD = "h";//prev. e
         public static final String GETUSERNAME_METHOD = "d";//prev. g
+        public static final String GETDISPLAYNAME_METHOD = "g";
     }
     public class bus {
         public static final String UPDATEEVENT_CLASS = "Ds";

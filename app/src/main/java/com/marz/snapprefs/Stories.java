@@ -89,9 +89,9 @@ public class Stories {
         for (int i = 0; i <= friends.size() - 1; i++) {
             String username = (String) XposedHelpers.callMethod(friends.get(i), Obfuscator.save.GET_FRIEND_USERNAME);
             if (peopleToHide.contains(username)) {
-                friendList.add(new Friend(username, true));
+                friendList.add(new Friend(username, "", true));
             } else {
-                friendList.add(new Friend(username, false));
+                friendList.add(new Friend(username, "", false));
             }
         }
         Collections.sort(friendList, new Friend.friendComparator());

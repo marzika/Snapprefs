@@ -136,10 +136,11 @@ public class Groups {
         friendList.clear();
         for (int i = 0; i <= friends.size() - 1; i++) {
             String username = (String) callMethod(friends.get(i), Obfuscator.groups.GETUSERNAME_METHOD);
+            String displayName = (String) callMethod(friends.get(i), Obfuscator.groups.GETDISPLAYNAME_METHOD);
             if (selectedGroup != null && selectedGroup.users.contains(username)) {
-                friendList.add(new Friend(username, true));
+                friendList.add(new Friend(username, displayName, true));
             } else {
-                friendList.add(new Friend(username, false));
+                friendList.add(new Friend(username, displayName, false));
             }
         }
         Collections.sort(friendList, new Friend.friendComparator());
