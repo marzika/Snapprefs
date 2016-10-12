@@ -264,6 +264,7 @@ public class HookedLayouts {
 
         if( storyButton.getParent() == null ) {
             frameLayout.addView(storyButton);
+            storyButton.setAssignedmKey(mKey);
         }
 
         if( !storyButton.areParamsSet )
