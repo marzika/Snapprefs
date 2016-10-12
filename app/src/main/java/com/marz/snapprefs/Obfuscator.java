@@ -204,7 +204,21 @@ public class Obfuscator implements Serializable {
         public final static String OBJECT_MCLIENTID = "mClientId";
         public final static String OBJECT_MVIDEOURI = "mVideoUri";
 
+        public final static String STORY_DETAILS_PACKET = "aGg";
+        public final static String SDP_GET_ENUM_METHOD = "b";
+        public final static String SDP_GET_OBJECT = "a";
+        public final static String SDP_GET_STRING = "d";
 
+        public final static String STORY_VIEWER_MEDIA_CACHE = "com.snapchat.android.stories.viewer.StoryViewerMediaCache";
+        public final static String VIEWING_STORY_METHOD = "a";
+        public final static String VIEWING_STORY_VAR4 = "aEm$a";
+
+        public final static String STORY_IMAGE_HOLDER = "gC";
+
+        public final static String STORY_LOADER = "asT";
+        public final static String SL_ISVIEWING_METHOD = "i";
+        public final static String SL_ON_RESOURCE_READY_METHOD = "onResourceReady";
+        public final static String SL_VAR2 = "gt";
     }
     public static class datasaving {
         public final static String DSNAPDOWNLOADER_CLASS = "Df$a";//Prev. KL

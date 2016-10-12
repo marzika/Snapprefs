@@ -106,8 +106,8 @@ public class Saving {
                     });
 
             /**
-            * Called whenever a bitmap is set to the view (I believe)
-            **/
+             * Called whenever a bitmap is set to the view (I believe)
+             **/
             // UPDATED METHOD & CONTENT 9.39.5
             findAndHookMethod(Obfuscator.save.IMAGESNAPRENDERER_CLASS2, cl, Obfuscator.save.IMAGESNAPRENDERER_NEW_BITMAP, Bitmap.class, new XC_MethodHook() {
                 @Override
@@ -120,7 +120,7 @@ public class Saving {
                 }
             });
 
-            findAndHookMethod("aGg", cl, "b", String.class, Object.class, new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.STORY_DETAILS_PACKET, cl, Obfuscator.save.SDP_GET_ENUM_METHOD, String.class, Object.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
@@ -131,19 +131,18 @@ public class Saving {
                 }
             });
 
-            findAndHookMethod("com.snapchat.android.stories.viewer.StoryViewerMediaCache", cl, "a",
-                    String.class, findClass("aGg", cl), ImageView.class, findClass("aEm$a", cl), new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.STORY_VIEWER_MEDIA_CACHE, cl, Obfuscator.save.VIEWING_STORY_METHOD,
+                    String.class, findClass(Obfuscator.save.STORY_DETAILS_PACKET, cl), ImageView.class, findClass(Obfuscator.save.VIEWING_STORY_VAR4, cl), new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                             super.beforeHookedMethod(param);
                             Log.d("snapprefs", "### START StoryViewerMediaCache ###");
                             Object godPacket = param.args[1];
-                            Object storySnap = callMethod(godPacket, "a", "STORY_REPLY_SNAP");
+                            Object storySnap = callMethod(godPacket, Obfuscator.save.SDP_GET_OBJECT, "STORY_REPLY_SNAP");
 
-                            String storyUsername = (String) callMethod(godPacket, "d", "POSTER_USERNAME");
+                            String storyUsername = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "POSTER_USERNAME");
 
-                            if( storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader)))
-                            {
+                            if (storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader))) {
                                 Logger.log("Story is yours");
                                 return;
                             }
@@ -153,9 +152,9 @@ public class Saving {
                             String mKey = (String) getObjectField(storySnap, "mId");
 
                             if (snapContainer != null) {
-                                if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON )
+                                if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON)
                                     HookedLayouts.assignStoryButton(snapContainer, snapContext, mKey);
-                                else if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S )
+                                else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S)
                                     HookedLayouts.assignGestures((FrameLayout) snapContainer.getParent());
                             }
 
@@ -166,7 +165,7 @@ public class Saving {
                         }
                     });
 
-            findAndHookConstructor("gC", cl, ImageView.class, new XC_MethodHook() {
+            findAndHookConstructor(Obfuscator.save.STORY_IMAGE_HOLDER, cl, ImageView.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
@@ -178,8 +177,7 @@ public class Saving {
 
                         String storyUsername = (String) getObjectField(storySnap, "mUsername");
 
-                        if( storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader)))
-                        {
+                        if (storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader))) {
                             Logger.log("Story is yours");
                             return;
                         }
@@ -192,7 +190,7 @@ public class Saving {
                 }
             });
 
-            findAndHookMethod("asT", cl, "i", storyClass, new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.STORY_LOADER, cl, Obfuscator.save.SL_ISVIEWING_METHOD, storyClass, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
@@ -200,15 +198,14 @@ public class Saving {
 
                     Object storySnap = param.args[0];
 
-                    if( storySnap == null ) {
+                    if (storySnap == null) {
                         Log.d("snapprefs", "Null StorySnap");
                         return;
                     }
 
                     String storyUsername = (String) getObjectField(storySnap, "mUsername");
 
-                    if( storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader)))
-                    {
+                    if (storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader))) {
                         Logger.log("Story is yours");
                         return;
                     }
@@ -217,7 +214,7 @@ public class Saving {
                 }
             });
 
-            findAndHookMethod("gC", cl, "onResourceReady", Object.class, findClass("gt", cl), new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.save.STORY_IMAGE_HOLDER, cl, "onResourceReady", Object.class, findClass(Obfuscator.save.SL_VAR2, cl), new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
@@ -238,15 +235,14 @@ public class Saving {
 
                     String storyUsername = (String) getObjectField(storySnap, "mUsername");
 
-                    if( storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader)))
-                    {
+                    if (storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader))) {
                         Logger.log("Story is yours");
                         return;
                     }
 
 
                     String mKey = (String) getObjectField(storySnap, "mId");
-                    handleImagePayload(snapContext, mKey, (Bitmap) image );
+                    handleImagePayload(snapContext, mKey, (Bitmap) image);
                 }
             });
 
@@ -428,25 +424,21 @@ public class Saving {
         }
     }
 
-    public static FrameLayout scanForStoryContainer(View view)
-    {
-        if( view == null )
+    public static FrameLayout scanForStoryContainer(View view) {
+        if (view == null)
             return null;
 
         Object parent = view.getParent();
 
-        if( parent != null )
-        {
-            if( parent instanceof View )
-            {
-                int id = ((View)parent).getId();
+        if (parent != null) {
+            if (parent instanceof View) {
+                int id = ((View) parent).getId();
                 Logger.log("Scanned ID: " + id);
 
-                if( id == +2131689491) {
+                if (id == +2131689491) {
                     Logger.log("Found Opera container");
                     return (FrameLayout) parent;
-                }
-                else {
+                } else {
                     Logger.log("Failed scan attempt");
                     return scanForStoryContainer((View) parent);
                 }
@@ -581,6 +573,7 @@ public class Saving {
             performButtonSave(currentSnapKey);
         }
     }
+
     public static void performButtonSave(String mKey) {
         SnapData currentSnapData = null;
         Logger.printTitle("Launching BUTTON Save");

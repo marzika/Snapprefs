@@ -28,7 +28,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -262,12 +261,12 @@ public class HookedLayouts {
 
         Logger.log("Frame type: " + frameLayout);
 
-        if( storyButton.getParent() == null ) {
+        if (storyButton.getParent() == null) {
             frameLayout.addView(storyButton);
             storyButton.setAssignedmKey(mKey);
         }
 
-        if( !storyButton.areParamsSet )
+        if (!storyButton.areParamsSet)
             storyButton.buildParams(frameLayout, context);
 
         storyButton.bringToFront();
@@ -277,14 +276,14 @@ public class HookedLayouts {
     }
 
     public static AssignedStoryButton retrieveStoryButton(Context context, String mKey) {
-        for( AssignedStoryButton button : storyButtonQueue ){
+        for (AssignedStoryButton button : storyButtonQueue) {
             Logger.log("ItemStart");
             Logger.log("Button: " + button.getParent());
             Logger.log("Button: " + button.isShown());
 
-            if(( button.getAssignedmKey() != null && button.getAssignedmKey().equals(mKey) ) ||
+            if ((button.getAssignedmKey() != null && button.getAssignedmKey().equals(mKey)) ||
                     button.canBeReassigned()) {
-                if(!button.isShown())
+                if (!button.isShown())
                     button.removeParent();
 
                 return button;
