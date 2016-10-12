@@ -20,7 +20,6 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -29,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -47,14 +47,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Preferences.Prefs;
+import com.marz.snapprefs.Util.AssignedStoryButton;
 import com.marz.snapprefs.Util.GestureEvent;
 import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.TypefaceUtil;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
@@ -62,9 +62,7 @@ import de.robv.android.xposed.callbacks.XC_InitPackageResources;
 import de.robv.android.xposed.callbacks.XC_LayoutInflated;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
-import static de.robv.android.xposed.XposedHelpers.findClass;
 
 /**
  * Created by MARZ on 2016. 04. 08..
@@ -77,6 +75,7 @@ public class HookedLayouts {
     public static boolean setInt = true;
     public static ImageButton saveSnapButton;
     public static ImageButton saveStoryButton;
+    public static ArrayList<AssignedStoryButton> storyButtonQueue = new ArrayList<>();
     public static Class OperaPageViewLayoutsClass;
 
     public static void initIntegration(XC_LoadPackage.LoadPackageParam lpparam,
@@ -120,16 +119,14 @@ public class HookedLayouts {
                 navigation.addView(row);
 
                 boolean containsRow = false;
-                for(int index=0; index< navigation.getChildCount(); ++index) {
+                for (int index = 0; index < navigation.getChildCount(); ++index) {
                     View nextChild = navigation.getChildAt(index);
 
-                    if( nextChild.getTag() != null && nextChild.getTag() instanceof String )
-                    {
-                        if( nextChild.getTag().equals("Hello"))
-                        {
+                    if (nextChild.getTag() != null && nextChild.getTag() instanceof String) {
+                        if (nextChild.getTag().equals("Hello")) {
                             Logger.log("IT EQUALS IT MOTHA: " + containsRow);
 
-                            if( containsRow)
+                            if (containsRow)
                                 navigation.removeView(nextChild);
                             else
                                 containsRow = true;
@@ -216,21 +213,6 @@ public class HookedLayouts {
                         FrameLayout.LayoutParams.WRAP_CONTENT,
                         Gravity.BOTTOM | horizontalPosition);
 
-        saveStoryButton = new ImageButton(localContext);
-        saveStoryButton.setLayoutParams(layoutParams);
-        saveStoryButton.setBackgroundColor(0);
-        saveStoryButton.setImageBitmap(saveImg);
-        saveStoryButton.setAlpha(0.8f);
-        saveStoryButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ?
-                View.VISIBLE : View.INVISIBLE);
-
-        saveStoryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Saving.performButtonSave();
-            }
-        });
-
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated() {
             @Override
             public void handleLayoutInflated(LayoutInflatedParam liparam)
@@ -270,34 +252,51 @@ public class HookedLayouts {
         });
     }
 
-    public static void assignImageButton(FrameLayout frameLayout, Context context, ClassLoader cl)
-    {
-        Object parent = saveStoryButton.getParent();
+    public static void assignStoryButton(FrameLayout frameLayout, Context context, String mKey) {
+        AssignedStoryButton storyButton = retrieveStoryButton(context, mKey);
 
-        if( parent != null )
-            ((FrameLayout) parent).removeView(saveStoryButton);
+        if (storyButton == null) {
+            Logger.log("Could not assign a story button");
+            return;
+        }
 
         Logger.log("Frame type: " + frameLayout);
 
-        frameLayout.addView(saveStoryButton);
+        if( storyButton.getParent() == null ) {
+            frameLayout.addView(storyButton);
+        }
 
-        final FrameLayout.LayoutParams layoutParams =
-                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
-                        FrameLayout.LayoutParams.WRAP_CONTENT,
-                        Gravity.BOTTOM | Gravity.END);
+        if( !storyButton.areParamsSet )
+            storyButton.buildParams(frameLayout, context);
 
-        layoutParams.setMargins(600, 500, 0, 0);
+        storyButton.bringToFront();
+        storyButton.invalidate();
 
-        FrameLayout.LayoutParams newParams = (FrameLayout.LayoutParams) callMethod(frameLayout, "generateLayoutParams", layoutParams);
-
-        saveStoryButton.setLayoutParams(newParams);
-        saveStoryButton.bringToFront();
-        saveStoryButton.invalidate();
         Logger.log("brought to front");
     }
 
-    public static void assignGestures(FrameLayout frameLayout)
-    {
+    public static AssignedStoryButton retrieveStoryButton(Context context, String mKey) {
+        for( AssignedStoryButton button : storyButtonQueue ){
+            Logger.log("ItemStart");
+            Logger.log("Button: " + button.getParent());
+            Logger.log("Button: " + button.isShown());
+
+            if(( button.getAssignedmKey() != null && button.getAssignedmKey().equals(mKey) ) ||
+                    button.canBeReassigned()) {
+                if(!button.isShown())
+                    button.removeParent();
+
+                return button;
+            }
+        }
+
+        Logger.log("No existing button available... Creating new");
+        AssignedStoryButton storyButton = new AssignedStoryButton(context);
+        storyButtonQueue.add(storyButton);
+        return storyButton;
+    }
+
+    public static void assignGestures(FrameLayout frameLayout) {
         final GestureEvent gestureEvent = new GestureEvent();
         frameLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -308,9 +307,9 @@ public class HookedLayouts {
             }
         });
     }
-    public static void initParents( View view )
-    {
-        if( view.getParent() != null ) {
+
+    public static void initParents(View view) {
+        if (view.getParent() != null) {
             View viewParent = (View) view.getParent();
             Log.d("snapprefs", "ViewId: " + viewParent.getId());
 
@@ -318,14 +317,11 @@ public class HookedLayouts {
         }
     }
 
-    public static void initView( View view )
-    {
+    public static void initView(View view) {
         Log.d("snapprefs", "ID: " + view.getId());
 
-        if( view instanceof ViewGroup )
-        {
-            for( int i = 0; i < ((ViewGroup) view).getChildCount(); i++)
-            {
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
                 View obj = ((ViewGroup) view).getChildAt(i);
 
                 Log.d("snapprefs", "ViewId: " + obj.getId());
@@ -489,9 +485,13 @@ public class HookedLayouts {
         });
     }
 
-    public static int px(float f) {
+    public static int px(float f, float density) {
         return Math.round((f *
-                HookMethods.SnapContext.getResources().getDisplayMetrics().density));
+                density));
+    }
+
+    public static int px(float f) {
+        return px(f, HookMethods.SnapContext.getResources().getDisplayMetrics().density);
     }
 
     public static void initVisiblity(XC_LoadPackage.LoadPackageParam lpparam) {

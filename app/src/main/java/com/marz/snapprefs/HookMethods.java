@@ -7,6 +7,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
 import android.content.res.XResources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -63,6 +65,7 @@ public class HookMethods
     private static XModuleResources mResources;
     private static int snapchatVersion;
     private static InitPackageResourcesParam resParam;
+    public static Bitmap saveImg;
     Class CaptionEditText;
     boolean latest = false;
 
@@ -136,6 +139,7 @@ public class HookMethods
             // TODO Set up removal of button when mode is changed
             // Currently requires snapchat to restart to remove the button
             try {
+                saveImg = BitmapFactory.decodeResource(mResources, R.drawable.save_button);
                 HookedLayouts.addSaveButtonsAndGestures(resparam, mResources, localContext);
             } catch( Throwable t )
             {

@@ -12,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -42,7 +41,6 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-import static com.marz.snapprefs.HookMethods.context;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
@@ -69,6 +67,7 @@ public class Saving {
     private static boolean asyncSaveMode = true;
     private static boolean hasAssignedButtonsAndGestures = false;
     private static Object enum_NO_AUTO_ADVANCE;
+    private static Context context;
 
     static void initSaving(final XC_LoadPackage.LoadPackageParam lpparam,
                            final XModuleResources modRes, final Context snapContext) {
@@ -149,6 +148,17 @@ public class Saving {
                                 return;
                             }
 
+                            View view = (View) param.args[2];
+                            FrameLayout snapContainer = scanForStoryContainer(view);
+                            String mKey = (String) getObjectField(storySnap, "mId");
+
+                            if (snapContainer != null) {
+                                if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON )
+                                    HookedLayouts.assignStoryButton(snapContainer, snapContext, mKey);
+                                else if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S )
+                                    HookedLayouts.assignGestures((FrameLayout) snapContainer.getParent());
+                            }
+
                             setAdditionalInstanceField(param.args[2], "StorySnap", storySnap);
                             Log.d("snapprefs", "StoryViewerMediaCache.a : KEY " + getObjectField(storySnap, "mId"));
                             Log.d("snapprefs", "Str: " + param.args[0]);
@@ -172,22 +182,6 @@ public class Saving {
                         {
                             Logger.log("Story is yours");
                             return;
-                        }
-
-                        View view = (View) param.args[0];
-
-                        FrameLayout snapContainer = scanForStoryContainer(view);
-
-                        
-                        if (snapContainer != null) {
-                            if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ) {
-                                ViewParent parent = snapContainer.getParent();
-
-                                if( parent != null && parent instanceof FrameLayout )
-                                    HookedLayouts.assignImageButton((FrameLayout) parent, snapContext, lpparam.classLoader);
-                            }
-                            else if( Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S )
-                                HookedLayouts.assignGestures(snapContainer);
                         }
 
                         setAdditionalInstanceField(param.thisObject, "StorySnap", storySnap);
@@ -250,8 +244,8 @@ public class Saving {
                         return;
                     }
 
-                    String mKey = (String) getObjectField(storySnap, "mId");
 
+                    String mKey = (String) getObjectField(storySnap, "mId");
                     handleImagePayload(snapContext, mKey, (Bitmap) image );
                 }
             });
@@ -436,6 +430,9 @@ public class Saving {
 
     public static FrameLayout scanForStoryContainer(View view)
     {
+        if( view == null )
+            return null;
+
         Object parent = view.getParent();
 
         if( parent != null )
@@ -580,13 +577,18 @@ public class Saving {
     }
 
     public static void performButtonSave() {
+        if (currentSnapKey != null) {
+            performButtonSave(currentSnapKey);
+        }
+    }
+    public static void performButtonSave(String mKey) {
         SnapData currentSnapData = null;
         Logger.printTitle("Launching BUTTON Save");
 
-        if (currentSnapKey != null) {
-            currentSnapData = hashSnapData.get(currentSnapKey);
+        if (mKey != null) {
+            currentSnapData = hashSnapData.get(mKey);
 
-            if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
+            if (currentSnapData != null && currentSnapData.getSnapType() != null && context != null) {
                 if (currentSnapData.getSnapType() == SnapType.STORY &&
                         Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_BUTTON) {
                     Logger.printFinalMessage("Tried to perform story button save from different mode");
@@ -600,7 +602,7 @@ public class Saving {
         }
 
         Logger.printMessage("SnapData set: " + (currentSnapData != null));
-        performManualSnapDataSave(currentSnapData, relativeContext);
+        performManualSnapDataSave(currentSnapData, context);
     }
 
     public static void performManualSnapDataSave(SnapData snapData, Context context) {
