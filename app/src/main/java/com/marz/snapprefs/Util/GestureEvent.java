@@ -3,6 +3,7 @@ package com.marz.snapprefs.Util;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.marz.snapprefs.HookedLayouts;
 import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.Preferences.Prefs;
@@ -12,7 +13,7 @@ import com.marz.snapprefs.Saving;
  * Created by Andre on 07/09/2016.
  */
 public class GestureEvent {
-    private final int MIN_DISTANCE = 300;
+    private static final int MIN_DISTANCE = 150;
     private float xStart;
     private float yStart;
     private float xEnd;
@@ -40,7 +41,7 @@ public class GestureEvent {
                         yStart - yEnd);
 
                 Logger.log("Distance: " + distance);
-                if (distance > MIN_DISTANCE) {
+                if (distance > HookedLayouts.px(MIN_DISTANCE)) {
 
                     Logger.log("Performed swipe: " + distance);
                     Saving.performS2SSave();

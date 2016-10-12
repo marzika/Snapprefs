@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.marz.snapprefs.Databases.LensDatabaseHelper;
 import com.marz.snapprefs.Tabs.BuyTabFragment;
 import com.marz.snapprefs.Tabs.DataTabFragment;
 import com.marz.snapprefs.Tabs.DeluxeTabFragment;
@@ -47,7 +49,6 @@ import com.marz.snapprefs.Tabs.SavingTabFragment;
 import com.marz.snapprefs.Tabs.SharingTabFragment;
 import com.marz.snapprefs.Tabs.SpoofingTabFragment;
 import com.marz.snapprefs.Tabs.TextTabFragment;
-import com.marz.snapprefs.Databases.LensDatabaseHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -148,9 +149,17 @@ public class MainActivity extends AppCompatActivity {
         ChangeLog cl = new ChangeLog(context);
         createDeviceId();
 
+        /*Obfuscator.writeGsonFile();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Obfuscator.readJsonFile();
+
         if (cl.isFirstRun()) {
             cl.getLogDialog().show();
-        }
+        }*/
 
         Logger.log("MainActivity: createPrefsIfNotExisting");
         createPrefsIfNotExisting();
@@ -446,6 +455,10 @@ public class MainActivity extends AppCompatActivity {
         prefs = this.getSharedPreferences(this.getPackageName() + "_preferences", Activity.MODE_WORLD_READABLE);
 
         return prefs;
+    }
+
+    public static boolean isNetworkAvailable(final Context context) {
+        return ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo() != null;
     }
 
     public void saveInSharedPref(String result) {

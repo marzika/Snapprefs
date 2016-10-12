@@ -7,6 +7,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.XModuleResources;
 import android.content.res.XResources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -23,6 +25,9 @@ import com.marz.snapprefs.Util.DebugHelper;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 import de.robv.android.xposed.IXposedHookInitPackageResources;
@@ -60,6 +65,7 @@ public class HookMethods
     private static XModuleResources mResources;
     private static int snapchatVersion;
     private static InitPackageResourcesParam resParam;
+    public static Bitmap saveImg;
     Class CaptionEditText;
     boolean latest = false;
 
@@ -132,8 +138,13 @@ public class HookMethods
 
             // TODO Set up removal of button when mode is changed
             // Currently requires snapchat to restart to remove the button
-            HookedLayouts.addSaveButtonsAndGestures(resparam, mResources, localContext);
-
+            try {
+                saveImg = BitmapFactory.decodeResource(mResources, R.drawable.save_button);
+                HookedLayouts.addSaveButtonsAndGestures(resparam, mResources, localContext);
+            } catch( Throwable t )
+            {
+                Logger.log(t);
+            }
             if (Preferences.shouldAddGhost()) {
                 HookedLayouts.addIcons(resparam, mResources);
             }
@@ -515,6 +526,12 @@ public class HookMethods
                             }
                         }
                     });
+                    //disable auto advance
+                    //search for "AUTO_ADVANCE_RECENT_UPDATES"
+
+                    if( Preferences.getBool(Prefs.AUTO_ADVANCE))
+                        XposedHelpers.findAndHookMethod("aty", lpparam.classLoader, "a", XC_MethodReplacement.returnConstant(false));
+
                 }
             });
         } catch (Exception e) {
@@ -524,8 +541,16 @@ public class HookMethods
 
     public static String getSCUsername(ClassLoader cl)
     {
-        Object scPreferenceHandler = findClass(Obfuscator.misc.PREFERENCES_CLASS, cl);
-        return (String) callMethod(scPreferenceHandler, Obfuscator.misc.GETUSERNAME_METHOD);
+        Class scPreferenceHandler = findClass(Obfuscator.misc.PREFERENCES_CLASS, cl);
+        try {
+            return (String) callMethod(scPreferenceHandler.newInstance(), Obfuscator.misc.GETUSERNAME_METHOD);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
     private void addFilter(LoadPackageParam lpparam) {
@@ -598,5 +623,59 @@ public class HookMethods
                 }
             }
         });
+    }
+
+    public static void hookAllMethods(String className, ClassLoader cl, boolean hookSubClasses, boolean hookSuperClasses)
+    {
+        Log.d("snapprefs", "Starting allhook");
+        final Class targetClass = findClass(className, cl);
+        Method[] allMethods = targetClass.getDeclaredMethods();
+
+        Log.d("snapprefs", "Methods to hook: " + allMethods.length);
+        for( final Method baseMethod : allMethods )
+        {
+            final Class<?>[] paramList = baseMethod.getParameterTypes();
+            final String fullMethodString = targetClass.getSimpleName() + "." + baseMethod.getName() + "(" + Arrays.toString(paramList) + ") -> " + baseMethod.getReturnType();
+
+            if(Modifier.isAbstract(baseMethod.getModifiers())) {
+                Log.d("snapprefs", "Abstract method: " + fullMethodString);
+                continue;
+            }
+
+            Object[] finalParam = new Object[paramList.length + 1];
+
+            System.arraycopy(paramList, 0, finalParam, 0, paramList.length);
+
+            finalParam[paramList.length] = new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+                    Log.d("snapprefs", "HookTrigger: " + fullMethodString);
+                }
+            };
+
+            findAndHookMethod(targetClass, baseMethod.getName(), finalParam);
+            Log.d("snapprefs", "Hooked method: " + fullMethodString);
+        }
+
+        if(hookSubClasses)
+        {
+            Class[] subClasses = targetClass.getClasses();
+
+            Log.d("snapprefs", "Hooking Subclasses: " + subClasses.length);
+
+            for(Class subClass : subClasses)
+                hookAllMethods(subClass.getName(), cl, hookSubClasses, hookSuperClasses);
+        }
+
+        if(hookSuperClasses)
+        {
+            Class superClass = targetClass.getSuperclass();
+            if( superClass == null || superClass.getSimpleName().equals("Object"))
+                return;
+
+            Log.d("snapprefs", "FOUND SUPERCLASS: " + superClass.getSimpleName());
+            hookAllMethods(superClass.getName(), cl, false, true);
+        }
     }
 }
