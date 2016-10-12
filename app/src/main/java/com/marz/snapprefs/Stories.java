@@ -10,8 +10,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import com.marz.snapprefs.Util.FileUtils;
 import com.marz.snapprefs.Preferences.Prefs;
+import com.marz.snapprefs.Util.FileUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_InitPackageResources;
 import de.robv.android.xposed.callbacks.XC_LayoutInflated;
@@ -97,6 +98,9 @@ public class Stories {
                 }
             }
         });
+
+        if( Preferences.getBool(Prefs.DISCOVER_UI))
+            findAndHookMethod("atk", lpparam.classLoader, "c", List.class, XC_MethodReplacement.returnConstant(new ArrayList<>()));
     }
 
     private static void readFriendList(ClassLoader classLoader) {
