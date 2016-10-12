@@ -586,9 +586,10 @@ public class Saving {
         Logger.printTitle("Launching BUTTON Save");
 
         if (mKey != null) {
+            Logger.log("Checking key: " + mKey);
             currentSnapData = hashSnapData.get(mKey);
 
-            if (currentSnapData != null && currentSnapData.getSnapType() != null && context != null) {
+            if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
                 if (currentSnapData.getSnapType() == SnapType.STORY &&
                         Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_BUTTON) {
                     Logger.printFinalMessage("Tried to perform story button save from different mode");
@@ -602,7 +603,7 @@ public class Saving {
         }
 
         Logger.printMessage("SnapData set: " + (currentSnapData != null));
-        performManualSnapDataSave(currentSnapData, context);
+        performManualSnapDataSave(currentSnapData, relativeContext);
     }
 
     public static void performManualSnapDataSave(SnapData snapData, Context context) {
