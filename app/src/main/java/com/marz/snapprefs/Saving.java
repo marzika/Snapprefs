@@ -435,7 +435,7 @@ public class Saving {
                 int id = ((View) parent).getId();
                 Logger.log("Scanned ID: " + id);
 
-                if (id == +2131689491) {
+                if (id == Obfuscator.save.OPERA_PAGE_VIEW_ID) {
                     Logger.log("Found Opera container");
                     return (FrameLayout) parent;
                 } else {

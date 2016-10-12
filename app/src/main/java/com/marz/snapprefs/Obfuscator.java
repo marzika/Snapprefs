@@ -219,6 +219,8 @@ public class Obfuscator implements Serializable {
         public final static String SL_ISVIEWING_METHOD = "i";
         public final static String SL_ON_RESOURCE_READY_METHOD = "onResourceReady";
         public final static String SL_VAR2 = "gt";
+
+        public final static int OPERA_PAGE_VIEW_ID = +2131689491;
     }
     public static class datasaving {
         public final static String DSNAPDOWNLOADER_CLASS = "Df$a";//Prev. KL
