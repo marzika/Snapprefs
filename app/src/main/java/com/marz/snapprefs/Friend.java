@@ -27,6 +27,9 @@ public class Friend implements Serializable {
     public Friend(String name, String disName, boolean isSelected) {
 
         this.name = name;
+        if(disName != "") {
+            Logger.log("Logging Display Name In Friend.java: " + disName, true, true);
+        }
         this.displayName = disName;
         this.isSelected = isSelected;
     }

@@ -137,6 +137,7 @@ public class Groups {
         for (int i = 0; i <= friends.size() - 1; i++) {
             String username = (String) callMethod(friends.get(i), Obfuscator.groups.GETUSERNAME_METHOD);
             String displayName = (String) callMethod(friends.get(i), Obfuscator.groups.GETDISPLAYNAME_METHOD);
+            Logger.log("Logging Display Name In Groups Method: " + displayName, true, true);
             if (selectedGroup != null && selectedGroup.users.contains(username)) {
                 friendList.add(new Friend(username, displayName, true));
             } else {
