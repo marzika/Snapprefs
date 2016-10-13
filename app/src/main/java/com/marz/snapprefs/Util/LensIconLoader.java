@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -56,12 +57,13 @@ public class LensIconLoader {
         }
     }
 
+    @Nullable
     public static Bitmap retrieveAppropriateBitmap( String url, Context context )
     {
         File iconDirectory = new File(Preferences.getSavePath(), "/LensIcon/");
 
         if( !iconDirectory.exists() && !iconDirectory.mkdirs()) {
-            return getBitmapFromURL(url, 1);
+            return getBitmapFromURL(url, 1, context);
         }
 
         String hashedFileName = hashBuilder(url);
@@ -76,14 +78,18 @@ public class LensIconLoader {
                 return bmp;
         }
 
-        Bitmap bmp = getBitmapFromURL(url, 1);
+        Bitmap bmp = getBitmapFromURL(url, 1, context);
+
+        if( bmp == null )
+            return null;
+
         SavingUtils.savePNGAsync(iconFile, bmp, context, false);
 
 
         File nomediaFile = new File( Preferences.getSavePath(), "/LensIcon/.nomedia");
 
         if( !nomediaFile.exists() )
-            MainActivity.writeNoMediaFile(Preferences.getSavePath() + "/LensIcon/");
+            MainActivity.writeNoMediaFile(Preferences.getSavePath() + "/LensIcon");
 
         return bmp;
     }
@@ -95,7 +101,10 @@ public class LensIconLoader {
         return BitmapFactory.decodeFile(iconFile.getPath(), options);
     }
 
-    public static Bitmap getBitmapFromURL(String src, int sampleSize) {
+    public static Bitmap getBitmapFromURL(String src, int sampleSize, Context context) {
+        if( !MainActivity.isNetworkAvailable(context))
+            return null;
+
         Bitmap bmImg;
         URL myFileUrl = null;
 

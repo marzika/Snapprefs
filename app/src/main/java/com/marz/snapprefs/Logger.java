@@ -49,6 +49,7 @@ public class Logger {
         try {
             if (!Preferences.getBool(Preferences.Prefs.DEBUGGING) && !forced)
                 return;
+
         } catch( Throwable t)
         {
             Log.d("SNAPPREFS", "Tried to log before fully loaded: ["  + message + "]");
@@ -63,7 +64,7 @@ public class Logger {
             XposedBridge.log(message);
         } catch( Throwable e)
         {
-            Log.d("SNAPPREFS", message);
+            Log.d("snapprefs", message);
         }
     }
 

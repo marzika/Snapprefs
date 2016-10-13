@@ -418,6 +418,8 @@ public class Preferences {
         CAPTION_UNLIMITED_FAT("pref_caption_unlimited_fat", false),
         CHECK_SIZE("pref_size_disabled", true),
         TIMBER("pref_timber", false),
+        AUTO_ADVANCE("pref_key_auto_advance", false),
+
         VFILTER_AMARO("AMARO", false),
         VFILTER_F1997("F1997", false),
         VFILTER_BRANNAN("BRANNAN", false),

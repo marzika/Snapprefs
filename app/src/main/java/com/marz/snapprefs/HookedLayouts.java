@@ -20,6 +20,7 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -44,13 +45,15 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Preferences.Prefs;
+import com.marz.snapprefs.Util.AssignedStoryButton;
 import com.marz.snapprefs.Util.GestureEvent;
 import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.TypefaceUtil;
-import com.marz.snapprefs.Preferences.Prefs;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
@@ -71,6 +74,8 @@ public class HookedLayouts {
     public static boolean setInt = true;
     public static ImageButton saveSnapButton;
     public static ImageButton saveStoryButton;
+    public static ArrayList<AssignedStoryButton> storyButtonQueue = new ArrayList<>();
+    public static Class OperaPageViewLayoutsClass;
 
     public static void initIntegration(XC_LoadPackage.LoadPackageParam lpparam,
                                        final XModuleResources mResources) {
@@ -113,16 +118,14 @@ public class HookedLayouts {
                 navigation.addView(row);
 
                 boolean containsRow = false;
-                for(int index=0; index< navigation.getChildCount(); ++index) {
+                for (int index = 0; index < navigation.getChildCount(); ++index) {
                     View nextChild = navigation.getChildAt(index);
 
-                    if( nextChild.getTag() != null && nextChild.getTag() instanceof String )
-                    {
-                        if( nextChild.getTag().equals("Hello"))
-                        {
+                    if (nextChild.getTag() != null && nextChild.getTag() instanceof String) {
+                        if (nextChild.getTag().equals("Hello")) {
                             Logger.log("IT EQUALS IT MOTHA: " + containsRow);
 
-                            if( containsRow)
+                            if (containsRow)
                                 navigation.removeView(nextChild);
                             else
                                 containsRow = true;
@@ -164,10 +167,10 @@ public class HookedLayouts {
                 upload = new ImageButton(HookMethods.SnapContext);
                 upload.setLayoutParams(layoutParams);
                 upload.setBackgroundColor(0);
-                Drawable uploadimg =
+                Drawable uploading =
                         HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.sharing.UPLOAD_ICON.substring(2), 16));
                 //upload.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
-                upload.setImageDrawable(uploadimg);
+                upload.setImageDrawable(uploading);
                 upload.setScaleX((float) 0.55);
                 upload.setScaleY((float) 0.55);
                 upload.setOnClickListener(new View.OnClickListener() {
@@ -191,7 +194,7 @@ public class HookedLayouts {
             XModuleResources mResources, final Context localContext
     ) {
         final GestureEvent gestureEvent = new GestureEvent();
-        Logger.log("Adding Save Buttons", false, true);
+        Logger.log("Adding Save Buttons");
 /*
         int intIconID = resparam.res.getIdentifier("aa_snap_preview_save", "drawable", Common
                 .PACKAGE_SNAP);
@@ -203,56 +206,11 @@ public class HookedLayouts {
             throw new NullPointerException("Button Image not found");
 
         int horizontalPosition = Preferences.getBool(Prefs.BUTTON_POSITION) ? Gravity.START : Gravity.END;
+
         final FrameLayout.LayoutParams layoutParams =
                 new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
                         FrameLayout.LayoutParams.WRAP_CONTENT,
                         Gravity.BOTTOM | horizontalPosition);
-
-        //stories_mystoryoverlaysave_icon
-
-        //final Bitmap saveImg = BitmapFactory.decodeResource( mResources, R.mipmap.snap_button );
-
-        resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_story_snap", new XC_LayoutInflated() {
-            @Override
-            public void handleLayoutInflated(LayoutInflatedParam liparam)
-                    throws Throwable {
-                Logger.log("Updating view_story_snap.snap_container layout");
-                final FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(
-                        liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP)
-                ).getParent();
-
-                ViewGroup overlay_group = (ViewGroup) liparam.view.findViewById(
-                        liparam.res.getIdentifier("my_story_swipe_layout", "id", Common.PACKAGE_SNAP));
-
-                saveStoryButton = new ImageButton(localContext);
-                saveStoryButton.setLayoutParams(layoutParams);
-                saveStoryButton.setBackgroundColor(0);
-                saveStoryButton.setImageBitmap(saveImg);
-                saveStoryButton.setAlpha(0.8f);
-                saveStoryButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ?
-                        View.VISIBLE : View.INVISIBLE);
-
-                frameLayout.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S &&
-                                gestureEvent.onTouch(v, event, Saving.SnapType.STORY);
-
-                    }
-                });
-
-                frameLayout.addView(saveStoryButton);
-
-                overlay_group.bringToFront();
-
-                saveStoryButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Saving.performButtonSave();
-                    }
-                });
-            }
-        });
 
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated() {
             @Override
@@ -280,6 +238,7 @@ public class HookedLayouts {
                     }
                 });
                 frameLayout.addView(saveSnapButton);
+                saveSnapButton.bringToFront();
 
                 saveSnapButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -290,6 +249,84 @@ public class HookedLayouts {
                 });
             }
         });
+    }
+
+    public static void assignStoryButton(FrameLayout frameLayout, Context context, String mKey) {
+        AssignedStoryButton storyButton = retrieveStoryButton(context, mKey);
+
+        if (storyButton == null) {
+            Logger.log("Could not assign a story button");
+            return;
+        }
+
+        Logger.log("Frame type: " + frameLayout);
+
+        if (storyButton.getParent() == null) {
+            frameLayout.addView(storyButton);
+            storyButton.setAssignedmKey(mKey);
+        }
+
+        if (!storyButton.areParamsSet)
+            storyButton.buildParams(frameLayout, context);
+
+        storyButton.bringToFront();
+        storyButton.invalidate();
+
+        Logger.log("brought to front");
+    }
+
+    public static AssignedStoryButton retrieveStoryButton(Context context, String mKey) {
+        for (AssignedStoryButton button : storyButtonQueue) {
+            Logger.log("ItemStart");
+            Logger.log("Button: " + button.getParent());
+            Logger.log("Button: " + button.isShown());
+
+            if ((button.getAssignedmKey() != null && button.getAssignedmKey().equals(mKey)) ||
+                    button.canBeReassigned()) {
+                if (!button.isShown())
+                    button.removeParent();
+
+                return button;
+            }
+        }
+
+        Logger.log("No existing button available... Creating new");
+        AssignedStoryButton storyButton = new AssignedStoryButton(context);
+        storyButtonQueue.add(storyButton);
+        return storyButton;
+    }
+
+    public static void assignGestures(FrameLayout frameLayout) {
+        final GestureEvent gestureEvent = new GestureEvent();
+        frameLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S &&
+                        gestureEvent.onTouch(v, event, Saving.SnapType.STORY);
+
+            }
+        });
+    }
+
+    public static void initParents(View view) {
+        if (view.getParent() != null) {
+            View viewParent = (View) view.getParent();
+            Log.d("snapprefs", "ViewId: " + viewParent.getId());
+
+            initParents(viewParent);
+        }
+    }
+
+    public static void initView(View view) {
+        Log.d("snapprefs", "ID: " + view.getId());
+
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                View obj = ((ViewGroup) view).getChildAt(i);
+
+                Log.d("snapprefs", "ViewId: " + obj.getId());
+            }
+        }
     }
 
     //TODO refresh button position when preference is changed
@@ -448,9 +485,13 @@ public class HookedLayouts {
         });
     }
 
-    public static int px(float f) {
+    public static int px(float f, float density) {
         return Math.round((f *
-                HookMethods.SnapContext.getResources().getDisplayMetrics().density));
+                density));
+    }
+
+    public static int px(float f) {
+        return px(f, HookMethods.SnapContext.getResources().getDisplayMetrics().density);
     }
 
     public static void initVisiblity(XC_LoadPackage.LoadPackageParam lpparam) {
