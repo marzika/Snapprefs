@@ -61,7 +61,6 @@ public class GroupDataAdapter extends RecyclerView.Adapter<GroupDataAdapter.View
         viewHolder.tvName = (TextView) viewHolder.itemView.getChildAt(0);
         viewHolder.chkSelected = (CheckBox) viewHolder.itemView.getChildAt(1);
 
-        Logger.log("Logging Display Name In GroupDataAdapter.java: " + friendList.get(position).getDisplayName(), true, true);
         viewHolder.tvName.setText(friendList.get(position).getDisplayName());
         viewHolder.tvName.setHint(friendList.get(position).getName());
 
