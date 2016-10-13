@@ -266,7 +266,7 @@ public class HookedLayouts {
             storyButton.setAssignedmKey(mKey);
         }
 
-        if (!storyButton.areParamsSet)
+        if (!storyButton.areParamsSet())
             storyButton.buildParams(frameLayout, context);
 
         storyButton.bringToFront();
@@ -277,12 +277,12 @@ public class HookedLayouts {
 
     public static AssignedStoryButton retrieveStoryButton(Context context, String mKey) {
         for (AssignedStoryButton button : storyButtonQueue) {
-            Logger.log("ItemStart");
-            Logger.log("Button: " + button.getParent());
-            Logger.log("Button: " + button.isShown());
+            Logger.log("Checking if button can be reassigned");
 
             if ((button.getAssignedmKey() != null && button.getAssignedmKey().equals(mKey)) ||
                     button.canBeReassigned()) {
+                Logger.log("Found button to reassign");
+
                 if (!button.isShown())
                     button.removeParent();
 
@@ -290,7 +290,7 @@ public class HookedLayouts {
             }
         }
 
-        Logger.log("No existing button available... Creating new");
+        Logger.log("No existing or assignable button available... Creating new");
         AssignedStoryButton storyButton = new AssignedStoryButton(context);
         storyButtonQueue.add(storyButton);
         return storyButton;

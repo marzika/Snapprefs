@@ -73,8 +73,10 @@ public class Stories {
                             }
                         }
                     } else if (o.getClass() == liveStory && Preferences.getBool(Prefs.HIDE_LIVE)) {
+                        Logger.log("Live");
                         f.remove(i);
                     } else if (o.getClass() == discoverStory && Preferences.getBool(Prefs.DISCOVER_UI)) {
+                        Logger.log("Discover");
                         f.remove(i);
                     } else if (!types.contains(o.getClass())){
                         Logger.log("Found an unexpected entry at stories TYPE: " + o.getClass().getCanonicalName());

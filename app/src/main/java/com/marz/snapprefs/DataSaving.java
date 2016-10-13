@@ -38,7 +38,7 @@ public class DataSaving {
     static void blockStoryPreLoad(final XC_LoadPackage.LoadPackageParam lpparam){
         try {
             findAndHookMethod(Obfuscator.datasaving.LIVESTORYPRELOAD_CLASS, lpparam.classLoader, Obfuscator.datasaving.LIVESTORYPRELOAD_METHOD, XC_MethodReplacement.DO_NOTHING);
-            findAndHookMethod(Obfuscator.datasaving.STORYPRELOAD_CLASS, lpparam.classLoader, Obfuscator.datasaving.STORYPRELOAD_METHOD, XC_MethodReplacement.DO_NOTHING);
+            //findAndHookMethod(Obfuscator.datasaving.STORYPRELOAD_CLASS, lpparam.classLoader, Obfuscator.datasaving.STORYPRELOAD_METHOD, XC_MethodReplacement.DO_NOTHING);
         } catch (Throwable t){
             Logger.log("Error while blocking Story preload", true);
             Logger.log(t.toString());

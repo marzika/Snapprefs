@@ -65,9 +65,7 @@ public class Saving {
     private static Context relativeContext;
     //TODO implement user selected save mode
     private static boolean asyncSaveMode = true;
-    private static boolean hasAssignedButtonsAndGestures = false;
     private static Object enum_NO_AUTO_ADVANCE;
-    private static Context context;
 
     static void initSaving(final XC_LoadPackage.LoadPackageParam lpparam,
                            final XModuleResources modRes, final Context snapContext) {
@@ -138,7 +136,15 @@ public class Saving {
                             super.beforeHookedMethod(param);
                             Log.d("snapprefs", "### START StoryViewerMediaCache ###");
                             Object godPacket = param.args[1];
-                            Object storySnap = callMethod(godPacket, Obfuscator.save.SDP_GET_OBJECT, "STORY_REPLY_SNAP");
+                            Object c = getObjectField(param.thisObject, "c");
+                            String POSTER_USERNAME = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "POSTER_USERNAME");
+                            String CLIENT_ID = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "CLIENT_ID");
+                            Object storySnap = callMethod(c, "a", POSTER_USERNAME, CLIENT_ID);
+
+                            if (storySnap == null) {
+                                Logger.log("Null storysnap?");
+                                return;
+                            }
 
                             String storyUsername = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "POSTER_USERNAME");
 
@@ -149,7 +155,7 @@ public class Saving {
 
                             View view = (View) param.args[2];
                             FrameLayout snapContainer = scanForStoryContainer(view);
-                            String mKey = (String) getObjectField(storySnap, "mId");
+                            String mKey = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "CLIENT_ID");
 
                             if (snapContainer != null) {
                                 if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON)
@@ -243,6 +249,14 @@ public class Saving {
 
                     String mKey = (String) getObjectField(storySnap, "mId");
                     handleImagePayload(snapContext, mKey, (Bitmap) image);
+                }
+            });
+
+            findAndHookMethod("aEH", cl, "e", new XC_MethodHook() {
+                @Override
+                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                    super.afterHookedMethod(param);
+                    Logger.log("Type103: " + getObjectField(param.thisObject, "n").getClass().getCanonicalName());
                 }
             });
 
@@ -376,7 +390,7 @@ public class Saving {
                             }
 
                             if (profileImages == null) {
-                                SavingUtils.vibrate(context, false);
+                                SavingUtils.vibrate(snapContext, false);
                                 NotificationUtils.showStatefulMessage("Error Saving Profile Images For " + username + "\nIf The Profile Image Is Not Blank Please Enable Debug Mode And Rep", ToastType.BAD, lpparam.classLoader);
                                 return false;
                             }
@@ -398,13 +412,13 @@ public class Saving {
                                     NotificationUtils.showStatefulMessage("Profile Images already Exist.", ToastType.BAD, lpparam.classLoader);
                                     return true;
                                 }
-                                if (SavingUtils.saveJPG(f, profileImages.get(iterator), context)) {
+                                if (SavingUtils.saveJPG(f, profileImages.get(iterator), snapContext)) {
                                     succCounter++;
                                 }
                             }
                             Boolean succ = (succCounter == sizeOfProfileImages);
                             NotificationUtils.showStatefulMessage("Saved " + succCounter + "/" + sizeOfProfileImages + " profile images.", succ ? ToastType.GOOD : ToastType.BAD, lpparam.classLoader);
-                            SavingUtils.vibrate(context, succ);
+                            SavingUtils.vibrate(snapContext, succ);
                             return true;
                         }
                     });

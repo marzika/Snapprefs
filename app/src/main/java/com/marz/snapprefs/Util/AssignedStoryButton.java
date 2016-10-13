@@ -20,8 +20,8 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
  */
 
 public class AssignedStoryButton extends ImageButton {
-    public boolean areParamsSet = false;
-    public String assignedmKey;
+    private boolean areParamsSet = false;
+    private String assignedmKey;
 
     public AssignedStoryButton(Context context) {
         super(context);
@@ -29,7 +29,7 @@ public class AssignedStoryButton extends ImageButton {
         this.setBackgroundColor(0);
         this.setAlpha(0.8f);
         this.setImageBitmap(HookMethods.saveImg);
-        this.setVisibility(Preferences.getInt(Preferences.Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
+        super.setVisibility(Preferences.getInt(Preferences.Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
                 ? View.VISIBLE : View.INVISIBLE);
 
         this.setOnClickListener(new View.OnClickListener() {
@@ -42,17 +42,16 @@ public class AssignedStoryButton extends ImageButton {
     }
 
     public boolean canBeReassigned() {
-        if( this.getParent() == null )
-            return true;
-
-        return !this.isShown();
+        return this.getParent() == null || !this.isShown();
     }
 
     public void removeParent() {
         Object parent = this.getParent();
 
-        if( parent != null && parent instanceof FrameLayout)
-            ((FrameLayout)parent).removeView(this);
+        if (parent != null && parent instanceof FrameLayout) {
+            ((FrameLayout) parent).removeView(this);
+            Logger.log("Removing buttons previous parent");
+        }
     }
 
     public void buildParams(FrameLayout frameLayout, Context context) {
@@ -67,7 +66,7 @@ public class AssignedStoryButton extends ImageButton {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 
         boolean horizontalPosition = Preferences.getBool(Preferences.Prefs.BUTTON_POSITION);
-        int scaledSize = px(65, metrics.density);
+        int scaledSize = px(70, metrics.density);
         int newX = horizontalPosition ? 0 : metrics.widthPixels - scaledSize;
         int newY = metrics.heightPixels - scaledSize;
 
@@ -78,18 +77,36 @@ public class AssignedStoryButton extends ImageButton {
         Logger.log("newParams: " + newParams);
         super.setLayoutParams(newParams);
         this.setAdjustViewBounds(true);
+        super.setPadding(0, 0, 0, 0);
+
         areParamsSet = true;
     }
 
     @Override
-    public void setLayoutParams(ViewGroup.LayoutParams params) {
+    public void setPadding(int x, int y, int x2, int y2) {
+        Logger.log("OVERRIDDEN: setPadding");
     }
 
-    public void setAssignedmKey(String assignedmKey){
-        this.assignedmKey = assignedmKey;
+    @Override
+    public void setLayoutParams(ViewGroup.LayoutParams params) {
+        Logger.log("OVERRIDDEN: setLayoutParams");
+    }
+
+    @Override
+    public void setVisibility(int VISIBILITY) {
+        super.setVisibility(VISIBILITY);
+        Logger.log("OVERRIDDEN: setVisibility");
     }
 
     public String getAssignedmKey() {
         return this.assignedmKey;
+    }
+
+    public void setAssignedmKey(String assignedmKey) {
+        this.assignedmKey = assignedmKey;
+    }
+
+    public boolean areParamsSet() {
+        return areParamsSet;
     }
 }
