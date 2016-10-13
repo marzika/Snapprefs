@@ -346,7 +346,8 @@ public class Obfuscator implements Serializable {
         public static final String FILTER_GETVIEW = "c";
         public static final String BRYO_SNAPTYPE = "com.snapchat.android.app.feature.messaging.chat.type.SnapType";
         public static final String VISUALFILTER_TYPE = "com.snapchat.android.app.shared.feature.preview.model.filter.VisualFilterType";
-        public static final String VISUAL_FILTER_TYPE_CHECK_METHOD = "e";
+        public static final String VISUAL_FILTER_TYPE_CHECK_METHOD = "c";
+        public static final String VISUAL_FILTER_TYPE_CHECK_METHOD_PARAMETER_CLASS = "Oi";
     }
     public static class timer {
         public final static String TAKESNAPBUTTON_CLASS = "com.snapchat.android.ui.camera.TakeSnapButton";
@@ -412,6 +413,7 @@ public class Obfuscator implements Serializable {
         public final static String INTERFACE = "Ml";//prev. BS
         public final static String GETFRIENDMANAGER_METHOD = "h";//prev. e
         public final static String GETUSERNAME_METHOD = "d";//prev. g
+        public final static String GETDISPLAYNAME_METHOD = "f";
     }
     public static class bus {
         public final static String UPDATEEVENT_CLASS = "Ds";
