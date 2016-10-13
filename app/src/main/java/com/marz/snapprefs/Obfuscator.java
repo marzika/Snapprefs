@@ -413,6 +413,7 @@ public class Obfuscator implements Serializable {
         public final static String INTERFACE = "Ml";//prev. BS
         public final static String GETFRIENDMANAGER_METHOD = "h";//prev. e
         public final static String GETUSERNAME_METHOD = "d";//prev. g
+        public final static String GETDISPLAYNAME_METHOD = "f";
     }
     public static class bus {
         public final static String UPDATEEVENT_CLASS = "Ds";
