@@ -136,7 +136,7 @@ public class CommonUtils {
     }
 
     /**
-     * Checks whether Snapshare is enabled. If it's enabled, Xposed should hook this method and return {@link com.marz.snapprefs.Common#MODULE_ENABLED_CHECK_INT}.
+     * Checks whether Snapprefs is enabled. If it's enabled, Xposed should hook this method and return {@link com.marz.snapprefs.Common#MODULE_ENABLED_CHECK_INT}.
      *
      * @return Number that should be incremented for each build at {@link com.marz.snapprefs.Common#MODULE_ENABLED_CHECK_INT}
      */
