@@ -145,7 +145,8 @@ public class CommonUtils {
     }
 
     /**
-     * Gets the status(Activate, Not Actived, Needs Restart) of the module.
+     * Gets the status(Activate, Not Actived, Needs Restart) of Snapprefs
+     * .
      * @return Returns one of the following values based on its findings: {@link Common#MODULE_STATUS_ACTIVATED}, {@link Common#MODULE_STATUS_NOT_ACTIVATED}, {@link Common#MODULE_STATUS_NOT_RESTARTED}
      */
     public static int getModuleStatus(){
