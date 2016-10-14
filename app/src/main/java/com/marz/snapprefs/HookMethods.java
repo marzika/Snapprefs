@@ -165,8 +165,13 @@ public class HookMethods
     @Override
     public void handleLoadPackage(final LoadPackageParam lpparam) throws Throwable {
         try {
-            if (!lpparam.packageName.equals(Common.PACKAGE_SNAP))
+            if (!lpparam.packageName.equals(Common.PACKAGE_SNAP) && !lpparam.packageName.equals(Common.PACKAGE_SP))
                 return;
+
+            if(lpparam.packageName.equals(Common.PACKAGE_SP)) {
+                findAndHookMethod("com.marz.snapprefs.Util.CommonUtils", lpparam.classLoader, "isModuleEnabled", XC_MethodReplacement.returnConstant(Common.MODULE_ENABLED_CHECK_INT));
+                return;
+            }
 
             try {
                 XposedUtils.log("----------------- SNAPPREFS HOOKED -----------------", false);

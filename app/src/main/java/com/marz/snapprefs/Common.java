@@ -1,6 +1,11 @@
 package com.marz.snapprefs;
 
 public final class Common {
+    // Integer to be incremented for each build(To ensure proper hook checking)
+    public static final int MODULE_ENABLED_CHECK_INT = 7;
+    public static final int MODULE_STATUS_NOT_ACTIVATED = 0;
+    public static final int MODULE_STATUS_NOT_RESTARTED = 1;
+    public static final int MODULE_STATUS_ACTIVATED = 2;
     // Debugging settings
     public static final String LOG_TAG = "SnapPrefs: ";
     // Adjustment methods
@@ -15,6 +20,7 @@ public final class Common {
     public static final int MAX_VIDEO_SIZE = (int) (2.50 * 1024 * 1024);
     final static String basename = "com.snapchat.android";
     final static String PACKAGE_SNAP = "com.snapchat.android";
+    final static String PACKAGE_SP = "com.marz.snapprefs";
     final static String dialog_default = "Default";
     public final static String dialog_cancel = "Cancel";
     public final static String dialog_done = "Done";
