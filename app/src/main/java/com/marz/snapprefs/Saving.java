@@ -23,7 +23,6 @@ import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.NotificationUtils.ToastType;
 import com.marz.snapprefs.Util.SavingUtils;
 import com.marz.snapprefs.Util.StringUtils;
-import com.marz.snapprefs.Util.XposedUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
