@@ -23,6 +23,7 @@ import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.NotificationUtils.ToastType;
 import com.marz.snapprefs.Util.SavingUtils;
 import com.marz.snapprefs.Util.StringUtils;
+import com.marz.snapprefs.Util.XposedUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -376,7 +377,7 @@ public class Saving {
                             }
 
                             if (profileImages == null) {
-                                SavingUtils.vibrate(context, false);
+                                SavingUtils.vibrate(snapContext, false);
                                 NotificationUtils.showStatefulMessage("Error Saving Profile Images For " + username + "\nIf The Profile Image Is Not Blank Please Enable Debug Mode And Rep", ToastType.BAD, lpparam.classLoader);
                                 return false;
                             }
@@ -392,19 +393,20 @@ public class Saving {
                                 }
                                 if (f == null) {
                                     NotificationUtils.showStatefulMessage("File f is null!", ToastType.BAD, lpparam.classLoader);
+                                    Logger.logStackTrace();
                                     return false;
                                 }
                                 if (f.exists()) {
                                     NotificationUtils.showStatefulMessage("Profile Images already Exist.", ToastType.BAD, lpparam.classLoader);
                                     return true;
                                 }
-                                if (SavingUtils.saveJPG(f, profileImages.get(iterator), context)) {
+                                if (SavingUtils.saveJPG(f, profileImages.get(iterator), snapContext, false)) {
                                     succCounter++;
                                 }
                             }
                             Boolean succ = (succCounter == sizeOfProfileImages);
                             NotificationUtils.showStatefulMessage("Saved " + succCounter + "/" + sizeOfProfileImages + " profile images.", succ ? ToastType.GOOD : ToastType.BAD, lpparam.classLoader);
-                            SavingUtils.vibrate(context, succ);
+                            SavingUtils.vibrate(snapContext, succ);
                             return true;
                         }
                     });
@@ -413,11 +415,11 @@ public class Saving {
 
             //HookMethods.hookAllMethods("Ce", cl, true);
         } catch (Exception e) {
-            Logger.log("Error occured: Snapprefs doesn't currently support this version, wait for an update", e);
+            Logger.log("Error occurred: Snapprefs doesn't currently support this version, wait for an update", e);
 
             findAndHookMethod(Obfuscator.save.LANDINGPAGEACTIVITY_CLASS, lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Toast.makeText((Context) param.thisObject, "This version of snapchat is currently not supported by Snapprefs.", Toast.LENGTH_LONG)
+                    Toast.makeText((Context) param.thisObject, "This version of Snapchat is currently not supported by Snapprefs.", Toast.LENGTH_LONG)
                             .show();
                 }
             });
