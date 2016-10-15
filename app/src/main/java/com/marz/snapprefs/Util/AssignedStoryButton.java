@@ -21,6 +21,7 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
 
 public class AssignedStoryButton extends ImageButton {
     private boolean areParamsSet = false;
+    public boolean shouldAbortAssignment = false;
     private String assignedmKey;
 
     public AssignedStoryButton(Context context) {
@@ -29,7 +30,7 @@ public class AssignedStoryButton extends ImageButton {
         this.setBackgroundColor(0);
         this.setAlpha(0.8f);
         this.setImageBitmap(HookMethods.saveImg);
-        super.setVisibility(Preferences.getInt(Preferences.Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
+        this.setVisibility(Preferences.getInt(Preferences.Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON
                 ? View.VISIBLE : View.INVISIBLE);
 
         this.setOnClickListener(new View.OnClickListener() {
@@ -66,10 +67,11 @@ public class AssignedStoryButton extends ImageButton {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 
         boolean horizontalPosition = Preferences.getBool(Preferences.Prefs.BUTTON_POSITION);
-        int scaledSize = px(70, metrics.density);
+        int scaledSize = px(65, metrics.density);
         int newX = horizontalPosition ? 0 : metrics.widthPixels - scaledSize;
         int newY = metrics.heightPixels - scaledSize;
 
+        //noinspection ResourceType
         newParams.setMargins(newX, newY, newX, newY);
 
         Logger.log("Margins: " + newParams.leftMargin + " " + newParams.topMargin + " " + newParams.rightMargin + " " + newParams.bottomMargin);
@@ -83,19 +85,8 @@ public class AssignedStoryButton extends ImageButton {
     }
 
     @Override
-    public void setPadding(int x, int y, int x2, int y2) {
-        Logger.log("OVERRIDDEN: setPadding");
-    }
-
-    @Override
     public void setLayoutParams(ViewGroup.LayoutParams params) {
         Logger.log("OVERRIDDEN: setLayoutParams");
-    }
-
-    @Override
-    public void setVisibility(int VISIBILITY) {
-        super.setVisibility(VISIBILITY);
-        Logger.log("OVERRIDDEN: setVisibility");
     }
 
     public String getAssignedmKey() {
@@ -108,5 +99,8 @@ public class AssignedStoryButton extends ImageButton {
 
     public boolean areParamsSet() {
         return areParamsSet;
+    }
+
+    public void abortAssignment() {
     }
 }

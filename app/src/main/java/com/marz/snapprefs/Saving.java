@@ -75,7 +75,7 @@ public class Saving {
         if (mSCResources == null) mSCResources = snapContext.getResources();
 
         try {
-            ClassLoader cl = lpparam.classLoader;
+            final ClassLoader cl = lpparam.classLoader;
 
             final Class storyClass = findClass(Obfuscator.save.STORYSNAP_CLASS, cl);
             Class AdvanceType = findClass(Obfuscator.misc.ADVANCE_TYPE_CLASS, cl);
@@ -154,14 +154,15 @@ public class Saving {
                             }
 
                             View view = (View) param.args[2];
+
                             FrameLayout snapContainer = scanForStoryContainer(view);
-                            String mKey = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "CLIENT_ID");
+                            String mKey = (String) getObjectField(storySnap, "mId");
 
                             if (snapContainer != null) {
                                 if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON)
                                     HookedLayouts.assignStoryButton(snapContainer, snapContext, mKey);
                                 else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S)
-                                    HookedLayouts.assignGestures((FrameLayout) snapContainer.getParent());
+                                    HookedLayouts.assignGestures(snapContainer);
                             }
 
                             setAdditionalInstanceField(param.args[2], "StorySnap", storySnap);
@@ -252,15 +253,27 @@ public class Saving {
                 }
             });
 
-            findAndHookMethod("aEH", cl, "e", new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-                    Logger.log("Type103: " + getObjectField(param.thisObject, "n").getClass().getCanonicalName());
-                }
-            });
+                    /*findAndHookMethod("com.snapchat.opera.view.OperaPageView", cl, "onMeasure", int.class, int.class, new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            super.afterHookedMethod(param);
 
-            //HookMethods.hookAllMethods("apn", cl, true, true);
+                            Object mKey = getAdditionalInstanceField(param.thisObject, "mKey");
+
+                            if (mKey != null) {
+                                Logger.log("It worked!");
+                                //AssignedStoryButton storyButton = HookedLayouts.assignStoryButton((FrameLayout) param.thisObject, snapContext, (String) mKey);
+
+                                List<View> viewList = (List<View>) getObjectField(param.thisObject, "a");
+                                //viewList.add(storyButton);
+
+                                Logger.log("ViewSize: " + viewList.size());
+                            } else
+                                Logger.log("It didn't work!");
+
+                        }
+                    });*/
+
             /**
              * Called every time a snap is viewed - Quite reliable
              */

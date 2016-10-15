@@ -7,8 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.XModuleResources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Point;
@@ -62,6 +60,7 @@ import de.robv.android.xposed.callbacks.XC_LayoutInflated;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
 
 /**
  * Created by MARZ on 2016. 04. 08..
@@ -156,6 +155,7 @@ public class HookedLayouts {
     public static void addShareIcon(final XC_InitPackageResources.InitPackageResourcesParam resparam) {
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "camera_preview", new XC_LayoutInflated() {
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
+                Logger.log("Doing shit?");
                 final RelativeLayout relativeLayout =
                         (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("camera_preview_layout", "id", Common.PACKAGE_SNAP));
                 //final RelativeLayout.LayoutParams lParams =
@@ -200,9 +200,7 @@ public class HookedLayouts {
                 .PACKAGE_SNAP);
 
         final BitmapDrawable drawable = (BitmapDrawable) resparam.res.getDrawable(intIconID);*/
-        final Bitmap saveImg = BitmapFactory.decodeResource(mResources, R.drawable.save_button); //processButtonDrawable(drawable);
-
-        if (saveImg == null)
+        if (HookMethods.saveImg == null)
             throw new NullPointerException("Button Image not found");
 
         int horizontalPosition = Preferences.getBool(Prefs.BUTTON_POSITION) ? Gravity.START : Gravity.END;
@@ -212,72 +210,90 @@ public class HookedLayouts {
                         FrameLayout.LayoutParams.WRAP_CONTENT,
                         Gravity.BOTTOM | horizontalPosition);
 
-        resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated() {
-            @Override
-            public void handleLayoutInflated(LayoutInflatedParam liparam)
-                    throws Throwable {
-                Logger.log("Updating view_snap.snap_container layout");
-                final FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(
-                        liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP)
-                ).getParent();
+        try {
+            resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated() {
+                @Override
+                public void handleLayoutInflated(LayoutInflatedParam liparam)
+                        throws Throwable {
+                    Logger.log("Updating view_snap.snap_container layout");
+                    final FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(
+                            liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP)
+                    ).getParent();
 
-                saveSnapButton = new ImageButton(localContext);
-                saveSnapButton.setLayoutParams(layoutParams);
-                saveSnapButton.setBackgroundColor(0);
-                saveSnapButton.setAlpha(1f);
-                saveSnapButton.setImageBitmap(saveImg);
-                saveSnapButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
-                        ? View.VISIBLE : View.INVISIBLE);
+                    saveSnapButton = new ImageButton(localContext);
+                    saveSnapButton.setLayoutParams(layoutParams);
+                    saveSnapButton.setBackgroundColor(0);
+                    saveSnapButton.setAlpha(1f);
+                    saveSnapButton.setImageBitmap(HookMethods.saveImg);
+                    saveSnapButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
+                            ? View.VISIBLE : View.INVISIBLE);
 
-                frameLayout.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S &&
-                                gestureEvent.onTouch(v, event, Saving.SnapType.SNAP);
+                    frameLayout.setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            return Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S &&
+                                    gestureEvent.onTouch(v, event, Saving.SnapType.SNAP);
 
-                    }
-                });
-                frameLayout.addView(saveSnapButton);
-                saveSnapButton.bringToFront();
+                        }
+                    });
+                    frameLayout.addView(saveSnapButton);
+                    saveSnapButton.bringToFront();
 
-                saveSnapButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Logger.printTitle("Performing Button Save");
-                        Saving.performButtonSave();
-                    }
-                });
-            }
-        });
+                    saveSnapButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Logger.printTitle("Performing Button Save");
+                            Saving.performButtonSave();
+                        }
+                    });
+                }
+            });
+        } catch(Exception e) {
+            Logger.log("Not found something", e);
+        }
     }
 
-    public static void assignStoryButton(FrameLayout frameLayout, Context context, String mKey) {
-        AssignedStoryButton storyButton = retrieveStoryButton(context, mKey);
+    public static AssignedStoryButton assignStoryButton(FrameLayout frameLayout, Context context, String mKey) {
+        AssignedStoryButton storyButton = retrieveStoryButton(frameLayout, context, mKey);
 
         if (storyButton == null) {
             Logger.log("Could not assign a story button");
-            return;
+            return null;
+        }
+
+        if( storyButton.shouldAbortAssignment ) {
+            Logger.log("Layout already has button assigned");
+            return storyButton;
         }
 
         Logger.log("Frame type: " + frameLayout);
+        Logger.log("Parent: " + storyButton.getParent());
 
         if (storyButton.getParent() == null) {
             frameLayout.addView(storyButton);
             storyButton.setAssignedmKey(mKey);
+            setAdditionalInstanceField(frameLayout, "mKey", mKey);
         }
 
-        if (!storyButton.areParamsSet())
-            storyButton.buildParams(frameLayout, context);
+        //if (!storyButton.areParamsSet())
+            //storyButton.buildParams(frameLayout, context);
 
         storyButton.bringToFront();
         storyButton.invalidate();
+        frameLayout.invalidate();
 
         Logger.log("brought to front");
+        return storyButton;
     }
 
-    public static AssignedStoryButton retrieveStoryButton(Context context, String mKey) {
+    public static AssignedStoryButton retrieveStoryButton(FrameLayout layout, Context context, String mKey) {
         for (AssignedStoryButton button : storyButtonQueue) {
             Logger.log("Checking if button can be reassigned");
+
+            if( button.getParent().equals(layout) ){
+                button.abortAssignment();
+                return button;
+            }
 
             if ((button.getAssignedmKey() != null && button.getAssignedmKey().equals(mKey)) ||
                     button.canBeReassigned()) {
@@ -292,6 +308,7 @@ public class HookedLayouts {
 
         Logger.log("No existing or assignable button available... Creating new");
         AssignedStoryButton storyButton = new AssignedStoryButton(context);
+        storyButton.buildParams(layout, context);
         storyButtonQueue.add(storyButton);
         return storyButton;
     }
@@ -311,7 +328,7 @@ public class HookedLayouts {
     public static void initParents(View view) {
         if (view.getParent() != null) {
             View viewParent = (View) view.getParent();
-            Log.d("snapprefs", "ViewId: " + viewParent.getId());
+            Log.d("snapprefs", "ViewId: " + viewParent);
 
             initParents(viewParent);
         }
