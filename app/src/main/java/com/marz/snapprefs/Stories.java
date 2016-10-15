@@ -85,7 +85,7 @@ public class Stories {
 
         Class ExitEventTypeClass = findClass("com.snapchat.android.framework.analytics.perf.ExitEvent", lpparam.classLoader);
         final Object ExitEvent_AUTO_ADVANCE = getStaticObjectField(ExitEventTypeClass, "AUTO_ADVANCE");
-        findAndHookMethod("atJ", lpparam.classLoader, "a", ExitEventTypeClass, new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.stories.AUTOADVANCE_CLASS2, lpparam.classLoader, Obfuscator.stories.AUTOADVANCE_METHOD2, ExitEventTypeClass, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 super.beforeHookedMethod(param);

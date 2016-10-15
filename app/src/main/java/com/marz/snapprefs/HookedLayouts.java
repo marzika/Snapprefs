@@ -552,7 +552,7 @@ public class HookedLayouts {
         };
         findAndHookMethod("com.snapchat.android.app.shared.analytics.ui.StickerPickerAnalytics", lpparam.classLoader, "b", hideLayout);//prev. a
         //TODO Find the new representation of this method - DONE?
-        findAndHookMethod("TX", lpparam.classLoader, "c", hideLayout);
+        findAndHookMethod(Obfuscator.icons.CAPTIONOPENED_CLASS, lpparam.classLoader, Obfuscator.icons.CAPTIONOPENED_METHOD, hideLayout);
     }
 
     private static class OptionsAdapter extends BaseAdapter {
