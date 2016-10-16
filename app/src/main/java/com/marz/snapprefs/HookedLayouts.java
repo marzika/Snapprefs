@@ -253,17 +253,17 @@ public class HookedLayouts {
         }
     }
 
-    public static AssignedStoryButton assignStoryButton(FrameLayout frameLayout, Context context, String mKey) {
+    public static void assignStoryButton(FrameLayout frameLayout, Context context, String mKey) {
         AssignedStoryButton storyButton = retrieveStoryButton(frameLayout, context, mKey);
 
         if (storyButton == null) {
             Logger.log("Could not assign a story button");
-            return null;
+            return;
         }
 
         if( storyButton.shouldAbortAssignment ) {
             Logger.log("Layout already has button assigned");
-            return storyButton;
+            return;
         }
 
         Logger.log("Frame type: " + frameLayout);
@@ -283,7 +283,7 @@ public class HookedLayouts {
         frameLayout.invalidate();
 
         Logger.log("brought to front");
-        return storyButton;
+        return;
     }
 
     public static AssignedStoryButton retrieveStoryButton(FrameLayout layout, Context context, String mKey) {
