@@ -132,7 +132,7 @@ public class Saving {
             });
 
             if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S) {
-                findAndHookMethod("com.snapchat.opera.ui.DirectionalLayout", cl, "dispatchTouchEvent", MotionEvent.class, new XC_MethodHook() {
+                findAndHookMethod(Obfuscator.save.DIRECTIONAL_LAYOUT_CLASS, cl, "dispatchTouchEvent", MotionEvent.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         super.beforeHookedMethod(param);
@@ -183,21 +183,23 @@ public class Saving {
 
                             View view = (View) param.args[2];
 
-                            FrameLayout snapContainer = scanForStoryContainer(view);
-                            String mKey = (String) getObjectField(storySnap, "mId");
+                            if(Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_AUTO) {
+                                FrameLayout snapContainer = scanForStoryContainer(view);
+                                String mKey = (String) getObjectField(storySnap, "mId");
 
-                            if (snapContainer != null) {
-                                if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON)
-                                    HookedLayouts.assignStoryButton(snapContainer, snapContext, mKey);
-                                else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S) {
-                                    FrameLayout snapContainerParent = (FrameLayout) snapContainer.getParent();
+                                if (snapContainer != null) {
+                                    if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON)
+                                        HookedLayouts.assignStoryButton(snapContainer, snapContext, mKey);
+                                    else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S) {
+                                        FrameLayout snapContainerParent = (FrameLayout) snapContainer.getParent();
 
-                                    if (snapContainerParent != null)
-                                        setAdditionalInstanceField(snapContainerParent, "mKey", mKey);
+                                        if (snapContainerParent != null)
+                                            setAdditionalInstanceField(snapContainerParent, "mKey", mKey);
+                                    }
                                 }
                             }
 
-                            setAdditionalInstanceField(param.args[2], "StorySnap", storySnap);
+                            setAdditionalInstanceField(view, "StorySnap", storySnap);
                             Log.d("snapprefs", "StoryViewerMediaCache.a : KEY " + getObjectField(storySnap, "mId"));
                             Log.d("snapprefs", "Str: " + param.args[0]);
                             Log.d("snapprefs", "### END StoryViewerMediaCache ###");

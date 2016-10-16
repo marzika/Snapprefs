@@ -222,6 +222,8 @@ public class Obfuscator implements Serializable {
         public final static String SL_VAR2 = "gt";
 
         public final static int OPERA_PAGE_VIEW_ID = +2131689491;
+
+        public final static String DIRECTIONAL_LAYOUT_CLASS = "com.snapchat.opera.ui.DirectionalLayout";
     }
     public static class datasaving {
         public final static String DSNAPDOWNLOADER_CLASS = "Df$a";//Prev. KL
