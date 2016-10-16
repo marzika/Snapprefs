@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.content.res.XModuleResources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -145,96 +146,103 @@ public class HookedLayouts {
 
     public static void fullScreenFilter(
             XC_InitPackageResources.InitPackageResourcesParam resparam) {
-        resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "battery_view", new XC_LayoutInflated() {
-            LinearLayout.LayoutParams batteryLayoutParams =
-                    new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        try {
+            resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "battery_view", new XC_LayoutInflated() {
+                LinearLayout.LayoutParams batteryLayoutParams =
+                        new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
-            @Override
-            public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
-                View battery =
-                        liparam.view.findViewById(liparam.res.getIdentifier("battery_icon", "id", "com.snapchat.android"));
-                battery.setLayoutParams(batteryLayoutParams);
-                battery.setPadding(0, 0, 0, 0);
-                Logger.log("fullScreenFilter", true);
-            }
-        });
+                @Override
+                public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
+                    View battery =
+                            liparam.view.findViewById(liparam.res.getIdentifier("battery_icon", "id", "com.snapchat.android"));
+                    battery.setLayoutParams(batteryLayoutParams);
+                    battery.setPadding(0, 0, 0, 0);
+                    Logger.log("fullScreenFilter", true);
+                }
+            });
+        }catch (Resources.NotFoundException ignore){
+
+        }
     }
 
     public static void addShareIcon(final XC_InitPackageResources.InitPackageResourcesParam resparam) {
-        resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "camera_preview", new XC_LayoutInflated() {
-            public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
-                final RelativeLayout relativeLayout =
-                        (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("camera_preview_layout", "id", Common.PACKAGE_SNAP));
-                //final RelativeLayout.LayoutParams lParams =
-                //        new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("camera_take_snap_button", "id", Common.PACKAGE_SNAP)).getLayoutParams());
-                final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams((int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP)), (int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP)));
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                layoutParams.rightMargin = px(55);
-                layoutParams.topMargin = px(10);
-                upload = new ImageButton(HookMethods.SnapContext);
-                upload.setLayoutParams(layoutParams);
-                upload.setBackgroundColor(0);
-                //Drawable uploadimg = HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.sharing.UPLOAD_ICON.substring(2), 16));
-                //upload.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
-                String[] projection = new String[]{
-                        MediaStore.Images.ImageColumns._ID,
-                        MediaStore.Images.ImageColumns.DATA,
-                        MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
-                        MediaStore.Images.ImageColumns.DATE_TAKEN,
-                        MediaStore.Images.ImageColumns.MIME_TYPE
-                };
-                final Cursor cursor = HookMethods.SnapContext.getContentResolver()
-                        .query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null,
-                                null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
-                if (cursor.moveToFirst()) {
-                    String imageLocation = cursor.getString(1);
-                    File imageFile = new File(imageLocation);
-                    if (imageFile.exists()) {
-                        Bitmap bm = BitmapFactory.decodeFile(imageLocation);
-                        Bitmap resized = Bitmap.createScaledBitmap(bm, layoutParams.width, layoutParams.height, false);
-                        int w = resized.getWidth();
-                        int h = resized.getHeight();
+        try {
+            resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "camera_preview", new XC_LayoutInflated() {
+                public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
+                    final RelativeLayout relativeLayout =
+                            (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("camera_preview_layout", "id", Common.PACKAGE_SNAP));
+                    //final RelativeLayout.LayoutParams lParams =
+                    //        new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("camera_take_snap_button", "id", Common.PACKAGE_SNAP)).getLayoutParams());
+                    final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams((int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP)), (int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP)));
+                    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                    layoutParams.rightMargin = px(55);
+                    layoutParams.topMargin = px(10);
+                    upload = new ImageButton(HookMethods.SnapContext);
+                    upload.setLayoutParams(layoutParams);
+                    upload.setBackgroundColor(0);
+                    //Drawable uploadimg = HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.sharing.UPLOAD_ICON.substring(2), 16));
+                    //upload.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
+                    String[] projection = new String[]{
+                            MediaStore.Images.ImageColumns._ID,
+                            MediaStore.Images.ImageColumns.DATA,
+                            MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
+                            MediaStore.Images.ImageColumns.DATE_TAKEN,
+                            MediaStore.Images.ImageColumns.MIME_TYPE
+                    };
+                    final Cursor cursor = HookMethods.SnapContext.getContentResolver()
+                            .query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null,
+                                    null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
+                    if (cursor.moveToFirst()) {
+                        String imageLocation = cursor.getString(1);
+                        File imageFile = new File(imageLocation);
+                        if (imageFile.exists()) {
+                            Bitmap bm = BitmapFactory.decodeFile(imageLocation);
+                            Bitmap resized = Bitmap.createScaledBitmap(bm, layoutParams.width, layoutParams.height, false);
+                            int w = resized.getWidth();
+                            int h = resized.getHeight();
 
-                        int radius = Math.min(h / 2, w / 2);
-                        Bitmap output = Bitmap.createBitmap(w + 8, h + 8, Bitmap.Config.ARGB_8888);
+                            int radius = Math.min(h / 2, w / 2);
+                            Bitmap output = Bitmap.createBitmap(w + 8, h + 8, Bitmap.Config.ARGB_8888);
 
-                        Paint p = new Paint();
-                        p.setAntiAlias(true);
+                            Paint p = new Paint();
+                            p.setAntiAlias(true);
 
-                        Canvas c = new Canvas(output);
-                        c.drawARGB(0, 0, 0, 0);
-                        p.setStyle(Paint.Style.FILL);
+                            Canvas c = new Canvas(output);
+                            c.drawARGB(0, 0, 0, 0);
+                            p.setStyle(Paint.Style.FILL);
 
-                        c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
+                            c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
 
-                        p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+                            p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
 
-                        c.drawBitmap(resized, 4, 4, p);
-                        p.setXfermode(null);
-                        p.setStyle(Paint.Style.STROKE);
-                        p.setColor(Color.WHITE);
-                        p.setStrokeWidth(7.5f);
-                        c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
-                        upload.setImageDrawable(new BitmapDrawable(output));
+                            c.drawBitmap(resized, 4, 4, p);
+                            p.setXfermode(null);
+                            p.setStyle(Paint.Style.STROKE);
+                            p.setColor(Color.WHITE);
+                            p.setStrokeWidth(7.5f);
+                            c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
+                            upload.setImageDrawable(new BitmapDrawable(output));
+                        }
                     }
+                    //upload.setImageDrawable(uploadimg);
+                    upload.setScaleX((float) 1.1);
+                    upload.setScaleY((float) 1.1);
+                    upload.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent launchIntent = new Intent(Intent.ACTION_RUN);
+                            launchIntent.setFlags(
+                                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            launchIntent.setComponent(new ComponentName("com.marz.snapprefs", "com.marz.snapprefs.PickerActivity"));
+                            HookMethods.context.startActivity(launchIntent);
+                        }
+                    });
+
+                    relativeLayout.addView(upload);
                 }
-                //upload.setImageDrawable(uploadimg);
-                upload.setScaleX((float) 1.1);
-                upload.setScaleY((float) 1.1);
-                upload.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent launchIntent = new Intent(Intent.ACTION_RUN);
-                        launchIntent.setFlags(
-                                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        launchIntent.setComponent(new ComponentName("com.marz.snapprefs", "com.marz.snapprefs.PickerActivity"));
-                        HookMethods.context.startActivity(launchIntent);
-                    }
-                });
-
-                relativeLayout.addView(upload);
-            }
-        });
+            });
+        } catch (Resources.NotFoundException ignore){
+        }
     }
 
     public static void addSaveButtonsAndGestures(
@@ -260,43 +268,46 @@ public class HookedLayouts {
                         FrameLayout.LayoutParams.WRAP_CONTENT,
                         Gravity.BOTTOM | horizontalPosition);
 
-        resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated() {
-            @Override
-            public void handleLayoutInflated(LayoutInflatedParam liparam)
-                    throws Throwable {
-                Logger.log("Updating view_snap.snap_container layout");
-                final FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(
-                        liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP)
-                ).getParent();
+        try{
+            resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated() {
+                @Override
+                public void handleLayoutInflated(LayoutInflatedParam liparam)
+                        throws Throwable {
+                    Logger.log("Updating view_snap.snap_container layout");
+                    final FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(
+                            liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP)
+                    ).getParent();
 
-                saveSnapButton = new ImageButton(localContext);
-                saveSnapButton.setLayoutParams(layoutParams);
-                saveSnapButton.setBackgroundColor(0);
-                saveSnapButton.setAlpha(1f);
-                saveSnapButton.setImageBitmap(saveImg);
-                saveSnapButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
-                        ? View.VISIBLE : View.INVISIBLE);
+                    saveSnapButton = new ImageButton(localContext);
+                    saveSnapButton.setLayoutParams(layoutParams);
+                    saveSnapButton.setBackgroundColor(0);
+                    saveSnapButton.setAlpha(1f);
+                    saveSnapButton.setImageBitmap(saveImg);
+                    saveSnapButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
+                            ? View.VISIBLE : View.INVISIBLE);
 
-                frameLayout.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        return Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S &&
-                                gestureEvent.onTouch(v, event, Saving.SnapType.SNAP);
+                    frameLayout.setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            return Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S &&
+                                    gestureEvent.onTouch(v, event, Saving.SnapType.SNAP);
 
-                    }
-                });
-                frameLayout.addView(saveSnapButton);
-                saveSnapButton.bringToFront();
+                        }
+                    });
+                    frameLayout.addView(saveSnapButton);
+                    saveSnapButton.bringToFront();
 
-                saveSnapButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Logger.printTitle("Performing Button Save");
-                        Saving.performButtonSave();
-                    }
-                });
-            }
-        });
+                    saveSnapButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Logger.printTitle("Performing Button Save");
+                            Saving.performButtonSave();
+                        }
+                    });
+                }
+            });
+        } catch (Resources.NotFoundException ignore){
+        }
     }
 
     public static void assignStoryButton(FrameLayout frameLayout, Context context, String mKey) {
