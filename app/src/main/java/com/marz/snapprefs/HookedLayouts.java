@@ -20,7 +20,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
@@ -164,7 +163,6 @@ public class HookedLayouts {
     public static void addShareIcon(final XC_InitPackageResources.InitPackageResourcesParam resparam) {
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "camera_preview", new XC_LayoutInflated() {
             public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
-                Logger.log("Doing shit?");
                 final RelativeLayout relativeLayout =
                         (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("camera_preview_layout", "id", Common.PACKAGE_SNAP));
                 //final RelativeLayout.LayoutParams lParams =

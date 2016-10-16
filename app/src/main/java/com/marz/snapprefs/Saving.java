@@ -136,10 +136,10 @@ public class Saving {
                             super.beforeHookedMethod(param);
                             Log.d("snapprefs", "### START StoryViewerMediaCache ###");
                             Object godPacket = param.args[1];
-                            Object c = getObjectField(param.thisObject, "c");
+                            Object storyList = getObjectField(param.thisObject, Obfuscator.save.SVMC_STORYLIST_OBJECT);
                             String POSTER_USERNAME = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "POSTER_USERNAME");
                             String CLIENT_ID = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "CLIENT_ID");
-                            Object storySnap = callMethod(c, "a", POSTER_USERNAME, CLIENT_ID);
+                            Object storySnap = callMethod(storyList, Obfuscator.save.SDP_GET_OBJECT, POSTER_USERNAME, CLIENT_ID);
 
                             if (storySnap == null) {
                                 Logger.log("Null storysnap?");
@@ -252,27 +252,6 @@ public class Saving {
                     handleImagePayload(snapContext, mKey, (Bitmap) image);
                 }
             });
-
-                    /*findAndHookMethod("com.snapchat.opera.view.OperaPageView", cl, "onMeasure", int.class, int.class, new XC_MethodHook() {
-                        @Override
-                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            super.afterHookedMethod(param);
-
-                            Object mKey = getAdditionalInstanceField(param.thisObject, "mKey");
-
-                            if (mKey != null) {
-                                Logger.log("It worked!");
-                                //AssignedStoryButton storyButton = HookedLayouts.assignStoryButton((FrameLayout) param.thisObject, snapContext, (String) mKey);
-
-                                List<View> viewList = (List<View>) getObjectField(param.thisObject, "a");
-                                //viewList.add(storyButton);
-
-                                Logger.log("ViewSize: " + viewList.size());
-                            } else
-                                Logger.log("It didn't work!");
-
-                        }
-                    });*/
 
             /**
              * Called every time a snap is viewed - Quite reliable

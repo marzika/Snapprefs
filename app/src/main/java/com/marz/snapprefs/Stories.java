@@ -102,7 +102,7 @@ public class Stories {
         });
 
         if( Preferences.getBool(Prefs.DISCOVER_UI))
-            findAndHookMethod("atk", lpparam.classLoader, "c", List.class, XC_MethodReplacement.returnConstant(new ArrayList<>()));
+            findAndHookMethod(Obfuscator.stories.TILE_HANDLER_CLASS, lpparam.classLoader, Obfuscator.stories.GET_TILES_METHOD, List.class, XC_MethodReplacement.returnConstant(new ArrayList<>()));
     }
 
     private static void readFriendList(ClassLoader classLoader) {
