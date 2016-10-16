@@ -80,7 +80,6 @@ public class HookedLayouts {
 
     public static boolean setInt = true;
     public static ImageButton saveSnapButton;
-    public static ImageButton saveStoryButton;
     public static ArrayList<AssignedStoryButton> storyButtonQueue = new ArrayList<>();
     public static Class OperaPageViewLayoutsClass;
 
@@ -186,7 +185,7 @@ public class HookedLayouts {
                 final Cursor cursor = HookMethods.SnapContext.getContentResolver()
                         .query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null,
                                 null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
-                if (cursor.moveToFirst()) {
+                if (cursor != null && cursor.moveToFirst()) {
                     String imageLocation = cursor.getString(1);
                     File imageFile = new File(imageLocation);
                     if (imageFile.exists()) {
@@ -233,6 +232,8 @@ public class HookedLayouts {
                 });
 
                 relativeLayout.addView(upload);
+
+                cursor.close();
             }
         });
     }
@@ -296,7 +297,7 @@ public class HookedLayouts {
                     });
                 }
             });
-        } catch(Exception e) {
+        } catch (Exception e) {
             Logger.log("Not found something", e);
         }
     }
@@ -309,7 +310,7 @@ public class HookedLayouts {
             return;
         }
 
-        if( storyButton.shouldAbortAssignment ) {
+        if (storyButton.shouldAbortAssignment) {
             Logger.log("Layout already has button assigned");
             return;
         }
@@ -324,7 +325,7 @@ public class HookedLayouts {
         }
 
         //if (!storyButton.areParamsSet())
-            //storyButton.buildParams(frameLayout, context);
+        //storyButton.buildParams(frameLayout, context);
 
         storyButton.bringToFront();
         storyButton.invalidate();
@@ -338,7 +339,7 @@ public class HookedLayouts {
         for (AssignedStoryButton button : storyButtonQueue) {
             Logger.log("Checking if button can be reassigned");
 
-            if( button.getParent().equals(layout) ){
+            if (button.getParent().equals(layout)) {
                 button.abortAssignment();
                 return button;
             }
@@ -368,7 +369,6 @@ public class HookedLayouts {
             public boolean onTouch(View v, MotionEvent event) {
                 return Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S &&
                         gestureEvent.onTouch(v, event, Saving.SnapType.STORY);
-
             }
         });
     }
@@ -391,29 +391,6 @@ public class HookedLayouts {
 
                 Log.d("snapprefs", "ViewId: " + obj.getId());
             }
-        }
-    }
-
-    //TODO refresh button position when preference is changed
-    public static void refreshButtonPreferences() {
-        int horizontalPosition = Preferences.getBool(Prefs.BUTTON_POSITION) ? Gravity.START : Gravity.END;
-        final FrameLayout.LayoutParams layoutParams =
-                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
-                        FrameLayout.LayoutParams.WRAP_CONTENT,
-                        Gravity.BOTTOM | horizontalPosition);
-
-        if (HookedLayouts.saveSnapButton != null) {
-            HookedLayouts.saveSnapButton.setVisibility(
-                    Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE);
-
-            HookedLayouts.saveSnapButton.setLayoutParams(layoutParams);
-        }
-
-        if (HookedLayouts.saveStoryButton != null) {
-            HookedLayouts.saveStoryButton.setVisibility(
-                    Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE);
-
-            HookedLayouts.saveStoryButton.setLayoutParams(layoutParams);
         }
     }
 

@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -129,6 +130,13 @@ public class Saving {
                 }
             });
 
+            findAndHookMethod("com.snapchat.android.stories.ui.StorySnapView", cl, "onTouchEvent", MotionEvent.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+                    Logger.log("Performing touch event");
+                }
+            });
             findAndHookMethod(Obfuscator.save.STORY_VIEWER_MEDIA_CACHE, cl, Obfuscator.save.VIEWING_STORY_METHOD,
                     String.class, findClass(Obfuscator.save.STORY_DETAILS_PACKET, cl), ImageView.class, findClass(Obfuscator.save.VIEWING_STORY_VAR4, cl), new XC_MethodHook() {
                         @Override
@@ -161,8 +169,12 @@ public class Saving {
                             if (snapContainer != null) {
                                 if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON)
                                     HookedLayouts.assignStoryButton(snapContainer, snapContext, mKey);
-                                else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S)
-                                    HookedLayouts.assignGestures(snapContainer);
+                                else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S) {
+                                    FrameLayout snapContainerParent = (FrameLayout) snapContainer.getParent();
+
+                                    if (snapContainerParent != null)
+                                        HookedLayouts.assignGestures(snapContainerParent);
+                                }
                             }
 
                             setAdditionalInstanceField(param.args[2], "StorySnap", storySnap);
@@ -432,9 +444,11 @@ public class Saving {
         }
     }
 
-    public static FrameLayout scanForStoryContainer(View view) {
-        if (view == null)
+    private static FrameLayout scanForStoryContainer(View view) {
+        if (view == null) {
+            Logger.log("Called scan with Null view");
             return null;
+        }
 
         Object parent = view.getParent();
 
