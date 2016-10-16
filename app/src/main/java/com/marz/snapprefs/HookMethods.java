@@ -531,11 +531,8 @@ public class HookMethods
                             }
                         }
                     });
-                    //disable auto advance
-                    //search for "AUTO_ADVANCE_RECENT_UPDATES"
-
                     if( Preferences.getBool(Prefs.AUTO_ADVANCE))
-                        XposedHelpers.findAndHookMethod("aty", lpparam.classLoader, "a", XC_MethodReplacement.returnConstant(false));
+                        XposedHelpers.findAndHookMethod(Obfuscator.stories.AUTOADVANCE_CLASS, lpparam.classLoader, Obfuscator.stories.AUTOADVANCE_METHOD, XC_MethodReplacement.returnConstant(false));
 
                 }
             });

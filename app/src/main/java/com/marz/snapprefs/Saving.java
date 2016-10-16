@@ -419,13 +419,15 @@ public class Saving {
                                 }
                                 if (f == null) {
                                     NotificationUtils.showStatefulMessage("File f is null!", ToastType.BAD, lpparam.classLoader);
+                                    Logger.logStackTrace();
                                     return false;
                                 }
                                 if (f.exists()) {
                                     NotificationUtils.showStatefulMessage("Profile Images already Exist.", ToastType.BAD, lpparam.classLoader);
                                     return true;
                                 }
-                                if (SavingUtils.saveJPG(f, profileImages.get(iterator), snapContext)) {
+
+                                if (SavingUtils.saveJPG(f, profileImages.get(iterator), snapContext, false)) {
                                     succCounter++;
                                 }
                             }
@@ -440,11 +442,11 @@ public class Saving {
 
             //HookMethods.hookAllMethods("Ce", cl, true);
         } catch (Exception e) {
-            Logger.log("Error occured: Snapprefs doesn't currently support this version, wait for an update", e);
+            Logger.log("Error occurred: Snapprefs doesn't currently support this version, wait for an update", e);
 
             findAndHookMethod(Obfuscator.save.LANDINGPAGEACTIVITY_CLASS, lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Toast.makeText((Context) param.thisObject, "This version of snapchat is currently not supported by Snapprefs.", Toast.LENGTH_LONG)
+                    Toast.makeText((Context) param.thisObject, "This version of Snapchat is currently not supported by Snapprefs.", Toast.LENGTH_LONG)
                             .show();
                 }
             });

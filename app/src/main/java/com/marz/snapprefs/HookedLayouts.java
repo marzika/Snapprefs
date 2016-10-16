@@ -7,17 +7,26 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.XModuleResources;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Shader;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -162,17 +171,58 @@ public class HookedLayouts {
                 //        new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("camera_take_snap_button", "id", Common.PACKAGE_SNAP)).getLayoutParams());
                 final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams((int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP)), (int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP)));
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                layoutParams.rightMargin = px(50);
-                layoutParams.topMargin = px(12);
+                layoutParams.rightMargin = px(55);
+                layoutParams.topMargin = px(10);
                 upload = new ImageButton(HookMethods.SnapContext);
                 upload.setLayoutParams(layoutParams);
                 upload.setBackgroundColor(0);
-                Drawable uploading =
-                        HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.sharing.UPLOAD_ICON.substring(2), 16));
+                //Drawable uploadimg = HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.sharing.UPLOAD_ICON.substring(2), 16));
                 //upload.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
-                upload.setImageDrawable(uploading);
-                upload.setScaleX((float) 0.55);
-                upload.setScaleY((float) 0.55);
+                String[] projection = new String[]{
+                        MediaStore.Images.ImageColumns._ID,
+                        MediaStore.Images.ImageColumns.DATA,
+                        MediaStore.Images.ImageColumns.BUCKET_DISPLAY_NAME,
+                        MediaStore.Images.ImageColumns.DATE_TAKEN,
+                        MediaStore.Images.ImageColumns.MIME_TYPE
+                };
+                final Cursor cursor = HookMethods.SnapContext.getContentResolver()
+                        .query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null,
+                                null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
+                if (cursor.moveToFirst()) {
+                    String imageLocation = cursor.getString(1);
+                    File imageFile = new File(imageLocation);
+                    if (imageFile.exists()) {
+                        Bitmap bm = BitmapFactory.decodeFile(imageLocation);
+                        Bitmap resized = Bitmap.createScaledBitmap(bm, layoutParams.width, layoutParams.height, false);
+                        int w = resized.getWidth();
+                        int h = resized.getHeight();
+
+                        int radius = Math.min(h / 2, w / 2);
+                        Bitmap output = Bitmap.createBitmap(w + 8, h + 8, Bitmap.Config.ARGB_8888);
+
+                        Paint p = new Paint();
+                        p.setAntiAlias(true);
+
+                        Canvas c = new Canvas(output);
+                        c.drawARGB(0, 0, 0, 0);
+                        p.setStyle(Paint.Style.FILL);
+
+                        c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
+
+                        p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+
+                        c.drawBitmap(resized, 4, 4, p);
+                        p.setXfermode(null);
+                        p.setStyle(Paint.Style.STROKE);
+                        p.setColor(Color.WHITE);
+                        p.setStrokeWidth(7.5f);
+                        c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
+                        upload.setImageDrawable(new BitmapDrawable(output));
+                    }
+                }
+                //upload.setImageDrawable(uploadimg);
+                upload.setScaleX((float) 1.1);
+                upload.setScaleY((float) 1.1);
                 upload.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -521,7 +571,7 @@ public class HookedLayouts {
         };
         findAndHookMethod("com.snapchat.android.app.shared.analytics.ui.StickerPickerAnalytics", lpparam.classLoader, "b", hideLayout);//prev. a
         //TODO Find the new representation of this method - DONE?
-        findAndHookMethod("TX", lpparam.classLoader, "c", hideLayout);
+        findAndHookMethod(Obfuscator.icons.CAPTIONOPENED_CLASS, lpparam.classLoader, Obfuscator.icons.CAPTIONOPENED_METHOD, hideLayout);
     }
 
     private static class OptionsAdapter extends BaseAdapter {
