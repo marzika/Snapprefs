@@ -19,8 +19,11 @@ import android.widget.Toast;
 import com.marz.snapprefs.Preferences.Prefs;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by MARZ on 2016. 04. 14..
@@ -56,9 +59,20 @@ public class GroupDialog extends DialogFragment {
         v.setOrientation(LinearLayout.VERTICAL);
         v.setLayoutParams(linearparams);
 
-        final File[] files = Groups.groupsDir.listFiles();
+        File[] files = Groups.groupsDir.listFiles();
+        if(files==null){
+            Groups.groupsDir.mkdir();
+            files = Groups.groupsDir.listFiles();
+        }
         Arrays.sort(files);
-        final int N = Groups.groups.size(); // total number of textviews to add
+        List<String> al = new ArrayList<>();
+        // add elements to al, including duplicates
+        Set<Groups.Group> linkedHashSet = new LinkedHashSet<>();
+        linkedHashSet.addAll(Groups.groups);
+        Groups.groups.clear();
+        Groups.groups.addAll(linkedHashSet);
+        final int N = Groups.groups.size();
+        // total number of textviews to add
         for (int i = 0; i < N; i++) {
             // create a new textview
             final TextView rowTextView = new TextView(HookMethods.context);

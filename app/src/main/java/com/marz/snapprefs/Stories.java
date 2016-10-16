@@ -105,26 +105,38 @@ public class Stories {
             findAndHookMethod(Obfuscator.stories.TILE_HANDLER_CLASS, lpparam.classLoader, Obfuscator.stories.GET_TILES_METHOD, List.class, XC_MethodReplacement.returnConstant(new ArrayList<>()));
     }
 
-    private static void readFriendList(ClassLoader classLoader) {
-        final Object friendManager = XposedHelpers.callStaticMethod(XposedHelpers.findClass(Obfuscator.stories.FRIENDMANAGER_CLASS, classLoader), Obfuscator.stories.FRIENDMANAGER_RETURNINSTANCE);
-        List friends = (List) XposedHelpers.getObjectField(XposedHelpers.getObjectField(friendManager, "mOutgoingFriendsListMap"), "mList");
-        friendList.clear();
-        for (int i = 0; i <= friends.size() - 1; i++) {
-            String username = (String) XposedHelpers.callMethod(friends.get(i), Obfuscator.save.GET_FRIEND_USERNAME);
-            if (peopleToHide.contains(username)) {
-                friendList.add(new Friend(username, "", true));
-            } else {
-                friendList.add(new Friend(username, "", false));
+    private static void readFriendList(final ClassLoader classLoader) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final Object friendManager = XposedHelpers.callStaticMethod(XposedHelpers.findClass(Obfuscator.stories.FRIENDMANAGER_CLASS, classLoader), Obfuscator.stories.FRIENDMANAGER_RETURNINSTANCE);
+                List friends = (List) XposedHelpers.getObjectField(XposedHelpers.getObjectField(friendManager, "mOutgoingFriendsListMap"), "mList");
+                friendList.clear();
+                for (int i = 0; i <= friends.size() - 1; i++) {
+                    String username = (String) XposedHelpers.callMethod(friends.get(i), Obfuscator.save.GET_FRIEND_USERNAME);
+                    if (peopleToHide.contains(username)) {
+                        friendList.add(new Friend(username, "", true));
+                    } else {
+                        friendList.add(new Friend(username, "", false));
+                    }
+                }
+                Collections.sort(friendList, new Friend.friendComparator());
             }
-        }
-        Collections.sort(friendList, new Friend.friendComparator());
+        }).start();
+
     }
 
     private static void readBlockedList() {
-        String read = FileUtils.readFromSDFolder("blockedstories").replaceAll("\n", "");
-        if (!read.equals("0")) {
-            peopleToHide = Arrays.asList(read.split(";"));
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String read = FileUtils.readFromSDFolder("blockedstories").replaceAll("\n", "");
+                if (!read.equals("0")) {
+                    peopleToHide = Arrays.asList(read.split(";"));
+                }
+            }
+        }).start();
+
     }
 
     public static void addSnapprefsBtn(XC_InitPackageResources.InitPackageResourcesParam resparam, final XModuleResources mResources) {
