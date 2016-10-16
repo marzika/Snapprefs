@@ -20,8 +20,9 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
  */
 
 public class AssignedStoryButton extends ImageButton {
-    public boolean areParamsSet = false;
-    public String assignedmKey;
+    private boolean areParamsSet = false;
+    public boolean shouldAbortAssignment = false;
+    private String assignedmKey;
 
     public AssignedStoryButton(Context context) {
         super(context);
@@ -29,7 +30,7 @@ public class AssignedStoryButton extends ImageButton {
         this.setBackgroundColor(0);
         this.setAlpha(0.8f);
         this.setImageBitmap(HookMethods.saveImg);
-        this.setVisibility(Preferences.getInt(Preferences.Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
+        this.setVisibility(Preferences.getInt(Preferences.Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON
                 ? View.VISIBLE : View.INVISIBLE);
 
         this.setOnClickListener(new View.OnClickListener() {
@@ -42,17 +43,16 @@ public class AssignedStoryButton extends ImageButton {
     }
 
     public boolean canBeReassigned() {
-        if( this.getParent() == null )
-            return true;
-
-        return !this.isShown();
+        return this.getParent() == null || !this.isShown();
     }
 
     public void removeParent() {
         Object parent = this.getParent();
 
-        if( parent != null && parent instanceof FrameLayout)
-            ((FrameLayout)parent).removeView(this);
+        if (parent != null && parent instanceof FrameLayout) {
+            ((FrameLayout) parent).removeView(this);
+            Logger.log("Removing buttons previous parent");
+        }
     }
 
     public void buildParams(FrameLayout frameLayout, Context context) {
@@ -71,6 +71,7 @@ public class AssignedStoryButton extends ImageButton {
         int newX = horizontalPosition ? 0 : metrics.widthPixels - scaledSize;
         int newY = metrics.heightPixels - scaledSize;
 
+        //noinspection ResourceType
         newParams.setMargins(newX, newY, newX, newY);
 
         Logger.log("Margins: " + newParams.leftMargin + " " + newParams.topMargin + " " + newParams.rightMargin + " " + newParams.bottomMargin);
@@ -78,18 +79,28 @@ public class AssignedStoryButton extends ImageButton {
         Logger.log("newParams: " + newParams);
         super.setLayoutParams(newParams);
         this.setAdjustViewBounds(true);
+        super.setPadding(0, 0, 0, 0);
+
         areParamsSet = true;
     }
 
     @Override
     public void setLayoutParams(ViewGroup.LayoutParams params) {
-    }
-
-    public void setAssignedmKey(String assignedmKey){
-        this.assignedmKey = assignedmKey;
+        Logger.log("OVERRIDDEN: setLayoutParams");
     }
 
     public String getAssignedmKey() {
         return this.assignedmKey;
+    }
+
+    public void setAssignedmKey(String assignedmKey) {
+        this.assignedmKey = assignedmKey;
+    }
+
+    public boolean areParamsSet() {
+        return areParamsSet;
+    }
+
+    public void abortAssignment() {
     }
 }

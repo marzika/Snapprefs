@@ -65,9 +65,7 @@ public class Saving {
     private static Context relativeContext;
     //TODO implement user selected save mode
     private static boolean asyncSaveMode = true;
-    private static boolean hasAssignedButtonsAndGestures = false;
     private static Object enum_NO_AUTO_ADVANCE;
-    private static Context context;
 
     static void initSaving(final XC_LoadPackage.LoadPackageParam lpparam,
                            final XModuleResources modRes, final Context snapContext) {
@@ -77,7 +75,7 @@ public class Saving {
         if (mSCResources == null) mSCResources = snapContext.getResources();
 
         try {
-            ClassLoader cl = lpparam.classLoader;
+            final ClassLoader cl = lpparam.classLoader;
 
             final Class storyClass = findClass(Obfuscator.save.STORYSNAP_CLASS, cl);
             Class AdvanceType = findClass(Obfuscator.misc.ADVANCE_TYPE_CLASS, cl);
@@ -138,7 +136,15 @@ public class Saving {
                             super.beforeHookedMethod(param);
                             Log.d("snapprefs", "### START StoryViewerMediaCache ###");
                             Object godPacket = param.args[1];
-                            Object storySnap = callMethod(godPacket, Obfuscator.save.SDP_GET_OBJECT, "STORY_REPLY_SNAP");
+                            Object storyList = getObjectField(param.thisObject, Obfuscator.save.SVMC_STORYLIST_OBJECT);
+                            String POSTER_USERNAME = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "POSTER_USERNAME");
+                            String CLIENT_ID = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "CLIENT_ID");
+                            Object storySnap = callMethod(storyList, Obfuscator.save.SDP_GET_OBJECT, POSTER_USERNAME, CLIENT_ID);
+
+                            if (storySnap == null) {
+                                Logger.log("Null storysnap?");
+                                return;
+                            }
 
                             String storyUsername = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "POSTER_USERNAME");
 
@@ -148,6 +154,7 @@ public class Saving {
                             }
 
                             View view = (View) param.args[2];
+
                             FrameLayout snapContainer = scanForStoryContainer(view);
                             String mKey = (String) getObjectField(storySnap, "mId");
 
@@ -155,7 +162,7 @@ public class Saving {
                                 if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON)
                                     HookedLayouts.assignStoryButton(snapContainer, snapContext, mKey);
                                 else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S)
-                                    HookedLayouts.assignGestures((FrameLayout) snapContainer.getParent());
+                                    HookedLayouts.assignGestures(snapContainer);
                             }
 
                             setAdditionalInstanceField(param.args[2], "StorySnap", storySnap);
@@ -246,7 +253,6 @@ public class Saving {
                 }
             });
 
-            //HookMethods.hookAllMethods("apn", cl, true, true);
             /**
              * Called every time a snap is viewed - Quite reliable
              */
@@ -399,6 +405,7 @@ public class Saving {
                                     NotificationUtils.showStatefulMessage("Profile Images already Exist.", ToastType.BAD, lpparam.classLoader);
                                     return true;
                                 }
+
                                 if (SavingUtils.saveJPG(f, profileImages.get(iterator), snapContext, false)) {
                                     succCounter++;
                                 }

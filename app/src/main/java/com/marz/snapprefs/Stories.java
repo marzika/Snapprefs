@@ -10,8 +10,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
-import com.marz.snapprefs.Util.FileUtils;
 import com.marz.snapprefs.Preferences.Prefs;
+import com.marz.snapprefs.Util.FileUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_InitPackageResources;
 import de.robv.android.xposed.callbacks.XC_LayoutInflated;
@@ -72,8 +73,10 @@ public class Stories {
                             }
                         }
                     } else if (o.getClass() == liveStory && Preferences.getBool(Prefs.HIDE_LIVE)) {
+                        Logger.log("Live");
                         f.remove(i);
                     } else if (o.getClass() == discoverStory && Preferences.getBool(Prefs.DISCOVER_UI)) {
+                        Logger.log("Discover");
                         f.remove(i);
                     } else if (!types.contains(o.getClass())){
                         Logger.log("Found an unexpected entry at stories TYPE: " + o.getClass().getCanonicalName());
@@ -97,6 +100,9 @@ public class Stories {
                 }
             }
         });
+
+        if( Preferences.getBool(Prefs.DISCOVER_UI))
+            findAndHookMethod(Obfuscator.stories.TILE_HANDLER_CLASS, lpparam.classLoader, Obfuscator.stories.GET_TILES_METHOD, List.class, XC_MethodReplacement.returnConstant(new ArrayList<>()));
     }
 
     private static void readFriendList(final ClassLoader classLoader) {

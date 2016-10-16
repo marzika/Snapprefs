@@ -212,6 +212,7 @@ public class Obfuscator implements Serializable {
         public final static String STORY_VIEWER_MEDIA_CACHE = "com.snapchat.android.stories.viewer.StoryViewerMediaCache";
         public final static String VIEWING_STORY_METHOD = "a";
         public final static String VIEWING_STORY_VAR4 = "aEm$a";
+        public final static String SVMC_STORYLIST_OBJECT = "c";
 
         public final static String STORY_IMAGE_HOLDER = "gC";
 
@@ -408,6 +409,9 @@ public class Obfuscator implements Serializable {
         public final static String AUTOADVANCE_METHOD2 = "a";
         public final static String AUTOADVANCE_CLASS = "aty";
         public final static String AUTOADVANCE_METHOD = "a";
+
+        public final static String TILE_HANDLER_CLASS = "atk";
+        public final static String GET_TILES_METHOD = "c";
     }
     public static class groups {
         public final static String STORY_CLASS = "apb";//prev. Vp

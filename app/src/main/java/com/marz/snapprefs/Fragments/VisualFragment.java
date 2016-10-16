@@ -191,7 +191,7 @@ public class VisualFragment extends Fragment {
         }
     }
     public static void refreshPreferences() {
-        SharedPreferences prefs = MainActivity.getPrefereces();
+        SharedPreferences prefs = MainActivity.getPreferences();
         mAmaro = prefs.getBoolean("AMARO", mAmaro);
         mF1997 = prefs.getBoolean("F1997", mF1997);
         mBrannan  = prefs.getBoolean("BRANNAN", mBrannan );
