@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         return deviceUuid != null ? deviceUuid.toString() : (String) Preferences.Prefs.DEVICE_ID.defaultVal;
     }
 
-    public static SharedPreferences getPrefereces() {
+    public static SharedPreferences getPreferences() {
         return prefs;
     }
 
@@ -439,9 +439,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public String readStringPreference(String key) {
-        SharedPreferences prefs = getPrefereces();
-        String returned = prefs.getString(key, null);
-        return returned;
+        SharedPreferences prefs = getPreferences();
+        return prefs.getString(key, null);
     }
 
     private SharedPreferences createPrefsIfNotExisting() {
