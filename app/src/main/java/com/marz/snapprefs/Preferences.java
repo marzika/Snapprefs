@@ -323,6 +323,10 @@ public class Preferences {
         return getString(Prefs.SAVE_PATH);
     }
 
+    public static String getContentPath() {
+        return getExternalPath() + "/Snapprefs";
+    }
+
     public static String getFilterPath() {
         String path = getString(Prefs.CUSTOM_FILTER_LOCATION);
 
