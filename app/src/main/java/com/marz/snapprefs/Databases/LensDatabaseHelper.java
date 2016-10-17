@@ -188,7 +188,7 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
         ArrayList<LensData> lensDataList = new ArrayList<>();
 
         while (!cursor.isAfterLast()) {
-            Logger.log("Looping cursor result");
+            //Logger.log("Looping cursor result");
             LensData lensData = getLensFromCursor(cursor);
 
             if (lensData == null) {
