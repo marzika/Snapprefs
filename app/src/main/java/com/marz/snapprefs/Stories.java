@@ -20,14 +20,12 @@ import java.util.HashMap;
 import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_InitPackageResources;
 import de.robv.android.xposed.callbacks.XC_LayoutInflated;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedHelpers.callMethod;
-import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
@@ -68,16 +66,6 @@ public class Stories {
             }
         });
 
-        findAndHookConstructor("agJ", lpparam.classLoader, View.class, findClass("aev", lpparam.classLoader),
-                findClass("aeu", lpparam.classLoader), findClass("axJ", lpparam.classLoader), findClass("aeJ", lpparam.classLoader),
-                new XC_MethodHook() {
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        super.beforeHookedMethod(param);
-                        Logger.logStackTrace();
-                    }
-                });
-
         Class ExitEventTypeClass = findClass("com.snapchat.android.framework.analytics.perf.ExitEvent", lpparam.classLoader);
         final Object ExitEvent_AUTO_ADVANCE = getStaticObjectField(ExitEventTypeClass, "AUTO_ADVANCE");
         findAndHookMethod(Obfuscator.stories.AUTOADVANCE_CLASS2, lpparam.classLoader, Obfuscator.stories.AUTOADVANCE_METHOD2, ExitEventTypeClass, new XC_MethodHook() {
@@ -92,9 +80,6 @@ public class Stories {
                 }
             }
         });
-
-        if (Preferences.getBool(Prefs.DISCOVER_UI))
-            findAndHookMethod(Obfuscator.stories.TILE_HANDLER_CLASS, lpparam.classLoader, Obfuscator.stories.GET_TILES_METHOD, List.class, XC_MethodReplacement.returnConstant(new ArrayList<>()));
     }
 
     private static void readFriendList(final ClassLoader classLoader) {
@@ -207,12 +192,8 @@ public class Stories {
         filterMap.put(liveStory, new Callable() {
             public void callBackMethod(ArrayList<Object> objectList, Object obj) {
                 if (Preferences.getBool(Prefs.HIDE_LIVE)) {
-                    String friendUsername = (String) callMethod(obj, Obfuscator.stories.RECENTSTORY_GETUSERNAME);
-
-                    if (friendUsername != null && peopleToHide.contains(friendUsername)) {
-                        Logger.log("Blocking Live Story");
-                        objectList.remove(obj);
-                    }
+                    Logger.log("Blocking Live Story");
+                    objectList.remove(obj);
                 }
             }
         });
