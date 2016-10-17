@@ -21,6 +21,7 @@ public class Preferences {
     public static final int DO_NOT_SAVE = 2;
     public static final int SAVE_BUTTON = 0;
     public static final int SAVE_AUTO = 3;
+    public static final int SAVE_F2S = 4;
     public static final int TOAST_LENGTH_SHORT = 0;
     public static final int TOAST_LENGTH_LONG = 1;
     public static final int TIMER_MINIMUM_DISABLED = 0;

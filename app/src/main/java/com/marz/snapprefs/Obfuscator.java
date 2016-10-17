@@ -398,8 +398,8 @@ public class Obfuscator implements Serializable {
         public final static String RECENTSTORY_GETUSERNAME = "d";
         public final static String ALLSTORY_CLASS = "agD";
         public final static String ALLSTORY_GETFRIEND = "h";
-        public final static String LIVESTORY_CLASS = "aaF";
-        public final static String DISCOVERSTORY_CLASS = "Le";
+        public final static String LIVESTORY_CLASS = "aee";
+        public final static String DISCOVERSTORY_CLASS = "ati";
         public final static String STORYLIST = "g";
         public final static String RECENTSTORIES_CLASS = "com.snapchat.android.fragments.stories.StoriesFragment";
         public final static String STORIES_FRAGMENT_POPULATEARRAY = "c";

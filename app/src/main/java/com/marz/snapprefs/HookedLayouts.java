@@ -54,8 +54,10 @@ import android.widget.Toast;
 
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.AssignedStoryButton;
+import com.marz.snapprefs.Util.FlingSaveGesture;
 import com.marz.snapprefs.Util.GestureEvent;
 import com.marz.snapprefs.Util.NotificationUtils;
+import com.marz.snapprefs.Util.SweepSaveGesture;
 import com.marz.snapprefs.Util.TypefaceUtil;
 
 import java.io.File;
@@ -75,14 +77,10 @@ import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
  * Created by MARZ on 2016. 04. 08..
  */
 public class HookedLayouts {
-
     public static ImageButton upload = null;
     public static RelativeLayout outerOptionsLayout = null;
-
-    public static boolean setInt = true;
     public static ImageButton saveSnapButton;
     public static ArrayList<AssignedStoryButton> storyButtonQueue = new ArrayList<>();
-    public static Class OperaPageViewLayoutsClass;
 
     public static void initIntegration(XC_LoadPackage.LoadPackageParam lpparam,
                                        final XModuleResources mResources) {
@@ -251,7 +249,6 @@ public class HookedLayouts {
             XC_InitPackageResources.InitPackageResourcesParam resparam,
             XModuleResources mResources, final Context localContext
     ) {
-        final GestureEvent gestureEvent = new GestureEvent();
         Logger.log("Adding Save Buttons");
 /*
         int intIconID = resparam.res.getIdentifier("aa_snap_preview_save", "drawable", Common
@@ -269,6 +266,8 @@ public class HookedLayouts {
                         Gravity.BOTTOM | horizontalPosition);
 
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated() {
+            private GestureEvent gestureEvent;
+
             @Override
             public void handleLayoutInflated(LayoutInflatedParam liparam)
                     throws Throwable {
@@ -288,11 +287,21 @@ public class HookedLayouts {
                 frameLayout.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-                        return Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S &&
-                                gestureEvent.onTouch(v, event, Saving.SnapType.SNAP) != GestureEvent.ReturnType.SAVED;
+                        if (gestureEvent == null) {
+                            if( Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S)
+                                gestureEvent = new SweepSaveGesture();
+                            else if( Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_F2S )
+                                gestureEvent = new FlingSaveGesture();
+                            else {
+                                Logger.log("No gesture method provided");
+                                return false;
+                            }
+                        }
 
+                        return gestureEvent.onTouch(v, event, Saving.SnapType.SNAP) != GestureEvent.ReturnType.SAVED;
                     }
                 });
+
                 frameLayout.addView(saveSnapButton);
                 saveSnapButton.bringToFront();
 
@@ -329,15 +338,11 @@ public class HookedLayouts {
             setAdditionalInstanceField(frameLayout, "mKey", mKey);
         }
 
-        //if (!storyButton.areParamsSet())
-        //storyButton.buildParams(frameLayout, context);
-
         storyButton.bringToFront();
         storyButton.invalidate();
         frameLayout.invalidate();
 
         Logger.log("brought to front");
-        return;
     }
 
     public static AssignedStoryButton retrieveStoryButton(FrameLayout layout, Context context, String mKey) {

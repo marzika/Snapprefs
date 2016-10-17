@@ -16,6 +16,7 @@ import com.marz.snapprefs.Util.FileUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -39,53 +40,31 @@ public class Stories {
     public static List<String> peopleToHide = new ArrayList<>();
 
     public static List<Friend> friendList = new ArrayList<>();
+    public static HashMap<Class<?>, Callable> filterMap = new HashMap<>();
 
     static void initStories(final XC_LoadPackage.LoadPackageParam lpparam) {
         readBlockedList();
-        findAndHookMethod(Obfuscator.stories.RECENTSTORIES_CLASS, lpparam.classLoader, Obfuscator.stories.STORIES_FRAGMENT_POPULATEARRAY, new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                ArrayList f = (ArrayList) getObjectField(param.thisObject, Obfuscator.stories.STORYLIST);
-                List<Class> types = new ArrayList<Class>();
-                Class<?> recentStory = XposedHelpers.findClass(Obfuscator.stories.RECENTSTORY_CLASS, lpparam.classLoader);
-                Class<?> allStory = XposedHelpers.findClass(Obfuscator.stories.ALLSTORY_CLASS, lpparam.classLoader);
-                Class<?> liveStory = XposedHelpers.findClass(Obfuscator.stories.LIVESTORY_CLASS, lpparam.classLoader);
-                Class<?> discoverStory = XposedHelpers.findClass(Obfuscator.stories.DISCOVERSTORY_CLASS, lpparam.classLoader);
-                types.add(recentStory);
-                types.add(allStory);
-                types.add(liveStory);
-                types.add(discoverStory);
 
-                for (int i = f.size() - 1; i >= 0; i--) {
-                    Object o = f.get(i);
-                    if (o.getClass() == recentStory && Preferences.getBool(Prefs.HIDE_PEOPLE)) {
-                        String username = (String) callMethod(o, Obfuscator.stories.RECENTSTORY_GETUSERNAME);
-                        for (String person : peopleToHide) {
-                            if (username.equals(person)) {
-                                Logger.log("removing from recents" + username);
-                                f.remove(i);
-                            }
-                        }
-                    } else if (o.getClass() == allStory && Preferences.getBool(Prefs.HIDE_PEOPLE)) {
-                        Object friend = callMethod(o, Obfuscator.stories.ALLSTORY_GETFRIEND);
-                        String username = (String) callMethod(friend, Obfuscator.save.GET_FRIEND_USERNAME);
-                        for (String person : peopleToHide) {
-                            if (username.equals(person)) {
-                                Logger.log("removing " + username);
-                                f.remove(i);
-                            }
-                        }
-                    } else if (o.getClass() == liveStory && Preferences.getBool(Prefs.HIDE_LIVE)) {
-                        Logger.log("Live");
-                        f.remove(i);
-                    } else if (o.getClass() == discoverStory && Preferences.getBool(Prefs.DISCOVER_UI)) {
-                        Logger.log("Discover");
-                        f.remove(i);
-                    } else if (!types.contains(o.getClass())) {
-                        Logger.log("Found an unexpected entry at stories TYPE: " + o.getClass().getCanonicalName());
+        buildFilterMap(lpparam);
+
+        findAndHookMethod(Obfuscator.stories.STORY_LOADER_CLASS, lpparam.classLoader, Obfuscator.stories.SL_LOAD_METHOD, List.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                ArrayList<Object> originalList = (ArrayList<Object>) param.args[0];
+                ArrayList<Object> iterativeList = new ArrayList<>(originalList);
+
+                for (Object storyItemObject : iterativeList) {
+                    Class<?> storyItemClass = storyItemObject.getClass();
+                    Callable callable = filterMap.get(storyItemClass);
+
+                    if (callable == null) {
+                        Logger.log("Unhandled story item: " + storyItemClass.getCanonicalName());
+                        return;
                     }
+
+                    callable.callBackMethod(originalList, storyItemObject);
                 }
-                XposedHelpers.setObjectField(param.thisObject, Obfuscator.stories.STORYLIST, f);
             }
         });
 
@@ -98,33 +77,6 @@ public class Stories {
                         Logger.logStackTrace();
                     }
                 });
-
-        findAndHookMethod(Obfuscator.stories.STORY_LOADER_CLASS, lpparam.classLoader, Obfuscator.stories.SL_LOAD_METHOD, List.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                super.beforeHookedMethod(param);
-                List<Object> originalList = (List<Object>) param.args[0];
-                List<Object> iterativeList = new ArrayList<>(originalList);
-
-                for (Object obj : iterativeList) {
-                    String className = obj.getClass().getCanonicalName();
-                    String friendUsername = null;
-
-                    if (className.equals(Obfuscator.stories.VIEWED_STORY_CLASS)) {
-                        Object friendObj = getObjectField(obj, Obfuscator.stories.VS_FRIEND_OBJECT);
-                        friendUsername = (String) getObjectField(friendObj, "mUsername");
-
-                    } else if (className.equals(Obfuscator.stories.RECENTSTORY_CLASS)) {
-                        friendUsername = (String) callMethod(obj, Obfuscator.stories.RECENTSTORY_GETUSERNAME);
-                    }
-
-                    if (friendUsername != null && peopleToHide.contains(friendUsername)) {
-                        Logger.log("Contains blocked friend.... Removing");
-                        originalList.remove(obj);
-                    }
-                }
-            }
-        });
 
         Class ExitEventTypeClass = findClass("com.snapchat.android.framework.analytics.perf.ExitEvent", lpparam.classLoader);
         final Object ExitEvent_AUTO_ADVANCE = getStaticObjectField(ExitEventTypeClass, "AUTO_ADVANCE");
@@ -218,5 +170,64 @@ public class Stories {
                 });
             }
         });
+    }
+
+    private static void buildFilterMap(XC_LoadPackage.LoadPackageParam lpparam) {
+        Class<?> recentStory = XposedHelpers.findClass(Obfuscator.stories.RECENTSTORY_CLASS, lpparam.classLoader);
+        Class<?> allStory = XposedHelpers.findClass(Obfuscator.stories.ALLSTORY_CLASS, lpparam.classLoader);
+        Class<?> liveStory = XposedHelpers.findClass(Obfuscator.stories.LIVESTORY_CLASS, lpparam.classLoader);
+        Class<?> featuredStory = XposedHelpers.findClass(Obfuscator.stories.DISCOVERSTORY_CLASS, lpparam.classLoader);
+
+        filterMap.put(recentStory, new Callable() {
+            public void callBackMethod(ArrayList<Object> objectList, Object obj) {
+                if (Preferences.getBool(Prefs.HIDE_PEOPLE)) {
+                    String friendUsername = (String) callMethod(obj, Obfuscator.stories.RECENTSTORY_GETUSERNAME);
+
+                    if (friendUsername != null && peopleToHide.contains(friendUsername)) {
+                        Logger.log("Contains blocked friend.... Removing " + friendUsername);
+                        objectList.remove(obj);
+                    }
+                }
+            }
+        });
+
+        filterMap.put(allStory, new Callable() {
+            public void callBackMethod(ArrayList<Object> objectList, Object obj) {
+                if (Preferences.getBool(Prefs.HIDE_PEOPLE)) {
+                    String friendUsername = (String) callMethod(obj, Obfuscator.stories.RECENTSTORY_GETUSERNAME);
+
+                    if (friendUsername != null && peopleToHide.contains(friendUsername)) {
+                        Logger.log("Contains blocked friend.... Removing " + friendUsername);
+                        objectList.remove(obj);
+                    }
+                }
+            }
+        });
+
+        filterMap.put(liveStory, new Callable() {
+            public void callBackMethod(ArrayList<Object> objectList, Object obj) {
+                if (Preferences.getBool(Prefs.HIDE_LIVE)) {
+                    String friendUsername = (String) callMethod(obj, Obfuscator.stories.RECENTSTORY_GETUSERNAME);
+
+                    if (friendUsername != null && peopleToHide.contains(friendUsername)) {
+                        Logger.log("Blocking Live Story");
+                        objectList.remove(obj);
+                    }
+                }
+            }
+        });
+
+        filterMap.put(featuredStory, new Callable() {
+            public void callBackMethod(ArrayList<Object> objectList, Object obj) {
+                if (Preferences.getBool(Prefs.DISCOVER_UI)) {
+                    Logger.log("Blocking Featured Story");
+                    objectList.remove(obj);
+                }
+            }
+        });
+    }
+
+    interface Callable {
+        void callBackMethod(ArrayList<Object> objectList, Object obj);
     }
 }

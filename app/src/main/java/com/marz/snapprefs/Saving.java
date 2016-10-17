@@ -20,11 +20,13 @@ import android.widget.Toast;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.SnapData.FlagState;
 import com.marz.snapprefs.Util.CommonUtils;
+import com.marz.snapprefs.Util.FlingSaveGesture;
 import com.marz.snapprefs.Util.GestureEvent;
 import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.NotificationUtils.ToastType;
 import com.marz.snapprefs.Util.SavingUtils;
 import com.marz.snapprefs.Util.StringUtils;
+import com.marz.snapprefs.Util.SweepSaveGesture;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -67,7 +69,7 @@ public class Saving {
     //TODO implement user selected save mode
     private static boolean asyncSaveMode = true;
     private static Object enum_NO_AUTO_ADVANCE;
-    private static GestureEvent gestureEvent = new GestureEvent();
+    private static GestureEvent gestureEvent;
     private static boolean gestureCalledInternally = false;
 
     static void initSaving(final XC_LoadPackage.LoadPackageParam lpparam,
@@ -131,22 +133,35 @@ public class Saving {
                 }
             });
 
-            if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S) {
+            if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S ||
+                    Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_F2S) {
                 findAndHookMethod(Obfuscator.save.DIRECTIONAL_LAYOUT_CLASS, cl, "dispatchTouchEvent", MotionEvent.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         super.beforeHookedMethod(param);
 
-                        if(gestureCalledInternally)
+                        if (gestureCalledInternally)
                             return;
+
+                        if (gestureEvent == null) {
+                            if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S)
+                                gestureEvent = new SweepSaveGesture();
+                            else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_F2S)
+                                gestureEvent = new FlingSaveGesture();
+                            else {
+                                Logger.log("No gesture method provided");
+                                return;
+                            }
+                        }
 
                         Logger.log("Dispatching touch event");
                         String mKey = (String) getAdditionalInstanceField(param.thisObject, "mKey");
 
                         if (mKey != null) {
-                            if (gestureEvent.onTouch((FrameLayout) param.thisObject, (MotionEvent) param.args[0], SnapType.STORY) !=
-                                    GestureEvent.ReturnType.SAVED) {
+                            if (gestureEvent.onTouch((FrameLayout) param.thisObject, (MotionEvent) param.args[0], SnapType.STORY) ==
+                                    GestureEvent.ReturnType.TAP) {
                                 gestureCalledInternally = true;
+                                Logger.log("Performed TAP?");
                                 param.setResult(callMethod(param.thisObject, "dispatchTouchEvent", param.args[0]));
                             } else
                                 param.setResult(true);
@@ -183,14 +198,15 @@ public class Saving {
 
                             View view = (View) param.args[2];
 
-                            if(Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_AUTO) {
+                            if (Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_AUTO) {
                                 FrameLayout snapContainer = scanForStoryContainer(view);
                                 String mKey = (String) getObjectField(storySnap, "mId");
 
                                 if (snapContainer != null) {
                                     if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON)
                                         HookedLayouts.assignStoryButton(snapContainer, snapContext, mKey);
-                                    else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S) {
+                                    else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S ||
+                                            Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_F2S) {
                                         FrameLayout snapContainerParent = (FrameLayout) snapContainer.getParent();
 
                                         if (snapContainerParent != null)
@@ -594,11 +610,13 @@ public class Saving {
 
             if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
                 if (currentSnapData.getSnapType() == SnapType.STORY &&
-                        Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_S2S) {
+                        Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_S2S &&
+                        Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_F2S) {
                     Logger.printFinalMessage("Tried to perform story S2S from different mode");
                     return;
                 } else if (currentSnapData.getSnapType() == SnapType.SNAP &&
-                        Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_S2S) {
+                        Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_S2S &&
+                        Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_F2S) {
                     Logger.printFinalMessage("Tried to perform snap S2S from different mode");
                     return;
                 }
@@ -962,15 +980,11 @@ public class Saving {
         Logger.printMessage("Passed payload checks");
 
         if (snapData.getSnapType() == SnapType.SNAP &&
-                (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.DO_NOT_SAVE ||
-                        Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON ||
-                        Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S)) {
+                Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_AUTO) {
             Logger.printMessage("Snap save mode check failed");
             return false;
         } else if (snapData.getSnapType() == SnapType.STORY &&
-                (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.DO_NOT_SAVE ||
-                        Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ||
-                        Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S)) {
+                Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_AUTO) {
             Logger.printMessage("Story save mode check failed");
             return false;
         }
