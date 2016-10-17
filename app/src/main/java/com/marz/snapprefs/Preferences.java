@@ -155,7 +155,7 @@ public class Preferences {
                 Logger.log("Loading null object for: " + key);
                 return;
             }
-            Logger.log("Loaded preference: " + key + " val: " + obj);
+            //Logger.log("Loaded preference: " + key + " val: " + obj);
             preferenceMap.put(key, obj);
         }
     }

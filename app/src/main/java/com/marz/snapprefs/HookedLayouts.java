@@ -268,47 +268,43 @@ public class HookedLayouts {
                         FrameLayout.LayoutParams.WRAP_CONTENT,
                         Gravity.BOTTOM | horizontalPosition);
 
-        try {
-            resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated() {
-                @Override
-                public void handleLayoutInflated(LayoutInflatedParam liparam)
-                        throws Throwable {
-                    Logger.log("Updating view_snap.snap_container layout");
-                    final FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(
-                            liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP)
-                    ).getParent();
+        resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated() {
+            @Override
+            public void handleLayoutInflated(LayoutInflatedParam liparam)
+                    throws Throwable {
+                Logger.log("Updating view_snap.snap_container layout");
+                final FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(
+                        liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP)
+                ).getParent();
 
-                    saveSnapButton = new ImageButton(localContext);
-                    saveSnapButton.setLayoutParams(layoutParams);
-                    saveSnapButton.setBackgroundColor(0);
-                    saveSnapButton.setAlpha(1f);
-                    saveSnapButton.setImageBitmap(HookMethods.saveImg);
-                    saveSnapButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
-                            ? View.VISIBLE : View.INVISIBLE);
+                saveSnapButton = new ImageButton(localContext);
+                saveSnapButton.setLayoutParams(layoutParams);
+                saveSnapButton.setBackgroundColor(0);
+                saveSnapButton.setAlpha(1f);
+                saveSnapButton.setImageBitmap(HookMethods.saveImg);
+                saveSnapButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
+                        ? View.VISIBLE : View.INVISIBLE);
 
-                    frameLayout.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event) {
-                            return Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S &&
-                                    gestureEvent.onTouch(v, event, Saving.SnapType.SNAP) != GestureEvent.ReturnType.SAVED;
+                frameLayout.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        return Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S &&
+                                gestureEvent.onTouch(v, event, Saving.SnapType.SNAP) != GestureEvent.ReturnType.SAVED;
 
-                        }
-                    });
-                    frameLayout.addView(saveSnapButton);
-                    saveSnapButton.bringToFront();
+                    }
+                });
+                frameLayout.addView(saveSnapButton);
+                saveSnapButton.bringToFront();
 
-                    saveSnapButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Logger.printTitle("Performing Button Save");
-                            Saving.performButtonSave();
-                        }
-                    });
-                }
-            });
-        } catch (Exception e) {
-            Logger.log("Not found something", e);
-        }
+                saveSnapButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Logger.printTitle("Performing Button Save");
+                        Saving.performButtonSave();
+                    }
+                });
+            }
+        });
     }
 
     public static void assignStoryButton(FrameLayout frameLayout, Context context, String mKey) {

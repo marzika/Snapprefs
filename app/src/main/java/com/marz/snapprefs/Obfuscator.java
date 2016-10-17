@@ -414,6 +414,11 @@ public class Obfuscator implements Serializable {
 
         public final static String TILE_HANDLER_CLASS = "atk";
         public final static String GET_TILES_METHOD = "c";
+
+        public final static String STORY_LOADER_CLASS = "ahm";
+        public final static String SL_LOAD_METHOD = "a";
+        public final static String VIEWED_STORY_CLASS = "agD";
+        public final static String VS_FRIEND_OBJECT = "b";
     }
     public static class groups {
         public final static String STORY_CLASS = "apb";//prev. Vp
