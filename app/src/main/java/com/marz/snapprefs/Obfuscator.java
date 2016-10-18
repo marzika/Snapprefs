@@ -212,6 +212,7 @@ public class Obfuscator implements Serializable {
         public final static String STORY_VIEWER_MEDIA_CACHE = "com.snapchat.android.stories.viewer.StoryViewerMediaCache";
         public final static String VIEWING_STORY_METHOD = "a";
         public final static String VIEWING_STORY_VAR4 = "aEm$a";
+        public final static String SVMC_STORYLIST_OBJECT = "c";
 
         public final static String STORY_IMAGE_HOLDER = "gC";
 
@@ -387,9 +388,8 @@ public class Obfuscator implements Serializable {
         public final static String NOTIFICATION_CLASS_2 = "azz";//prev. ajh
     }
     public static class icons {
-        public final static String ICON_HANDLER_CLASS = "Em";
-        public final static String SHOW_LENS = "a";
-        public final static String RECORDING_VIDEO = "h";
+        public final static String CAPTIONOPENED_CLASS = "TX";
+        public final static String CAPTIONOPENED_METHOD = "c";
     }
     public static class stories {
         public final static String RECENTSTORY_CLASS = "ahd";
@@ -404,6 +404,14 @@ public class Obfuscator implements Serializable {
         public final static String FRIENDMANAGER_CLASS = "com.snapchat.android.model.FriendManager";
         public final static String FRIENDMANAGER_RETURNINSTANCE = "h";
         //public final static String DISCOVERSTORY_CLASS = "aay"; new story type "featured?" TODO: look into it
+        //search for "AUTO_ADVANCE_RECENT_UPDATES"
+        public final static String AUTOADVANCE_CLASS2 = "atJ";
+        public final static String AUTOADVANCE_METHOD2 = "a";
+        public final static String AUTOADVANCE_CLASS = "aty";
+        public final static String AUTOADVANCE_METHOD = "a";
+
+        public final static String TILE_HANDLER_CLASS = "atk";
+        public final static String GET_TILES_METHOD = "c";
     }
     public static class groups {
         public final static String STORY_CLASS = "apb";//prev. Vp
@@ -455,7 +463,7 @@ public class Obfuscator implements Serializable {
         public final static String ADVANCE_TYPE_CLASS = "aFl";
         public final static String NO_AUTO_ADVANCE_OBJECT = "a";
     }
-    public static class premium implements Serializable {
+    public static class premium{
         public final static String SNAP_UPDATE_CLASS = "zT";
     }
 

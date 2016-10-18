@@ -16,9 +16,9 @@ import java.util.ArrayList;
  * Created by Andre on 16/09/2016.
  */
 public class LensDatabaseHelper extends CoreDatabaseHandler {
-    public static final int DATABASE_VERSION = 2;
-    public static final String DATABASE_NAME = Preferences.getSavePath() + "/Lenses.db";
-    public static final String[] fullProjection = {
+    private static final int DATABASE_VERSION = 2;
+    private static final String DATABASE_NAME = Preferences.getContentPath() + "/Lenses.db";
+    private static final String[] fullProjection = {
             LensEntry.COLUMN_NAME_MCODE,
             LensEntry.COLUMN_NAME_GPLAYID,
             LensEntry.COLUMN_NAME_MHINTID,

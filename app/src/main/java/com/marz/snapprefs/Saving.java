@@ -65,9 +65,7 @@ public class Saving {
     private static Context relativeContext;
     //TODO implement user selected save mode
     private static boolean asyncSaveMode = true;
-    private static boolean hasAssignedButtonsAndGestures = false;
     private static Object enum_NO_AUTO_ADVANCE;
-    private static Context context;
 
     static void initSaving(final XC_LoadPackage.LoadPackageParam lpparam,
                            final XModuleResources modRes, final Context snapContext) {
@@ -77,7 +75,7 @@ public class Saving {
         if (mSCResources == null) mSCResources = snapContext.getResources();
 
         try {
-            ClassLoader cl = lpparam.classLoader;
+            final ClassLoader cl = lpparam.classLoader;
 
             final Class storyClass = findClass(Obfuscator.save.STORYSNAP_CLASS, cl);
             Class AdvanceType = findClass(Obfuscator.misc.ADVANCE_TYPE_CLASS, cl);
@@ -138,7 +136,15 @@ public class Saving {
                             super.beforeHookedMethod(param);
                             Log.d("snapprefs", "### START StoryViewerMediaCache ###");
                             Object godPacket = param.args[1];
-                            Object storySnap = callMethod(godPacket, Obfuscator.save.SDP_GET_OBJECT, "STORY_REPLY_SNAP");
+                            Object storyList = getObjectField(param.thisObject, Obfuscator.save.SVMC_STORYLIST_OBJECT);
+                            String POSTER_USERNAME = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "POSTER_USERNAME");
+                            String CLIENT_ID = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "CLIENT_ID");
+                            Object storySnap = callMethod(storyList, Obfuscator.save.SDP_GET_OBJECT, POSTER_USERNAME, CLIENT_ID);
+
+                            if (storySnap == null) {
+                                Logger.log("Null storysnap?");
+                                return;
+                            }
 
                             String storyUsername = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "POSTER_USERNAME");
 
@@ -148,6 +154,7 @@ public class Saving {
                             }
 
                             View view = (View) param.args[2];
+
                             FrameLayout snapContainer = scanForStoryContainer(view);
                             String mKey = (String) getObjectField(storySnap, "mId");
 
@@ -155,7 +162,7 @@ public class Saving {
                                 if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON)
                                     HookedLayouts.assignStoryButton(snapContainer, snapContext, mKey);
                                 else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S)
-                                    HookedLayouts.assignGestures((FrameLayout) snapContainer.getParent());
+                                    HookedLayouts.assignGestures(snapContainer);
                             }
 
                             setAdditionalInstanceField(param.args[2], "StorySnap", storySnap);
@@ -246,7 +253,6 @@ public class Saving {
                 }
             });
 
-            //HookMethods.hookAllMethods("apn", cl, true, true);
             /**
              * Called every time a snap is viewed - Quite reliable
              */
@@ -376,7 +382,7 @@ public class Saving {
                             }
 
                             if (profileImages == null) {
-                                SavingUtils.vibrate(context, false);
+                                SavingUtils.vibrate(snapContext, false);
                                 NotificationUtils.showStatefulMessage("Error Saving Profile Images For " + username + "\nIf The Profile Image Is Not Blank Please Enable Debug Mode And Rep", ToastType.BAD, lpparam.classLoader);
                                 return false;
                             }
@@ -392,19 +398,21 @@ public class Saving {
                                 }
                                 if (f == null) {
                                     NotificationUtils.showStatefulMessage("File f is null!", ToastType.BAD, lpparam.classLoader);
+                                    Logger.logStackTrace();
                                     return false;
                                 }
                                 if (f.exists()) {
                                     NotificationUtils.showStatefulMessage("Profile Images already Exist.", ToastType.BAD, lpparam.classLoader);
                                     return true;
                                 }
-                                if (SavingUtils.saveJPG(f, profileImages.get(iterator), context)) {
+
+                                if (SavingUtils.saveJPG(f, profileImages.get(iterator), snapContext, false)) {
                                     succCounter++;
                                 }
                             }
                             Boolean succ = (succCounter == sizeOfProfileImages);
                             NotificationUtils.showStatefulMessage("Saved " + succCounter + "/" + sizeOfProfileImages + " profile images.", succ ? ToastType.GOOD : ToastType.BAD, lpparam.classLoader);
-                            SavingUtils.vibrate(context, succ);
+                            SavingUtils.vibrate(snapContext, succ);
                             return true;
                         }
                     });
@@ -413,11 +421,11 @@ public class Saving {
 
             //HookMethods.hookAllMethods("Ce", cl, true);
         } catch (Exception e) {
-            Logger.log("Error occured: Snapprefs doesn't currently support this version, wait for an update", e);
+            Logger.log("Error occurred: Snapprefs doesn't currently support this version, wait for an update", e);
 
             findAndHookMethod(Obfuscator.save.LANDINGPAGEACTIVITY_CLASS, lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Toast.makeText((Context) param.thisObject, "This version of snapchat is currently not supported by Snapprefs.", Toast.LENGTH_LONG)
+                    Toast.makeText((Context) param.thisObject, "This version of Snapchat is currently not supported by Snapprefs.", Toast.LENGTH_LONG)
                             .show();
                 }
             });

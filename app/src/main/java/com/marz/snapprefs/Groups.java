@@ -131,57 +131,67 @@ public class Groups {
     }
 
     // Updated method & content 9.39.5
-    public static void readFriendList(ClassLoader classLoader, Group selectedGroup) {
-        final Object friendManager = callStaticMethod(findClass("com.snapchat.android.model.FriendManager", classLoader), Obfuscator.groups.GETFRIENDMANAGER_METHOD);
-        List friends = (List) XposedHelpers.getObjectField(XposedHelpers.getObjectField(friendManager, "mOutgoingFriendsListMap"), "mList");
-        friendList.clear();
-        for (int i = 0; i <= friends.size() - 1; i++) {
-            String username = (String) callMethod(friends.get(i), Obfuscator.groups.GETUSERNAME_METHOD);
-            String displayName = (String) callMethod(friends.get(i), Obfuscator.groups.GETDISPLAYNAME_METHOD);
-            if (selectedGroup != null && selectedGroup.users.contains(username)) {
-                friendList.add(new Friend(username, displayName, true));
-            } else {
-                friendList.add(new Friend(username, displayName, false));
+    public static void readFriendList(final ClassLoader classLoader,final Group selectedGroup) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final Object friendManager = callStaticMethod(findClass("com.snapchat.android.model.FriendManager", classLoader), Obfuscator.groups.GETFRIENDMANAGER_METHOD);
+                List friends = (List) XposedHelpers.getObjectField(XposedHelpers.getObjectField(friendManager, "mOutgoingFriendsListMap"), "mList");
+                friendList.clear();
+                for (int i = 0; i <= friends.size() - 1; i++) {
+                    String username = (String) callMethod(friends.get(i), Obfuscator.groups.GETUSERNAME_METHOD);
+                    String displayName = (String) callMethod(friends.get(i), Obfuscator.groups.GETDISPLAYNAME_METHOD);
+                    if (selectedGroup != null && selectedGroup.users.contains(username)) {
+                        friendList.add(new Friend(username, displayName, true));
+                    } else {
+                        friendList.add(new Friend(username, displayName, false));
+                    }
+                }
+                Collections.sort(friendList, new Friend.friendComparator());
             }
-        }
-        Collections.sort(friendList, new Friend.friendComparator());
+        }).start();
     }
 
     public static void readGroups() {
-        File groupFolder = groupsDir;
-        if (!groupFolder.exists()) {
-            groupFolder.mkdir();
-        }
-        File[] groupFiles = groupFolder.listFiles();
-        if (groupFiles == null || groupFiles.length == 0) {
-            groups.clear();
-            return;
-        }
-        groups.clear();
-        int numGroups = 0;
-        for (File group : groupFiles) {
-            String data = FileUtils.readFromSD(group);
-            if (!data.equalsIgnoreCase("0")) {
-                String[] groupData = data.split(";");
-                String name = groupData[0];
-                ArrayList<String> users = new ArrayList<>(Arrays.asList(groupData));
-                users.remove(0);
-                Group currentGroup = new Group(name, users);
-                if (numGroups == 3 && Preferences.getLicence() == 0) {
-                    NotificationUtils.showMessage("You cannot have more than 3 groups as a free user", Color.RED, NotificationUtils.LENGTH_SHORT, HookMethods.classLoader);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                File groupFolder = groupsDir;
+                if (!groupFolder.exists()) {
+                    groupFolder.mkdir();
+                }
+                File[] groupFiles = groupFolder.listFiles();
+                if (groupFiles == null || groupFiles.length == 0) {
+                    groups.clear();
                     return;
                 }
-                if (Preferences.getLicence() != 0 && !Preferences.getBool(Preferences.Prefs.UNLIM_GROUPS)) {
-                    NotificationUtils.showMessage("You disabled the option to have more than 3 groups", Color.RED, NotificationUtils.LENGTH_SHORT, HookMethods.classLoader);
-                    return;
+                groups.clear();
+                int numGroups = 0;
+                for (File group : groupFiles) {
+                    String data = FileUtils.readFromSD(group);
+                    if (!data.equalsIgnoreCase("0")) {
+                        String[] groupData = data.split(";");
+                        String name = groupData[0];
+                        ArrayList<String> users = new ArrayList<>(Arrays.asList(groupData));
+                        users.remove(0);
+                        Group currentGroup = new Group(name, users);
+                        if (numGroups == 3 && Preferences.getLicence() == 0) {
+                            NotificationUtils.showMessage("You cannot have more than 3 groups as a free user", Color.RED, NotificationUtils.LENGTH_SHORT, HookMethods.classLoader);
+                            return;
+                        }
+                        if (Preferences.getLicence() != 0 && !Preferences.getBool(Preferences.Prefs.UNLIM_GROUPS)) {
+                            NotificationUtils.showMessage("You disabled the option to have more than 3 groups", Color.RED, NotificationUtils.LENGTH_SHORT, HookMethods.classLoader);
+                            return;
+                        }
+                        if (!groups.contains(currentGroup)) {
+                            groups.add(currentGroup);
+                            numGroups++; //add limit for Free users
+                        }
+                    }
                 }
-                if (!groups.contains(currentGroup)) {
-                    groups.add(currentGroup);
-                    numGroups++; //add limit for Free users
-                }
+                Collections.sort(groups, new Groups.groupComparator());
             }
-        }
-        Collections.sort(groups, new Groups.groupComparator());
+        }).start();
     }
 
     public static void sendStoriesUpdateEvent() {

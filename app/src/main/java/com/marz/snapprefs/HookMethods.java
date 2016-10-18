@@ -62,7 +62,7 @@ public class HookMethods
     static XModuleResources modRes;
     static Context context;
     static int counter = 0;
-    private static XModuleResources mResources;
+    public static XModuleResources mResources;
     private static int snapchatVersion;
     private static InitPackageResourcesParam resParam;
     public static Bitmap saveImg;
@@ -86,7 +86,6 @@ public class HookMethods
     public void initZygote(StartupParam startupParam) throws Throwable {
         MODULE_PATH = startupParam.modulePath;
         mResources = XModuleResources.createInstance(startupParam.modulePath, null);
-        //refreshPreferences();
     }
 
     @Override
@@ -138,15 +137,21 @@ public class HookMethods
 
             // TODO Set up removal of button when mode is changed
             // Currently requires snapchat to restart to remove the button
+            saveImg = BitmapFactory.decodeResource(mResources, R.drawable.save_button);
+
             try {
-                saveImg = BitmapFactory.decodeResource(mResources, R.drawable.save_button);
                 HookedLayouts.addSaveButtonsAndGestures(resparam, mResources, localContext);
             } catch( Throwable t )
             {
                 Logger.log(t);
             }
+
             if (Preferences.shouldAddGhost()) {
-                HookedLayouts.addIcons(resparam, mResources);
+                try {
+                    HookedLayouts.addIcons(resparam, mResources);
+                } catch( Exception e ) {
+                    Logger.log("Exception thrown in addIcons", e);
+                }
             }
             if (Preferences.getBool(Prefs.INTEGRATION)) {
                 HookedLayouts.addShareIcon(resparam);
@@ -531,11 +536,8 @@ public class HookMethods
                             }
                         }
                     });
-                    //disable auto advance
-                    //search for "AUTO_ADVANCE_RECENT_UPDATES"
-
                     if( Preferences.getBool(Prefs.AUTO_ADVANCE))
-                        XposedHelpers.findAndHookMethod("aty", lpparam.classLoader, "a", XC_MethodReplacement.returnConstant(false));
+                        XposedHelpers.findAndHookMethod(Obfuscator.stories.AUTOADVANCE_CLASS, lpparam.classLoader, Obfuscator.stories.AUTOADVANCE_METHOD, XC_MethodReplacement.returnConstant(false));
 
                 }
             });
