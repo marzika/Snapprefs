@@ -161,4 +161,20 @@
         android:padding="10dp"
         android:text="Enable Lenses When Collected" />
 
+    <Switch
+        android:id="@+id/sort_lens_by_sel_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/editText"
+        android:layout_alignLeft="@id/btnLensSelector"
+        android:layout_alignRight="@id/editText"
+        android:layout_alignStart="@id/btnLensSelector"
+        android:layout_below="@id/autoenable_switch"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/border"
+        android:checked="true"
+        android:padding="10dp"
+        android:text="Enable Sorting Lenses By Selection Time" />
+
+
 </RelativeLayout>

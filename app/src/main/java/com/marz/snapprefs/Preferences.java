@@ -412,6 +412,7 @@ public class Preferences {
         LENSES_COLLECT("pref_key_collect_lenses", true),
         LENSES_AUTO_ENABLE("pref_key_auto_enable_lenses", false),
         LENSES_FORCED("pref_key_forced_lenses", true),
+        LENSES_SORT_BY_SEL("pref_key_sort_by_sel", true),
         ACCEPTED_TOU("acceptedToU", false),
         SELECT_STORY("pref_key_selectstory", false),
         SELECT_VENUE("pref_key_selectvenue", false),

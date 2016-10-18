@@ -492,7 +492,7 @@ public class MainActivity extends AppCompatActivity {
                 gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
             }
             try {
-                gcmRegId = gcm.register(GCM_SENDER_ID);
+                    gcmRegId = gcm.register(GCM_SENDER_ID);
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

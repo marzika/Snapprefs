@@ -204,8 +204,8 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         }
 
         String strBlacklist = formatExclusionList(blacklist);
-        String query = "select * from " + tableName +
-                " where " + columnName + " not in (" + strBlacklist + ")";
+        String query = "SELECT * FROM " + tableName +
+                " WHERE " + columnName + " NOT IN (" + strBlacklist + ")";
 
         Logger.log("Performing query: " + query);
 
@@ -283,8 +283,8 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         }
 
         String strBlacklist = formatExclusionList(blacklist);
-        String query = "select * from " + tableName +
-                " where " + columnName + " not in (" + strBlacklist + ")";
+        String query = "SELECT * FROM " + tableName +
+                " WHERE " + columnName + " NOT IN (" + strBlacklist + ")";
 
         Logger.log("Performing query: " + query);
 
@@ -335,7 +335,7 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         }
 
         Logger.log("Getting all lenses from database");
-        Cursor cursor = getDatabase().rawQuery("select * from " + tableName, null);
+        Cursor cursor = getDatabase().rawQuery("SELECT * FROM " + tableName, null);
         Logger.log("Query size: " + cursor.getCount());
 
         callbackHandler.addParams(cursor);

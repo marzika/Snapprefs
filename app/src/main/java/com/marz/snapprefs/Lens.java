@@ -8,6 +8,8 @@ import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.LensData;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -63,7 +65,7 @@ public class Lens {
             }
         });
 
-        //Bypasses signiture checking
+        //Bypasses signature checking
         findAndHookMethod(Obfuscator.lens.AUTHENTICATION_CLASS, lpparam.classLoader, Obfuscator.lens.SIGNITURE_CHECK_METHOD, LensClass, String.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -158,18 +160,36 @@ public class Lens {
             return list;
         }
 
-        Logger.log("New lenses to load: " + lensList.size());
+        if(Preferences.getBool(Prefs.LENSES_SORT_BY_SEL)){
+            ArrayList<LensData> lensDataList = new ArrayList<>();
+            for(Object obj : lensList) {
+                lensDataList.add((LensData) obj);
+            }
+            Logger.log("Soring Lens Data List!");
+            Collections.sort(lensDataList);
 
-        for (Object lensObj : lensList) {
-            LensData lensData = (LensData) lensObj;
-            if (!lensData.mActive)
-                continue;
+            Logger.log("New lenses to load: " + lensDataList.size());
 
-            Object lens = buildModifiedLens(lensData);
-            list.add(lens);
+            for (LensData lensData : lensDataList) {
+                if (!lensData.mActive)
+                    continue;
+
+                Object lens = buildModifiedLens(lensData);
+                list.add(lens);
+            }
+        } else {
+            Logger.log("New lenses to load: " + lensList.size());
+
+            for (Object lensObj : lensList) {
+                LensData lensData = (LensData) lensObj;
+                if (!lensData.mActive)
+                    continue;
+
+                Object lens = buildModifiedLens(lensData);
+                list.add(lens);
+            }
         }
         Logger.log("Total lens count: " + list.size());
-
         return list;
     }
 
@@ -210,6 +230,7 @@ public class Lens {
         //lensData.mPriority = (int) getObjectField(lens, "mPriority");
         lensData.mSignature = (String) getObjectField(lens, "mSignature");
         lensData.mActive = Preferences.getBool(Prefs.LENSES_AUTO_ENABLE);
+        lensData.selTime = -1;
         //lensData.mLensIcon = getBitmapFromURL(lensData.mIconLink);
 
         return lensData;

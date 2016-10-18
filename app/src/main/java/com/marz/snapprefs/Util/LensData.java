@@ -3,11 +3,12 @@ package com.marz.snapprefs.Util;
 import android.content.ContentValues;
 
 import com.marz.snapprefs.Databases.LensDatabaseHelper.LensEntry;
+import com.marz.snapprefs.Logger;
 
 /**
  * Created by Andre on 12/09/2016.
  */
-public class LensData {
+public class LensData implements Comparable{
     public String mCode;
     //public String mGplayIapId;
     public String mHintId;
@@ -22,6 +23,8 @@ public class LensData {
     //public int mPriority;
     public String mSignature;
     public boolean mActive;
+    public long selTime;
+
     //public Object mType;
     //public Bitmap mLensIcon;
 
@@ -36,6 +39,22 @@ public class LensData {
         contentValues.put(LensEntry.COLUMN_NAME_MLENSLINK, mLensLink);
         contentValues.put(LensEntry.COLUMN_NAME_MSIGNATURE, mSignature);
         contentValues.put(LensEntry.COLUMN_NAME_ACTIVE, mActive);
+        contentValues.put(LensEntry.COLUMN_NAME_SEL_TIME, selTime);
         return contentValues;
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        LensData lensDataObj = (LensData) o;
+        long compareTime = lensDataObj.selTime;
+        if(lensDataObj.mActive) {
+            Logger.log("compareTime: " + compareTime);
+            Logger.log("this.selTime: " + this.selTime);
+        }
+        if(compareTime < this.selTime) {
+            return 1;
+        } else {
+            return -1;
+        }
     }
 }
