@@ -160,35 +160,20 @@ public class Lens {
             return list;
         }
 
-        if(Preferences.getBool(Prefs.LENSES_SORT_BY_SEL)){
-            ArrayList<LensData> lensDataList = new ArrayList<>();
-            for(Object obj : lensList) {
-                lensDataList.add((LensData) obj);
-            }
-            Logger.log("Soring Lens Data List!");
-            Collections.sort(lensDataList);
-
-            Logger.log("New lenses to load: " + lensDataList.size());
-
-            for (LensData lensData : lensDataList) {
-                if (!lensData.mActive)
-                    continue;
-
-                Object lens = buildModifiedLens(lensData);
-                list.add(lens);
-            }
-        } else {
-            Logger.log("New lenses to load: " + lensList.size());
-
-            for (Object lensObj : lensList) {
-                LensData lensData = (LensData) lensObj;
-                if (!lensData.mActive)
-                    continue;
-
-                Object lens = buildModifiedLens(lensData);
-                list.add(lens);
-            }
+        if(Preferences.getBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES)) {
+            list.clear();
         }
+
+        for (Object lensObj : lensList) {
+            LensData lensData = (LensData) lensObj;
+            if (!lensData.mActive)
+                continue;
+
+            Object lens = buildModifiedLens(lensData);
+            list.add(lens);
+        }
+        Logger.log("New lenses to load: " + lensList.size());
+
         Logger.log("Total lens count: " + list.size());
         return list;
     }

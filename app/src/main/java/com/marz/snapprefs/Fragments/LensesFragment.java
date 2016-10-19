@@ -59,6 +59,7 @@ public class LensesFragment extends Fragment {
         Switch collectLensSwitch = (Switch) view.findViewById(R.id.lenscollector_toggle);
         Switch autoEnableSwitch = (Switch) view.findViewById(R.id.autoenable_switch);
         Switch sortBySelDate = (Switch) view.findViewById(R.id.sort_lens_by_sel_date);
+        Switch hideCurrProvidedSCLenses = (Switch) view.findViewById(R.id.hide_current_snapchat_lenses);
 
         loadLensSwitch.setChecked(Preferences.getBool(Prefs.LENSES_LOAD));
         collectLensSwitch.setChecked(Preferences.getBool(Prefs.LENSES_COLLECT));
@@ -90,6 +91,13 @@ public class LensesFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 Preferences.putBool(Prefs.LENSES_SORT_BY_SEL.key, isChecked);
+            }
+        });
+
+        hideCurrProvidedSCLenses.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Preferences.putBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES.key, isChecked);
             }
         });
 

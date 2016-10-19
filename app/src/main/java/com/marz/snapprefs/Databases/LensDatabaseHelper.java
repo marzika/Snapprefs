@@ -99,18 +99,11 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
 
         ContentValues values = new ContentValues();
         values.put(LensEntry.COLUMN_NAME_ACTIVE, activeState ? 1 : 0);
+        values.put(LensEntry.COLUMN_NAME_SEL_TIME, (activeState ? Long.toString(System.currentTimeMillis()) : Integer.toString(2000000000)));
 
         String[] selectionArgs = {mCode};
 
         super.updateObject(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE, selectionArgs, values);
-
-        // Update Selection Time Of Lense
-
-        String SQLQuery = "UPDATE " + LensEntry.TABLE_NAME + " SET " + LensEntry.COLUMN_NAME_SEL_TIME + "=" +
-                          (activeState ? Long.toString(System.currentTimeMillis()) : Integer.toString(2000000000)) +
-                        " WHERE " + LensEntry.COLUMN_NAME_MCODE + "='" + mCode + "'";
-        Logger.log("SQLQuerey: " + SQLQuery);
-        super.getDatabase().execSQL(SQLQuery);
 
         return activeState;
     }
@@ -161,8 +154,13 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
     public ArrayList<Object> getAllExcept(ArrayList<String> blacklist) {
         CallbackHandler callback = getCallback("getAllLensesFromCursor", Cursor.class);
 
-        return super.getAllBuiltObjectsExcept(LensEntry.TABLE_NAME,
-                LensEntry.COLUMN_NAME_MCODE, blacklist, callback);
+        if(Preferences.getBool(Preferences.Prefs.LENSES_SORT_BY_SEL)) {
+            return super.getAllBuiltObjectsExcept(LensEntry.TABLE_NAME,
+                    LensEntry.COLUMN_NAME_MCODE, LensEntry.COLUMN_NAME_SEL_TIME + " ASC", blacklist, callback);
+        } else{
+            return super.getAllBuiltObjectsExcept(LensEntry.TABLE_NAME,
+                    LensEntry.COLUMN_NAME_MCODE, blacklist, callback);
+        }
     }
 
     public ArrayList<Object> getAllActive() {

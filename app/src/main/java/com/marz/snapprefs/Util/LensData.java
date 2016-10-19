@@ -8,7 +8,7 @@ import com.marz.snapprefs.Logger;
 /**
  * Created by Andre on 12/09/2016.
  */
-public class LensData implements Comparable{
+public class LensData{
     public String mCode;
     //public String mGplayIapId;
     public String mHintId;
@@ -41,20 +41,5 @@ public class LensData implements Comparable{
         contentValues.put(LensEntry.COLUMN_NAME_ACTIVE, mActive);
         contentValues.put(LensEntry.COLUMN_NAME_SEL_TIME, selTime);
         return contentValues;
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        LensData lensDataObj = (LensData) o;
-        long compareTime = lensDataObj.selTime;
-        if(lensDataObj.mActive) {
-            Logger.log("compareTime: " + compareTime);
-            Logger.log("this.selTime: " + this.selTime);
-        }
-        if(compareTime < this.selTime) {
-            return 1;
-        } else {
-            return -1;
-        }
     }
 }
