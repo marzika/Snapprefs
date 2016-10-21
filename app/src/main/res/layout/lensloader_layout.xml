@@ -3,7 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+<RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
     <RelativeLayout
         android:id="@+id/rlayoutswitches"
         android:layout_width="match_parent"
@@ -21,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:text="Master Switches"
+            android:text="@string/lense_master_switches_heading_txt"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <Switch
@@ -34,7 +39,7 @@
             android:background="@drawable/border"
             android:checked="true"
             android:padding="10dp"
-            android:text="Lens Collection System" />
+            android:text="@string/lense_master_switch_lense_system_txt" />
 
         <Switch
             android:id="@+id/lensloader_toggle"
@@ -49,7 +54,7 @@
 
             android:checked="true"
             android:padding="10dp"
-            android:text="Lens Loading System" />
+            android:text="@string/lense_master_switch_loading_system_txt" />
 
     </RelativeLayout>
 
@@ -62,7 +67,7 @@
         android:layout_below="@+id/rlayoutswitches"
         android:layout_gravity="center_horizontal|top"
         android:layout_marginTop="10dp"
-        android:text="Select lenses to load"
+        android:text="@string/select_lense_button_heading_txt"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Button
@@ -71,7 +76,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/editText"
         android:layout_centerHorizontal="true"
-        android:text="Select Lenses" />
+        android:text="@string/select_lenses_btn_txt" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
@@ -91,7 +96,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:text="Total Lenses Collected"
+            android:text="@string/total_lenses_collected_heading_txt"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
@@ -100,7 +105,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/textView4"
             android:layout_centerHorizontal="true"
-            android:text="Unassigned"
+            android:text="@string/lense_unassigned_txt"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
     </RelativeLayout>
@@ -123,7 +128,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:text="Selected Lenses Count"
+            android:text="@string/sel_lense_count_heading_txt"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
@@ -132,7 +137,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/textView6"
             android:layout_centerHorizontal="true"
-            android:text="Unassigned"
+            android:text="@string/lense_unassigned_txt"
             android:textAppearance="?android:attr/textAppearanceLarge" />
     </RelativeLayout>
 
@@ -143,7 +148,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp"
-        android:text="Snapchat needs to be fully closed to update the lens list"
+        android:text="@string/fully_close_sc_lense_screen_txt"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <Switch
@@ -159,7 +164,7 @@
         android:background="@drawable/border"
         android:checked="true"
         android:padding="10dp"
-        android:text="Enable Lenses When Collected" />
+        android:text="@string/auto_enable_lenses_switch_txt" />
 
     <Switch
         android:id="@+id/sort_lens_by_sel_date"
@@ -174,7 +179,21 @@
         android:background="@drawable/border"
         android:checked="true"
         android:padding="10dp"
-        android:text="Enable Sorting Lenses By Selection Time" />
-
-
+        android:text="@string/enable_sort_by_sel_time_switch_txt" />
+    <Switch
+        android:id="@+id/hide_current_snapchat_lenses"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@id/editText"
+        android:layout_alignLeft="@id/btnLensSelector"
+        android:layout_alignRight="@id/editText"
+        android:layout_alignStart="@id/btnLensSelector"
+        android:layout_below="@id/sort_lens_by_sel_date"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/border"
+        android:checked="true"
+        android:padding="10dp"
+        android:text="@string/hide_current_sc_lenses_switch_txt" />
+</RelativeLayout>
+</ScrollView>
 </RelativeLayout>
