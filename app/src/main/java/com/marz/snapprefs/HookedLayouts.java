@@ -54,8 +54,10 @@ import android.widget.Toast;
 
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.AssignedStoryButton;
+import com.marz.snapprefs.Util.FlingSaveGesture;
 import com.marz.snapprefs.Util.GestureEvent;
 import com.marz.snapprefs.Util.NotificationUtils;
+import com.marz.snapprefs.Util.SweepSaveGesture;
 import com.marz.snapprefs.Util.TypefaceUtil;
 
 import java.io.File;
@@ -75,15 +77,10 @@ import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
  * Created by MARZ on 2016. 04. 08..
  */
 public class HookedLayouts {
-
     public static ImageButton upload = null;
     public static RelativeLayout outerOptionsLayout = null;
-
-    public static boolean setInt = true;
     public static ImageButton saveSnapButton;
-    public static ImageButton saveStoryButton;
     public static ArrayList<AssignedStoryButton> storyButtonQueue = new ArrayList<>();
-    public static Class OperaPageViewLayoutsClass;
 
     public static void initIntegration(XC_LoadPackage.LoadPackageParam lpparam,
                                        final XModuleResources mResources) {
@@ -166,6 +163,7 @@ public class HookedLayouts {
     }
 
     public static void addShareIcon(final XC_InitPackageResources.InitPackageResourcesParam resparam) {
+
         try {
             resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "camera_preview", new XC_LayoutInflated() {
                 public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
@@ -192,7 +190,7 @@ public class HookedLayouts {
                     final Cursor cursor = HookMethods.SnapContext.getContentResolver()
                             .query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection, null,
                                     null, MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC");
-                    if (cursor.moveToFirst()) {
+                    if (cursor != null && cursor.moveToFirst()) {
                         String imageLocation = cursor.getString(1);
                         File imageFile = new File(imageLocation);
                         if (imageFile.exists()) {
@@ -223,6 +221,8 @@ public class HookedLayouts {
                             c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
                             upload.setImageDrawable(new BitmapDrawable(output));
                         }
+
+                        cursor.close();
                     }
                     //upload.setImageDrawable(uploadimg);
                     upload.setScaleX((float) 1.1);
@@ -249,7 +249,6 @@ public class HookedLayouts {
             XC_InitPackageResources.InitPackageResourcesParam resparam,
             XModuleResources mResources, final Context localContext
     ) {
-        final GestureEvent gestureEvent = new GestureEvent();
         Logger.log("Adding Save Buttons");
 /*
         int intIconID = resparam.res.getIdentifier("aa_snap_preview_save", "drawable", Common
@@ -266,47 +265,55 @@ public class HookedLayouts {
                         FrameLayout.LayoutParams.WRAP_CONTENT,
                         Gravity.BOTTOM | horizontalPosition);
 
-        try {
-            resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated() {
-                @Override
-                public void handleLayoutInflated(LayoutInflatedParam liparam)
-                        throws Throwable {
-                    Logger.log("Updating view_snap.snap_container layout");
-                    final FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(
-                            liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP)
-                    ).getParent();
+        resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated() {
+            private GestureEvent gestureEvent;
 
-                    saveSnapButton = new ImageButton(localContext);
-                    saveSnapButton.setLayoutParams(layoutParams);
-                    saveSnapButton.setBackgroundColor(0);
-                    saveSnapButton.setAlpha(1f);
-                    saveSnapButton.setImageBitmap(HookMethods.saveImg);
-                    saveSnapButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
-                            ? View.VISIBLE : View.INVISIBLE);
+            @Override
+            public void handleLayoutInflated(LayoutInflatedParam liparam)
+                    throws Throwable {
+                Logger.log("Updating view_snap.snap_container layout");
+                final FrameLayout frameLayout = (FrameLayout) liparam.view.findViewById(
+                        liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP)
+                ).getParent();
 
-                    frameLayout.setOnTouchListener(new View.OnTouchListener() {
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event) {
-                            return Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S &&
-                                    gestureEvent.onTouch(v, event, Saving.SnapType.SNAP);
+                saveSnapButton = new ImageButton(localContext);
+                saveSnapButton.setLayoutParams(layoutParams);
+                saveSnapButton.setBackgroundColor(0);
+                saveSnapButton.setAlpha(1f);
+                saveSnapButton.setImageBitmap(HookMethods.saveImg);
+                saveSnapButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
+                        ? View.VISIBLE : View.INVISIBLE);
 
+                frameLayout.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if (gestureEvent == null) {
+                            if( Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S)
+                                gestureEvent = new SweepSaveGesture();
+                            else if( Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_F2S )
+                                gestureEvent = new FlingSaveGesture();
+                            else {
+                                Logger.log("No gesture method provided");
+                                return false;
+                            }
                         }
-                    });
-                    frameLayout.addView(saveSnapButton);
-                    saveSnapButton.bringToFront();
 
-                    saveSnapButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Logger.printTitle("Performing Button Save");
-                            Saving.performButtonSave();
-                        }
-                    });
-                }
-            });
-        } catch(Exception e) {
-            Logger.log("Not found something", e);
-        }
+                        return gestureEvent.onTouch(v, event, Saving.SnapType.SNAP) != GestureEvent.ReturnType.SAVED;
+                    }
+                });
+
+                frameLayout.addView(saveSnapButton);
+                saveSnapButton.bringToFront();
+
+                saveSnapButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Logger.printTitle("Performing Button Save");
+                        Saving.performButtonSave();
+                    }
+                });
+            }
+        });
     }
 
     public static void assignStoryButton(FrameLayout frameLayout, Context context, String mKey) {
@@ -317,7 +324,7 @@ public class HookedLayouts {
             return;
         }
 
-        if( storyButton.shouldAbortAssignment ) {
+        if (storyButton.shouldAbortAssignment) {
             Logger.log("Layout already has button assigned");
             return;
         }
@@ -331,22 +338,18 @@ public class HookedLayouts {
             setAdditionalInstanceField(frameLayout, "mKey", mKey);
         }
 
-        //if (!storyButton.areParamsSet())
-            //storyButton.buildParams(frameLayout, context);
-
         storyButton.bringToFront();
         storyButton.invalidate();
         frameLayout.invalidate();
 
         Logger.log("brought to front");
-        return;
     }
 
     public static AssignedStoryButton retrieveStoryButton(FrameLayout layout, Context context, String mKey) {
         for (AssignedStoryButton button : storyButtonQueue) {
             Logger.log("Checking if button can be reassigned");
 
-            if( button.getParent().equals(layout) ){
+            if (button.getParent().equals(layout)) {
                 button.abortAssignment();
                 return button;
             }
@@ -369,18 +372,6 @@ public class HookedLayouts {
         return storyButton;
     }
 
-    public static void assignGestures(FrameLayout frameLayout) {
-        final GestureEvent gestureEvent = new GestureEvent();
-        frameLayout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S &&
-                        gestureEvent.onTouch(v, event, Saving.SnapType.STORY);
-
-            }
-        });
-    }
-
     public static void initParents(View view) {
         if (view.getParent() != null) {
             View viewParent = (View) view.getParent();
@@ -399,29 +390,6 @@ public class HookedLayouts {
 
                 Log.d("snapprefs", "ViewId: " + obj.getId());
             }
-        }
-    }
-
-    //TODO refresh button position when preference is changed
-    public static void refreshButtonPreferences() {
-        int horizontalPosition = Preferences.getBool(Prefs.BUTTON_POSITION) ? Gravity.START : Gravity.END;
-        final FrameLayout.LayoutParams layoutParams =
-                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
-                        FrameLayout.LayoutParams.WRAP_CONTENT,
-                        Gravity.BOTTOM | horizontalPosition);
-
-        if (HookedLayouts.saveSnapButton != null) {
-            HookedLayouts.saveSnapButton.setVisibility(
-                    Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE);
-
-            HookedLayouts.saveSnapButton.setLayoutParams(layoutParams);
-        }
-
-        if (HookedLayouts.saveStoryButton != null) {
-            HookedLayouts.saveStoryButton.setVisibility(
-                    Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ? View.VISIBLE : View.INVISIBLE);
-
-            HookedLayouts.saveStoryButton.setLayoutParams(layoutParams);
         }
     }
 

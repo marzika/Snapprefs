@@ -12,6 +12,7 @@ import com.marz.snapprefs.Logger;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import static com.marz.snapprefs.Databases.CoreDatabaseHandler.DBUtils.formatExclusionList;
@@ -20,7 +21,7 @@ import static com.marz.snapprefs.Databases.CoreDatabaseHandler.DBUtils.formatExc
  * Created by Andre on 23/09/2016.
  */
 
-public class CoreDatabaseHandler extends SQLiteOpenHelper {
+class CoreDatabaseHandler extends SQLiteOpenHelper {
     public static String DATABASE_NAME;
     private static String SQL_CREATE_ENTRIES;
 
@@ -34,18 +35,18 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
     private ArrayList<Object> excludedObjectCache = new ArrayList<>();
     private boolean excludedObjectCacheNeedsUpdate = true;
 
-    public CoreDatabaseHandler(Context context, String databaseName, String entries, int DATABASE_VERSION) {
+    CoreDatabaseHandler(Context context, String databaseName, String entries, int DATABASE_VERSION) {
         super(context, databaseName, null, DATABASE_VERSION);
         DATABASE_NAME = databaseName;
         SQL_CREATE_ENTRIES = entries;
     }
 
-    public SQLiteDatabase getDatabase() {
+    private SQLiteDatabase getDatabase() {
         createIfNotExisting();
         return writeableDatabase;
     }
 
-    public void createIfNotExisting() {
+    private void createIfNotExisting() {
         if (writeableDatabase == null || !writeableDatabase.isOpen())
             writeableDatabase = this.getWritableDatabase();
     }
@@ -74,7 +75,7 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
 
     public boolean containsObject(String tableName, String columnName, String[] selectionArgs,
                                   String sortOrder, String[] projection) {
-        Logger.log("Getting content count from database");
+        //Logger.log("Getting content count from database");
 
         String selection = columnName + " = ?";
         Cursor cursor = getDatabase().query(
@@ -87,11 +88,12 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
                 sortOrder
         );
 
-        Logger.log("Query count: " + cursor.getCount());
+        //Logger.log("Query count: " + cursor.getCount());
 
+        int count = cursor.getCount();
         cursor.close();
 
-        return cursor.getCount() != 0;
+        return count != 0;
     }
 
     public int getCount(String tableName, String columnName, String[] selectionArgs, String[] projection) {
@@ -173,7 +175,7 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         Object invocationResponse;
 
         try {
-            Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + callbackHandler.parameters);
+            Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + Arrays.toString(callbackHandler.parameters));
             invocationResponse = callbackHandler.method.invoke(callbackHandler.caller, callbackHandler.parameters);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -221,7 +223,7 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         }
 
         while (!cursor.isAfterLast()) {
-            Logger.log("Looping cursor result");
+            //Logger.log("Looping cursor result");
             ContentValues value = getValuesFromCursor(cursor, projection);
 
             if (value.size() > 0)
@@ -301,7 +303,7 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         ArrayList<Object> invocationResponse;
 
         try {
-            Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + callbackHandler.parameters);
+            Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + Arrays.toString(callbackHandler.parameters));
             invocationResponse = (ArrayList<Object>) callbackHandler.method.invoke(callbackHandler.caller, callbackHandler.parameters);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
