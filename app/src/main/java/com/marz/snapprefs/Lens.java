@@ -115,12 +115,13 @@ public class Lens {
             for (Object lensParentObj : a) {
                 Logger.log("Looped precached lens");
                 Object lens = newInstance(LensClass, lensListTypeClass.cast(lensParentObj), enumScheduledType);
+                Logger.log("Precache: " + getObjectField(lens, "mCode"));
+                Logger.log("PrecacheLink: " + getObjectField(lens, "mIconLink"));
                 precachedLenses.add(lens);
             }
 
             if (Preferences.getBool(Prefs.LENSES_LOAD)) {
                 activeLenses = buildModifiedList(activeLenses, lensBlacklist);
-                precachedLenses = buildModifiedList(precachedLenses, lensBlacklist);
             }
 
             Logger.log("Finished list building");

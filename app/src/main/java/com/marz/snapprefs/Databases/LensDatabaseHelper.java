@@ -32,7 +32,7 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
     private static final String COMMA_SEP = ",";
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + LensEntry.TABLE_NAME;
-    private static final String SQL_CREATE_ENTRIES =
+    private static final String[] SQL_CREATE_ENTRIES = {
             "CREATE TABLE " + LensEntry.TABLE_NAME + " (" +
                     LensEntry.COLUMN_NAME_MCODE + TEXT_TYPE + " PRIMARY KEY," +
                     LensEntry.COLUMN_NAME_GPLAYID + TEXT_TYPE + COMMA_SEP +
@@ -41,7 +41,7 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
                     LensEntry.COLUMN_NAME_MID + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MLENSLINK + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MSIGNATURE + TEXT_TYPE + COMMA_SEP +
-                    LensEntry.COLUMN_NAME_ACTIVE + " INTEGER DEFAULT 0 )";
+                    LensEntry.COLUMN_NAME_ACTIVE + " INTEGER DEFAULT 0 )"};
 
     public LensDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, SQL_CREATE_ENTRIES, DATABASE_VERSION);

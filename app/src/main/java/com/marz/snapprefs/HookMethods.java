@@ -294,7 +294,7 @@ public class HookMethods
                                 Misc.initTimer(lpparam, mResources);
                             }
                             if (Preferences.getBool(Prefs.CHAT_AUTO_SAVE)) {
-                                Chat.initTextSave(lpparam, mResources);
+                                Chat.initTextSave(lpparam, SnapContext);
                             }
                             if (Preferences.getBool(Prefs.CHAT_MEDIA_SAVE)) {
                                 Chat.initImageSave(lpparam, mResources);
@@ -363,7 +363,7 @@ public class HookMethods
                     findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) {
-                            param.args[0] = 12000000;
+                            param.args[0] = 0;
                         }
                     });
                     findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxFileSize", long.class, new XC_MethodHook() {

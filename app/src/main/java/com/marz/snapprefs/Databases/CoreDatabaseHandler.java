@@ -21,9 +21,9 @@ import static com.marz.snapprefs.Databases.CoreDatabaseHandler.DBUtils.formatExc
  * Created by Andre on 23/09/2016.
  */
 
-class CoreDatabaseHandler extends SQLiteOpenHelper {
+public class CoreDatabaseHandler extends SQLiteOpenHelper {
     public static String DATABASE_NAME;
-    private static String SQL_CREATE_ENTRIES;
+    private static String[] SQL_CREATE_ENTRIES;
 
     private SQLiteDatabase writeableDatabase;
     private ArrayList<ContentValues> contentCache = new ArrayList<>();
@@ -35,24 +35,25 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
     private ArrayList<Object> excludedObjectCache = new ArrayList<>();
     private boolean excludedObjectCacheNeedsUpdate = true;
 
-    CoreDatabaseHandler(Context context, String databaseName, String entries, int DATABASE_VERSION) {
+    public CoreDatabaseHandler(Context context, String databaseName, String[] entries, int DATABASE_VERSION) {
         super(context, databaseName, null, DATABASE_VERSION);
         DATABASE_NAME = databaseName;
         SQL_CREATE_ENTRIES = entries;
     }
 
-    private SQLiteDatabase getDatabase() {
+    public SQLiteDatabase getDatabase() {
         createIfNotExisting();
         return writeableDatabase;
     }
 
-    private void createIfNotExisting() {
+    public void createIfNotExisting() {
         if (writeableDatabase == null || !writeableDatabase.isOpen())
             writeableDatabase = this.getWritableDatabase();
     }
 
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(SQL_CREATE_ENTRIES);
+        for (String entry : SQL_CREATE_ENTRIES)
+            db.execSQL(entry);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -75,7 +76,7 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
 
     public boolean containsObject(String tableName, String columnName, String[] selectionArgs,
                                   String sortOrder, String[] projection) {
-        //Logger.log("Getting content count from database");
+        Logger.log("Checking if object is in database");
 
         String selection = columnName + " = ?";
         Cursor cursor = getDatabase().query(
@@ -88,12 +89,11 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
                 sortOrder
         );
 
-        //Logger.log("Query count: " + cursor.getCount());
+        Logger.log("Query count: " + cursor.getCount());
 
-        int count = cursor.getCount();
         cursor.close();
 
-        return count != 0;
+        return cursor.getCount() != 0;
     }
 
     public int getCount(String tableName, String columnName, String[] selectionArgs, String[] projection) {
@@ -175,7 +175,7 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
         Object invocationResponse;
 
         try {
-            Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + Arrays.toString(callbackHandler.parameters));
+            Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + callbackHandler.parameters);
             invocationResponse = callbackHandler.method.invoke(callbackHandler.caller, callbackHandler.parameters);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -206,8 +206,8 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
         }
 
         String strBlacklist = formatExclusionList(blacklist);
-        String query = "select * from " + tableName +
-                " where " + columnName + " not in (" + strBlacklist + ")";
+        String query = "SELECT * FROM " + tableName +
+                " WHERE " + columnName + " NOT IN (" + strBlacklist + ")";
 
         Logger.log("Performing query: " + query);
 
@@ -223,7 +223,7 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
         }
 
         while (!cursor.isAfterLast()) {
-            //Logger.log("Looping cursor result");
+            Logger.log("Looping cursor result");
             ContentValues value = getValuesFromCursor(cursor, projection);
 
             if (value.size() > 0)
@@ -276,32 +276,33 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
 
     public ArrayList<Object> getAllBuiltObjectsExcept(String tableName, String columnName, ArrayList<String> blacklist,
                                                       CallbackHandler callbackHandler, boolean bypassCache) {
+        return getAllBuiltObjectsExcept(tableName, columnName, null, blacklist, callbackHandler, bypassCache);
+    }
 
+    public ArrayList<Object> getAllBuiltObjectsExcept(String tableName, String columnName, String orderBy, ArrayList<String> blacklist,
+                                                      CallbackHandler callbackHandler) {
+        return getAllBuiltObjectsExcept(tableName, columnName, orderBy, blacklist, callbackHandler, false);
+    }
+
+    public ArrayList<Object> getAllBuiltObjectsExcept(String tableName, String columnName, String orderBy, ArrayList<String> blacklist,
+                                                      CallbackHandler callbackHandler, boolean bypassCache) {
         Logger.log("Getting all content from database");
-
         if (!excludedObjectCacheNeedsUpdate && !bypassCache) {
             Logger.log("Using query cache");
             return excludedObjectCache;
         }
-
         String strBlacklist = formatExclusionList(blacklist);
         String query = "select * from " + tableName +
-                " where " + columnName + " not in (" + strBlacklist + ")";
-
+                " where " + columnName + " not in (" + strBlacklist + ")" + (orderBy != null ? " ORDER BY " + orderBy : "");
         Logger.log("Performing query: " + query);
-
         Cursor cursor = getDatabase().rawQuery(query, null);
         callbackHandler.addParams(cursor);
-
         if (!cursor.moveToFirst()) {
             Logger.log("Error moving cursor to first row");
             return null;
         }
-
         Logger.log("Query size: " + cursor.getCount());
-
         ArrayList<Object> invocationResponse;
-
         try {
             Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + Arrays.toString(callbackHandler.parameters));
             invocationResponse = (ArrayList<Object>) callbackHandler.method.invoke(callbackHandler.caller, callbackHandler.parameters);
@@ -314,12 +315,10 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
             cursor.close();
             return null;
         }
-
         if (invocationResponse == null) {
             Logger.log("Null response from the invoked method: " + callbackHandler.method.getName());
             return null;
         }
-
         cursor.close();
         excludedObjectCache = invocationResponse;
         excludedObjectCacheNeedsUpdate = false;
@@ -327,17 +326,25 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
     }
 
     public ArrayList<Object> getAllBuiltObjects(String tableName, CallbackHandler callbackHandler) {
-        return getAllBuiltObjects(tableName, callbackHandler, false);
+        return getAllBuiltObjects(tableName, null, callbackHandler, false);
     }
 
     public ArrayList<Object> getAllBuiltObjects(String tableName, CallbackHandler callbackHandler, boolean bypassCache) {
+        return getAllBuiltObjects(tableName, null, callbackHandler, bypassCache);
+    }
+
+    public ArrayList<Object> getAllBuiltObjects(String tableName, String where, CallbackHandler callbackHandler) {
+        return getAllBuiltObjects(tableName, where, callbackHandler, false);
+    }
+
+    public ArrayList<Object> getAllBuiltObjects(String tableName, String where, CallbackHandler callbackHandler, boolean bypassCache) {
         if (!objectCacheNeedsUpdate && !bypassCache) {
             Logger.log("Using lens cache");
             return objectCache;
         }
 
         Logger.log("Getting all lenses from database");
-        Cursor cursor = getDatabase().rawQuery("select * from " + tableName, null);
+        Cursor cursor = getDatabase().rawQuery("SELECT * FROM " + tableName + (where != null ? " WHERE " + where : ""), null);
         Logger.log("Query size: " + cursor.getCount());
 
         callbackHandler.addParams(cursor);
@@ -514,6 +521,23 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
             this.caller = caller;
             this.method = method;
             this.parameters = parameters;
+        }
+
+        /**
+         * Usage: getCallback("methodToCall", ParameterClassTypes...);
+         *
+         * @param methodName - The name of the method to call
+         * @param classType  - The list of Classes called as the method parameters
+         * @return CallbackHandler - The object holding the callback data
+         */
+        public static CallbackHandler getCallback(Class<?> clazz, String methodName, Class... classType) {
+            try {
+                Logger.log("Trying to build callback method");
+                return new CallbackHandler(clazz, clazz.getMethod(methodName, classType));
+            } catch (NoSuchMethodException e) {
+                Logger.log("ERROR GETTING CALLBACK", e);
+                return null;
+            }
         }
 
         public Object[] addParams(Object... newParams) {

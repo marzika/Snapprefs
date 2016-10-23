@@ -161,7 +161,13 @@ public class LensesFragment extends Fragment {
                 if (containerData == null || containerData.bmp == null) {
                     containerData = new LensContainerData(inflatedLayout, iconImageView, iconName, lensData.mIconLink, null);
                     iconMap.put(lensData.mCode, containerData);
-                    new LensIconLoader.AsyncLensIconDownloader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, containerData, context);
+                    //TODO Implement try/catch
+
+                    try {
+                        new LensIconLoader.AsyncLensIconDownloader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, containerData, context);
+                    } catch (Throwable e) {
+                        Logger.log("Error loading lens", e);
+                    }
                 } else {
                     iconImageView.setImageBitmap(containerData.bmp);
                     iconImageView.invalidate();
