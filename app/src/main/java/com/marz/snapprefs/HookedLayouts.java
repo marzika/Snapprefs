@@ -171,10 +171,10 @@ public class HookedLayouts {
                             (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("camera_preview_layout", "id", Common.PACKAGE_SNAP));
                     //final RelativeLayout.LayoutParams lParams =
                     //        new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("camera_take_snap_button", "id", Common.PACKAGE_SNAP)).getLayoutParams());
-                    final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams((int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP)), (int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP)));
+                    final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(px((int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP))), px((int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP))));
                     layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                    layoutParams.rightMargin = px(55);
-                    layoutParams.topMargin = px(10);
+                    layoutParams.rightMargin = px(50);
+                    layoutParams.topMargin = px(-10);
                     upload = new ImageButton(HookMethods.SnapContext);
                     upload.setLayoutParams(layoutParams);
                     upload.setBackgroundColor(0);
@@ -217,7 +217,7 @@ public class HookedLayouts {
                             p.setXfermode(null);
                             p.setStyle(Paint.Style.STROKE);
                             p.setColor(Color.WHITE);
-                            p.setStrokeWidth(7.5f);
+                            p.setStrokeWidth(13f);
                             c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
                             upload.setImageDrawable(new BitmapDrawable(output));
                         }
@@ -225,8 +225,8 @@ public class HookedLayouts {
                         cursor.close();
                     }
                     //upload.setImageDrawable(uploadimg);
-                    upload.setScaleX((float) 1.1);
-                    upload.setScaleY((float) 1.1);
+                    upload.setScaleX((float) 0.65);
+                    upload.setScaleY((float) 0.65);
                     upload.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
