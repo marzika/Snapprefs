@@ -91,13 +91,13 @@ public class Lens {
 
                 if (Preferences.getBool(Prefs.LENSES_COLLECT)) {
                     String url = (String) getObjectField(lens, "mIconLink");
-                    Logger.log("Icon url: " + url);
+                    //Logger.log("Icon url: " + url);
                     String mCode = (String) getObjectField(lens, "mCode");
 
-                    Logger.log("Handling lens: " + mCode);
+                    //Logger.log("Handling lens: " + mCode);
 
                     if (MainActivity.lensDBHelper.containsLens(mCode)) {
-                        Logger.log("Already contains lens: " + mCode);
+                        //Logger.log("Already contains lens: " + mCode);
                         lensBlacklist.add(mCode);
                     } else {
                         Logger.log("Saving new lens: " + mCode);

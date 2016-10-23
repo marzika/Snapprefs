@@ -154,6 +154,7 @@
         <item>Sweep to Save</item>
         <item>Don\'t Save</item>
         <item>Auto Save</item>
+        <item>Fling to Save</item>
     </string-array>
 
     <string-array name="pref_save_mode_values" translatable="false">
@@ -161,6 +162,7 @@
         <item>1</item>
         <item>2</item>
         <item>3</item>
+        <item>4</item>
     </string-array>
 
     <!-- Viewing settings -->

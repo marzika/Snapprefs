@@ -124,19 +124,19 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
     }
 
     public int getActiveLensCount() {
-        Logger.log("Getting lens from database");
+        //Logger.log("Getting lens from database");
 
         String[] selectionArgs = {"1"};
 
         int count = super.getCount(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_ACTIVE, selectionArgs, fullProjection);
 
-        Logger.log("Query count: " + count);
+        //Logger.log("Query count: " + count);
 
         return count;
     }
 
     public LensData getLens(String mCode) {
-        Logger.log("Getting lens from database");
+        //Logger.log("Getting lens from database");
 
         String[] selectionArgs = {mCode};
         String sortOrder =
@@ -146,7 +146,7 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
         LensData lensData = (LensData) super.getBuiltContent(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE,
                 selectionArgs, sortOrder, fullProjection, callback);
 
-        Logger.log("Queried database to get lens: " + lensData.mCode);
+        //Logger.log("Queried database to get lens: " + lensData.mCode);
         return lensData;
     }
 
@@ -202,7 +202,7 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
         ArrayList<LensData> lensDataList = new ArrayList<>();
 
         while (!cursor.isAfterLast()) {
-            Logger.log("Looping cursor result");
+            //Logger.log("Looping cursor result");
             LensData lensData = getLensFromCursor(cursor);
 
             if (lensData == null) {
@@ -237,7 +237,7 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
             lensData.mActive = activeState != 0;
             lensData.selTime = cursor.getInt(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_SEL_TIME));
 
-            Logger.log("Queried database for lens: " + lensData.mCode + " Active: " + lensData.mActive);
+            //Logger.log("Queried database for lens: " + lensData.mCode + " Active: " + lensData.mActive);
         } catch (IllegalArgumentException e) {
             Logger.log("Issue querying database", e);
             return null;

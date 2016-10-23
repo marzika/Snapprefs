@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.content.res.XModuleResources;
 import android.content.res.XResources;
 import android.graphics.Bitmap;
@@ -141,27 +142,33 @@ public class HookMethods
 
             try {
                 HookedLayouts.addSaveButtonsAndGestures(resparam, mResources, localContext);
-            } catch( Throwable t )
-            {
-                Logger.log(t);
+            } catch (Resources.NotFoundException ignore){
             }
 
             if (Preferences.shouldAddGhost()) {
                 try {
                     HookedLayouts.addIcons(resparam, mResources);
-                } catch( Exception e ) {
-                    Logger.log("Exception thrown in addIcons", e);
+                } catch (Resources.NotFoundException ignore){
                 }
             }
             if (Preferences.getBool(Prefs.INTEGRATION)) {
-                HookedLayouts.addShareIcon(resparam);
+                try {
+                    HookedLayouts.addShareIcon(resparam);
+                } catch (Resources.NotFoundException ignore){
+                }
             }
             if (Preferences.getBool(Prefs.HIDE_PEOPLE)) {
-                Stories.addSnapprefsBtn(resparam, mResources);
+                try {
+                    Stories.addSnapprefsBtn(resparam, mResources);
+                } catch (Resources.NotFoundException ignore){
+                }
             }
 
             //Chat.initChatSave(resparam, mResources);
-            HookedLayouts.fullScreenFilter(resparam);
+            try {
+                HookedLayouts.fullScreenFilter(resparam);
+            } catch (Resources.NotFoundException ignore){
+            }
         } catch (Exception e) {
             Logger.log("Exception thrown in handleInitPackageResources", e);
         }

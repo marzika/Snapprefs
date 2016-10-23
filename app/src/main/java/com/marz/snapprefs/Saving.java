@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -19,10 +20,13 @@ import android.widget.Toast;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.SnapData.FlagState;
 import com.marz.snapprefs.Util.CommonUtils;
+import com.marz.snapprefs.Util.FlingSaveGesture;
+import com.marz.snapprefs.Util.GestureEvent;
 import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.NotificationUtils.ToastType;
 import com.marz.snapprefs.Util.SavingUtils;
 import com.marz.snapprefs.Util.StringUtils;
+import com.marz.snapprefs.Util.SweepSaveGesture;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,13 +56,12 @@ import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
 
 public class Saving {
     //public static final String SNAPCHAT_PACKAGE_NAME = "com.snapchat.android";
-    public static Resources mSCResources;
-    public static XC_LoadPackage.LoadPackageParam lpparam2;
+    private static Resources mSCResources;
+    private static XC_LoadPackage.LoadPackageParam lpparam2;
     private static SimpleDateFormat dateFormat =
             new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.getDefault());
     private static SimpleDateFormat dateFormatSent =
             new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
-    private static XModuleResources mResources;
     private static ConcurrentHashMap<String, SnapData> hashSnapData = new ConcurrentHashMap<>();
     private static boolean printFlags = true;
     private static String currentSnapKey;
@@ -66,10 +69,11 @@ public class Saving {
     //TODO implement user selected save mode
     private static boolean asyncSaveMode = true;
     private static Object enum_NO_AUTO_ADVANCE;
+    private static GestureEvent gestureEvent;
+    private static boolean gestureCalledInternally = false;
 
     static void initSaving(final XC_LoadPackage.LoadPackageParam lpparam,
                            final XModuleResources modRes, final Context snapContext) {
-        mResources = modRes;
         lpparam2 = lpparam;
 
         if (mSCResources == null) mSCResources = snapContext.getResources();
@@ -129,6 +133,45 @@ public class Saving {
                 }
             });
 
+            if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S ||
+                    Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_F2S) {
+                findAndHookMethod(Obfuscator.save.DIRECTIONAL_LAYOUT_CLASS, cl, "dispatchTouchEvent", MotionEvent.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+
+                        if (gestureCalledInternally)
+                            return;
+
+                        if (gestureEvent == null) {
+                            if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S)
+                                gestureEvent = new SweepSaveGesture();
+                            else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_F2S)
+                                gestureEvent = new FlingSaveGesture();
+                            else {
+                                Logger.log("No gesture method provided");
+                                return;
+                            }
+                        }
+
+                        Logger.log("Dispatching touch event");
+                        String mKey = (String) getAdditionalInstanceField(param.thisObject, "mKey");
+
+                        if (mKey != null) {
+                            if (gestureEvent.onTouch((FrameLayout) param.thisObject, (MotionEvent) param.args[0], SnapType.STORY) ==
+                                    GestureEvent.ReturnType.TAP) {
+                                gestureCalledInternally = true;
+                                Logger.log("Performed TAP?");
+                                param.setResult(callMethod(param.thisObject, "dispatchTouchEvent", param.args[0]));
+                            } else
+                                param.setResult(true);
+                        }
+
+                        gestureCalledInternally = false;
+                    }
+                });
+            }
+
             findAndHookMethod(Obfuscator.save.STORY_VIEWER_MEDIA_CACHE, cl, Obfuscator.save.VIEWING_STORY_METHOD,
                     String.class, findClass(Obfuscator.save.STORY_DETAILS_PACKET, cl), ImageView.class, findClass(Obfuscator.save.VIEWING_STORY_VAR4, cl), new XC_MethodHook() {
                         @Override
@@ -155,17 +198,24 @@ public class Saving {
 
                             View view = (View) param.args[2];
 
-                            FrameLayout snapContainer = scanForStoryContainer(view);
-                            String mKey = (String) getObjectField(storySnap, "mId");
+                            if (Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_AUTO) {
+                                FrameLayout snapContainer = scanForStoryContainer(view);
+                                String mKey = (String) getObjectField(storySnap, "mId");
 
-                            if (snapContainer != null) {
-                                if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON)
-                                    HookedLayouts.assignStoryButton(snapContainer, snapContext, mKey);
-                                else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S)
-                                    HookedLayouts.assignGestures(snapContainer);
+                                if (snapContainer != null) {
+                                    if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON)
+                                        HookedLayouts.assignStoryButton(snapContainer, snapContext, mKey);
+                                    else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S ||
+                                            Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_F2S) {
+                                        FrameLayout snapContainerParent = (FrameLayout) snapContainer.getParent();
+
+                                        if (snapContainerParent != null)
+                                            setAdditionalInstanceField(snapContainerParent, "mKey", mKey);
+                                    }
+                                }
                             }
 
-                            setAdditionalInstanceField(param.args[2], "StorySnap", storySnap);
+                            setAdditionalInstanceField(view, "StorySnap", storySnap);
                             Log.d("snapprefs", "StoryViewerMediaCache.a : KEY " + getObjectField(storySnap, "mId"));
                             Log.d("snapprefs", "Str: " + param.args[0]);
                             Log.d("snapprefs", "### END StoryViewerMediaCache ###");
@@ -432,9 +482,11 @@ public class Saving {
         }
     }
 
-    public static FrameLayout scanForStoryContainer(View view) {
-        if (view == null)
+    private static FrameLayout scanForStoryContainer(View view) {
+        if (view == null) {
+            Logger.log("Called scan with Null view");
             return null;
+        }
 
         Object parent = view.getParent();
 
@@ -458,7 +510,7 @@ public class Saving {
     }
 
     // UPDATED 9.39.5
-    public static void handleSentSnap(Object snapPreviewFragment, Context snapContext) {
+    private static void handleSentSnap(Object snapPreviewFragment, Context snapContext) {
         try {
             Logger.printTitle("Handling SENT snap");
             Activity activity = (Activity) callMethod(snapPreviewFragment, "getActivity");
@@ -537,16 +589,13 @@ public class Saving {
                 Logger.printFinalMessage("Saved sent snap");
                 createStatefulToast("Saved send snap", ToastType.GOOD);
                 snapData.addFlag(FlagState.SAVED);
-                return;
             } else if (response == SaveResponse.FAILED) {
                 Logger.printFinalMessage("Error saving snap");
                 createStatefulToast("Error saving snap", ToastType.BAD);
                 snapData.addFlag(FlagState.FAILED);
-                return;
             } else {
                 Logger.printFinalMessage("Unhandled save response");
                 createStatefulToast("Unhandled save response", ToastType.WARNING);
-                return;
             }
         } catch (Exception e) {
             Logger.log("Error getting sent media", e);
@@ -561,11 +610,13 @@ public class Saving {
 
             if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
                 if (currentSnapData.getSnapType() == SnapType.STORY &&
-                        Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_S2S) {
+                        Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_S2S &&
+                        Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_F2S) {
                     Logger.printFinalMessage("Tried to perform story S2S from different mode");
                     return;
                 } else if (currentSnapData.getSnapType() == SnapType.SNAP &&
-                        Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_S2S) {
+                        Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_S2S &&
+                        Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_F2S) {
                     Logger.printFinalMessage("Tried to perform snap S2S from different mode");
                     return;
                 }
@@ -576,7 +627,7 @@ public class Saving {
         performManualSnapDataSave(currentSnapData, relativeContext);
     }
 
-    public static void performButtonSave() {
+    static void performButtonSave() {
         if (currentSnapKey != null) {
             performButtonSave(currentSnapKey);
         }
@@ -607,7 +658,7 @@ public class Saving {
         performManualSnapDataSave(currentSnapData, relativeContext);
     }
 
-    public static void performManualSnapDataSave(SnapData snapData, Context context) {
+    private static void performManualSnapDataSave(SnapData snapData, Context context) {
         if (snapData != null && context != null) {
             Logger.printMessage("Found SnapData to save");
             Logger.printMessage("Key: " + snapData.getmKey());
@@ -929,15 +980,11 @@ public class Saving {
         Logger.printMessage("Passed payload checks");
 
         if (snapData.getSnapType() == SnapType.SNAP &&
-                (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.DO_NOT_SAVE ||
-                        Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON ||
-                        Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S)) {
+                Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_AUTO) {
             Logger.printMessage("Snap save mode check failed");
             return false;
         } else if (snapData.getSnapType() == SnapType.STORY &&
-                (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.DO_NOT_SAVE ||
-                        Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ||
-                        Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S)) {
+                Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_AUTO) {
             Logger.printMessage("Story save mode check failed");
             return false;
         }
@@ -954,17 +1001,9 @@ public class Saving {
      * @return True if contains any of the flags
      */
     private static boolean scanForExisting(SnapData snapData, FlagState flagState) {
-        if (snapData.hasFlag(FlagState.SAVED))
-            return true;
-        else if (snapData.hasFlag(flagState))
-            return true;
-        else if (snapData.hasFlag(FlagState.PROCESSING))
-            return true;
-        else
-            return false;
-        /*return !snapData.hasFlag(FlagState.SAVED) ||
-                (snapData.hasFlag(flagState) || snapData.hasFlag(FlagState.SAVED)) &&
-                (!snapData.hasFlag(FlagState.FAILED) || !snapData.hasFlag(FlagState.COMPLETED));*/
+        return snapData.hasFlag(FlagState.SAVED) ||
+                snapData.hasFlag(flagState) ||
+                snapData.hasFlag(FlagState.PROCESSING);
     }
 
     /**
@@ -974,7 +1013,7 @@ public class Saving {
      * @param snapData
      * @throws Exception
      */
-    public static void handleSave(Context context, SnapData snapData) throws Exception {
+    private static void handleSave(Context context, SnapData snapData) throws Exception {
         // Ensure snapData is ready for saving
         if (snapData.hasFlag(FlagState.COMPLETED)) {
             Logger.printMessage("Saving Snap");
@@ -1141,9 +1180,9 @@ public class Saving {
      * @return
      * @throws Exception
      */
-    public static SaveResponse saveSnap(SnapType snapType, MediaType mediaType, Context context,
-                                        Bitmap image, FileInputStream video, String filename,
-                                        String sender) throws Exception {
+    static SaveResponse saveSnap(SnapType snapType, MediaType mediaType, Context context,
+                                 Bitmap image, FileInputStream video, String filename,
+                                 String sender) throws Exception {
         File directory;
 
         try {
@@ -1202,12 +1241,16 @@ public class Saving {
         return SaveResponse.FAILED;
     }
 
-    public static void createStatefulToast(String message, ToastType type) {
+    static void createStatefulToast(String message, ToastType type) {
         NotificationUtils.showStatefulMessage(message, type, lpparam2.classLoader);
     }
 
-    public static File createFileDir(String category, String sender) throws IOException {
-        File directory = new File(Preferences.getSavePath());
+    private static File createFileDir(String category, String sender) throws IOException {
+        String savePath = Preferences.getSavePath();
+        if (savePath == null)
+            savePath = Preferences.getContentPath();
+
+        File directory = new File(savePath);
 
         if (Preferences.getBool(Prefs.SORT_BY_CATEGORY) || (Preferences.getBool(Prefs.SORT_BY_USERNAME) && sender == null)) {
             directory = new File(directory, category);
@@ -1239,11 +1282,11 @@ public class Saving {
         }
     }
 
-    public enum SaveResponse {
+    enum SaveResponse {
         SUCCESS, FAILED, ONGOING, EXISTING
     }
 
-    public enum MediaType {
+    enum MediaType {
         IMAGE(".jpg", "Image"),
         IMAGE_OVERLAY(".png", "Overlay"),
         VIDEO(".mp4", "Video");
@@ -1257,7 +1300,7 @@ public class Saving {
         }
     }
 
-    public static class AsyncSaveSnapData extends AsyncTask<Object, Void, Boolean> {
+    private static class AsyncSaveSnapData extends AsyncTask<Object, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Object... params) {
             Context context = (Context) params[0];
