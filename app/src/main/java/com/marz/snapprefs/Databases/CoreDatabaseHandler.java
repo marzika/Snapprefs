@@ -25,7 +25,7 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
     public static String DATABASE_NAME;
     private static String SQL_CREATE_ENTRIES;
 
-    private SQLiteDatabase writeableDatabase;
+    private SQLiteDatabase writableDatabase;
     private ArrayList<ContentValues> contentCache = new ArrayList<>();
     private boolean contentCacheNeedsUpdate = true;
     private ArrayList<ContentValues> excludedContentCache = new ArrayList<>();
@@ -43,12 +43,12 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
 
     private SQLiteDatabase getDatabase() {
         createIfNotExisting();
-        return writeableDatabase;
+        return writableDatabase;
     }
 
     private void createIfNotExisting() {
-        if (writeableDatabase == null || !writeableDatabase.isOpen())
-            writeableDatabase = this.getWritableDatabase();
+        if (writableDatabase == null || !writableDatabase.isOpen())
+            writableDatabase = this.getWritableDatabase();
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -248,7 +248,7 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
             return contentCache;
         }
         Logger.log("Getting all lenses from database");
-        Cursor cursor = getDatabase().rawQuery("select * from " + tableName, null);
+        Cursor cursor = getDatabase().rawQuery("SELECT * FROM " + tableName, null);
 
         Logger.log("Query size: " + cursor.getCount());
 
