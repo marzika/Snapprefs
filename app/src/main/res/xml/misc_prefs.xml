@@ -21,7 +21,7 @@
         android:summary="@string/auto_advance_summary"
         android:title="@string/auto_advance_title" />
     <CheckBoxPreference
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:key="pref_key_paint_checkbox"
         android:summaryOff="@string/pref_paint_cb_summary_off"
         android:summaryOn="@string/pref_paint_cb_summary_on"
