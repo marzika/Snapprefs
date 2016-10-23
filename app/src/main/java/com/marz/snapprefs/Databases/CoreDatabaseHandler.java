@@ -264,8 +264,8 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
 
 
         cursor.close();
-            contentCache = new ArrayList<>(contentList);
-            contentCacheNeedsUpdate = false;
+        contentCache = new ArrayList<>(contentList);
+        contentCacheNeedsUpdate = false;
         return contentList;
     }
     public ArrayList<Object> getAllBuiltObjectsExcept(String tableName, String columnName, ArrayList<String> blacklist,
