@@ -8,7 +8,7 @@ import com.marz.snapprefs.Logger;
 /**
  * Created by Andre on 12/09/2016.
  */
-public class LensData{
+public class LensData {
     public String mCode;
     //public String mGplayIapId;
     public String mHintId;
