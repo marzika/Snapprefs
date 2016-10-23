@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Message;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -208,6 +209,30 @@ public class HookMethods
 
             Logger.log("Loading map from xposed");
             Preferences.loadMapFromXposed();
+            findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) {
+                    Logger.printFinalMessage("setMaxDuration - " + param.args[0]);
+                    param.args[0] = 12000000;//2 mins
+                }
+            });
+            findAndHookMethod("android.os.Handler", lpparam.classLoader, "sendMessageDelayed", Message.class, long.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    if((long)param.args[1]==10000){
+                        Logger.printFinalMessage("sendMessageDelayed - " + param.args[1]);
+                        param.args[1]=12000000L;
+                    }
+                }
+            });
+            /* Not needed as they are not setting a sizelimit anymore, yay
+            findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxFileSize", long.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) {//1730151
+                    Logger.printFinalMessage("setMaxFileSize - " + param.args[0]);
+                    param.args[0] = 5190453;//5190453
+                }
+            });*/
 
             findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
@@ -246,6 +271,8 @@ public class HookMethods
                             }
                             boolean isNull = SnapContext == null;
                             Logger.log("SNAPCONTEXT, NULL? - " + isNull, true);
+                            // Fallback method to force the MediaRecorder implementation in Snapchat
+                            // XposedHelpers.findAndHookMethod("com.snapchat.android.camera.videocamera.recordingpreferences.VideoRecorderFactory", lpparam.classLoader, "b", XC_MethodReplacement.returnConstant(false));
                             //SNAPPREFS
                             Saving.initSaving(lpparam, mResources, SnapContext);
                             //NewSaving.initSaving(lpparam);
@@ -360,19 +387,6 @@ public class HookMethods
                         Logger.log("ROOTCHECK: " + s, true);
                     }
                     // External class - Belongs to android
-                    findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
-                        @Override
-                        protected void beforeHookedMethod(MethodHookParam param) {
-                            param.args[0] = 12000000;
-                        }
-                    });
-                    findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxFileSize", long.class, new XC_MethodHook() {
-                        @Override
-                        protected void beforeHookedMethod(MethodHookParam param) {//1730151
-                            param.args[0] = 5190453;//5190453
-                        }
-                    });
-
                     //Gabe is a douche
                     // COMPLETED 9.39.5
                     final Class<?> receivedSnapClass =
