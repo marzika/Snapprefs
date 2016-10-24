@@ -150,7 +150,7 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
         String sortOrder =
                 LensEntry.COLUMN_NAME_MCODE + " DESC";
 
-        CallbackHandler callback = getCallback(this.getClass(), "getLensFromCursor", LensDatabaseHelper.class, Cursor.class);
+        CallbackHandler callback = getCallback(this, "getLensFromCursor", LensDatabaseHelper.class, Cursor.class);
 
         //Logger.log("Queried database to get lens: " + lensData.mCode);
         return (LensData) super.getBuiltContent(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE,
@@ -159,7 +159,7 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
 
     @SuppressWarnings("unchecked")
     public HashMap<String, LensData> getAllExcept(ArrayList<String> blacklist) {
-        CallbackHandler callback = getCallback(this.getClass(), "getAllLensesFromCursor", Cursor.class);
+        CallbackHandler callback = getCallback(this, "getAllLensesFromCursor", Cursor.class);
 
         if(Preferences.getBool(Preferences.Prefs.LENSES_SORT_BY_SEL)) {
             return (HashMap<String, LensData>) super.getAllBuiltObjectsExcept(LensEntry.TABLE_NAME,
@@ -172,7 +172,7 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
 
     @SuppressWarnings("unchecked")
     public HashMap<String, Object> getAllOfType(LensData.LensType type) {
-        CallbackHandler callback = getCallback(this.getClass(), "getAllLensesFromCursor", Cursor.class);
+        CallbackHandler callback = getCallback(this, "getAllLensesFromCursor", Cursor.class);
 
         String orderBy = Preferences.getBool(Preferences.Prefs.LENSES_SORT_BY_SEL) ?
                 LensEntry.COLUMN_NAME_SEL_TIME + " ASC" : null;
@@ -186,7 +186,7 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
 
     @SuppressWarnings("unchecked")
     public HashMap<String, Object> getAllActive() {
-        CallbackHandler callback = getCallback(this.getClass(), "getAllLensesFromCursor", Cursor.class);
+        CallbackHandler callback = getCallback(this, "getAllLensesFromCursor", Cursor.class);
 
         String selection = LensEntry.COLUMN_NAME_ACTIVE + " = ?";
         String[] selectionArgs = {"1"};
@@ -198,7 +198,7 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
     @SuppressWarnings("unchecked")
     public HashMap<String, Object> getAllLenses() {
         Logger.log("Getting all lenses from database");
-        CallbackHandler callback = getCallback(this.getClass(), "getAllLensesFromCursor", Cursor.class);
+        CallbackHandler callback = getCallback(this, "getAllLensesFromCursor", Cursor.class);
 
         return (HashMap<String, Object>) super.getAllBuiltObjects(LensEntry.TABLE_NAME, callback);
     }

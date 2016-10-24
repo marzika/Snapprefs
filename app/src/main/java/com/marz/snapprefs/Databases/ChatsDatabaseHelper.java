@@ -14,6 +14,8 @@ import com.marz.snapprefs.Util.ChatData;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.marz.snapprefs.Databases.CoreDatabaseHandler.CallbackHandler.getCallback;
+
 /**
  * Created by Andre on 20/10/2016.
  */
@@ -139,19 +141,19 @@ public class ChatsDatabaseHelper extends CoreDatabaseHandler {
 
     @SuppressWarnings("unchecked")
     public ArrayList<Object> getAllChats() {
-        CallbackHandler callback = getCallback("getAllChatsFromCursor", Cursor.class);
+        CallbackHandler callback = getCallback(this, "getAllChatsFromCursor", Cursor.class);
         return (ArrayList<Object>) getAllBuiltObjects(ChatEntry.TABLE_NAME, callback);
     }
 
     @SuppressWarnings("unchecked")
     public ArrayList<Object> getAllChatsFrom(String conversationId) {
-        CallbackHandler callback = getCallback("getAllChatsFromCursor", Cursor.class);
+        CallbackHandler callback = getCallback(this, "getAllChatsFromCursor", Cursor.class);
         return (ArrayList<Object>) getAllBuiltObjects(ChatEntry.TABLE_NAME, ChatEntry.COLUMN_NAME_CONVERSATION_ID + " = '" + conversationId + "'", null, callback);
     }
 
     @SuppressWarnings("unchecked")
     public ArrayList<Object> getAllChatsFromExcept(String conversationId, String formattedBlacklist) {
-        CallbackHandler callback = getCallback("getAllChatsFromCursor", Cursor.class);
+        CallbackHandler callback = getCallback(this, "getAllChatsFromCursor", Cursor.class);
 
         return (ArrayList<Object>) getAllBuiltObjects(
                 ChatEntry.TABLE_NAME,
@@ -255,24 +257,6 @@ public class ChatsDatabaseHelper extends CoreDatabaseHandler {
         }
 
         return null;
-    }
-
-    /**
-     * Usage: getCallback("methodToCall", ParameterClassTypes...);
-     *
-     * @param methodName - The name of the method to call
-     * @param classType  - The list of Classes called as the method parameters
-     * @return CallbackHandler - The object holding the callback data
-     */
-    //TODO Generalize this to the CoreDBHandler
-    public CallbackHandler getCallback(String methodName, Class... classType) {
-        try {
-            Logger.log("Trying to build callback method");
-            return new CallbackHandler(this, ChatsDatabaseHelper.class.getMethod(methodName, classType));
-        } catch (NoSuchMethodException e) {
-            Logger.log("ERROR GETTING CALLBACK", e);
-            return null;
-        }
     }
 
     private static class ChatEntry implements BaseColumns {

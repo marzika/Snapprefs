@@ -200,7 +200,13 @@ public class Chat {
                                     chatData.setSnapWidth((int) getObjectField(media, "width"));
                                     chatData.setSnapHeight((int) getObjectField(media, "height"));
                                     //TODO Handle null
-                                    chatData.setSnapDuration((float) getObjectField(media, "timerSec"));
+
+                                    Float timerSec = (Float) getObjectField(media, "timerSec");
+
+                                    if( timerSec == null )
+                                        timerSec = 0f;
+
+                                    chatData.setSnapDuration(timerSec);
                                 }
 
                                 Logger.log("Inserting chat to DB: " + chatData.getMessageType() + "|" + chatData.getMediaType());

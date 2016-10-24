@@ -437,10 +437,10 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
          * @param classType  - The list of Classes called as the method parameters
          * @return CallbackHandler - The object holding the callback data
          */
-        static CallbackHandler getCallback(Class<?> clazz, String methodName, Class<?>... classType) {
+        static CallbackHandler getCallback(Object clazz, String methodName, Class<?>... classType) {
             try {
                 Logger.log("Trying to build callback method");
-                return new CallbackHandler(clazz, clazz.getMethod(methodName, classType));
+                return new CallbackHandler(clazz, clazz.getClass().getMethod(methodName, classType));
             } catch (NoSuchMethodException e) {
                 Logger.log("ERROR GETTING CALLBACK", e);
                 return null;
