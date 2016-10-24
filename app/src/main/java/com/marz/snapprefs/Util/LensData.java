@@ -23,6 +23,8 @@ public class LensData {
     //public int mPriority;
     public String mSignature;
     public boolean mActive;
+    public long selTime;
+
     //public Object mType;
     //public Bitmap mLensIcon;
 
@@ -31,12 +33,14 @@ public class LensData {
         ContentValues contentValues = new ContentValues();
         contentValues.put(LensEntry.COLUMN_NAME_MCODE, mCode);
         //contentValues.put(LensEntry.COLUMN_NAME_GPLAYID, mGplayIapId);
+        contentValues.put(LensEntry.COLUMN_NAME_TYPE, String.valueOf(mType));
         contentValues.put(LensEntry.COLUMN_NAME_MHINTID, mHintId);
         contentValues.put(LensEntry.COLUMN_NAME_MICONLINK, mIconLink);
         contentValues.put(LensEntry.COLUMN_NAME_MID, mId);
         contentValues.put(LensEntry.COLUMN_NAME_MLENSLINK, mLensLink);
         contentValues.put(LensEntry.COLUMN_NAME_MSIGNATURE, mSignature);
         contentValues.put(LensEntry.COLUMN_NAME_ACTIVE, mActive);
+        contentValues.put(LensEntry.COLUMN_NAME_SEL_TIME, selTime);
         return contentValues;
     }
 

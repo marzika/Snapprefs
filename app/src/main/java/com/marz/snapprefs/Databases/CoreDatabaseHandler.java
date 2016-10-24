@@ -21,34 +21,27 @@ import static com.marz.snapprefs.Databases.CoreDatabaseHandler.DBUtils.formatExc
  * Created by Andre on 23/09/2016.
  */
 
-public class CoreDatabaseHandler extends SQLiteOpenHelper {
-    public static String DATABASE_NAME;
+class CoreDatabaseHandler extends SQLiteOpenHelper {
+    private static String DATABASE_NAME;
     private static String[] SQL_CREATE_ENTRIES;
 
-    private SQLiteDatabase writeableDatabase;
-    private ArrayList<ContentValues> contentCache = new ArrayList<>();
-    private boolean contentCacheNeedsUpdate = true;
-    private ArrayList<ContentValues> excludedContentCache = new ArrayList<>();
-    private boolean excludedContentCacheNeedsUpdate = true;
-    private ArrayList<Object> objectCache = new ArrayList<>();
-    private boolean objectCacheNeedsUpdate = true;
-    private ArrayList<Object> excludedObjectCache = new ArrayList<>();
-    private boolean excludedObjectCacheNeedsUpdate = true;
+    private SQLiteDatabase writableDatabase;
 
-    public CoreDatabaseHandler(Context context, String databaseName, String[] entries, int DATABASE_VERSION) {
+    CoreDatabaseHandler(Context context, String databaseName, String[] entries, int DATABASE_VERSION) {
         super(context, databaseName, null, DATABASE_VERSION);
         DATABASE_NAME = databaseName;
         SQL_CREATE_ENTRIES = entries;
     }
 
-    public SQLiteDatabase getDatabase() {
+    SQLiteDatabase getDatabase() {
         createIfNotExisting();
-        return writeableDatabase;
+        return writableDatabase;
     }
 
-    public void createIfNotExisting() {
-        if (writeableDatabase == null || !writeableDatabase.isOpen())
-            writeableDatabase = this.getWritableDatabase();
+
+    private void createIfNotExisting() {
+        if (writableDatabase == null || !writableDatabase.isOpen())
+            writableDatabase = this.getWritableDatabase();
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -63,15 +56,12 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    public long getRowCount(String tableName) {
+    long getRowCount(String tableName) {
         return DatabaseUtils.queryNumEntries(getDatabase(), tableName);
     }
 
     public long insertValues(String tableName, ContentValues values) {
-        long newRowID = getDatabase().insert(tableName, null, values);
-        invalidateCache();
-
-        return newRowID;
+        return getDatabase().insert(tableName, null, values);
     }
 
     public boolean containsObject(String tableName, String columnName, String[] selectionArgs,
@@ -172,20 +162,7 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
             return null;
         }
 
-        Object invocationResponse;
-
-        try {
-            Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + callbackHandler.parameters);
-            invocationResponse = callbackHandler.method.invoke(callbackHandler.caller, callbackHandler.parameters);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            cursor.close();
-            return null;
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            cursor.close();
-            return null;
-        }
+        Object invocationResponse = invokeCallback(callbackHandler);
 
         if (invocationResponse == null) {
             Logger.log("Null response from the invoked method: " + callbackHandler.method.getName());
@@ -199,11 +176,6 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
     public ArrayList<ContentValues> getAllContentExcept(String tableName, String columnName, String[] projection,
                                                         ArrayList<String> blacklist) {
         Logger.log("Getting all content from database");
-
-        if (!excludedContentCacheNeedsUpdate && excludedObjectCache.size() > 0) {
-            Logger.log("Using query cache");
-            return excludedContentCache;
-        }
 
         String strBlacklist = formatExclusionList(blacklist);
         String query = "SELECT * FROM " + tableName +
@@ -236,19 +208,12 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
 
 
         cursor.close();
-        excludedContentCache = new ArrayList<>(content);
-        excludedContentCacheNeedsUpdate = false;
         return content;
     }
 
     public ArrayList<ContentValues> getAllContent(String tableName, String[] projection) {
-
-        if (!contentCacheNeedsUpdate && contentCache.size() > 0) {
-            Logger.log("Using cached content");
-            return contentCache;
-        }
         Logger.log("Getting all lenses from database");
-        Cursor cursor = getDatabase().rawQuery("select * from " + tableName, null);
+        Cursor cursor = getDatabase().rawQuery("SELECT * FROM " + tableName, null);
 
         Logger.log("Query size: " + cursor.getCount());
 
@@ -262,78 +227,55 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         while (!cursor.isAfterLast())
             contentList.add(this.getValuesFromCursor(cursor, projection));
 
-
-        cursor.close();
-        contentCache = new ArrayList<>(contentList);
-        contentCacheNeedsUpdate = false;
         return contentList;
     }
 
-    public ArrayList<Object> getAllBuiltObjectsExcept(String tableName, String columnName, ArrayList<String> blacklist,
-                                                      CallbackHandler callbackHandler) {
-        return getAllBuiltObjectsExcept(tableName, columnName, blacklist, callbackHandler, false);
+    public Object getAllBuiltObjectsExcept(String tableName, String columnName, ArrayList<String> blacklist,
+                                           CallbackHandler callbackHandler) {
+        return getAllBuiltObjectsExcept(tableName, columnName, null, blacklist, callbackHandler);
     }
 
-    public ArrayList<Object> getAllBuiltObjectsExcept(String tableName, String columnName, ArrayList<String> blacklist,
-                                                      CallbackHandler callbackHandler, boolean bypassCache) {
-        return getAllBuiltObjectsExcept(tableName, columnName, null, blacklist, callbackHandler, bypassCache);
-    }
-
-    public ArrayList<Object> getAllBuiltObjectsExcept(String tableName, String columnName, String orderBy, ArrayList<String> blacklist,
-                                                      CallbackHandler callbackHandler) {
-        return getAllBuiltObjectsExcept(tableName, columnName, orderBy, blacklist, callbackHandler, false);
-    }
-
-    public ArrayList<Object> getAllBuiltObjectsExcept(String tableName, String columnName, String orderBy, ArrayList<String> blacklist,
-                                                      CallbackHandler callbackHandler, boolean bypassCache) {
-        Logger.log("Getting all content from database");
-        if (!excludedObjectCacheNeedsUpdate && !bypassCache) {
-            Logger.log("Using query cache");
-            return excludedObjectCache;
-        }
+    public Object getAllBuiltObjectsExcept(String tableName, String columnName, String orderBy, ArrayList<String> blacklist,
+                                           CallbackHandler callbackHandler) {
         String strBlacklist = formatExclusionList(blacklist);
-        String query = "select * from " + tableName +
-                " where " + columnName + " not in (" + strBlacklist + ")" + (orderBy != null ? " ORDER BY " + orderBy : "");
+
+        String query = "SELECT * FROM " + tableName +
+                " WHERE " + columnName + " NOT IN " + "(" + strBlacklist + ")" + (orderBy != null ? " ORDER BY " + orderBy : "");
+
         Logger.log("Performing query: " + query);
         Cursor cursor = getDatabase().rawQuery(query, null);
         callbackHandler.addParams(cursor);
+
         if (!cursor.moveToFirst()) {
             Logger.log("Error moving cursor to first row");
             return null;
         }
+
         Logger.log("Query size: " + cursor.getCount());
+
         Object invocationResponse = invokeCallback(callbackHandler);
+
+        cursor.close();
 
         if (invocationResponse == null) {
             Logger.log("Null response from the invoked method: " + callbackHandler.method.getName());
             return null;
         }
-        cursor.close();
-        excludedObjectCache = (ArrayList<Object>) invocationResponse;
-        excludedObjectCacheNeedsUpdate = false;
-        return (ArrayList<Object>) invocationResponse;
+
+        return invocationResponse;
     }
 
-    public Object getAllBuiltObjects(String tableName, CallbackHandler callbackHandler) {
-        return getAllBuiltObjects(tableName, null, callbackHandler, false);
+    Object getAllBuiltObjects(String tableName, CallbackHandler callbackHandler) {
+        return getAllBuiltObjects(tableName, null, null, callbackHandler);
     }
 
-    public Object getAllBuiltObjects(String tableName, CallbackHandler callbackHandler, boolean bypassCache) {
-        return getAllBuiltObjects(tableName, null, callbackHandler, bypassCache);
-    }
-
-    public Object getAllBuiltObjects(String tableName, String where, CallbackHandler callbackHandler) {
-        return getAllBuiltObjects(tableName, where, callbackHandler, false);
-    }
-
-    public Object getAllBuiltObjects(String tableName, String where, CallbackHandler callbackHandler, boolean bypassCache) {
-        if (!objectCacheNeedsUpdate && !bypassCache) {
-            Logger.log("Using lens cache");
-            return objectCache;
-        }
-
+    Object getAllBuiltObjects(String tableName, String where, String orderBy, CallbackHandler callbackHandler) {
         Logger.log("Getting all lenses from database");
-        Cursor cursor = getDatabase().rawQuery("SELECT * FROM " + tableName + (where != null ? " WHERE " + where : ""), null);
+        Cursor cursor = getDatabase().rawQuery(
+                "SELECT * FROM " + tableName +
+                        (where != null ? " WHERE " + where : "") +
+                        (orderBy != null ? " ORDER BY " + orderBy : ""), null);
+
         Logger.log("Query size: " + cursor.getCount());
 
         callbackHandler.addParams(cursor);
@@ -352,13 +294,11 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
 
         cursor.close();
 
-        objectCache = new ArrayList<>(invocationResponse);
-        objectCacheNeedsUpdate = false;
         return invocationResponse;
     }
 
     public Object performQueryForBuiltObjects(String tableName, String selection, String[] selectionArgs,
-                                                         String[] projection, String sortOrder, CallbackHandler callbackHandler) {
+                                              String[] projection, String sortOrder, CallbackHandler callbackHandler) {
         Cursor cursor = getDatabase().query(
                 tableName,                     // The table to query
                 projection,                               // The columns to return
@@ -389,27 +329,21 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         return invocationResponse;
     }
 
-    public void deleteObject(String tableName, String columnName, String[] selectionArgs) {
+    public int deleteObject(String tableName, String columnName, String[] selectionArgs) {
         String selection = columnName + " = ?";
 
-        int rowsDeleted = getDatabase().delete(tableName, selection, selectionArgs);
-
-        if (rowsDeleted > 0)
-            invalidateCache();
+        return getDatabase().delete(tableName, selection, selectionArgs);
     }
 
-    public void updateObject(String tableName, String columnName, String[] selectionArgs,
+    public int updateObject(String tableName, String columnName, String[] selectionArgs,
                              ContentValues values) {
         String selection = columnName + " = ?";
 
-        int rowsUpdated = getDatabase().update(
+        return getDatabase().update(
                 tableName,
                 values,
                 selection,
                 selectionArgs);
-
-        if (rowsUpdated > 0)
-            invalidateCache();
     }
 
     public ContentValues getValuesFromCursor(Cursor cursor, String[] arrProjection) {
@@ -450,13 +384,7 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         return contentValues;
     }
 
-    public void invalidateCache() {
-        excludedContentCacheNeedsUpdate = true;
-        contentCacheNeedsUpdate = true;
-        objectCacheNeedsUpdate = true;
-        excludedObjectCacheNeedsUpdate = true;
-    }
-
+    @SuppressWarnings("TryWithIdenticalCatches")
     private Object invokeCallback(CallbackHandler callbackHandler) {
         try {
             Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + Arrays.toString(callbackHandler.parameters));
@@ -470,8 +398,8 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         return null;
     }
 
-    public static class DBUtils {
-        public static String formatExclusionList(ArrayList<String> list) {
+    static class DBUtils {
+        static String formatExclusionList(ArrayList<String> list) {
             StringBuilder builder = new StringBuilder();
 
             Iterator<String> iterator = list.iterator();
@@ -489,7 +417,8 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         }
     }
 
-    public static class CallbackHandler {
+    static class CallbackHandler {
+        public String toString;
         Object caller;
         Method method;
         Object[] parameters;
@@ -498,6 +427,7 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
             this.caller = caller;
             this.method = method;
             this.parameters = parameters;
+            this.toString = caller.toString() + method.getName() + Arrays.toString(parameters);
         }
 
         /**
@@ -507,7 +437,7 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
          * @param classType  - The list of Classes called as the method parameters
          * @return CallbackHandler - The object holding the callback data
          */
-        public static CallbackHandler getCallback(Class<?> clazz, String methodName, Class... classType) {
+        static CallbackHandler getCallback(Class<?> clazz, String methodName, Class<?>... classType) {
             try {
                 Logger.log("Trying to build callback method");
                 return new CallbackHandler(clazz, clazz.getMethod(methodName, classType));
@@ -517,7 +447,7 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
             }
         }
 
-        public Object[] addParams(Object... newParams) {
+        Object[] addParams(Object... newParams) {
             int newParamLength = newParams.length;
 
             Object[] newParamList = new Object[parameters.length + newParamLength];
@@ -531,15 +461,6 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
                 Logger.log("New parameter: " + param.getClass().getCanonicalName());
 
             return newParamList;
-        }
-
-        public Cursor getCursorParam() {
-            for (Object param : parameters) {
-                if (param instanceof Cursor)
-                    return (Cursor) param;
-            }
-
-            return null;
         }
     }
 }

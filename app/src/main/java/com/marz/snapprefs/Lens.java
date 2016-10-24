@@ -6,6 +6,7 @@ import android.content.res.XModuleResources;
 import com.marz.snapprefs.Databases.LensDatabaseHelper;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.LensData;
+import com.marz.snapprefs.Util.LensData.LensType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,10 +14,10 @@ import java.util.HashSet;
 import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-import static de.robv.android.xposed.XposedHelpers.callMethod;
+import static com.marz.snapprefs.Util.LensData.LensType.GEO;
+import static com.marz.snapprefs.Util.LensData.LensType.SCHEDULED;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
@@ -30,6 +31,7 @@ public class Lens {
     public static Class LensClass;
     public static Object enumScheduledType;
     public static Object enumSelfieLens;
+    public static Class LensCategoryClass;
     public static Class lensListTypeClass;
     public static HashMap<String, LensData> lensDataMap = new HashMap<>();
 
@@ -40,7 +42,7 @@ public class Lens {
         lensListTypeClass = findClass(Obfuscator.lens.CLASS_LENSLIST_TYPE, lpparam.classLoader);
         Class TypeClass = findClass(Obfuscator.lens.LENSCLASS + "$Type", lpparam.classLoader);
         enumScheduledType = getStaticObjectField(TypeClass, "SCHEDULED");
-        Class LensCategoryClass = findClass("com.looksery.sdk.domain.Category", lpparam.classLoader);
+        LensCategoryClass = findClass("com.looksery.sdk.domain.Category", lpparam.classLoader);
         enumSelfieLens = getStaticObjectField(LensCategoryClass, "SELFIE");
 
         if (MainActivity.lensDBHelper == null)
@@ -56,14 +58,6 @@ public class Lens {
             }
         });
 
-        findAndHookMethod(Obfuscator.lens.LENSCALLBACK_CLASS, lpparam.classLoader, "onJsonResult", Object.class, findClass(Obfuscator.lens.LENSCALLBACK_ONJSONRESULT_VAR2, lpparam.classLoader), new XC_MethodReplacement() {
-            @Override
-            protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                onJsonResultRebuilt(param, param.args[0], param.args[1]);
-                return null;
-            }
-        });
-
         findAndHookMethod("aLW", lpparam.classLoader,
                 "m", List.class, new XC_MethodHook() {
                     @Override
@@ -71,8 +65,18 @@ public class Lens {
                         super.beforeHookedMethod(param);
 
                         List<Object> oldGeoLensList = (List<Object>) param.args[0];
+                        buildModifiedList(oldGeoLensList, GEO);
+                    }
+                });
 
-                        buildModifiedList(oldGeoLensList, LensData.LensType.GEO);
+        findAndHookMethod("aLP", lpparam.classLoader,
+                "a", List.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+
+                        List<Object> oldScheduledLensList = (List<Object>) param.args[0];
+                        buildModifiedList(oldScheduledLensList, SCHEDULED);
                     }
                 });
 
@@ -85,145 +89,58 @@ public class Lens {
         });
     }
 
-    public static ArrayList<Object> buildModifiedList(ArrayList<Object> list, LensData.LensType type) {
+    public static void buildModifiedList(List<Object> list, LensType type) {
         Logger.log("Original list size: " + list.size());
+
+        final HashMap<String, Object> queriedList = MainActivity.lensDBHelper.getAllOfType(type);
+
+        if( queriedList == null ) {
+            Logger.log("No lenses to load for type: " + type);
+            return;
+        }
 
         HashSet<String> containedList = new HashSet<>();
 
         for( Object lens : list ) {
             String mCode = (String) getObjectField(lens, "mCode");
 
+            if(Preferences.getBool(Prefs.LENSES_COLLECT) && !queriedList.containsKey(mCode)) {
+                performLensSave(lens, type);
+            }
 
-            containedList.add(mCode);
+            if(!Preferences.getBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES))
+                containedList.add(mCode);
         }
 
-        ArrayList<Object> lensList = MainActivity.lensDBHelper.getAllOfType(type);
+        if(Preferences.getBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES))
+            list.clear();
 
-        if (lensList == null) {
-            Logger.log("No lenses to load!");
-            return list;
-        }
-
-        Logger.log("New lenses to load: " + lensList.size());
-
-        for (Object lensObj : lensList) {
-            LensData lensData = (LensData) lensObj;
-            if (!lensData.mActive)
-                continue;
-
-            Object lens = buildModifiedLens(lensData);
-            list.add(lens);
-        }
-        Logger.log("Total lens count: " + list.size());
-
-        return list;
-    }
-
-    public static void onJsonResultRebuilt(XC_MethodHook.MethodHookParam param, Object arg1, Object arg2) {
-        Logger.log("CallingJsonResult");
-
-        if (callBoolMethod(arg2, "c") && arg1 != null && callBoolMethod(arg1, "b") &&
-                callBoolMethod(arg1, "d") && callBoolMethod(arg1, "f")) {
-
-            Logger.log("Entered statement");
-            List a = (List) callMethod(arg1, "a");
-            Logger.log("Active lens size: " + a.size());
-            ArrayList<Object> activeLenses = new ArrayList<>();
-            ArrayList<String> lensBlacklist = new ArrayList<>();
-
-            for (Object listObj : a) {
-                Object lens = newInstance(LensClass, lensListTypeClass.cast(listObj), enumScheduledType);
-
-                if (Preferences.getBool(Prefs.LENSES_COLLECT)) {
-                    String url = (String) getObjectField(lens, "mIconLink");
-                    //Logger.log("Icon url: " + url);
-                    String mCode = (String) getObjectField(lens, "mCode");
-
-                    //Logger.log("Handling lens: " + mCode);
-
-                    if (MainActivity.lensDBHelper.containsLens(mCode)) {
-                        //Logger.log("Already contains lens: " + mCode);
-                        lensBlacklist.add(mCode);
-                    } else {
-                        Logger.log("Saving new lens: " + mCode);
-                        performLensSave(lens);
-                    }
-                }
-
-                activeLenses.add(lens);
-            }
-
-            Logger.log("Finished active lens loop");
-
-            a = (List) callMethod(arg1, "c");
-            Logger.log("Precached lens size: " + a.size());
-
-            ArrayList<Object> precachedLenses = new ArrayList<>();
-            for (Object lensParentObj : a) {
-                Logger.log("Looped precached lens");
-                Object lens = newInstance(LensClass, lensListTypeClass.cast(lensParentObj), enumScheduledType);
-                Logger.log("Precache: " + getObjectField(lens, "mCode"));
-                Logger.log("PrecacheLink: " + getObjectField(lens, "mIconLink"));
-                precachedLenses.add(lens);
-            }
-
-            if (Preferences.getBool(Prefs.LENSES_LOAD)) {
-                activeLenses = buildModifiedList(activeLenses, lensBlacklist);
-            }
-
-            Logger.log("Finished list building");
-            Logger.log("Building method params");
-            Object callback = getObjectField(param.thisObject, "mCallback");
-            Object arg1g = callMethod(arg1, "g");
-            Object arg1e = callMethod(arg1, "e");
-            Object longValue = callMethod(arg1e, "longValue");
-            Logger.log("Ready to call");
-            try {
-                callMethod(callback, "a", activeLenses, precachedLenses, arg1g, longValue);
-                Logger.log("Called method... Returning");
-            } catch (Exception e) {
-                Logger.log("Error calling method", e);
-            }
+        if(!Preferences.getBool(Prefs.LENSES_LOAD))
             return;
-        }
 
-        Logger.log("Skipping statement");
-        Object callback = getObjectField(param.thisObject, "mCallback");
-        callMethod(callback, "a");
-        Logger.log("Called end method");
-    }
+        Logger.log("Potential lenses to load: " + queriedList.size());
 
-    public static boolean callBoolMethod(Object object, String methodName) {
-        return (boolean) callMethod(object, methodName);
-    }
-
-    public static ArrayList<Object> buildModifiedList(ArrayList<Object> list, ArrayList<String> lensBlacklist) {
-        Logger.log("Original list size: " + list.size());
-        ArrayList<Object> lensList = MainActivity.lensDBHelper.getAllExcept(lensBlacklist);
-
-        if (lensList == null) {
-            Logger.log("No lenses to load!");
-            return list;
-        }
-
-        Logger.log("New lenses to load: " + lensList.size());
-
-        for (Object lensObj : lensList) {
+        int injectedLensCount = 0;
+        for (Object lensObj : queriedList.values()) {
             LensData lensData = (LensData) lensObj;
-            if (!lensData.mActive)
+            String mCode = lensData.mCode;
+
+            if (!lensData.mActive || containedList.contains(mCode))
                 continue;
 
             Object lens = buildModifiedLens(lensData);
             list.add(lens);
+            injectedLensCount++;
         }
-        Logger.log("Total lens count: " + list.size());
 
-        return list;
+        Logger.log(String.format("Injected %s %s Lenses", injectedLensCount, String.valueOf(type)));
     }
 
     public static Object buildModifiedLens(LensData lensData) {
-        ArrayList mCategory = new ArrayList();
-        mCategory.add(enumSelfieLens);
+        ArrayList mCategory = new ArrayList() {{
+            add(enumScheduledType);
+        }};
+
         Object lens = newInstance(LensClass, lensData.mId, lensData.mCode, enumScheduledType, lensData.mIconLink, null, mCategory);
         setObjectField(lens, "mHintId", lensData.mHintId);
         //setObjectField(lens, "mGplayIapId", lensData.mGplayIapId);
@@ -237,12 +154,12 @@ public class Lens {
         return lens;
     }
 
-    public static void performLensSave(Object lens) {
-        LensData lensData = buildSaveableLensData(lens);
+    public static void performLensSave(Object lens, LensType type) {
+        LensData lensData = buildSaveableLensData(lens, type);
         MainActivity.lensDBHelper.insertLens(lensData);
     }
 
-    public static LensData buildSaveableLensData(Object lens) {
+    public static LensData buildSaveableLensData(Object lens, LensType type) {
         LensData lensData = new LensData();
         lensData.mId = (String) getObjectField(lens, "mId");
         lensData.mCode = (String) getObjectField(lens, "mCode");
@@ -258,6 +175,9 @@ public class Lens {
         //lensData.mPriority = (int) getObjectField(lens, "mPriority");
         lensData.mSignature = (String) getObjectField(lens, "mSignature");
         lensData.mActive = Preferences.getBool(Prefs.LENSES_AUTO_ENABLE);
+        lensData.selTime = -1;
+
+        lensData.mType = type;
         //lensData.mLensIcon = getBitmapFromURL(lensData.mIconLink);
 
         return lensData;

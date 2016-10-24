@@ -58,10 +58,13 @@ public class LensesFragment extends Fragment {
         Switch loadLensSwitch = (Switch) view.findViewById(R.id.lensloader_toggle);
         Switch collectLensSwitch = (Switch) view.findViewById(R.id.lenscollector_toggle);
         Switch autoEnableSwitch = (Switch) view.findViewById(R.id.autoenable_switch);
+        Switch sortBySelDate = (Switch) view.findViewById(R.id.sort_lens_by_sel_date);
+        Switch hideCurrProvidedSCLenses = (Switch) view.findViewById(R.id.hide_current_snapchat_lenses);
 
         loadLensSwitch.setChecked(Preferences.getBool(Prefs.LENSES_LOAD));
         collectLensSwitch.setChecked(Preferences.getBool(Prefs.LENSES_COLLECT));
         autoEnableSwitch.setChecked(Preferences.getBool(Prefs.LENSES_AUTO_ENABLE));
+        sortBySelDate.setChecked(Preferences.getBool(Prefs.LENSES_SORT_BY_SEL));
 
         loadLensSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -81,6 +84,20 @@ public class LensesFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                 Preferences.putBool(Prefs.LENSES_AUTO_ENABLE.key, isChecked);
+            }
+        });
+
+        sortBySelDate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                Preferences.putBool(Prefs.LENSES_SORT_BY_SEL.key, isChecked);
+            }
+        });
+
+        hideCurrProvidedSCLenses.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Preferences.putBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES.key, isChecked);
             }
         });
 
@@ -105,7 +122,7 @@ public class LensesFragment extends Fragment {
             if (MainActivity.lensDBHelper == null)
                 MainActivity.lensDBHelper = new LensDatabaseHelper(context);
 
-            ArrayList<Object> lensList = MainActivity.lensDBHelper.getAllLenses();
+            HashMap<String, Object> lensList = MainActivity.lensDBHelper.getAllLenses();
 
             if (lensList == null) {
                 Logger.log("Tried to create dialog with no lenses");
@@ -118,7 +135,7 @@ public class LensesFragment extends Fragment {
 
             GridLayout gridLayout = (GridLayout) view.findViewById(R.id.lensloader_gridholder);
 
-            for (Object lensObj : lensList) {
+            for (Object lensObj : lensList.values()) {
                 final LensData lensData = (LensData) lensObj;
 
                 // Set up Lens Container \\
@@ -143,7 +160,30 @@ public class LensesFragment extends Fragment {
                         }
                     }
                 });
-
+                inflatedLayout.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        AlertDialog.Builder selectionOptionsBuilder = new AlertDialog.Builder(inflatedLayout.getContext());
+                        selectionOptionsBuilder.setTitle("Special Selection Options");
+                        selectionOptionsBuilder.setMessage("Tap either of the options below to perform the corresponding action. Reopen the lens selector to see changes.");
+                        selectionOptionsBuilder.setPositiveButton("Select All", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                MainActivity.lensDBHelper.getWritableDatabase().execSQL("UPDATE " + LensDatabaseHelper.LensEntry.TABLE_NAME + " SET " + LensDatabaseHelper.LensEntry.COLUMN_NAME_ACTIVE + "=1");
+                                MainActivity.lensDBHelper.invalidateCache();
+                            }
+                        });
+                        selectionOptionsBuilder.setNegativeButton("DeSelect All", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                MainActivity.lensDBHelper.getWritableDatabase().execSQL("UPDATE " + LensDatabaseHelper.LensEntry.TABLE_NAME + " SET " + LensDatabaseHelper.LensEntry.COLUMN_NAME_ACTIVE + "=0");
+                                MainActivity.lensDBHelper.invalidateCache();
+                            }
+                        });
+                        selectionOptionsBuilder.show();
+                        return true;
+                    }
+                });
                 ImageView iconImageView = (ImageView) inflatedLayout.findViewById(R.id.lensIconView);
 
                 TextView iconName = (TextView) inflatedLayout.findViewById(R.id.lensTextView);
@@ -195,6 +235,7 @@ public class LensesFragment extends Fragment {
                     loadedLensesTextView.setText(String.format("%s", selectedLensSize));
                 }
             });
+
 
             builder.show();
         }

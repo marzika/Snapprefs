@@ -137,24 +137,28 @@ public class ChatsDatabaseHelper extends CoreDatabaseHandler {
         return super.containsObject(ChatEntry.TABLE_NAME, ChatEntry.COLUMN_NAME_UNIQUE_ID, idHolder, null, keyProjection);
     }
 
+    @SuppressWarnings("unchecked")
     public ArrayList<Object> getAllChats() {
         CallbackHandler callback = getCallback("getAllChatsFromCursor", Cursor.class);
-        return getAllBuiltObjects(ChatEntry.TABLE_NAME, callback, true);
+        return (ArrayList<Object>) getAllBuiltObjects(ChatEntry.TABLE_NAME, callback);
     }
 
+    @SuppressWarnings("unchecked")
     public ArrayList<Object> getAllChatsFrom(String conversationId) {
         CallbackHandler callback = getCallback("getAllChatsFromCursor", Cursor.class);
-        return getAllBuiltObjects(ChatEntry.TABLE_NAME, ChatEntry.COLUMN_NAME_CONVERSATION_ID + " = '" + conversationId + "'", callback, true);
+        return (ArrayList<Object>) getAllBuiltObjects(ChatEntry.TABLE_NAME, ChatEntry.COLUMN_NAME_CONVERSATION_ID + " = '" + conversationId + "'", null, callback);
     }
 
+    @SuppressWarnings("unchecked")
     public ArrayList<Object> getAllChatsFromExcept(String conversationId, String formattedBlacklist) {
         CallbackHandler callback = getCallback("getAllChatsFromCursor", Cursor.class);
 
-        return getAllBuiltObjects(
+        return (ArrayList<Object>) getAllBuiltObjects(
                 ChatEntry.TABLE_NAME,
                 ChatEntry.COLUMN_NAME_CONVERSATION_ID + " = '" + conversationId + "'" +
                         " AND " + ChatEntry.COLUMN_NAME_UNIQUE_ID + " NOT IN " + formattedBlacklist,
-                callback, true);
+                null,
+                callback);
     }
 
     /**
