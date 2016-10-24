@@ -11,6 +11,7 @@ import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.Util.LensData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Andre on 16/09/2016.
@@ -21,6 +22,7 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
     private static final String[] fullProjection = {
             LensEntry.COLUMN_NAME_MCODE,
             LensEntry.COLUMN_NAME_GPLAYID,
+            LensEntry.COLUMN_NAME_TYPE,
             LensEntry.COLUMN_NAME_MHINTID,
             LensEntry.COLUMN_NAME_MICONLINK,
             LensEntry.COLUMN_NAME_MID,
@@ -36,6 +38,7 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
             "CREATE TABLE " + LensEntry.TABLE_NAME + " (" +
                     LensEntry.COLUMN_NAME_MCODE + TEXT_TYPE + " PRIMARY KEY," +
                     LensEntry.COLUMN_NAME_GPLAYID + TEXT_TYPE + COMMA_SEP +
+                    LensEntry.COLUMN_NAME_TYPE + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MHINTID + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MICONLINK + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MID + TEXT_TYPE + COMMA_SEP +
@@ -149,7 +152,14 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
                 LensEntry.COLUMN_NAME_MCODE, blacklist, callback);
     }
 
-    public ArrayList<Object> getAllActive() {
+    public ArrayList<Object> getAllOfType(LensData.LensType type) {
+        CallbackHandler callback = getCallback("getAllLensesFromCursor", Cursor.class);
+
+        return super.getAllBuiltObjects(LensEntry.TABLE_NAME,
+                LensEntry.COLUMN_NAME_TYPE + " = '" + type + "'", callback);
+    }
+
+    public HashMap<String, Object> getAllActive() {
         CallbackHandler callback = getCallback("getAllLensesFromCursor", Cursor.class);
 
         String selection = LensEntry.COLUMN_NAME_ACTIVE + " = ?";
@@ -159,7 +169,7 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
                 selection, selectionArgs, fullProjection, null, callback);
     }
 
-    public ArrayList<Object> getAllLenses() {
+    public HashMap<String, Object> getAllLenses() {
         Logger.log("Getting all lenses from database");
         CallbackHandler callback = getCallback("getAllLensesFromCursor", Cursor.class);
 
@@ -184,11 +194,10 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
      * @param cursor
      * @return lensDataList
      */
-    public ArrayList<LensData> getAllLensesFromCursor(Cursor cursor) {
-        ArrayList<LensData> lensDataList = new ArrayList<>();
+    public HashMap<String, LensData> getAllLensesFromCursor(Cursor cursor) {
+        HashMap<String, LensData> lensDataMap = new HashMap<>();
 
         while (!cursor.isAfterLast()) {
-            //Logger.log("Looping cursor result");
             LensData lensData = getLensFromCursor(cursor);
 
             if (lensData == null) {
@@ -196,11 +205,11 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
                 continue;
             }
 
-            lensDataList.add(lensData);
+            lensDataMap.put(lensData.mCode, lensData);
             cursor.moveToNext();
         }
 
-        return lensDataList;
+        return lensDataMap;
     }
 
     /**
@@ -221,6 +230,21 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
             lensData.mSignature = cursor.getString(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_MSIGNATURE));
             short activeState = cursor.getShort(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_ACTIVE));
             lensData.mActive = activeState != 0;
+
+            String strLensType = cursor.getString(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_TYPE));
+
+            boolean hasAssignedType = false;
+            if( strLensType != null ) {
+                try {
+                    lensData.mType = LensData.LensType.valueOf(strLensType);
+                    hasAssignedType = true;
+                } catch( Exception e ) {
+                    Logger.log("Unknown Lens type: " + strLensType);
+                }
+            }
+
+            if( !hasAssignedType )
+                lensData.mType = LensData.LensType.SCHEDULED;
 
             //Logger.log("Queried database for lens: " + lensData.mCode + " Active: " + lensData.mActive);
         } catch (IllegalArgumentException e) {
@@ -250,6 +274,7 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
     public static class LensEntry implements BaseColumns {
         public static final String TABLE_NAME = "LensTable";
         public static final String COLUMN_NAME_MCODE = "mCode";
+        public static final String COLUMN_NAME_TYPE = "mType";
         public static final String COLUMN_NAME_GPLAYID = "mGplayIapId";
         public static final String COLUMN_NAME_MHINTID = "mHintId";
         public static final String COLUMN_NAME_MICONLINK = "mIconLink";

@@ -9,6 +9,7 @@ import com.marz.snapprefs.Databases.LensDatabaseHelper.LensEntry;
  */
 public class LensData {
     public String mCode;
+    public LensType mType;
     //public String mGplayIapId;
     public String mHintId;
     //public Map<String, String> mHintTranslations;
@@ -37,5 +38,9 @@ public class LensData {
         contentValues.put(LensEntry.COLUMN_NAME_MSIGNATURE, mSignature);
         contentValues.put(LensEntry.COLUMN_NAME_ACTIVE, mActive);
         return contentValues;
+    }
+
+    public enum LensType {
+        GEO, SCHEDULED
     }
 }

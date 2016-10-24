@@ -9,6 +9,7 @@ import com.marz.snapprefs.Util.LensData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -63,6 +64,18 @@ public class Lens {
             }
         });
 
+        findAndHookMethod("aLW", lpparam.classLoader,
+                "m", List.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+
+                        List<Object> oldGeoLensList = (List<Object>) param.args[0];
+
+                        buildModifiedList(oldGeoLensList, LensData.LensType.GEO);
+                    }
+                });
+
         //Bypasses signiture checking
         findAndHookMethod(Obfuscator.lens.AUTHENTICATION_CLASS, lpparam.classLoader, Obfuscator.lens.SIGNITURE_CHECK_METHOD, LensClass, String.class, new XC_MethodHook() {
             @Override
@@ -70,6 +83,40 @@ public class Lens {
                 param.setResult(true);
             }
         });
+    }
+
+    public static ArrayList<Object> buildModifiedList(ArrayList<Object> list, LensData.LensType type) {
+        Logger.log("Original list size: " + list.size());
+
+        HashSet<String> containedList = new HashSet<>();
+
+        for( Object lens : list ) {
+            String mCode = (String) getObjectField(lens, "mCode");
+
+
+            containedList.add(mCode);
+        }
+
+        ArrayList<Object> lensList = MainActivity.lensDBHelper.getAllOfType(type);
+
+        if (lensList == null) {
+            Logger.log("No lenses to load!");
+            return list;
+        }
+
+        Logger.log("New lenses to load: " + lensList.size());
+
+        for (Object lensObj : lensList) {
+            LensData lensData = (LensData) lensObj;
+            if (!lensData.mActive)
+                continue;
+
+            Object lens = buildModifiedLens(lensData);
+            list.add(lens);
+        }
+        Logger.log("Total lens count: " + list.size());
+
+        return list;
     }
 
     public static void onJsonResultRebuilt(XC_MethodHook.MethodHookParam param, Object arg1, Object arg2) {

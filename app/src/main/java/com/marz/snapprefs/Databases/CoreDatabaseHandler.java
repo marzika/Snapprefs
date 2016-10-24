@@ -302,42 +302,31 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
             return null;
         }
         Logger.log("Query size: " + cursor.getCount());
-        ArrayList<Object> invocationResponse;
-        try {
-            Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + Arrays.toString(callbackHandler.parameters));
-            invocationResponse = (ArrayList<Object>) callbackHandler.method.invoke(callbackHandler.caller, callbackHandler.parameters);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            cursor.close();
-            return null;
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            cursor.close();
-            return null;
-        }
+        Object invocationResponse = invokeCallback(callbackHandler);
+
         if (invocationResponse == null) {
             Logger.log("Null response from the invoked method: " + callbackHandler.method.getName());
             return null;
         }
         cursor.close();
-        excludedObjectCache = invocationResponse;
+        excludedObjectCache = (ArrayList<Object>) invocationResponse;
         excludedObjectCacheNeedsUpdate = false;
-        return invocationResponse;
+        return (ArrayList<Object>) invocationResponse;
     }
 
-    public ArrayList<Object> getAllBuiltObjects(String tableName, CallbackHandler callbackHandler) {
+    public Object getAllBuiltObjects(String tableName, CallbackHandler callbackHandler) {
         return getAllBuiltObjects(tableName, null, callbackHandler, false);
     }
 
-    public ArrayList<Object> getAllBuiltObjects(String tableName, CallbackHandler callbackHandler, boolean bypassCache) {
+    public Object getAllBuiltObjects(String tableName, CallbackHandler callbackHandler, boolean bypassCache) {
         return getAllBuiltObjects(tableName, null, callbackHandler, bypassCache);
     }
 
-    public ArrayList<Object> getAllBuiltObjects(String tableName, String where, CallbackHandler callbackHandler) {
+    public Object getAllBuiltObjects(String tableName, String where, CallbackHandler callbackHandler) {
         return getAllBuiltObjects(tableName, where, callbackHandler, false);
     }
 
-    public ArrayList<Object> getAllBuiltObjects(String tableName, String where, CallbackHandler callbackHandler, boolean bypassCache) {
+    public Object getAllBuiltObjects(String tableName, String where, CallbackHandler callbackHandler, boolean bypassCache) {
         if (!objectCacheNeedsUpdate && !bypassCache) {
             Logger.log("Using lens cache");
             return objectCache;
@@ -354,19 +343,7 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
             return null;
         }
 
-        ArrayList<Object> invocationResponse;
-        try {
-            Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + callbackHandler.parameters);
-            invocationResponse = (ArrayList<Object>) callbackHandler.method.invoke(callbackHandler.caller, callbackHandler.parameters);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            cursor.close();
-            return null;
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            cursor.close();
-            return null;
-        }
+        Object invocationResponse = invokeCallback(callbackHandler);
 
         if (invocationResponse == null) {
             Logger.log("Null response from the invoked method: " + callbackHandler.method.getName());
@@ -380,7 +357,7 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         return invocationResponse;
     }
 
-    public ArrayList<Object> performQueryForBuiltObjects(String tableName, String selection, String[] selectionArgs,
+    public Object performQueryForBuiltObjects(String tableName, String selection, String[] selectionArgs,
                                                          String[] projection, String sortOrder, CallbackHandler callbackHandler) {
         Cursor cursor = getDatabase().query(
                 tableName,                     // The table to query
@@ -401,20 +378,7 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
             return null;
         }
 
-        ArrayList<Object> invocationResponse;
-
-        try {
-            Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + callbackHandler.parameters);
-            invocationResponse = (ArrayList<Object>) callbackHandler.method.invoke(callbackHandler.caller, callbackHandler.parameters);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            cursor.close();
-            return null;
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            cursor.close();
-            return null;
-        }
+        Object invocationResponse = invokeCallback(callbackHandler);
 
         if (invocationResponse == null) {
             Logger.log("Null response from the invoked method: " + callbackHandler.method.getName());
@@ -491,6 +455,19 @@ public class CoreDatabaseHandler extends SQLiteOpenHelper {
         contentCacheNeedsUpdate = true;
         objectCacheNeedsUpdate = true;
         excludedObjectCacheNeedsUpdate = true;
+    }
+
+    private Object invokeCallback(CallbackHandler callbackHandler) {
+        try {
+            Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + Arrays.toString(callbackHandler.parameters));
+            return callbackHandler.method.invoke(callbackHandler.caller, callbackHandler.parameters);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public static class DBUtils {
