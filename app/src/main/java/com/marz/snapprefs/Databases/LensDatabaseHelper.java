@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * Created by Andre on 16/09/2016.
  */
 public class LensDatabaseHelper extends CoreDatabaseHandler {
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = Preferences.getContentPath() + "/Lenses.db";
     private static final String[] fullProjection = {
             LensEntry.COLUMN_NAME_MCODE,
@@ -26,22 +26,26 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
             LensEntry.COLUMN_NAME_MID,
             LensEntry.COLUMN_NAME_MLENSLINK,
             LensEntry.COLUMN_NAME_MSIGNATURE,
-            LensEntry.COLUMN_NAME_ACTIVE
+            LensEntry.COLUMN_NAME_ACTIVE,
+            LensEntry.COLUMN_NAME_SEL_TIME
     };
     private static final String TEXT_TYPE = " TEXT";
+    private static final String INT_TYPE = " INTEGER";
     private static final String COMMA_SEP = ",";
+    private static final String DEF_SEL_TIME_VAL = "2000000000";
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + LensEntry.TABLE_NAME;
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + LensEntry.TABLE_NAME + " (" +
-                    LensEntry.COLUMN_NAME_MCODE + TEXT_TYPE + " PRIMARY KEY," +
+                    LensEntry.COLUMN_NAME_MCODE + TEXT_TYPE + " PRIMARY KEY" + COMMA_SEP +
                     LensEntry.COLUMN_NAME_GPLAYID + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MHINTID + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MICONLINK + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MID + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MLENSLINK + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MSIGNATURE + TEXT_TYPE + COMMA_SEP +
-                    LensEntry.COLUMN_NAME_ACTIVE + " INTEGER DEFAULT 0 )";
+                    LensEntry.COLUMN_NAME_ACTIVE + INT_TYPE + " DEFAULT 0," +
+                    LensEntry.COLUMN_NAME_SEL_TIME + INT_TYPE + " DEFAULT " + DEF_SEL_TIME_VAL + " )";
 
     public LensDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, SQL_CREATE_ENTRIES, DATABASE_VERSION);
@@ -56,6 +60,10 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
         if (oldVersion < 2) {
             db.execSQL("ALTER TABLE " + LensEntry.TABLE_NAME +
                     " ADD COLUMN " + LensEntry.COLUMN_NAME_ACTIVE + " INTEGER DEFAULT 0");
+        }
+        if (oldVersion < 3) {
+            db.execSQL("ALTER TABLE " + LensEntry.TABLE_NAME +
+                    " ADD COLUMN " + LensEntry.COLUMN_NAME_SEL_TIME + " INTEGER DEFAULT " + DEF_SEL_TIME_VAL);
         }
     }
 
@@ -91,6 +99,7 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
 
         ContentValues values = new ContentValues();
         values.put(LensEntry.COLUMN_NAME_ACTIVE, activeState ? 1 : 0);
+        values.put(LensEntry.COLUMN_NAME_SEL_TIME, (activeState ? Long.toString(System.currentTimeMillis()) : Integer.toString(2000000000)));
 
         String[] selectionArgs = {mCode};
 
@@ -145,8 +154,13 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
     public ArrayList<Object> getAllExcept(ArrayList<String> blacklist) {
         CallbackHandler callback = getCallback("getAllLensesFromCursor", Cursor.class);
 
-        return super.getAllBuiltObjectsExcept(LensEntry.TABLE_NAME,
-                LensEntry.COLUMN_NAME_MCODE, blacklist, callback);
+        if(Preferences.getBool(Preferences.Prefs.LENSES_SORT_BY_SEL)) {
+            return super.getAllBuiltObjectsExcept(LensEntry.TABLE_NAME,
+                    LensEntry.COLUMN_NAME_MCODE, LensEntry.COLUMN_NAME_SEL_TIME + " ASC", blacklist, callback);
+        } else{
+            return super.getAllBuiltObjectsExcept(LensEntry.TABLE_NAME,
+                    LensEntry.COLUMN_NAME_MCODE, blacklist, callback);
+        }
     }
 
     public ArrayList<Object> getAllActive() {
@@ -221,6 +235,7 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
             lensData.mSignature = cursor.getString(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_MSIGNATURE));
             short activeState = cursor.getShort(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_ACTIVE));
             lensData.mActive = activeState != 0;
+            lensData.selTime = cursor.getInt(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_SEL_TIME));
 
             //Logger.log("Queried database for lens: " + lensData.mCode + " Active: " + lensData.mActive);
         } catch (IllegalArgumentException e) {
@@ -257,5 +272,6 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
         public static final String COLUMN_NAME_MLENSLINK = "mLensLink";
         public static final String COLUMN_NAME_MSIGNATURE = "mSignature";
         public static final String COLUMN_NAME_ACTIVE = "mActiveState";
+        public static final String COLUMN_NAME_SEL_TIME = "selDateTime";
     }
 }

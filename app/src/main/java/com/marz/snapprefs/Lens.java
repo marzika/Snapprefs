@@ -63,7 +63,7 @@ public class Lens {
             }
         });
 
-        //Bypasses signiture checking
+        //Bypasses signature checking
         findAndHookMethod(Obfuscator.lens.AUTHENTICATION_CLASS, lpparam.classLoader, Obfuscator.lens.SIGNITURE_CHECK_METHOD, LensClass, String.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -158,7 +158,9 @@ public class Lens {
             return list;
         }
 
-        Logger.log("New lenses to load: " + lensList.size());
+        if(Preferences.getBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES)) {
+            list.clear();
+        }
 
         for (Object lensObj : lensList) {
             LensData lensData = (LensData) lensObj;
@@ -168,8 +170,9 @@ public class Lens {
             Object lens = buildModifiedLens(lensData);
             list.add(lens);
         }
-        Logger.log("Total lens count: " + list.size());
+        Logger.log("New lenses to load: " + lensList.size());
 
+        Logger.log("Total lens count: " + list.size());
         return list;
     }
 
@@ -210,6 +213,7 @@ public class Lens {
         //lensData.mPriority = (int) getObjectField(lens, "mPriority");
         lensData.mSignature = (String) getObjectField(lens, "mSignature");
         lensData.mActive = Preferences.getBool(Prefs.LENSES_AUTO_ENABLE);
+        lensData.selTime = -1;
         //lensData.mLensIcon = getBitmapFromURL(lensData.mIconLink);
 
         return lensData;

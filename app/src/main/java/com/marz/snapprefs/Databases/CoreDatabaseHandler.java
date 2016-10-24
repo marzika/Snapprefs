@@ -25,7 +25,7 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
     public static String DATABASE_NAME;
     private static String SQL_CREATE_ENTRIES;
 
-    private SQLiteDatabase writeableDatabase;
+    private SQLiteDatabase writableDatabase;
     private ArrayList<ContentValues> contentCache = new ArrayList<>();
     private boolean contentCacheNeedsUpdate = true;
     private ArrayList<ContentValues> excludedContentCache = new ArrayList<>();
@@ -43,12 +43,12 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
 
     private SQLiteDatabase getDatabase() {
         createIfNotExisting();
-        return writeableDatabase;
+        return writableDatabase;
     }
 
     private void createIfNotExisting() {
-        if (writeableDatabase == null || !writeableDatabase.isOpen())
-            writeableDatabase = this.getWritableDatabase();
+        if (writableDatabase == null || !writableDatabase.isOpen())
+            writableDatabase = this.getWritableDatabase();
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -206,8 +206,8 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
         }
 
         String strBlacklist = formatExclusionList(blacklist);
-        String query = "select * from " + tableName +
-                " where " + columnName + " not in (" + strBlacklist + ")";
+        String query = "SELECT * FROM " + tableName +
+                " WHERE " + columnName + " NOT IN (" + strBlacklist + ")";
 
         Logger.log("Performing query: " + query);
 
@@ -248,7 +248,7 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
             return contentCache;
         }
         Logger.log("Getting all lenses from database");
-        Cursor cursor = getDatabase().rawQuery("select * from " + tableName, null);
+        Cursor cursor = getDatabase().rawQuery("SELECT * FROM " + tableName, null);
 
         Logger.log("Query size: " + cursor.getCount());
 
@@ -268,7 +268,6 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
         contentCacheNeedsUpdate = false;
         return contentList;
     }
-
     public ArrayList<Object> getAllBuiltObjectsExcept(String tableName, String columnName, ArrayList<String> blacklist,
                                                       CallbackHandler callbackHandler) {
         return getAllBuiltObjectsExcept(tableName, columnName, blacklist, callbackHandler, false);
@@ -276,32 +275,33 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
 
     public ArrayList<Object> getAllBuiltObjectsExcept(String tableName, String columnName, ArrayList<String> blacklist,
                                                       CallbackHandler callbackHandler, boolean bypassCache) {
+        return getAllBuiltObjectsExcept(tableName, columnName, null, blacklist, callbackHandler, bypassCache );
+    }
 
+    public ArrayList<Object> getAllBuiltObjectsExcept(String tableName, String columnName, String orderBy, ArrayList<String> blacklist,
+                                                      CallbackHandler callbackHandler) {
+        return getAllBuiltObjectsExcept(tableName, columnName, orderBy, blacklist, callbackHandler, false);
+    }
+
+    public ArrayList<Object> getAllBuiltObjectsExcept(String tableName, String columnName, String orderBy, ArrayList<String> blacklist,
+                                                      CallbackHandler callbackHandler, boolean bypassCache) {
         Logger.log("Getting all content from database");
-
         if (!excludedObjectCacheNeedsUpdate && !bypassCache) {
             Logger.log("Using query cache");
             return excludedObjectCache;
         }
-
         String strBlacklist = formatExclusionList(blacklist);
-        String query = "select * from " + tableName +
-                " where " + columnName + " not in (" + strBlacklist + ")";
-
+        String query = "SELECT * FROM " + tableName +
+                " WHERE " + columnName + " NOT IN " + "(" + strBlacklist + ")" + (orderBy != null ? " ORDER BY " + orderBy : "");
         Logger.log("Performing query: " + query);
-
         Cursor cursor = getDatabase().rawQuery(query, null);
         callbackHandler.addParams(cursor);
-
         if (!cursor.moveToFirst()) {
             Logger.log("Error moving cursor to first row");
             return null;
         }
-
         Logger.log("Query size: " + cursor.getCount());
-
         ArrayList<Object> invocationResponse;
-
         try {
             Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + Arrays.toString(callbackHandler.parameters));
             invocationResponse = (ArrayList<Object>) callbackHandler.method.invoke(callbackHandler.caller, callbackHandler.parameters);
@@ -314,12 +314,10 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
             cursor.close();
             return null;
         }
-
         if (invocationResponse == null) {
             Logger.log("Null response from the invoked method: " + callbackHandler.method.getName());
             return null;
         }
-
         cursor.close();
         excludedObjectCache = invocationResponse;
         excludedObjectCacheNeedsUpdate = false;
@@ -337,7 +335,7 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
         }
 
         Logger.log("Getting all lenses from database");
-        Cursor cursor = getDatabase().rawQuery("select * from " + tableName, null);
+        Cursor cursor = getDatabase().rawQuery("SELECT * FROM " + tableName, null);
         Logger.log("Query size: " + cursor.getCount());
 
         callbackHandler.addParams(cursor);
