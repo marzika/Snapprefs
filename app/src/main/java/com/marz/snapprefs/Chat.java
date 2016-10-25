@@ -29,6 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
@@ -67,7 +68,83 @@ public class Chat {
         if (chatDBHelper == null)
             chatDBHelper = new ChatsDatabaseHelper(snapContext);
 
-        //TODO Implement duplication blocking
+        findAndHookMethod("Ie", cl, "a", Map.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                Logger.log("Called save");
+                Logger.logStackTrace();
+
+                Map<String, Object> savedState = (Map<String, Object>) param.args[0];
+
+                if (savedState == null) {
+                    savedState = new HashMap<>();
+                    Object savedObject = savedClass.newInstance();
+                    callMethod(savedObject, "a", Boolean.TRUE);
+                    callMethod(savedObject, "a", 1);
+                    savedState.put(yourUsername, savedObject);
+                    Logger.log("Inserting new save state");
+                } else {
+                    for (String key : savedState.keySet()) {
+                        Logger.log("Checking save status of: " + key);
+
+                        if (yourUsername.equals(key)) {
+                            Object stateObj = savedState.get(key);
+                            if( getObjectField(stateObj, "a") == Boolean.FALSE ) {
+                                setObjectField(stateObj, "a", Boolean.TRUE);
+                                Logger.log("Setting saved to TRUE");
+                            }
+                        }
+                    }
+                }
+
+            }
+        });
+
+        findAndHookMethod("IM", cl, "c", findClass("Ii", cl), new XC_MethodReplacement() {
+            @Override
+            protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+                String id = "null";
+                if (param.args[0] != null)
+                    id = (String) callMethod(param.args[0], "getId");
+
+                Logger.log("REMOVING ID: " + id);
+                return null;
+            }
+        });
+
+        findAndHookMethod("IM", cl, "d", findClass("Ii", cl), new XC_MethodReplacement() {
+            @Override
+            protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+                String id = "null";
+                if (param.args[0] != null)
+                    id = (String) callMethod(param.args[0], "getId");
+
+                Logger.log("REMOVING ID: " + id);
+                return null;
+            }
+        });
+
+        findAndHookMethod("IM", cl, "e", findClass("Ii", cl), new XC_MethodReplacement() {
+            @Override
+            protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+                String id = "null";
+                if (param.args[0] != null)
+                    id = (String) callMethod(param.args[0], "getId");
+
+                Logger.log("REMOVING ID: " + id);
+                return null;
+            }
+        });
+
+        findAndHookMethod("Ig", cl, "c", List.class, new XC_MethodReplacement() {
+            @Override
+            protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
+                Logger.log("REMOVING ALL");
+                return null;
+            }
+        });
+
         findAndHookMethod("aJz", cl, "read", findClass("com.google.gson.stream.JsonReader", cl),
                 new XC_MethodHook() {
                     @Override
@@ -113,10 +190,15 @@ public class Chat {
                                     setObjectField(chat_message, "savedState", savedState);
                                 } else {
                                     for (String key : savedState.keySet()) {
+                                        Logger.log("Checking save status of: " + key);
+
                                         if (yourUsername.equals(key)) {
                                             Object stateObj = savedState.get(key);
-                                            setObjectField(stateObj, "saved", Boolean.TRUE);
-                                            Logger.log("Setting saved to TRUE");
+
+                                            if( getObjectField(stateObj, "saved") == Boolean.FALSE ) {
+                                                setObjectField(stateObj, "saved", Boolean.TRUE);
+                                                Logger.log("Setting saved to TRUE");
+                                            }
                                         }
                                     }
                                 }
@@ -203,7 +285,7 @@ public class Chat {
 
                                     Float timerSec = (Float) getObjectField(media, "timerSec");
 
-                                    if( timerSec == null )
+                                    if (timerSec == null)
                                         timerSec = 0f;
 
                                     chatData.setSnapDuration(timerSec);

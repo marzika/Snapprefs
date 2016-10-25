@@ -3,9 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
     <ScrollView
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/textView5">
         <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
@@ -141,16 +143,6 @@
                     android:textAppearance="?android:attr/textAppearanceLarge" />
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="10dp"
-                android:text="@string/fully_close_sc_lense_screen_txt"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
             <Switch
                 android:id="@+id/autoenable_switch"
                 android:layout_width="wrap_content"
@@ -191,9 +183,22 @@
                 android:layout_below="@id/sort_lens_by_sel_date"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/border"
-                android:checked="true"
+                android:checked="false"
                 android:padding="10dp"
                 android:text="@string/hide_current_sc_lenses_switch_txt" />
         </RelativeLayout>
     </ScrollView>
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/fully_close_sc_lense_screen_txt"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:padding="5dp"
+        android:textAlignment="center"
+        android:gravity="center_horizontal" />
+
 </RelativeLayout>

@@ -43,7 +43,7 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
             "CREATE TABLE " + LensEntry.TABLE_NAME + " (" +
                     LensEntry.COLUMN_NAME_MCODE + TEXT_TYPE + " PRIMARY KEY" + COMMA_SEP +
                     LensEntry.COLUMN_NAME_GPLAYID + TEXT_TYPE + COMMA_SEP +
-                    LensEntry.COLUMN_NAME_TYPE + TEXT_TYPE + COMMA_SEP +
+                    LensEntry.COLUMN_NAME_TYPE + TEXT_TYPE + COMMA_SEP + " DEFAULT 'SCHEDULED'" +
                     LensEntry.COLUMN_NAME_MHINTID + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MICONLINK + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MID + TEXT_TYPE + COMMA_SEP +
@@ -62,18 +62,15 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 2) {
+        Logger.log(String.format("Upgrading LensDB from v%s to v%s", oldVersion, newVersion));
+
+        if (oldVersion == 1) {
             db.execSQL("ALTER TABLE " + LensEntry.TABLE_NAME +
                     " ADD COLUMN " + LensEntry.COLUMN_NAME_ACTIVE + " INTEGER DEFAULT 0");
         }
-        if (oldVersion < 3) {
+        if (oldVersion == 2) {
             db.execSQL("ALTER TABLE " + LensEntry.TABLE_NAME +
                     " ADD COLUMN " + LensEntry.COLUMN_NAME_SEL_TIME + " INTEGER DEFAULT " + DEF_SEL_TIME_VAL);
-        }
-
-        if(oldVersion < 4) {
-            db.execSQL("ALTER TABLE " + LensEntry.TABLE_NAME +
-                    " ADD COLUMN " + LensEntry.COLUMN_NAME_TYPE + " TEXT DEFAULT SCHEDULED");
         }
     }
 
@@ -141,6 +138,14 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
         //Logger.log("Query count: " + count);
 
         return super.getCount(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_ACTIVE, selectionArgs, fullProjection);
+    }
+
+    public void setActiveStateOfAllLenses(boolean newState) {
+
+        getDatabase().execSQL("UPDATE " + LensDatabaseHelper.LensEntry.TABLE_NAME + " SET " +
+                LensDatabaseHelper.LensEntry.COLUMN_NAME_ACTIVE + "=" + (newState ? "1" : "0"));
+
+        super.invalidateCache();
     }
 
     public LensData getLens(String mCode) {

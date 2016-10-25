@@ -29,20 +29,40 @@ import com.marz.snapprefs.R;
 import com.marz.snapprefs.Util.LensData;
 import com.marz.snapprefs.Util.LensIconLoader;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Andre on 16/09/2016.
  */
 public class LensesFragment extends Fragment {
-    private static final ArrayList<String> stringFilter = new ArrayList<String>() {
-        {
-            add("code_scheduled_lens_-_");
-            add("len_");
-            add("code_special_lens_-_");
+    private static final DialogInterface.OnClickListener onSelectAllClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            MainActivity.lensDBHelper.setActiveStateOfAllLenses(true);
+
+            for( LensContainerData containerData : iconMap.values() )
+                containerData.inflatedLayout.setBackgroundResource(R.drawable.lens_bg_selected);
         }
     };
+
+    private static final DialogInterface.OnClickListener onDeslectAllClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            MainActivity.lensDBHelper.setActiveStateOfAllLenses(false);
+
+            for( LensContainerData containerData : iconMap.values() )
+                containerData.inflatedLayout.setBackgroundResource(R.drawable.lens_bg_unselected);
+        }
+    };
+
+    private static final List<String> stringFilter = Arrays.asList(
+            "code_scheduled_lens_-_",
+            "len_",
+            "code_special_lens_-_"
+    );
+
     private static HashMap<String, LensContainerData> iconMap = new HashMap<>();
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
@@ -65,6 +85,7 @@ public class LensesFragment extends Fragment {
         collectLensSwitch.setChecked(Preferences.getBool(Prefs.LENSES_COLLECT));
         autoEnableSwitch.setChecked(Preferences.getBool(Prefs.LENSES_AUTO_ENABLE));
         sortBySelDate.setChecked(Preferences.getBool(Prefs.LENSES_SORT_BY_SEL));
+        hideCurrProvidedSCLenses.setChecked(Preferences.getBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES));
 
         loadLensSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -117,8 +138,8 @@ public class LensesFragment extends Fragment {
     }
 
     public static class DialogHelper {
-        public static void lensDialog(final Context context, final TextView loadedLensesTextView, LayoutInflater inflater,
-                                      ViewGroup container) {
+        static void lensDialog(final Context context, final TextView loadedLensesTextView, LayoutInflater inflater,
+                               ViewGroup container) {
             if (MainActivity.lensDBHelper == null)
                 MainActivity.lensDBHelper = new LensDatabaseHelper(context);
 
@@ -131,9 +152,33 @@ public class LensesFragment extends Fragment {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Select Lenses");
+
             View view = inflater.inflate(R.layout.lenslist_layout, container, false);
 
             GridLayout gridLayout = (GridLayout) view.findViewById(R.id.lensloader_gridholder);
+            Button btnSelectAll = (Button) view.findViewById(R.id.btn_select_all_lenses);
+            Button btnDeselectAll = (Button) view.findViewById(R.id.btn_deselect_all_lenses);
+
+            final AlertDialog.Builder selectBuilder = new AlertDialog.Builder(context);
+            selectBuilder.setTitle("Confirm Select All");
+            selectBuilder.setMessage("Are you sure you want to enable all lenses?");
+            selectBuilder.setNegativeButton("Cancel", null);
+
+            btnSelectAll.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    selectBuilder.setPositiveButton("Select All", onSelectAllClick);
+                    selectBuilder.show();
+                }
+            });
+
+            btnDeselectAll.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    selectBuilder.setPositiveButton("Deselect All", onDeslectAllClick);
+                    selectBuilder.show();
+                }
+            });
 
             for (Object lensObj : lensList.values()) {
                 final LensData lensData = (LensData) lensObj;
@@ -158,30 +203,6 @@ public class LensesFragment extends Fragment {
                         } catch (Exception e) {
                             Logger.log("No lens found with code: " + mCode + "\n" + e.getMessage());
                         }
-                    }
-                });
-                inflatedLayout.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(View v) {
-                        AlertDialog.Builder selectionOptionsBuilder = new AlertDialog.Builder(inflatedLayout.getContext());
-                        selectionOptionsBuilder.setTitle("Special Selection Options");
-                        selectionOptionsBuilder.setMessage("Tap either of the options below to perform the corresponding action. Reopen the lens selector to see changes.");
-                        selectionOptionsBuilder.setPositiveButton("Select All", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                MainActivity.lensDBHelper.getWritableDatabase().execSQL("UPDATE " + LensDatabaseHelper.LensEntry.TABLE_NAME + " SET " + LensDatabaseHelper.LensEntry.COLUMN_NAME_ACTIVE + "=1");
-                                MainActivity.lensDBHelper.invalidateCache();
-                            }
-                        });
-                        selectionOptionsBuilder.setNegativeButton("DeSelect All", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                MainActivity.lensDBHelper.getWritableDatabase().execSQL("UPDATE " + LensDatabaseHelper.LensEntry.TABLE_NAME + " SET " + LensDatabaseHelper.LensEntry.COLUMN_NAME_ACTIVE + "=0");
-                                MainActivity.lensDBHelper.invalidateCache();
-                            }
-                        });
-                        selectionOptionsBuilder.show();
-                        return true;
                     }
                 });
                 ImageView iconImageView = (ImageView) inflatedLayout.findViewById(R.id.lensIconView);
@@ -248,7 +269,7 @@ public class LensesFragment extends Fragment {
         public String url;
         public Bitmap bmp;
 
-        public LensContainerData(LinearLayout inflatedLayout, ImageView iconImageView, TextView textView, String url, Bitmap bmp) {
+        LensContainerData(LinearLayout inflatedLayout, ImageView iconImageView, TextView textView, String url, Bitmap bmp) {
             this.inflatedLayout = inflatedLayout;
             this.iconImageView = iconImageView;
             this.textView = textView;
