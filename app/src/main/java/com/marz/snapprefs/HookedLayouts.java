@@ -167,16 +167,21 @@ public class HookedLayouts {
         try {
             resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "camera_preview", new XC_LayoutInflated() {
                 public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {
+                    final int padding = px(10f);
+                    final int topMargin = 0;
+                    final int size = px((int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP)));
+
                     final RelativeLayout relativeLayout =
                             (RelativeLayout) liparam.view.findViewById(liparam.res.getIdentifier("camera_preview_layout", "id", Common.PACKAGE_SNAP));
                     //final RelativeLayout.LayoutParams lParams =
                     //        new RelativeLayout.LayoutParams(liparam.view.findViewById(liparam.res.getIdentifier("camera_take_snap_button", "id", Common.PACKAGE_SNAP)).getLayoutParams());
-                    final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(px((int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP))), px((int) resparam.res.getDimension(resparam.res.getIdentifier("profile_picture_button_size", "dimen", Common.PACKAGE_SNAP))));
-                    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                    final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT | RelativeLayout.ALIGN_PARENT_TOP);
                     layoutParams.rightMargin = px(50);
-                    layoutParams.topMargin = px(-10);
+                    layoutParams.topMargin = topMargin;
                     upload = new ImageButton(HookMethods.SnapContext);
                     upload.setLayoutParams(layoutParams);
+                    upload.setPadding(padding,padding,padding,padding);
                     upload.setBackgroundColor(0);
                     //Drawable uploadimg = HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.sharing.UPLOAD_ICON.substring(2), 16));
                     //upload.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
@@ -195,7 +200,7 @@ public class HookedLayouts {
                         File imageFile = new File(imageLocation);
                         if (imageFile.exists()) {
                             Bitmap bm = BitmapFactory.decodeFile(imageLocation);
-                            Bitmap resized = Bitmap.createScaledBitmap(bm, layoutParams.width, layoutParams.height, false);
+                            Bitmap resized = Bitmap.createScaledBitmap(bm, size, size, false);
                             int w = resized.getWidth();
                             int h = resized.getHeight();
 
@@ -217,7 +222,7 @@ public class HookedLayouts {
                             p.setXfermode(null);
                             p.setStyle(Paint.Style.STROKE);
                             p.setColor(Color.WHITE);
-                            p.setStrokeWidth(13f);
+                            p.setStrokeWidth(px(4));
                             c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
                             upload.setImageDrawable(new BitmapDrawable(output));
                         }
