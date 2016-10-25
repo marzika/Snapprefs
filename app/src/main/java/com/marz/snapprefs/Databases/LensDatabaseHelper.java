@@ -63,15 +63,6 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Logger.log(String.format("Upgrading LensDB from v%s to v%s", oldVersion, newVersion));
-
-        if (oldVersion == 1) {
-            db.execSQL("ALTER TABLE " + LensEntry.TABLE_NAME +
-                    " ADD COLUMN " + LensEntry.COLUMN_NAME_ACTIVE + " INTEGER DEFAULT 0");
-        }
-        if (oldVersion == 2) {
-            db.execSQL("ALTER TABLE " + LensEntry.TABLE_NAME +
-                    " ADD COLUMN " + LensEntry.COLUMN_NAME_SEL_TIME + " INTEGER DEFAULT " + DEF_SEL_TIME_VAL);
-        }
     }
 
     @Override
