@@ -16,9 +16,8 @@ import java.util.List;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-import static com.marz.snapprefs.Util.LensData.LensType.SCHEDULED;
 import static com.marz.snapprefs.Util.LensData.LensType.GEO;
-import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
+import static com.marz.snapprefs.Util.LensData.LensType.SCHEDULED;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
@@ -36,7 +35,6 @@ class Lens {
     private static Object enumSelfieLens;
     private static Class LensCategoryClass;
     private static Class lensListTypeClass;
-    public static HashMap<String, LensData> lensDataMap = new HashMap<>();
 
     static void initLens(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
         lensPrepareState = findClass(Obfuscator.lens.LENSPREPARESTATECHANGE, lpparam.classLoader);
@@ -61,21 +59,6 @@ class Lens {
                 }
             }
         });
-
-        try {
-            Class sentSnap = findClass("Jf", lpparam.classLoader);
-            hookAllConstructors(sentSnap, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-
-                    setObjectField(param.thisObject, "mSentTimestamp", 1477340549);
-                    Logger.log("Type: " + getObjectField(param.thisObject, "mClientSnapStatus"));
-                }
-            });
-        } catch( Throwable e) {
-            Logger.log("JUST SOME TEST SHIT", e);
-        }
 
         findAndHookMethod("com.snapchat.android.location.LocationRequestController", lpparam.classLoader,
                 "a", List.class, new XC_MethodHook() {
@@ -122,13 +105,13 @@ class Lens {
     }
 
     private static void buildModifiedList(List<Object> list, LensType type) {
-        Logger.log("Original list size: " + list.size());
+        Logger.log("Original lens list size: " + list.size());
 
         final HashMap<String, Object> queriedList = MainActivity.lensDBHelper.getAllOfType(type);
+        final boolean canInjectLenses = queriedList != null;
 
-        if( queriedList == null ) {
+        if( !canInjectLenses ) {
             Logger.log("No lenses to load for type: " + type);
-            return;
         }
 
         HashSet<String> containedList = new HashSet<>();
@@ -136,18 +119,19 @@ class Lens {
         for( Object lens : list ) {
             String mCode = (String) getObjectField(lens, "mCode");
 
-            if(Preferences.getBool(Prefs.LENSES_COLLECT) && !queriedList.containsKey(mCode)) {
+            if(Preferences.getBool(Prefs.LENSES_COLLECT) &&
+                    (!canInjectLenses || !queriedList.containsKey(mCode))) {
                 performLensSave(lens, type);
             }
 
-            if(!Preferences.getBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES))
+            if(!Preferences.getBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES) && canInjectLenses)
                 containedList.add(mCode);
         }
 
         if(Preferences.getBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES))
             list.clear();
 
-        if(!Preferences.getBool(Prefs.LENSES_LOAD))
+        if(!Preferences.getBool(Prefs.LENSES_LOAD) || !canInjectLenses)
             return;
 
         Logger.log("Potential lenses to load: " + queriedList.size());
@@ -188,7 +172,16 @@ class Lens {
 
     private static void performLensSave(Object lens, LensType type) {
         LensData lensData = buildSaveableLensData(lens, type);
-        MainActivity.lensDBHelper.insertLens(lensData);
+        Logger.log("Inserting lens of type: " + type);
+
+        try {
+            MainActivity.lensDBHelper.insertLens(lensData);
+        } catch( Exception e ) {
+            if( lensData == null || lensData.mCode == null )
+                Logger.log("Error inserting lens", e);
+            else
+                Logger.log("Error inserting lens: "  + lensData.mCode, e);
+        }
     }
 
     private static LensData buildSaveableLensData(Object lens, LensType type) {
