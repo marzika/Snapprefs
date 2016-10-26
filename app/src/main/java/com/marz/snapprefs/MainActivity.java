@@ -146,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = this;
+        Logger.loadSelectedLogTypes();
         ChangeLog cl = new ChangeLog(context);
         createDeviceId();
         /*Obfuscator.writeGsonFile();

@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 import com.marz.snapprefs.Logger;
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.Util.LensData;
 
@@ -208,7 +209,7 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
 
     @SuppressWarnings("unchecked")
     public HashMap<String, Object> getAllLenses() {
-        Logger.log("Getting all lenses from database");
+        Logger.log("Getting all lenses from database", LogType.DATABASE);
         CallbackHandler callback = getCallback(this, "getAllLensesFromCursor", Cursor.class);
 
         return (HashMap<String, Object>) super.getAllBuiltObjects(LensEntry.TABLE_NAME, callback);

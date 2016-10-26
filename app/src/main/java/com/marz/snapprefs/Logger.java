@@ -18,9 +18,20 @@
  */
 package com.marz.snapprefs;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.marz.snapprefs.Util.StringUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
 
 import de.robv.android.xposed.XposedBridge;
 
@@ -30,6 +41,9 @@ public class Logger {
     private static int printWidth = 70;
     private static boolean defaultForced = false;
     private static boolean defaultPrefix = true;
+
+    private static boolean hasLoaded = false;
+    private static HashSet<LogType> logTypes = new HashSet<>();
 
     /**
      * Restrict instantiation of this class, it only contains static methods.
@@ -50,9 +64,8 @@ public class Logger {
             if (!Preferences.getBool(Preferences.Prefs.DEBUGGING) && !forced)
                 return;
 
-        } catch( Throwable t)
-        {
-            Log.d("SNAPPREFS", "Tried to log before fully loaded: ["  + message + "]");
+        } catch (Throwable t) {
+            Log.d("SNAPPREFS", "Tried to log before fully loaded: [" + message + "]");
             return;
         }
 
@@ -62,20 +75,17 @@ public class Logger {
 
         try {
             XposedBridge.log(message);
-        } catch( Throwable e)
-        {
+        } catch (Throwable e) {
             Log.d("snapprefs", message);
         }
     }
 
-    public static void afterHook( String message )
-    {
-        log( "AfterHook: " + message, defaultPrefix, defaultForced);
+    public static void afterHook(String message) {
+        log("AfterHook: " + message, defaultPrefix, defaultForced);
     }
 
-    public static void beforeHook( String message )
-    {
-        log( "BeforeHook: " + message, defaultPrefix, defaultForced);
+    public static void beforeHook(String message) {
+        log("BeforeHook: " + message, defaultPrefix, defaultForced);
     }
 
     /**
@@ -83,11 +93,10 @@ public class Logger {
      *
      * @param message The message to print in the title
      */
-    public static void printTitle( String message )
-    {
-        log( "", defaultPrefix, defaultForced);
+    public static void printTitle(String message) {
+        log("", defaultPrefix, defaultForced);
         printFilledRow();
-        printMessage( message );
+        printMessage(message);
         printFilledRow();
     }
 
@@ -96,9 +105,8 @@ public class Logger {
      *
      * @param message The message to print between the '#'s
      */
-    public static void printMessage( String message )
-    {
-        log( "#" + StringUtils.center( message, printWidth ) + "#", defaultPrefix, defaultForced);
+    public static void printMessage(String message) {
+        log("#" + StringUtils.center(message, printWidth) + "#", defaultPrefix, defaultForced);
     }
 
     /**
@@ -106,19 +114,18 @@ public class Logger {
      *
      * @param message The final message that is going to be printed
      */
-    public static void printFinalMessage( String message )
-    {
-        printMessage( message );
+    public static void printFinalMessage(String message) {
+        printMessage(message);
         printFilledRow();
     }
 
     /**
      * Print a '#' Filled row of width {@link #printWidth}
      */
-    public static void printFilledRow()
-    {
-        log( StringUtils.repeat( "#", printWidth + 2 ), defaultPrefix, defaultForced);
+    public static void printFilledRow() {
+        log(StringUtils.repeat("#", printWidth + 2), defaultPrefix, defaultForced);
     }
+
     /**
      * Write debug information to the Xposed Log if enabled.
      *
@@ -130,16 +137,6 @@ public class Logger {
     }
 
     /**
-     * Write debug information to the Xposed Log if enabled.
-     * This method always prefixes the message by the log-tag
-     *
-     * @param message The message you want to log
-     */
-    public static void log(String message) {
-        log(message, defaultPrefix, defaultForced);
-    }
-
-    /**
      * Write a throwable to the Xposed Log, even when debugging is disabled.
      *
      * @param throwable The throwable to log
@@ -147,8 +144,7 @@ public class Logger {
     public static void log(Throwable throwable) {
         try {
             XposedBridge.log(throwable);
-        } catch( Throwable t )
-        {
+        } catch (Throwable t) {
             Log.e("SNAPPREFS", "Throwable: " + t.getMessage());
             t.printStackTrace();
         }
@@ -171,7 +167,131 @@ public class Logger {
     public static void logStackTrace() {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
 
-        for(StackTraceElement traceElement : stackTraceElements)
+        for (StackTraceElement traceElement : stackTraceElements)
             Logger.log("Stack trace: [Class: " + traceElement.getClassName() + "] [Method: " + traceElement.getMethodName() + "]", defaultPrefix, defaultForced);
+    }
+
+
+    public static void log(String message) {
+        log(message, LogType.DEBUG);
+    }
+
+    public static void log(String message, @Nullable LogType logType) {
+        if (!Preferences.getBool(Preferences.Prefs.DEBUGGING) &&
+                (logType != null && !logType.isForced))
+            return;
+
+        if (logType == null) {
+            assignPrefixAndPrint(message);
+            return;
+        }
+
+        if (!hasLoaded || logType.isForced || logTypes.contains(logType)) {
+            String outputMsg = logType.tag + " " + message;
+            assignPrefixAndPrint(outputMsg);
+        }
+    }
+
+    private static void assignPrefixAndPrint(String message) {
+        if (defaultPrefix)
+            message = LOG_TAG + message;
+
+        try {
+            XposedBridge.log(message);
+        } catch (Throwable t) {
+            Log.d("Snapprefs", message);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    static void loadSelectedLogTypes() {
+        File logTypeFile = new File(Preferences.getContentPath(), "LogTypes.json");
+        log("Performing LogType load", LogType.FORCED);
+
+        if (!logTypeFile.exists()) {
+            loadDefaultLogTypes();
+            return;
+        }
+
+        Gson gson = new Gson();
+        FileReader reader = null;
+
+        try {
+            reader = new FileReader(logTypeFile);
+            logTypes = gson.fromJson(reader, HashSet.class);
+            log(String.format("Loaded %s log types", logTypes.toString()), LogType.FORCED);
+        } catch (FileNotFoundException e) {
+            log("LogType list file not found", LogType.FORCED);
+            loadDefaultLogTypes();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    static void saveSelectedLogTypes() {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        File logTypeFile = new File(Preferences.getContentPath(), "/LogTypes.json");
+
+        try {
+            logTypeFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter(logTypeFile);
+            gson.toJson(logTypes, writer);
+            log(String.format("Saved %s log types", logTypes.toString()), LogType.FORCED);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.flush();
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private static void loadDefaultLogTypes() {
+        log("Loading default LogTypes", LogType.FORCED);
+
+        Collections.addAll(logTypes, LogType.values());
+        saveSelectedLogTypes();
+    }
+
+    public enum LogType {
+        DEBUG("Debug"),
+        CHAT("Chat"),
+        LENS("Lens"),
+        GROUPS("Groups"),
+        DATABASE("Database"),
+        SAVING("Saving"),
+        FORCED("Forced", true);
+
+        public String tag;
+        public boolean isForced = false;
+
+        LogType(String tag) {
+            this.tag = String.format("[%s]", tag);
+        }
+
+        LogType(String tag, boolean isForced) {
+            this(tag);
+            this.isForced = isForced;
+        }
     }
 }
