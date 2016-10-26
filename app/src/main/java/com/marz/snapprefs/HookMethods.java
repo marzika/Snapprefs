@@ -20,6 +20,7 @@ import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Preferences.Prefs;
@@ -436,7 +437,7 @@ public class HookMethods
                                 vanillaCaptionEditText.setSingleLine(false);
                                 vanillaCaptionEditText.setFilters(new InputFilter[0]);
                                 // Remove actionDone IME option, by only setting flagNoExtractUi
-                                vanillaCaptionEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+                                vanillaCaptionEditText.setImeOptions(EditorInfo.IME_ACTION_NONE);
                                 // Remove listener hiding keyboard when enter is pressed by setting the listener to null
                                 vanillaCaptionEditText.setOnEditorActionListener(null);
                                 // Remove listener for cutting of text when the first line is full by setting the text change listeners list to null
@@ -450,8 +451,14 @@ public class HookMethods
                             if (Preferences.getBool(Prefs.CAPTION_UNLIMITED_VANILLA)) {
                                 XposedUtils.log("Unlimited vanilla captions - 2");
                                 EditorInfo editorInfo = (EditorInfo) param.args[0];
-                                editorInfo.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI;
+                                editorInfo.imeOptions = EditorInfo.IME_ACTION_NONE;
                             }
+                        }
+                    });
+                    XposedHelpers.findAndHookMethod("TX$3", lpparam.classLoader, "onEditorAction", TextView.class, int.class, KeyEvent.class, new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            Logger.printFinalMessage("onEditorAction: int= " + param.args[1]);
                         }
                     });
                     /*String vanillaCaptionEditTextClassName =
