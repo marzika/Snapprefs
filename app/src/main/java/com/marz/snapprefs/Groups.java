@@ -27,7 +27,6 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
-import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.newInstance;
 
 public class Groups {
@@ -179,7 +178,7 @@ public class Groups {
                             NotificationUtils.showMessage("You cannot have more than 3 groups as a free user", Color.RED, NotificationUtils.LENGTH_SHORT, HookMethods.classLoader);
                             return;
                         }
-                        if (Preferences.getLicence() != 0 && !Preferences.getBool(Preferences.Prefs.UNLIM_GROUPS)) {
+                        if (Preferences.getLicence() != 0 && !Preferences.getBool(Preferences.Prefs.UNLIM_GROUPS) && numGroups > 3) {
                             NotificationUtils.showMessage("You disabled the option to have more than 3 groups", Color.RED, NotificationUtils.LENGTH_SHORT, HookMethods.classLoader);
                             return;
                         }

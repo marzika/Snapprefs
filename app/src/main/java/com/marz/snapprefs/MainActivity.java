@@ -148,7 +148,6 @@ public class MainActivity extends AppCompatActivity {
         context = this;
         ChangeLog cl = new ChangeLog(context);
         createDeviceId();
-
         /*Obfuscator.writeGsonFile();
         try {
             Thread.sleep(2000);

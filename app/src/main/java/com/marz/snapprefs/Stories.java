@@ -66,20 +66,23 @@ public class Stories {
             }
         });
 
-        Class ExitEventTypeClass = findClass("com.snapchat.android.framework.analytics.perf.ExitEvent", lpparam.classLoader);
-        final Object ExitEvent_AUTO_ADVANCE = getStaticObjectField(ExitEventTypeClass, "AUTO_ADVANCE");
-        findAndHookMethod(Obfuscator.stories.AUTOADVANCE_CLASS2, lpparam.classLoader, Obfuscator.stories.AUTOADVANCE_METHOD2, ExitEventTypeClass, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                super.beforeHookedMethod(param);
-                Object exitEvent = param.args[0];
 
-                if (exitEvent == ExitEvent_AUTO_ADVANCE) {
-                    Logger.log("Skipped auto advance");
-                    param.setResult(null);
+        if( Preferences.getBool(Prefs.AUTO_ADVANCE)) {
+            Class ExitEventTypeClass = findClass("com.snapchat.android.framework.analytics.perf.ExitEvent", lpparam.classLoader);
+            final Object ExitEvent_AUTO_ADVANCE = getStaticObjectField(ExitEventTypeClass, "AUTO_ADVANCE");
+            findAndHookMethod(Obfuscator.stories.AUTOADVANCE_CLASS2, lpparam.classLoader, Obfuscator.stories.AUTOADVANCE_METHOD2, ExitEventTypeClass, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+                    Object exitEvent = param.args[0];
+
+                    if (exitEvent == ExitEvent_AUTO_ADVANCE) {
+                        Logger.log("Skipped auto advance");
+                        param.setResult(null);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     private static void readFriendList(final ClassLoader classLoader) {

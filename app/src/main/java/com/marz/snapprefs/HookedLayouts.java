@@ -163,7 +163,6 @@ public class HookedLayouts {
     }
 
     public static void addShareIcon(final XC_InitPackageResources.InitPackageResourcesParam resparam) {
-
         try {
             resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "camera_preview", new XC_LayoutInflated() {
                 public void handleLayoutInflated(LayoutInflatedParam liparam) throws Throwable {

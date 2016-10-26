@@ -26,7 +26,7 @@ import de.robv.android.xposed.XposedBridge;
 
 public class Logger {
 
-    public static final String LOG_TAG = "SnapPrefs: ";
+    public static final String LOG_TAG = "Snapprefs: ";
     private static int printWidth = 70;
     private static boolean defaultForced = false;
     private static boolean defaultPrefix = true;

@@ -28,29 +28,33 @@ public class LensIconLoader {
     public static class AsyncLensIconDownloader extends AsyncTask<Object, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Object... params) {
-            LensesFragment.LensContainerData pair = (LensesFragment.LensContainerData) params[0];
-            Activity context = (Activity) params[1];
+            try {
+                LensesFragment.LensContainerData pair = (LensesFragment.LensContainerData) params[0];
+                Activity context = (Activity) params[1];
 
-            final String url = pair.url;
-            final LinearLayout inflatedLayout = pair.inflatedLayout;
-            final ImageView button = pair.iconImageView;
-            final TextView textView = pair.textView;
-            final Bitmap bmp = retrieveAppropriateBitmap(url, context);
+                final String url = pair.url;
+                final LinearLayout inflatedLayout = pair.inflatedLayout;
+                final ImageView button = pair.iconImageView;
+                final TextView textView = pair.textView;
+                final Bitmap bmp = retrieveAppropriateBitmap(url, context);
 
-            if( bmp == null )
-                return null;
+                if (bmp == null)
+                    return null;
 
-            float density = context.getResources().getDisplayMetrics().density;
-            final int imgSize = (int) (65f * density);
-            pair.bmp = Bitmap.createScaledBitmap(bmp, imgSize, imgSize, false);
+                float density = context.getResources().getDisplayMetrics().density;
+                final int imgSize = (int) (65f * density);
+                pair.bmp = Bitmap.createScaledBitmap(bmp, imgSize, imgSize, false);
 
-            context.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Logger.log("Loading image: " + url);
-                    button.setImageBitmap(bmp);
-                }
-            });
+                context.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Logger.log("Loading image: " + url);
+                        button.setImageBitmap(bmp);
+                    }
+                });
+            } catch (Throwable e) {
+                Logger.log("Error inside async", e);
+            }
 
 
             return null;

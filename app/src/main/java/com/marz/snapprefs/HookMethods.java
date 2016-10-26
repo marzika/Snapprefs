@@ -321,7 +321,7 @@ public class HookMethods
                                 Misc.initTimer(lpparam, mResources);
                             }
                             if (Preferences.getBool(Prefs.CHAT_AUTO_SAVE)) {
-                                Chat.initTextSave(lpparam, mResources);
+                                Chat.initTextSave(lpparam, SnapContext);
                             }
                             if (Preferences.getBool(Prefs.CHAT_MEDIA_SAVE)) {
                                 Chat.initImageSave(lpparam, mResources);
@@ -552,6 +552,7 @@ public class HookMethods
                             }
                         }
                     });
+
                     if( Preferences.getBool(Prefs.AUTO_ADVANCE))
                         XposedHelpers.findAndHookMethod(Obfuscator.stories.AUTOADVANCE_CLASS, lpparam.classLoader, Obfuscator.stories.AUTOADVANCE_METHOD, XC_MethodReplacement.returnConstant(false));
 

@@ -5,7 +5,7 @@
     android:layout_height="fill_parent"
     android:layout_marginTop="10dp">
 
-    <TextView android:id="@+id/text_list_date"
+    <TextView android:id="@+id/text_list_sender"
         android:background="@color/primary_light"
         android:text="Gabe can piss off"
         android:textSize="14sp"
@@ -15,11 +15,11 @@
         android:layout_height="wrap_content"
         android:padding="10px"
         android:layout_marginTop="5px"/>
-    <TextView android:id="@+id/text_list_steps"
+    <TextView android:id="@+id/text_list_message"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:padding="10px"
-        android:layout_below="@+id/text_list_date"/>
+        android:layout_below="@+id/text_list_sender"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -28,8 +28,8 @@
         android:text="High Score"
         android:id="@+id/text_high_score"
         android:layout_gravity="right"
-        android:layout_alignTop="@+id/text_list_date"
-        android:layout_alignBottom="@+id/text_list_steps"
+        android:layout_alignTop="@+id/text_list_sender"
+        android:layout_alignBottom="@+id/text_list_message"
         android:textAlignment="center"
         android:gravity="center_vertical"
         android:layout_marginLeft="10px"

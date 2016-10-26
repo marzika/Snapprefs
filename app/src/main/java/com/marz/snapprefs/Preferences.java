@@ -75,7 +75,7 @@ public class Preferences {
             do {
                 spinCount++;
 
-                if ((spinCount % 100) == 0)
+                if ((spinCount % 500) == 0)
                     Logger.log("Current spin count: " + spinCount);
 
                 if (spinCount > 35000)

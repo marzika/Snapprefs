@@ -3,13 +3,13 @@ package com.marz.snapprefs.Util;
 import android.content.ContentValues;
 
 import com.marz.snapprefs.Databases.LensDatabaseHelper.LensEntry;
-import com.marz.snapprefs.Logger;
 
 /**
  * Created by Andre on 12/09/2016.
  */
 public class LensData {
     public String mCode;
+    public LensType mType;
     //public String mGplayIapId;
     public String mHintId;
     //public Map<String, String> mHintTranslations;
@@ -33,6 +33,7 @@ public class LensData {
         ContentValues contentValues = new ContentValues();
         contentValues.put(LensEntry.COLUMN_NAME_MCODE, mCode);
         //contentValues.put(LensEntry.COLUMN_NAME_GPLAYID, mGplayIapId);
+        contentValues.put(LensEntry.COLUMN_NAME_TYPE, String.valueOf(mType));
         contentValues.put(LensEntry.COLUMN_NAME_MHINTID, mHintId);
         contentValues.put(LensEntry.COLUMN_NAME_MICONLINK, mIconLink);
         contentValues.put(LensEntry.COLUMN_NAME_MID, mId);
@@ -41,5 +42,9 @@ public class LensData {
         contentValues.put(LensEntry.COLUMN_NAME_ACTIVE, mActive);
         contentValues.put(LensEntry.COLUMN_NAME_SEL_TIME, selTime);
         return contentValues;
+    }
+
+    public enum LensType {
+        GEO, SCHEDULED
     }
 }
