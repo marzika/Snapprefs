@@ -24,7 +24,6 @@ import static com.marz.snapprefs.Databases.CoreDatabaseHandler.DBUtils.formatExc
 class CoreDatabaseHandler extends SQLiteOpenHelper {
     private static String DATABASE_NAME;
     private static String[] SQL_CREATE_ENTRIES;
-
     private SQLiteDatabase writableDatabase;
 
     CoreDatabaseHandler(Context context, String databaseName, String[] entries, int DATABASE_VERSION) {
@@ -58,6 +57,25 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
 
     long getRowCount(String tableName) {
         return DatabaseUtils.queryNumEntries(getDatabase(), tableName);
+    }
+
+    boolean checkIfColumnExists(SQLiteDatabase db, String tableName, String columnName) {
+        Cursor emptyCursor = null;
+
+        Logger.log(String.format("Checking if column '%s' exists in table '%s'", columnName, tableName));
+
+        try {
+            emptyCursor = db.rawQuery("SELECT * FROM " + tableName + " LIMIT 0", null);
+
+            return emptyCursor.getColumnIndex(tableName) != -1;
+        } catch (Exception e) {
+            Logger.log("Problem checking if cursor exists!");
+        } finally {
+            if (emptyCursor != null)
+                emptyCursor.close();
+        }
+
+        return false;
     }
 
     public long insertValues(String tableName, ContentValues values) {
@@ -336,7 +354,7 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
     }
 
     public int updateObject(String tableName, String columnName, String[] selectionArgs,
-                             ContentValues values) {
+                            ContentValues values) {
         String selection = columnName + " = ?";
 
         return getDatabase().update(

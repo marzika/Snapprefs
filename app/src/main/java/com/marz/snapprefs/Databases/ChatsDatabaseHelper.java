@@ -20,13 +20,12 @@ import static com.marz.snapprefs.Databases.CoreDatabaseHandler.CallbackHandler.g
  * Created by Andre on 20/10/2016.
  */
 
-public class ChatsDatabaseHelper extends CoreDatabaseHandler {
-    private static final int DATABASE_VERSION = 1;
+public class ChatsDatabaseHelper extends CachedDatabaseHandler {
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = Preferences.getContentPath() + "/ChatMessages.db";
     private static final String TEXT_TYPE = " TEXT";
     private static final String INT_TYPE = " INTEGER";
     private static final String COMMA_SEP = ",";
-
     private static final String[] SQL_CREATE_ENTRIES = {
             "CREATE TABLE " + ChatEntry.TABLE_NAME + " (" +
                     ChatEntry.COLUMN_NAME_UNIQUE_ID + TEXT_TYPE + " PRIMARY KEY," +
@@ -48,7 +47,7 @@ public class ChatsDatabaseHelper extends CoreDatabaseHandler {
                     ChatEntry.COLUMN_NAME_MEDIA_URL + INT_TYPE + COMMA_SEP +
                     ChatEntry.COLUMN_NAME_MEDIA_ID + TEXT_TYPE + " )",
     };
-
+    private static byte[] keyBytes;
     private Gson gson;
     private String[] idHolder = new String[1];
     private String[] keyProjection = {ChatEntry.COLUMN_NAME_UNIQUE_ID};
@@ -64,6 +63,7 @@ public class ChatsDatabaseHelper extends CoreDatabaseHandler {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Logger.log(String.format("Upgrading LensDB from v%s to v%s", oldVersion, newVersion));
     }
 
     @Override
@@ -87,6 +87,7 @@ public class ChatsDatabaseHelper extends CoreDatabaseHandler {
         contentValues.put(ChatEntry.COLUMN_NAME_UNIQUE_ID, chatData.getUniqueId());
         contentValues.put(ChatEntry.COLUMN_NAME_MESSAGE_ID, chatData.getMessageId());
         contentValues.put(ChatEntry.COLUMN_NAME_MESSAGE_TEXT, chatData.getText());
+
         contentValues.put(ChatEntry.COLUMN_NAME_SENDER, chatData.getSender());
         contentValues.put(ChatEntry.COLUMN_NAME_RECIPIENT_GSON, gson.toJson(chatData.getRecipients(), List.class));
         contentValues.put(ChatEntry.COLUMN_NAME_TIMESTAMP, chatData.getTimestamp());
@@ -101,28 +102,6 @@ public class ChatsDatabaseHelper extends CoreDatabaseHandler {
         contentValues.put(ChatEntry.COLUMN_NAME_MEDIA_URL, chatData.getMediaURL());
         contentValues.put(ChatEntry.COLUMN_NAME_MEDIA_ID, chatData.getMediaID());
         contentValues.put(ChatEntry.COLUMN_NAME_MEDIA_TYPE, String.valueOf(chatData.getMediaType()));
-
-        long rowsInserted = super.insertValues(ChatEntry.TABLE_NAME, contentValues);
-
-        return rowsInserted > 0;
-    }
-
-    public boolean insertSnap(ChatData chatData) {
-        if (this.containsChat(chatData.getUniqueId())) {
-            Logger.log("Already contains chat: " + chatData.getText());
-            return false;
-        }
-
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(ChatEntry.COLUMN_NAME_CONVERSATION_ID, chatData.getConversationId());
-        contentValues.put(ChatEntry.COLUMN_NAME_TYPE, chatData.getMessageType().value);
-        contentValues.put(ChatEntry.COLUMN_NAME_UNIQUE_ID, chatData.getUniqueId());
-        contentValues.put(ChatEntry.COLUMN_NAME_MESSAGE_ID, chatData.getMessageId());
-        contentValues.put(ChatEntry.COLUMN_NAME_SENDER, chatData.getSender());
-        contentValues.put(ChatEntry.COLUMN_NAME_RECIPIENT_GSON, gson.toJson(chatData.getRecipients(), List.class));
-        contentValues.put(ChatEntry.COLUMN_NAME_TIMESTAMP, chatData.getTimestamp());
-        contentValues.put(ChatEntry.COLUMN_NAME_ITER_TOKEN, chatData.getIter_token());
-        contentValues.put(ChatEntry.COLUMN_NAME_SEQ_NUM, chatData.getSeq_num());
 
         long rowsInserted = super.insertValues(ChatEntry.TABLE_NAME, contentValues);
 
@@ -169,6 +148,7 @@ public class ChatsDatabaseHelper extends CoreDatabaseHandler {
      * @param cursor
      * @return chatDataList
      */
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public ArrayList<ChatData> getAllChatsFromCursor(Cursor cursor) {
         ArrayList<ChatData> chatDataList = new ArrayList<>();
 
@@ -195,6 +175,7 @@ public class ChatsDatabaseHelper extends CoreDatabaseHandler {
      * @param cursor
      * @return chatData
      */
+    @SuppressWarnings({"unused", "WeakerAccess", "unchecked"})
     public ChatData getChatFromCursor(Cursor cursor) {
 
         try {
@@ -279,17 +260,6 @@ public class ChatsDatabaseHelper extends CoreDatabaseHandler {
         static final String COLUMN_NAME_MEDIA_URL = "media_url";
         static final String COLUMN_NAME_MEDIA_ID = "media_id";
         static final String COLUMN_NAME_MEDIA_TYPE = "media_type";
-    }
-
-    private static class SnapEntry implements BaseColumns {
-        static final String TABLE_NAME = "ChatSnaps";
-        static final String COLUMN_NAME_CONVERSATION_ID = "conversation_id";
-        static final String COLUMN_NAME_ES_ID = "es_id";
-        static final String COLUMN_NAME_ID = "es_id";
-        static final String COLUMN_NAME_CAPTION = "caption";
-        static final String COLUMN_NAME_FILTER_ID = "filter_id";
-        static final String COLUMN_NAME_ITER_TOKEN = "iter_token";
-        static final String COLUMN_NAME_SENDER = "sender";//statefulChatFeedItem.am
-        static final String COLUMN_NAME_DURATION = "duration";
+        static final String COLUMN_NAME_ENCRYPTED = "encrypted";
     }
 }

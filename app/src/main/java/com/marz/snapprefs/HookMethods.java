@@ -552,6 +552,7 @@ public class HookMethods
                             }
                         }
                     });
+
                     if( Preferences.getBool(Prefs.AUTO_ADVANCE))
                         XposedHelpers.findAndHookMethod(Obfuscator.stories.AUTOADVANCE_CLASS, lpparam.classLoader, Obfuscator.stories.AUTOADVANCE_METHOD, XC_MethodReplacement.returnConstant(false));
 

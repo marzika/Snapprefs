@@ -13,23 +13,18 @@ import java.util.HashMap;
  * Created by Andre on 24/10/2016.
  */
 
-public class CachedDatabaseHandler extends CoreDatabaseHandler {
-    private boolean isCacheValid = false;
+class CachedDatabaseHandler extends CoreDatabaseHandler {
     private HashMap<String, Object> objectCache = new HashMap<>();
 
-    public CachedDatabaseHandler(Context context, String databaseName, String[] entries, int DATABASE_VERSION) {
+    CachedDatabaseHandler(Context context, String databaseName, String[] entries, int DATABASE_VERSION) {
         super(context, databaseName, entries, DATABASE_VERSION);
-    }
-
-    public long insertValues(String tableName, ContentValues values) {
-        return shouldInvalidateCache(getDatabase().insert(tableName, null, values));
     }
 
     public boolean containsObject(String tableName, String columnName, String[] selectionArgs,
                                   String sortOrder, String[] projection) {
         String key = String.format("%s%s%s%s", "containsObject", tableName, columnName, Arrays.toString(selectionArgs));
 
-        if (isCacheValid) {
+        if (!objectCache.isEmpty()) {
             Object cachedResult = objectCache.get(key);
 
             if (cachedResult != null)
@@ -38,7 +33,6 @@ public class CachedDatabaseHandler extends CoreDatabaseHandler {
 
         boolean result = super.containsObject(tableName, columnName, selectionArgs, sortOrder, projection);
         objectCache.put(key, result);
-
         return result;
     }
 
@@ -46,7 +40,7 @@ public class CachedDatabaseHandler extends CoreDatabaseHandler {
                                     String sortOrder, String[] projection) {
         String key = String.format("%s%s%s%s%s%s", "getContent", tableName, columnName, Arrays.toString(selectionArgs), sortOrder, Arrays.toString(projection));
 
-        if (isCacheValid) {
+        if (!objectCache.isEmpty()) {
             Object cachedResult = objectCache.get(key);
 
             if (cachedResult != null)
@@ -62,7 +56,7 @@ public class CachedDatabaseHandler extends CoreDatabaseHandler {
                                   String sortOrder, String[] projection, CallbackHandler callbackHandler) {
         String key = String.format("%s%s%s%s%s%s%s", "getBuiltContent", tableName, columnName, Arrays.toString(selectionArgs), sortOrder, Arrays.toString(projection), callbackHandler.toString);
 
-        if (isCacheValid) {
+        if (!objectCache.isEmpty()) {
             Object cachedResult = objectCache.get(key);
 
             if (cachedResult != null)
@@ -79,7 +73,7 @@ public class CachedDatabaseHandler extends CoreDatabaseHandler {
                                                         ArrayList<String> blacklist) {
         String key = String.format("%s%s%s%s%s", "getAllContentExcept", tableName, columnName, Arrays.toString(projection), blacklist);
 
-        if (isCacheValid) {
+        if (!objectCache.isEmpty()) {
             Object cachedResult = objectCache.get(key);
 
             if (cachedResult != null)
@@ -95,7 +89,7 @@ public class CachedDatabaseHandler extends CoreDatabaseHandler {
     public ArrayList<ContentValues> getAllContent(String tableName, String[] projection) {
         String key = String.format("%s%s%s", "getAllContent", tableName, Arrays.toString(projection));
 
-        if (isCacheValid) {
+        if (!objectCache.isEmpty()) {
             Object cachedResult = objectCache.get(key);
 
             if (cachedResult != null)
@@ -116,7 +110,7 @@ public class CachedDatabaseHandler extends CoreDatabaseHandler {
                                            CallbackHandler callbackHandler) {
         String key = String.format("%s%s%s%s%s%s", "getAllBuiltObjectsExcept", tableName, columnName, orderBy, blacklist, callbackHandler.toString);
 
-        if (isCacheValid) {
+        if (!objectCache.isEmpty()) {
             Object cachedResult = objectCache.get(key);
 
             if (cachedResult != null)
@@ -136,7 +130,7 @@ public class CachedDatabaseHandler extends CoreDatabaseHandler {
     public Object getAllBuiltObjects(String tableName, String where, String orderBy, CallbackHandler callbackHandler) {
         String key = String.format("%s%s%s%s", "getAllBuiltObjects", tableName, where, callbackHandler.toString);
 
-        if (isCacheValid) {
+        if (!objectCache.isEmpty()) {
             Object cachedResult = objectCache.get(key);
 
             if (cachedResult != null)
@@ -153,7 +147,7 @@ public class CachedDatabaseHandler extends CoreDatabaseHandler {
         String key = String.format("%s%s%s%s%s%s%s", "performQueryForBuiltObjects", tableName, selection, Arrays.toString(selectionArgs),
                 Arrays.toString(projection), sortOrder, callbackHandler.toString);
 
-        if (isCacheValid) {
+        if (!objectCache.isEmpty()) {
             Object cachedResult = objectCache.get(key);
 
             if (cachedResult != null)
@@ -164,6 +158,10 @@ public class CachedDatabaseHandler extends CoreDatabaseHandler {
         Object results = super.performQueryForBuiltObjects(tableName, selection, selectionArgs, projection, sortOrder, callbackHandler);
         objectCache.put(key, results);
         return results;
+    }
+
+    public long insertValues(String tableName, ContentValues values) {
+        return shouldInvalidateCache(super.insertValues(tableName, values));
     }
 
     public int deleteObject(String tableName, String columnName, String[] selectionArgs) {
@@ -180,7 +178,7 @@ public class CachedDatabaseHandler extends CoreDatabaseHandler {
     public ContentValues getValuesFromCursor(Cursor cursor, String[] arrProjection) {
         String key = String.format("%s%s", "getValuesFromCursor", Arrays.toString(arrProjection));
 
-        if (isCacheValid) {
+        if (!objectCache.isEmpty()) {
             Object cachedResult = objectCache.get(key);
 
             if (cachedResult != null && cachedResult instanceof  ContentValues)
@@ -193,7 +191,7 @@ public class CachedDatabaseHandler extends CoreDatabaseHandler {
         return results;
     }
 
-    public void invalidateCache() {
+    void invalidateCache() {
         objectCache.clear();
     }
 
