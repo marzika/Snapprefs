@@ -30,20 +30,19 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
 
 import de.robv.android.xposed.XposedBridge;
 
 public class Logger {
 
-    public static final String LOG_TAG = "Snapprefs: ";
+    private static final String LOG_TAG = "Snapprefs: ";
     private static int printWidth = 70;
     private static boolean defaultForced = false;
     private static boolean defaultPrefix = true;
 
     private static boolean hasLoaded = false;
-    private static HashSet<LogType> logTypes = new HashSet<>();
+    private static HashSet<String> logTypes = new HashSet<>();
 
     /**
      * Restrict instantiation of this class, it only contains static methods.
@@ -114,7 +113,7 @@ public class Logger {
      *
      * @param message The final message that is going to be printed
      */
-    public static void printFinalMessage(String message) {
+    static void printFinalMessage(String message) {
         printMessage(message);
         printFilledRow();
     }
@@ -122,7 +121,7 @@ public class Logger {
     /**
      * Print a '#' Filled row of width {@link #printWidth}
      */
-    public static void printFilledRow() {
+    static void printFilledRow() {
         log(StringUtils.repeat("#", printWidth + 2), defaultPrefix, defaultForced);
     }
 
@@ -145,8 +144,8 @@ public class Logger {
         try {
             XposedBridge.log(throwable);
         } catch (Throwable t) {
-            Log.e("SNAPPREFS", "Throwable: " + t.getMessage());
-            t.printStackTrace();
+            Log.e("SNAPPREFS", "Throwable: " + throwable.getMessage());
+            throwable.printStackTrace();
         }
     }
 
@@ -164,13 +163,17 @@ public class Logger {
     /**
      * Logs the current stack trace(ie. the chain of calls to get where you are now)
      */
-    public static void logStackTrace() {
+    static void logStackTrace() {
         StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
 
         for (StackTraceElement traceElement : stackTraceElements)
             Logger.log("Stack trace: [Class: " + traceElement.getClassName() + "] [Method: " + traceElement.getMethodName() + "]", defaultPrefix, defaultForced);
     }
 
+    public static void log(String message, Throwable throwable, LogType logType) {
+        log(message, logType.setForced());
+        log(throwable);
+    }
 
     public static void log(String message) {
         log(message, LogType.DEBUG);
@@ -178,7 +181,7 @@ public class Logger {
 
     public static void log(String message, @Nullable LogType logType) {
         if (!Preferences.getBool(Preferences.Prefs.DEBUGGING) &&
-                (logType != null && !logType.isForced))
+                (logType != null && !logType.isForced()))
             return;
 
         if (logType == null) {
@@ -186,9 +189,12 @@ public class Logger {
             return;
         }
 
-        if (!hasLoaded || logType.isForced || logTypes.contains(logType)) {
+        if (logType.isForced() || logTypes.contains(logType.name())) {
             String outputMsg = logType.tag + " " + message;
             assignPrefixAndPrint(outputMsg);
+
+            if (logType.tempForce)
+                logType.tempForce = false;
         }
     }
 
@@ -235,7 +241,7 @@ public class Logger {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    static void saveSelectedLogTypes() {
+    private static void saveSelectedLogTypes() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         File logTypeFile = new File(Preferences.getContentPath(), "/LogTypes.json");
@@ -269,7 +275,9 @@ public class Logger {
     private static void loadDefaultLogTypes() {
         log("Loading default LogTypes", LogType.FORCED);
 
-        Collections.addAll(logTypes, LogType.values());
+        for (LogType type : LogType.values())
+            logTypes.add(type.name());
+
         saveSelectedLogTypes();
     }
 
@@ -283,7 +291,8 @@ public class Logger {
         FORCED("Forced", true);
 
         public String tag;
-        public boolean isForced = false;
+        private boolean isForced = false;
+        private boolean tempForce = false;
 
         LogType(String tag) {
             this.tag = String.format("[%s]", tag);
@@ -292,6 +301,15 @@ public class Logger {
         LogType(String tag, boolean isForced) {
             this(tag);
             this.isForced = isForced;
+        }
+
+        public LogType setForced() {
+            this.tempForce = true;
+            return this;
+        }
+
+        public boolean isForced() {
+            return this.tempForce || this.isForced;
         }
     }
 }

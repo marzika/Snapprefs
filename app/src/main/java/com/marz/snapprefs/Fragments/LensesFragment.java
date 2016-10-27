@@ -20,7 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Common;
-import com.marz.snapprefs.Databases.LensDatabaseHelper;
 import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.MainActivity;
 import com.marz.snapprefs.Preferences;
@@ -31,6 +30,7 @@ import com.marz.snapprefs.Util.LensIconLoader;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -140,10 +140,7 @@ public class LensesFragment extends Fragment {
     public static class DialogHelper {
         static void lensDialog(final Context context, final TextView loadedLensesTextView, LayoutInflater inflater,
                                ViewGroup container) {
-            if (MainActivity.lensDBHelper == null)
-                MainActivity.lensDBHelper = new LensDatabaseHelper(context);
-
-            HashMap<String, Object> lensList = MainActivity.lensDBHelper.getAllLenses();
+            LinkedHashMap<String, Object> lensList = (LinkedHashMap<String, Object>) MainActivity.lensDBHelper.getAllLenses();
 
             if (lensList == null) {
                 Logger.log("Tried to create dialog with no lenses");

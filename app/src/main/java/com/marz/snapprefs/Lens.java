@@ -9,8 +9,8 @@ import com.marz.snapprefs.Util.LensData;
 import com.marz.snapprefs.Util.LensData.LensType;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -107,7 +107,7 @@ class Lens {
     private static void buildModifiedList(List<Object> list, LensType type) {
         Logger.log("Original lens list size: " + list.size());
 
-        final HashMap<String, Object> queriedList = MainActivity.lensDBHelper.getAllOfType(type);
+        final LinkedHashMap<String, Object> queriedList = (LinkedHashMap<String, Object>) MainActivity.lensDBHelper.getAllOfType(type);
         final boolean canInjectLenses = queriedList != null;
 
         if( !canInjectLenses ) {
