@@ -30,6 +30,7 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.widget.Toast;
 
+import com.marz.snapprefs.BuildConfig;
 import com.marz.snapprefs.Common;
 import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.Preferences;
@@ -155,7 +156,7 @@ public class CommonUtils {
             Logger.log("MODULE_ENABLED_CHECK_INT value: " + Common.MODULE_ENABLED_CHECK_INT);
         }
         int enabledCheckInt = CommonUtils.isModuleEnabled();
-        if(enabledCheckInt == Common.MODULE_ENABLED_CHECK_INT) {
+        if(enabledCheckInt == (BuildConfig.BUILD_TYPE == "debug" ? Common.MODULE_ENABLED_CHECK_INT : BuildConfig.VERSION_CODE)) {
             return Common.MODULE_STATUS_ACTIVATED;
         }
         if(enabledCheckInt == -1) {

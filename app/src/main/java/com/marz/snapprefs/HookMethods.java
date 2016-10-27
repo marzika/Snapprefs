@@ -183,7 +183,7 @@ public class HookMethods
                 return;
 
             if(lpparam.packageName.equals(Common.PACKAGE_SP)) {
-                findAndHookMethod("com.marz.snapprefs.Util.CommonUtils", lpparam.classLoader, "isModuleEnabled", XC_MethodReplacement.returnConstant(Common.MODULE_ENABLED_CHECK_INT));
+                findAndHookMethod("com.marz.snapprefs.Util.CommonUtils", lpparam.classLoader, "isModuleEnabled", XC_MethodReplacement.returnConstant((BuildConfig.BUILD_TYPE == "debug" ? Common.MODULE_ENABLED_CHECK_INT : BuildConfig.VERSION_CODE)));
                 return;
             }
 
@@ -225,9 +225,9 @@ public class HookMethods
             findAndHookMethod("android.os.Handler", lpparam.classLoader, "sendMessageDelayed", Message.class, long.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    if((long)param.args[1]==10000){
+                    if ((long) param.args[1] == 10000) {
                         Logger.printFinalMessage("sendMessageDelayed - " + param.args[1]);
-                        param.args[1]=12000000L;
+                        param.args[1] = 12000000L;
                     }
                 }
             });
