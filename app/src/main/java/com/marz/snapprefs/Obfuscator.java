@@ -222,6 +222,8 @@ public class Obfuscator implements Serializable {
         public final static String SL_VAR2 = "gt";
 
         public final static int OPERA_PAGE_VIEW_ID = +2131689491;
+
+        public final static String DIRECTIONAL_LAYOUT_CLASS = "com.snapchat.opera.ui.DirectionalLayout";
     }
     public static class datasaving {
         public final static String DSNAPDOWNLOADER_CLASS = "Df$a";//Prev. KL
@@ -396,8 +398,8 @@ public class Obfuscator implements Serializable {
         public final static String RECENTSTORY_GETUSERNAME = "d";
         public final static String ALLSTORY_CLASS = "agD";
         public final static String ALLSTORY_GETFRIEND = "h";
-        public final static String LIVESTORY_CLASS = "aaF";
-        public final static String DISCOVERSTORY_CLASS = "Le";
+        public final static String LIVESTORY_CLASS = "aee";
+        public final static String DISCOVERSTORY_CLASS = "ati";
         public final static String STORYLIST = "g";
         public final static String RECENTSTORIES_CLASS = "com.snapchat.android.fragments.stories.StoriesFragment";
         public final static String STORIES_FRAGMENT_POPULATEARRAY = "c";
@@ -412,6 +414,11 @@ public class Obfuscator implements Serializable {
 
         public final static String TILE_HANDLER_CLASS = "atk";
         public final static String GET_TILES_METHOD = "c";
+
+        public final static String STORY_LOADER_CLASS = "ahm";
+        public final static String SL_LOAD_METHOD = "a";
+        public final static String VIEWED_STORY_CLASS = "agD";
+        public final static String VS_FRIEND_OBJECT = "b";
     }
     public static class groups {
         public final static String STORY_CLASS = "apb";//prev. Vp

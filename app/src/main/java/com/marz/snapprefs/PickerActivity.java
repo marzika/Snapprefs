@@ -28,7 +28,7 @@ public class PickerActivity extends Activity {
 
         if (Intent.ACTION_RUN.equals(action)) {
                 Intent galleryPickerIntent = new Intent(Intent.ACTION_PICK);
-                galleryPickerIntent.setType("video/*, image/*");
+                galleryPickerIntent.setType("image/* video/*");
                 startActivityForResult(galleryPickerIntent, SELECT_GALLERY);
 
             } else {

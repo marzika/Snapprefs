@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.content.res.XModuleResources;
 import android.content.res.XResources;
 import android.graphics.Bitmap;
@@ -12,12 +13,14 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Message;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Preferences.Prefs;
@@ -141,27 +144,33 @@ public class HookMethods
 
             try {
                 HookedLayouts.addSaveButtonsAndGestures(resparam, mResources, localContext);
-            } catch( Throwable t )
-            {
-                Logger.log(t);
+            } catch (Resources.NotFoundException ignore){
             }
 
             if (Preferences.shouldAddGhost()) {
                 try {
                     HookedLayouts.addIcons(resparam, mResources);
-                } catch( Exception e ) {
-                    Logger.log("Exception thrown in addIcons", e);
+                } catch (Resources.NotFoundException ignore){
                 }
             }
             if (Preferences.getBool(Prefs.INTEGRATION)) {
-                HookedLayouts.addShareIcon(resparam);
+                try {
+                    HookedLayouts.addShareIcon(resparam);
+                } catch (Resources.NotFoundException ignore){
+                }
             }
             if (Preferences.getBool(Prefs.HIDE_PEOPLE)) {
-                Stories.addSnapprefsBtn(resparam, mResources);
+                try {
+                    Stories.addSnapprefsBtn(resparam, mResources);
+                } catch (Resources.NotFoundException ignore){
+                }
             }
 
             //Chat.initChatSave(resparam, mResources);
-            HookedLayouts.fullScreenFilter(resparam);
+            try {
+                HookedLayouts.fullScreenFilter(resparam);
+            } catch (Resources.NotFoundException ignore){
+            }
         } catch (Exception e) {
             Logger.log("Exception thrown in handleInitPackageResources", e);
         }
@@ -206,6 +215,30 @@ public class HookMethods
 
             Logger.log("Loading map from xposed");
             Preferences.loadMapFromXposed();
+            findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) {
+                    Logger.printFinalMessage("setMaxDuration - " + param.args[0]);
+                    param.args[0] = 12000000;//2 mins
+                }
+            });
+            findAndHookMethod("android.os.Handler", lpparam.classLoader, "sendMessageDelayed", Message.class, long.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    if((long)param.args[1]==10000){
+                        Logger.printFinalMessage("sendMessageDelayed - " + param.args[1]);
+                        param.args[1]=12000000L;
+                    }
+                }
+            });
+            /* Not needed as they are not setting a sizelimit anymore, yay
+            findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxFileSize", long.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) {//1730151
+                    Logger.printFinalMessage("setMaxFileSize - " + param.args[0]);
+                    param.args[0] = 5190453;//5190453
+                }
+            });*/
 
             findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
@@ -244,6 +277,8 @@ public class HookMethods
                             }
                             boolean isNull = SnapContext == null;
                             Logger.log("SNAPCONTEXT, NULL? - " + isNull, true);
+                            // Fallback method to force the MediaRecorder implementation in Snapchat
+                            // XposedHelpers.findAndHookMethod("com.snapchat.android.camera.videocamera.recordingpreferences.VideoRecorderFactory", lpparam.classLoader, "b", XC_MethodReplacement.returnConstant(false));
                             //SNAPPREFS
                             Saving.initSaving(lpparam, mResources, SnapContext);
                             //NewSaving.initSaving(lpparam);
@@ -292,7 +327,7 @@ public class HookMethods
                                 Misc.initTimer(lpparam, mResources);
                             }
                             if (Preferences.getBool(Prefs.CHAT_AUTO_SAVE)) {
-                                Chat.initTextSave(lpparam, mResources);
+                                Chat.initTextSave(lpparam, SnapContext);
                             }
                             if (Preferences.getBool(Prefs.CHAT_MEDIA_SAVE)) {
                                 Chat.initImageSave(lpparam, mResources);
@@ -358,19 +393,6 @@ public class HookMethods
                         Logger.log("ROOTCHECK: " + s, true);
                     }
                     // External class - Belongs to android
-                    findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
-                        @Override
-                        protected void beforeHookedMethod(MethodHookParam param) {
-                            param.args[0] = 12000000;
-                        }
-                    });
-                    findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxFileSize", long.class, new XC_MethodHook() {
-                        @Override
-                        protected void beforeHookedMethod(MethodHookParam param) {//1730151
-                            param.args[0] = 5190453;//5190453
-                        }
-                    });
-
                     //Gabe is a douche
                     // COMPLETED 9.39.5
                     final Class<?> receivedSnapClass =
@@ -420,7 +442,7 @@ public class HookMethods
                                 vanillaCaptionEditText.setSingleLine(false);
                                 vanillaCaptionEditText.setFilters(new InputFilter[0]);
                                 // Remove actionDone IME option, by only setting flagNoExtractUi
-                                vanillaCaptionEditText.setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
+                                vanillaCaptionEditText.setImeOptions(EditorInfo.IME_ACTION_NONE);
                                 // Remove listener hiding keyboard when enter is pressed by setting the listener to null
                                 vanillaCaptionEditText.setOnEditorActionListener(null);
                                 // Remove listener for cutting of text when the first line is full by setting the text change listeners list to null
@@ -434,8 +456,14 @@ public class HookMethods
                             if (Preferences.getBool(Prefs.CAPTION_UNLIMITED_VANILLA)) {
                                 XposedUtils.log("Unlimited vanilla captions - 2");
                                 EditorInfo editorInfo = (EditorInfo) param.args[0];
-                                editorInfo.imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI;
+                                editorInfo.imeOptions = EditorInfo.IME_ACTION_NONE;
                             }
+                        }
+                    });
+                    XposedHelpers.findAndHookMethod("TX$3", lpparam.classLoader, "onEditorAction", TextView.class, int.class, KeyEvent.class, new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            Logger.printFinalMessage("onEditorAction: int= " + param.args[1]);
                         }
                     });
                     /*String vanillaCaptionEditTextClassName =
@@ -536,6 +564,7 @@ public class HookMethods
                             }
                         }
                     });
+
                     if( Preferences.getBool(Prefs.AUTO_ADVANCE))
                         XposedHelpers.findAndHookMethod(Obfuscator.stories.AUTOADVANCE_CLASS, lpparam.classLoader, Obfuscator.stories.AUTOADVANCE_METHOD, XC_MethodReplacement.returnConstant(false));
 

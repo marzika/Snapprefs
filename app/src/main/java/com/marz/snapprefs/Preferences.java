@@ -21,6 +21,7 @@ public class Preferences {
     public static final int DO_NOT_SAVE = 2;
     public static final int SAVE_BUTTON = 0;
     public static final int SAVE_AUTO = 3;
+    public static final int SAVE_F2S = 4;
     public static final int TOAST_LENGTH_SHORT = 0;
     public static final int TOAST_LENGTH_LONG = 1;
     public static final int TIMER_MINIMUM_DISABLED = 0;
@@ -74,7 +75,7 @@ public class Preferences {
             do {
                 spinCount++;
 
-                if ((spinCount % 100) == 0)
+                if ((spinCount % 500) == 0)
                     Logger.log("Current spin count: " + spinCount);
 
                 if (spinCount > 35000)
@@ -155,7 +156,7 @@ public class Preferences {
                 Logger.log("Loading null object for: " + key);
                 return;
             }
-            Logger.log("Loaded preference: " + key + " val: " + obj);
+            //Logger.log("Loaded preference: " + key + " val: " + obj);
             preferenceMap.put(key, obj);
         }
     }
@@ -412,6 +413,8 @@ public class Preferences {
         LENSES_COLLECT("pref_key_collect_lenses", true),
         LENSES_AUTO_ENABLE("pref_key_auto_enable_lenses", false),
         LENSES_FORCED("pref_key_forced_lenses", true),
+        LENSES_SORT_BY_SEL("pref_key_sort_by_sel", true),
+        LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES("pref_key_hide_curr_provided_sc_lenses", false),
         ACCEPTED_TOU("acceptedToU", false),
         SELECT_STORY("pref_key_selectstory", false),
         SELECT_VENUE("pref_key_selectvenue", false),
