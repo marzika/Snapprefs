@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.marz.snapprefs.Fragments.ChatLogsFragment;
+import com.marz.snapprefs.Fragments.ConversationLogsFragment;
 import com.marz.snapprefs.R;
 
 /**
@@ -29,7 +29,7 @@ public class ChatLogsTabFragment extends Fragment {
         /**
          *Inflate tab_layout and setup Views.
          */
-        View x = inflater.inflate(R.layout.tab_layout, null);
+        View x = inflater.inflate(R.layout.tab_layout, container, false);
         tabLayout = (TabLayout) x.findViewById(R.id.tabs);
         viewPager = (ViewPager) x.findViewById(R.id.viewpager);
 
@@ -68,7 +68,7 @@ public class ChatLogsTabFragment extends Fragment {
         @Override
         public Fragment getItem(int position) {
             switch (position) {
-                case 0 : return new ChatLogsFragment();
+                case 0 : return new ConversationLogsFragment();
             }
             return null;
         }

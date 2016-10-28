@@ -15,21 +15,19 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.marz.snapprefs.Databases.ChatsDatabaseHelper;
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Util.ChatData;
 import com.marz.snapprefs.Util.NotificationUtils;
 
 import java.io.FileInputStream;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
@@ -37,284 +35,86 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
-import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
 public class Chat {
     public static HashSet<String> loadedMessages = new HashSet<>();
     private static SimpleDateFormat dateFormat =
             new SimpleDateFormat("'['dd'th' MMMM yyyy']' - hh:mm", Locale.getDefault());
     private static ChatsDatabaseHelper chatDBHelper;
-    private static Class snapClass;
-    private static Class savedClass;
-    private static Class headerClass;
-    private static Class messageClass;
-    private static Class messageBodyClass;
-    private static Class mediaClass;
 
     private static String yourUsername;
+
+    public static ChatsDatabaseHelper getChatDBHelper(Context context) {
+        if (chatDBHelper == null)
+            chatDBHelper = new ChatsDatabaseHelper(context);
+
+        return chatDBHelper;
+    }
 
     static void initTextSave(final XC_LoadPackage.LoadPackageParam lpparam, final Context snapContext) {
         ClassLoader cl = lpparam.classLoader;
 
-        snapClass = findClass("aJI", cl);
-        savedClass = findClass("aMX", cl);
-        headerClass = findClass("aLv", cl);
-        messageClass = findClass("aJE", cl);
-        messageBodyClass = findClass("aMl", cl);
-        mediaClass = findClass("aMc", cl);
-
-        yourUsername = HookMethods.getSCUsername(lpparam.classLoader);
-
-        if (chatDBHelper == null)
-            chatDBHelper = new ChatsDatabaseHelper(snapContext);
-
-        findAndHookMethod("Ie", cl, "a", Map.class, new XC_MethodHook() {
+        final Class chatClass = findClass(Obfuscator.chat.CHAT_CLASS, cl);
+        findAndHookMethod(Obfuscator.chat.MESSAGEVIEWHOLDER_CLASS, lpparam.classLoader, Obfuscator.chat.MESSAGEVIEWHOLDER_METHOD, boolean.class, new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                super.beforeHookedMethod(param);
-                Logger.log("Called save");
-                Logger.logStackTrace();
-
-                Map<String, Object> savedState = (Map<String, Object>) param.args[0];
-
-                if (savedState == null) {
-                    savedState = new HashMap<>();
-                    Object savedObject = savedClass.newInstance();
-                    callMethod(savedObject, "a", Boolean.TRUE);
-                    callMethod(savedObject, "a", 1);
-                    savedState.put(yourUsername, savedObject);
-                    Logger.log("Inserting new save state");
-                } else {
-                    for (String key : savedState.keySet()) {
-                        Logger.log("Checking save status of: " + key);
-
-                        if (yourUsername.equals(key)) {
-                            Object stateObj = savedState.get(key);
-                            if( getObjectField(stateObj, "a") == Boolean.FALSE ) {
-                                setObjectField(stateObj, "a", Boolean.TRUE);
-                                Logger.log("Setting saved to TRUE");
-                            }
+            protected void afterHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+                Object chat = getObjectField(getObjectField(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_VAR1), Obfuscator.chat.MESSAGEVIEWHOLDER_VAR2);
+                if (chat != null && chatClass.isInstance(chat)) {
+                    if (!(boolean) callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISSAVED) && !(boolean) callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISFAILED)) {
+                        try {
+                            callMethod(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_SAVE);
+                        } catch (XposedHelpers.InvocationTargetError e) {
+                            Logger.log("Unable to save chat text.", true);
                         }
                     }
                 }
-
             }
         });
+    }
 
-        findAndHookMethod("IM", cl, "c", findClass("Ii", cl), new XC_MethodReplacement() {
+    static void initChatLogging(final XC_LoadPackage.LoadPackageParam lpparam, final Context snapContext) {
+        ClassLoader cl = lpparam.classLoader;
+
+        yourUsername = HookMethods.getSCUsername(lpparam.classLoader);
+        getChatDBHelper(snapContext);
+
+        findAndHookMethod("IM", cl, "c", findClass("Ie", cl), new XC_MethodHook() {
             @Override
-            protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                String id = "null";
-                if (param.args[0] != null)
-                    id = (String) callMethod(param.args[0], "getId");
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
 
-                Logger.log("REMOVING ID: " + id);
-                return null;
+                Object chatMessage = param.args[0];
+                handleSentChatMessage(chatMessage);
             }
         });
 
-        findAndHookMethod("IM", cl, "d", findClass("Ii", cl), new XC_MethodReplacement() {
-            @Override
-            protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                String id = "null";
-                if (param.args[0] != null)
-                    id = (String) callMethod(param.args[0], "getId");
-
-                Logger.log("REMOVING ID: " + id);
-                return null;
-            }
-        });
-
-        findAndHookMethod("IM", cl, "e", findClass("Ii", cl), new XC_MethodReplacement() {
-            @Override
-            protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                String id = "null";
-                if (param.args[0] != null)
-                    id = (String) callMethod(param.args[0], "getId");
-
-                Logger.log("REMOVING ID: " + id);
-                return null;
-            }
-        });
-
-        findAndHookMethod("Ig", cl, "c", List.class, new XC_MethodReplacement() {
-            @Override
-            protected Object replaceHookedMethod(MethodHookParam param) throws Throwable {
-                Logger.log("REMOVING ALL");
-                return null;
-            }
-        });
-
-        findAndHookMethod("aJz", cl, "read", findClass("com.google.gson.stream.JsonReader", cl),
-                new XC_MethodHook() {
+        findAndHookMethod("com.snapchat.android.util.chat.SecureChatService", cl,
+                "a", findClass("aMj", cl), new XC_MethodHook() {
                     @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        super.afterHookedMethod(param);
-                        //(TypeAdapter) this.mChatConversationMessagesAdapter.a();
-                        Logger.log("Started chat additions");
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+                        Logger.log("aMj" + param.args[0], LogType.CHAT);
 
-                        String conversation_id = (String) getObjectField(param.getResult(), "id");
-                        Logger.log("Loading conversation ID: " + conversation_id);
+                        Object chatMessage = param.args[0];
+                        if (chatMessage.getClass().getCanonicalName().equals("aJE")) {
+                            handleChatMessage(chatMessage);
+                        } /*else {
+                            String type = (String) getObjectField(chatMessage, "type");
 
-                        Object conversationMessages = getObjectField(param.getResult(), "conversationMessages");
-                        List<Object> messageList = (List<Object>) getObjectField(conversationMessages, "messages");
-
-                        Iterator messageIter = messageList.iterator();
-                        StringBuilder blacklistBuilder = new StringBuilder("(");
-
-                        while (messageIter.hasNext()) {
-                            Object chatObj = messageIter.next();
-                            Object chat_message = getObjectField(chatObj, "chatMessage");
-
-                            if (chat_message == null) {
-                                Logger.log("Null chat message");
-                                continue;
+                            if( type.equals("ping_response")) {
+                                Logger.log("Ping Response", LogType.CHAT);
+                                param.setResult(null);
+                            } else if( type.equals("presence_v2")) {
+                                Logger.log("Presence", LogType.CHAT);
+                                param.setResult(null);
+                                Logger.logStackTrace();
                             }
-
-
-                            try {
-                                ChatData chatData = new ChatData();
-                                chatData.setUniqueId((String) getObjectField(chat_message, "id"));
-
-                                blacklistBuilder.append("'").append(chatData.getUniqueId()).append("'");
-
-                                Map<String, Object> savedState = (Map<String, Object>) getObjectField(chat_message, "savedState");
-
-                                if (savedState == null) {
-                                    savedState = new HashMap<>();
-                                    Object savedObject = savedClass.newInstance();
-                                    callMethod(savedObject, "a", Boolean.TRUE);
-                                    callMethod(savedObject, "a", 1);
-                                    savedState.put(yourUsername, savedObject);
-
-                                    setObjectField(chat_message, "savedState", savedState);
-                                } else {
-                                    for (String key : savedState.keySet()) {
-                                        Logger.log("Checking save status of: " + key);
-
-                                        if (yourUsername.equals(key)) {
-                                            Object stateObj = savedState.get(key);
-
-                                            if( getObjectField(stateObj, "saved") == Boolean.FALSE ) {
-                                                setObjectField(stateObj, "saved", Boolean.TRUE);
-                                                Logger.log("Setting saved to TRUE");
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (messageIter.hasNext())
-                                    blacklistBuilder.append(",");
-
-                                if (loadedMessages.contains(chatData.getUniqueId())) {
-                                    Logger.log("Message already loaded: " + chatData.getUniqueId());
-                                    continue;
-                                }
-
-                                if (chatDBHelper.containsChat(chatData.getUniqueId())) {
-                                    loadedMessages.add(chatData.getUniqueId());
-                                    Logger.log("Message already in DB");
-                                    continue;
-                                }
-
-                                chatData.setIter_token((String) getObjectField(chatObj, "iterToken"));
-                                chatData.setMessageId((String) getObjectField(chat_message, "chatMessageId"));
-                                chatData.setSeq_num((Long) getObjectField(chat_message, "seqNum"));
-                                chatData.setTimestamp((Long) getObjectField(chat_message, "timestamp"));
-                                Object header = getObjectField(chat_message, "header");
-
-                                if (header == null) {
-                                    Logger.log("Null header");
-                                    continue;
-                                }
-
-                                chatData.setConversationId((String) getObjectField(header, "convId"));
-                                chatData.setSender((String) getObjectField(header, "from"));
-                                chatData.setRecipients((List<String>) getObjectField(header, "to"));
-
-                                Object body = getObjectField(chat_message, "body");
-
-                                if (body == null) {
-                                    Logger.log("Null Body");
-                                    continue;
-                                }
-
-                                String type = (String) getObjectField(body, "type");
-
-                                Logger.log("Loading type: " + type);
-
-                                if (type.equals("text")) {
-                                    chatData.setText((String) getObjectField(body, "text"));
-                                    chatData.setMessageType(ChatData.MessageType.TEXT);
-                                } else if (type.equals("media")) {
-                                    chatData.setMessageType(ChatData.MessageType.MEDIA);
-
-                                    Object media = getObjectField(body, "media");
-
-                                    if (media == null) {
-                                        Logger.log("Null media, are we sure it's a media message?");
-                                        continue;
-                                    }
-
-                                    String mediaType = (String) getObjectField(media, "mediaType");
-
-                                    Logger.log("MediaType: " + mediaType);
-
-                                    if (mediaType != null) {
-                                        switch (mediaType) {
-                                            case "IMAGE":
-                                                chatData.setMediaType(ChatData.MediaType.IMAGE);
-                                                break;
-                                            case "VIDEO":
-                                                chatData.setMediaType(ChatData.MediaType.VIDEO);
-                                                break;
-                                            default:
-                                                Logger.log("Unknown media type: " + mediaType);
-                                                continue;
-                                        }
-                                    } else
-                                        Logger.log("Null media type...Continuing anyway");
-
-                                    chatData.setSnapKey((String) getObjectField(media, "key"));
-                                    chatData.setSnapIV((String) getObjectField(media, "iv"));
-                                    chatData.setMediaID((String) getObjectField(media, "mediaId"));
-                                    chatData.setMediaURL((String) getObjectField(media, "mediaUrl"));
-                                    chatData.setSnapWidth((int) getObjectField(media, "width"));
-                                    chatData.setSnapHeight((int) getObjectField(media, "height"));
-                                    //TODO Handle null
-
-                                    Float timerSec = (Float) getObjectField(media, "timerSec");
-
-                                    if (timerSec == null)
-                                        timerSec = 0f;
-
-                                    chatData.setSnapDuration(timerSec);
-                                }
-
-                                Logger.log("Inserting chat to DB: " + chatData.getMessageType() + "|" + chatData.getMediaType());
-
-                                if (chatDBHelper.insertChat(chatData))
-                                    loadedMessages.add(chatData.getUniqueId());
-                                else
-                                    Logger.log("Error inserting ChatData into DB");
-                            } catch (Exception e) {
-                                Logger.log("Problem loading ChatData", e);
-                            }
-                        }
-
-                        if (conversation_id == null) {
-                            Logger.log("Null Conversation ID");
-                            return;
-                        }
-
-                        blacklistBuilder.append(")");
-
-                        fillListWithChatMessages(messageList, conversation_id, blacklistBuilder.toString());
+                        }*/
                     }
                 });
     }
 
-    private static void fillListWithChatMessages(List<Object> messageList, String conversation_id, String blacklist) throws IllegalAccessException, InstantiationException {
+    /*private static void fillListWithChatMessages(List<Object> messageList, String conversation_id, String blacklist) throws IllegalAccessException, InstantiationException {
         List<Object> newChatList = chatDBHelper.getAllChatsFromExcept(conversation_id, blacklist);
 
         if (newChatList == null)
@@ -373,6 +173,56 @@ public class Chat {
             messageList.add(snapObject);
             Logger.log("Injected message");
         }
+    }*/
+
+    private static void handleChatMessage(Object chatObj) {
+        ChatData chatData = new ChatData();
+
+        try {
+            chatData.setMessageId((String) getObjectField(chatObj, "chatMessageId"));
+            chatData.setTimestamp((Long) getObjectField(chatObj, "timestamp"));
+
+            Object header = getObjectField(chatObj, "header");
+            chatData.setConversationId((String) getObjectField(header, "convId"));
+            chatData.setSender((String) getObjectField(header, "from"));
+
+            Object body = getObjectField(chatObj, "body");
+            chatData.setText((String) getObjectField(body, "text"));
+
+            chatData.setFriendName(getFriendNameFromId(chatData.getConversationId()));
+
+            chatDBHelper.insertChat(chatData);
+        } catch (Exception e) {
+            Logger.log("Error creating new chat message", e, LogType.CHAT);
+        }
+    }
+
+    private static void handleSentChatMessage(Object chatObj) {
+        ChatData chatData = new ChatData();
+
+        try {
+            chatData.setMessageId((String) callMethod(chatObj, "getId"));
+            chatData.setText((String) callMethod(chatObj, "r"));
+            chatData.setSender((String) getObjectField(chatObj, "am"));
+            chatData.setConversationId((String) callMethod(chatObj, "M_"));
+            chatData.setTimestamp((Long) callMethod(chatObj, "i"));
+            chatData.setFriendName(getFriendNameFromId(chatData.getConversationId()));
+
+            chatDBHelper.insertChat(chatData);
+        } catch (Exception e) {
+            Logger.log("Error creating new chat message", e, LogType.CHAT);
+        }
+    }
+
+    private static String getFriendNameFromId(String conversationId) {
+        String[] splitNames = conversationId.split("~");
+
+        for (String name : splitNames) {
+            if (!name.equals(yourUsername))
+                return name.trim();
+        }
+
+        return null;
     }
 
     static void initImageSave(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes) {

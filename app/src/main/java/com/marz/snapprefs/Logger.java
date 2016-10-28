@@ -41,7 +41,7 @@ public class Logger {
     private static boolean defaultForced = false;
     private static boolean defaultPrefix = true;
 
-    private static boolean hasLoaded = false;
+    private static boolean loggingEnabled = true;
     private static HashSet<String> logTypes = new HashSet<>();
 
     /**
@@ -170,6 +170,14 @@ public class Logger {
             Logger.log("Stack trace: [Class: " + traceElement.getClassName() + "] [Method: " + traceElement.getMethodName() + "]", defaultPrefix, defaultForced);
     }
 
+    public static void disableLogging() {
+        loggingEnabled = false;
+    }
+
+    public static void enableLogging() {
+        loggingEnabled = true;
+    }
+
     public static void log(String message, Throwable throwable, LogType logType) {
         log(message, logType.setForced());
         log(throwable);
@@ -180,7 +188,7 @@ public class Logger {
     }
 
     public static void log(String message, @Nullable LogType logType) {
-        if (!Preferences.getBool(Preferences.Prefs.DEBUGGING) &&
+        if (!loggingEnabled || !Preferences.getBool(Preferences.Prefs.DEBUGGING) &&
                 (logType != null && !logType.isForced()))
             return;
 
@@ -288,6 +296,7 @@ public class Logger {
         GROUPS("Groups"),
         DATABASE("Database"),
         SAVING("Saving"),
+        PREFS("Prefs"),
         FORCED("Forced", true);
 
         public String tag;

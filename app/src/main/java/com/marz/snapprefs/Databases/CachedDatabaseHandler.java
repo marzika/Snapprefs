@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
+import com.marz.snapprefs.Logger;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -133,8 +135,10 @@ class CachedDatabaseHandler extends CoreDatabaseHandler {
         if (!objectCache.isEmpty()) {
             Object cachedResult = objectCache.get(key);
 
-            if (cachedResult != null)
+            if (cachedResult != null) {
+                Logger.log("Getting cached results", Logger.LogType.DATABASE);
                 return cachedResult;
+            }
         }
 
         Object results = super.getAllBuiltObjects(tableName, where, orderBy, callbackHandler);
@@ -193,11 +197,14 @@ class CachedDatabaseHandler extends CoreDatabaseHandler {
 
     void invalidateCache() {
         objectCache.clear();
+        Logger.log("Cache invalidated", Logger.LogType.DATABASE);
     }
 
     private long shouldInvalidateCache(long rowsAffected) {
-        if (rowsAffected > 0)
-            objectCache.clear();
+        Logger.log("Cache rows affected: " + rowsAffected, Logger.LogType.DATABASE);
+
+        if (rowsAffected != 0)
+            invalidateCache();
 
         return rowsAffected;
     }

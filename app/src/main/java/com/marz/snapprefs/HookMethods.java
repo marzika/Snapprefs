@@ -13,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.text.InputFilter;
 import android.util.Log;
@@ -59,16 +60,16 @@ public class HookMethods
     public static Activity SnapContext;
     public static String MODULE_PATH = null;
     public static ClassLoader classLoader;
+    public static XModuleResources mResources;
+    public static Bitmap saveImg;
     static EditText editText;
     static Typeface defTypeface;
     static boolean haveDefTypeface;
     static XModuleResources modRes;
     static Context context;
     static int counter = 0;
-    public static XModuleResources mResources;
     private static int snapchatVersion;
     private static InitPackageResourcesParam resParam;
-    public static Bitmap saveImg;
     Class CaptionEditText;
     boolean latest = false;
 
@@ -84,6 +85,68 @@ public class HookMethods
         }
     }
 
+    public static String getSCUsername(ClassLoader cl) {
+        Class scPreferenceHandler = findClass(Obfuscator.misc.PREFERENCES_CLASS, cl);
+        try {
+            return (String) callMethod(scPreferenceHandler.newInstance(), Obfuscator.misc.GETUSERNAME_METHOD);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return "";
+    }
+
+    public static void hookAllMethods(String className, ClassLoader cl, boolean hookSubClasses, boolean hookSuperClasses) {
+        Log.d("snapprefs", "Starting allhook");
+        final Class targetClass = findClass(className, cl);
+        Method[] allMethods = targetClass.getDeclaredMethods();
+
+        Log.d("snapprefs", "Methods to hook: " + allMethods.length);
+        for (final Method baseMethod : allMethods) {
+            final Class<?>[] paramList = baseMethod.getParameterTypes();
+            final String fullMethodString = targetClass.getSimpleName() + "." + baseMethod.getName() + "(" + Arrays.toString(paramList) + ") -> " + baseMethod.getReturnType();
+
+            if (Modifier.isAbstract(baseMethod.getModifiers())) {
+                Log.d("snapprefs", "Abstract method: " + fullMethodString);
+                continue;
+            }
+
+            Object[] finalParam = new Object[paramList.length + 1];
+
+            System.arraycopy(paramList, 0, finalParam, 0, paramList.length);
+
+            finalParam[paramList.length] = new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+                    Log.d("snapprefs", "HookTrigger: " + fullMethodString);
+                }
+            };
+
+            findAndHookMethod(targetClass, baseMethod.getName(), finalParam);
+            Log.d("snapprefs", "Hooked method: " + fullMethodString);
+        }
+
+        if (hookSubClasses) {
+            Class[] subClasses = targetClass.getClasses();
+
+            Log.d("snapprefs", "Hooking Subclasses: " + subClasses.length);
+
+            for (Class subClass : subClasses)
+                hookAllMethods(subClass.getName(), cl, hookSubClasses, hookSuperClasses);
+        }
+
+        if (hookSuperClasses) {
+            Class superClass = targetClass.getSuperclass();
+            if (superClass == null || superClass.getSimpleName().equals("Object"))
+                return;
+
+            Log.d("snapprefs", "FOUND SUPERCLASS: " + superClass.getSimpleName());
+            hookAllMethods(superClass.getName(), cl, false, true);
+        }
+    }
 
     @Override
     public void initZygote(StartupParam startupParam) throws Throwable {
@@ -127,8 +190,7 @@ public class HookMethods
                     Logger.log("Loading map from xposed");
                     Preferences.loadMapFromXposed();
                 }
-            } catch( Exception e )
-            {
+            } catch (Exception e) {
                 Log.e("snapchat", "EXCEPTION LOADING HOOKED PREFS");
                 e.printStackTrace();
             }
@@ -144,32 +206,32 @@ public class HookMethods
 
             try {
                 HookedLayouts.addSaveButtonsAndGestures(resparam, mResources, localContext);
-            } catch (Resources.NotFoundException ignore){
+            } catch (Resources.NotFoundException ignore) {
             }
 
             if (Preferences.shouldAddGhost()) {
                 try {
                     HookedLayouts.addIcons(resparam, mResources);
-                } catch (Resources.NotFoundException ignore){
+                } catch (Resources.NotFoundException ignore) {
                 }
             }
             if (Preferences.getBool(Prefs.INTEGRATION)) {
                 try {
                     HookedLayouts.addShareIcon(resparam);
-                } catch (Resources.NotFoundException ignore){
+                } catch (Resources.NotFoundException ignore) {
                 }
             }
             if (Preferences.getBool(Prefs.HIDE_PEOPLE)) {
                 try {
                     Stories.addSnapprefsBtn(resparam, mResources);
-                } catch (Resources.NotFoundException ignore){
+                } catch (Resources.NotFoundException ignore) {
                 }
             }
 
             //Chat.initChatSave(resparam, mResources);
             try {
                 HookedLayouts.fullScreenFilter(resparam);
-            } catch (Resources.NotFoundException ignore){
+            } catch (Resources.NotFoundException ignore) {
             }
         } catch (Exception e) {
             Logger.log("Exception thrown in handleInitPackageResources", e);
@@ -184,6 +246,8 @@ public class HookMethods
 
             try {
                 XposedUtils.log("----------------- SNAPPREFS HOOKED -----------------", false);
+                Logger.loadSelectedLogTypes();
+
                 Object activityThread =
                         callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
                 context = (Context) callMethod(activityThread, "getSystemContext");
@@ -217,15 +281,54 @@ public class HookMethods
                     param.args[0] = 12000000;//2 mins
                 }
             });
-            findAndHookMethod("android.os.Handler", lpparam.classLoader, "sendMessageDelayed", Message.class, long.class, new XC_MethodHook() {
+
+            final int maxRecordTime = 20000;
+
+            // If maxRecordTime is same as SC timecap, let SC perform as normal
+            if( maxRecordTime > 10000 ) {
+                findAndHookMethod("abc", lpparam.classLoader, "handleMessage", Message.class, new XC_MethodHook() {
+                    boolean internallyCalled = false;
+
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+                        Message message = (Message) param.args[0];
+                        Logger.log("HandleMessageId: " + message.what);
+
+                        if (message.what == 15 && !internallyCalled) {
+                            if (maxRecordTime > 10000) {
+                                internallyCalled = true;
+
+                                Handler handler = message.getTarget();
+                                Message newMessage = Message.obtain(handler, 15);
+
+                                handler.sendMessageDelayed(newMessage, maxRecordTime - 10000);
+                                Logger.log(String.format("Triggering video end in %s more ms", maxRecordTime - 10000));
+                            }
+
+                            param.setResult(null);
+                        } else if (internallyCalled)
+                            internallyCalled = false;
+                    }
+                });
+            }
+
+            /*findAndHookMethod("android.os.Handler", lpparam.classLoader, "sendMessageDelayed", Message.class, long.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    Message message = (Message) param.args[0];
+
+                    //TODO Check message for target abc
+                    //Logger.log("MessageName: " + message.get);
+
                     if((long)param.args[1]==10000){
                         Logger.printFinalMessage("sendMessageDelayed - " + param.args[1]);
+                        Logger.log("Message: " + param.args[0].toString(), LogType.FORCED);
                         param.args[1]=12000000L;
+                        Logger.logStackTrace();
                     }
                 }
-            });
+            });*/
             /* Not needed as they are not setting a sizelimit anymore, yay
             findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxFileSize", long.class, new XC_MethodHook() {
                 @Override
@@ -324,6 +427,9 @@ public class HookMethods
                             if (Preferences.getBool(Prefs.CHAT_AUTO_SAVE)) {
                                 Chat.initTextSave(lpparam, SnapContext);
                             }
+                            if (Preferences.getBool(Prefs.CHAT_LOGGING))
+                                Chat.initChatLogging(lpparam, SnapContext);
+
                             if (Preferences.getBool(Prefs.CHAT_MEDIA_SAVE)) {
                                 Chat.initImageSave(lpparam, mResources);
                             }
@@ -560,7 +666,7 @@ public class HookMethods
                         }
                     });
 
-                    if( Preferences.getBool(Prefs.AUTO_ADVANCE))
+                    if (Preferences.getBool(Prefs.AUTO_ADVANCE))
                         XposedHelpers.findAndHookMethod(Obfuscator.stories.AUTOADVANCE_CLASS, lpparam.classLoader, Obfuscator.stories.AUTOADVANCE_METHOD, XC_MethodReplacement.returnConstant(false));
 
                 }
@@ -568,20 +674,6 @@ public class HookMethods
         } catch (Exception e) {
             Logger.log("Exception thrown in handleLoadPackage", e);
         }
-    }
-
-    public static String getSCUsername(ClassLoader cl)
-    {
-        Class scPreferenceHandler = findClass(Obfuscator.misc.PREFERENCES_CLASS, cl);
-        try {
-            return (String) callMethod(scPreferenceHandler.newInstance(), Obfuscator.misc.GETUSERNAME_METHOD);
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        return "";
     }
 
     private void addFilter(LoadPackageParam lpparam) {
@@ -628,7 +720,7 @@ public class HookMethods
         });
         //Used to emulate the battery status as being FULL -> above 90%
         final Class<?> batteryInfoProviderEnum =
-                    findClass("com.snapchat.android.app.shared.feature.preview.model.filter.BatteryLevel", lpparam.classLoader); //prev. com.snapchat.android.app.shared.model.filter.BatteryLevel
+                findClass("com.snapchat.android.app.shared.feature.preview.model.filter.BatteryLevel", lpparam.classLoader); //prev. com.snapchat.android.app.shared.model.filter.BatteryLevel
 
         findAndHookMethod(Obfuscator.spoofing.BATTERY_FILTER, lpparam.classLoader, "a", new XC_MethodHook() {
             @Override
@@ -654,59 +746,5 @@ public class HookMethods
                 }
             }
         });
-    }
-
-    public static void hookAllMethods(String className, ClassLoader cl, boolean hookSubClasses, boolean hookSuperClasses)
-    {
-        Log.d("snapprefs", "Starting allhook");
-        final Class targetClass = findClass(className, cl);
-        Method[] allMethods = targetClass.getDeclaredMethods();
-
-        Log.d("snapprefs", "Methods to hook: " + allMethods.length);
-        for( final Method baseMethod : allMethods )
-        {
-            final Class<?>[] paramList = baseMethod.getParameterTypes();
-            final String fullMethodString = targetClass.getSimpleName() + "." + baseMethod.getName() + "(" + Arrays.toString(paramList) + ") -> " + baseMethod.getReturnType();
-
-            if(Modifier.isAbstract(baseMethod.getModifiers())) {
-                Log.d("snapprefs", "Abstract method: " + fullMethodString);
-                continue;
-            }
-
-            Object[] finalParam = new Object[paramList.length + 1];
-
-            System.arraycopy(paramList, 0, finalParam, 0, paramList.length);
-
-            finalParam[paramList.length] = new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    super.beforeHookedMethod(param);
-                    Log.d("snapprefs", "HookTrigger: " + fullMethodString);
-                }
-            };
-
-            findAndHookMethod(targetClass, baseMethod.getName(), finalParam);
-            Log.d("snapprefs", "Hooked method: " + fullMethodString);
-        }
-
-        if(hookSubClasses)
-        {
-            Class[] subClasses = targetClass.getClasses();
-
-            Log.d("snapprefs", "Hooking Subclasses: " + subClasses.length);
-
-            for(Class subClass : subClasses)
-                hookAllMethods(subClass.getName(), cl, hookSubClasses, hookSuperClasses);
-        }
-
-        if(hookSuperClasses)
-        {
-            Class superClass = targetClass.getSuperclass();
-            if( superClass == null || superClass.getSimpleName().equals("Object"))
-                return;
-
-            Log.d("snapprefs", "FOUND SUPERCLASS: " + superClass.getSimpleName());
-            hookAllMethods(superClass.getName(), cl, false, true);
-        }
     }
 }

@@ -39,6 +39,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.marz.snapprefs.Databases.LensDatabaseHelper;
 import com.marz.snapprefs.Tabs.BuyTabFragment;
+import com.marz.snapprefs.Tabs.ChatLogsTabFragment;
 import com.marz.snapprefs.Tabs.DataTabFragment;
 import com.marz.snapprefs.Tabs.DeluxeTabFragment;
 import com.marz.snapprefs.Tabs.FiltersTabFragment;
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
     private static UUID deviceUuid;
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
-    FragmentManager mFragmentManager;
+    public static FragmentManager mFragmentManager;
     FragmentTransaction mFragmentTransaction;
     HashMap<Integer, Fragment> cache = new HashMap<>();
     GoogleCloudMessaging gcm;
@@ -294,14 +295,21 @@ public class MainActivity extends AppCompatActivity {
                 menuItem.setCheckable(true);
                 menuItem.setChecked(true);
                 Iterator<MenuItem> it = items.iterator();
+
+                mFragmentManager.popBackStack();
+                FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction().replace(R.id.containerView, getForId(menuItem.getItemId()));
+
                 while (it.hasNext()) {
                     MenuItem item = it.next();
                     if (!item.equals(menuItem)) {
                         item.setChecked(false);
+
+                        if( item.getItemId() == R.id.nav_item_main)
+                            fragmentTransaction.addToBackStack("Main");
                     }
                 }
                 items.add(menuItem);
-                mFragmentManager.beginTransaction().replace(R.id.containerView, getForId(menuItem.getItemId())).commit();
+                fragmentTransaction.commit();
                 return false;
             }
 
@@ -374,8 +382,12 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_item_lenses:
                     cache.put(id, new LensesTabFragment());
                     break;
+                case R.id.nav_item_chat:
+                    cache.put(id, new ChatLogsTabFragment());
+                    break;
             }
         }
+
         return cache.get(id);
     }
 
