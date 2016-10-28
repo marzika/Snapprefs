@@ -364,6 +364,7 @@ public class Obfuscator implements Serializable {
     public static class chat {
         public final static String CHAT_CLASS = "Ie";
         public final static String CONVERSATION_CLASS = "Ig";//prev. com.snapchat.android.model.chat.ChatConversation
+        public final static String ABSTRACT_CONVERSATION_CLASS = "IM";
         public final static String CHATFEEDITEM_CLASS = "com.snapchat.android.model.chat.ChatFeedItem";
         public final static String CONVERSATION_LOADOLDCHATS = "a";
         public final static String MESSAGEVIEWHOLDER_CLASS = "com.snapchat.android.app.feature.messaging.chat.impl.viewholder.MessageViewHolder";
@@ -384,6 +385,11 @@ public class Obfuscator implements Serializable {
         public final static String CHAT_MEDIA_CLASS = "com.snapchat.android.app.feature.messaging.chat.model2.ChatMedia";
         public final static String ISTYPING_CLASS = "FI";
         public final static String ISTYPING_METHOD = "a";
+        public final static String SENT_CHAT_METHOD = "c";
+        public final static String SECURE_CHAT_SERVICE_CLASS = "com.snapchat.android.util.chat.SecureChatService";
+        public final static String SCS_MESSAGE_METHOD = "a";
+        public final static String CHAT_MESSAGE_BASE_CLASS = "aMj";
+        public final static String CHAT_MESSAGE_DETAILS_CLASS = "aJE";
     }
     public static class notification {
         public final static String NOTIFICATION_CLASS_1 = "xH";//prev. vz

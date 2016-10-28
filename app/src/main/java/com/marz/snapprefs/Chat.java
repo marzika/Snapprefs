@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 
 import com.marz.snapprefs.Databases.ChatsDatabaseHelper;
 import com.marz.snapprefs.Logger.LogType;
+import com.marz.snapprefs.Obfuscator.chat;
 import com.marz.snapprefs.Util.ChatData;
 import com.marz.snapprefs.Util.NotificationUtils;
 
@@ -78,7 +79,7 @@ public class Chat {
         yourUsername = HookMethods.getSCUsername(lpparam.classLoader);
         getChatDBHelper(snapContext);
 
-        findAndHookMethod("IM", cl, "c", findClass("Ie", cl), new XC_MethodHook() {
+        findAndHookMethod(chat.ABSTRACT_CONVERSATION_CLASS, cl, Obfuscator.chat.SENT_CHAT_METHOD, findClass(chat.CHAT_CLASS, cl), new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 super.beforeHookedMethod(param);
@@ -88,28 +89,18 @@ public class Chat {
             }
         });
 
-        findAndHookMethod("com.snapchat.android.util.chat.SecureChatService", cl,
-                "a", findClass("aMj", cl), new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.chat.SECURE_CHAT_SERVICE_CLASS, cl,
+                chat.SCS_MESSAGE_METHOD, findClass(Obfuscator.chat.CHAT_MESSAGE_BASE_CLASS, cl), new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         super.beforeHookedMethod(param);
-                        Logger.log("aMj" + param.args[0], LogType.CHAT);
 
                         Object chatMessage = param.args[0];
-                        if (chatMessage.getClass().getCanonicalName().equals("aJE")) {
-                            handleChatMessage(chatMessage);
-                        } /*else {
-                            String type = (String) getObjectField(chatMessage, "type");
+                        Logger.log(String.format("Packet class [%s] Packet Type [%s]", chatMessage.getClass(), getObjectField(chatMessage, "type")), LogType.CHAT);
 
-                            if( type.equals("ping_response")) {
-                                Logger.log("Ping Response", LogType.CHAT);
-                                param.setResult(null);
-                            } else if( type.equals("presence_v2")) {
-                                Logger.log("Presence", LogType.CHAT);
-                                param.setResult(null);
-                                Logger.logStackTrace();
-                            }
-                        }*/
+                        if (chatMessage.getClass().getCanonicalName().equals(chat.CHAT_MESSAGE_DETAILS_CLASS)) {
+                            handleChatMessage(chatMessage);
+                        }
                     }
                 });
     }
