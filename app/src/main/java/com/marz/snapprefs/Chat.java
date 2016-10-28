@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Locale;
 
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static de.robv.android.xposed.XposedBridge.hookAllConstructors;
@@ -59,15 +58,36 @@ public class Chat {
         findAndHookMethod(Obfuscator.chat.MESSAGEVIEWHOLDER_CLASS, lpparam.classLoader, Obfuscator.chat.MESSAGEVIEWHOLDER_METHOD, boolean.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
-                Object chat = getObjectField(getObjectField(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_VAR1), Obfuscator.chat.MESSAGEVIEWHOLDER_VAR2);
-                if (chat != null && chatClass.isInstance(chat)) {
-                    if (!(boolean) callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISSAVED) && !(boolean) callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISFAILED)) {
-                        try {
-                            callMethod(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_SAVE);
-                        } catch (XposedHelpers.InvocationTargetError e) {
-                            Logger.log("Unable to save chat text.", true);
-                        }
+                try {
+                    Object chatLinker = getObjectField(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_VAR1);
+
+
+                    if (chatLinker == null) {
+                        Logger.log("Null chat linker", LogType.CHAT);
+                        return;
                     }
+
+                    Object chat = getObjectField(chatLinker, Obfuscator.chat.MESSAGEVIEWHOLDER_VAR2);
+
+                    if (chat == null) {
+                        Logger.log("Null Chat Object", LogType.CHAT);
+                        return;
+                    }
+
+                    if (chatClass.isInstance(chat)) {
+                        Boolean isSaved = (Boolean) callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISSAVED);
+                        Boolean isFailed = (Boolean) callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISFAILED);
+
+                        if (isSaved == null || isFailed == null) {
+                            Logger.log("Null Chat Data [isSaved:%s] [isFailed:%s]", LogType.CHAT);
+                            return;
+                        }
+
+                        if (!isSaved && !isFailed)
+                            callMethod(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_SAVE);
+                    }
+                } catch (Throwable t) {
+                    Logger.log("Error saving chat message", t, LogType.CHAT);
                 }
             }
         });
@@ -89,6 +109,7 @@ public class Chat {
             }
         });
 
+        final Class chatDetailsClass = findClass(Obfuscator.chat.CHAT_MESSAGE_DETAILS_CLASS, cl);
         findAndHookMethod(Obfuscator.chat.SECURE_CHAT_SERVICE_CLASS, cl,
                 chat.SCS_MESSAGE_METHOD, findClass(Obfuscator.chat.CHAT_MESSAGE_BASE_CLASS, cl), new XC_MethodHook() {
                     @Override
@@ -96,11 +117,11 @@ public class Chat {
                         super.beforeHookedMethod(param);
 
                         Object chatMessage = param.args[0];
-                        Logger.log(String.format("Packet class [%s] Packet Type [%s]", chatMessage.getClass(), getObjectField(chatMessage, "type")), LogType.CHAT);
+                        String type = (String) getObjectField(chatMessage, "type");
+                        Logger.log(String.format("Packet class [%s] Packet Type [%s]", chatMessage.getClass(), type), LogType.CHAT);
 
-                        if (chatMessage.getClass().getCanonicalName().equals(chat.CHAT_MESSAGE_DETAILS_CLASS)) {
+                        if (chatDetailsClass.isInstance(chatMessage) && type.equals("chat_message"))
                             handleChatMessage(chatMessage);
-                        }
                     }
                 });
     }

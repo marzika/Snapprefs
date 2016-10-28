@@ -45,7 +45,7 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
             "CREATE TABLE " + LensEntry.TABLE_NAME + " (" +
                     LensEntry.COLUMN_NAME_MCODE + TEXT_TYPE + " PRIMARY KEY" + COMMA_SEP +
                     LensEntry.COLUMN_NAME_GPLAYID + TEXT_TYPE + COMMA_SEP +
-                    LensEntry.COLUMN_NAME_TYPE + TEXT_TYPE + COMMA_SEP + " DEFAULT 'SCHEDULED'" +
+                    LensEntry.COLUMN_NAME_TYPE + TEXT_TYPE + " DEFAULT 'SCHEDULED'," +
                     LensEntry.COLUMN_NAME_MHINTID + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MICONLINK + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MID + TEXT_TYPE + COMMA_SEP +
