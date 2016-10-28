@@ -55,24 +55,22 @@ public class Chat {
         ClassLoader cl = lpparam.classLoader;
 
         final Class chatClass = findClass(Obfuscator.chat.CHAT_CLASS, cl);
-        findAndHookMethod(Obfuscator.chat.MESSAGEVIEWHOLDER_CLASS, lpparam.classLoader, Obfuscator.chat.MESSAGEVIEWHOLDER_METHOD, boolean.class, new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.chat.MESSAGEVIEWHOLDER_CLASS, lpparam.classLoader, "r", new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+            protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+
                 try {
                     Object chatLinker = getObjectField(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_VAR1);
 
-
-                    if (chatLinker == null) {
-                        Logger.log("Null chat linker", LogType.CHAT);
+                    if (chatLinker == null)
                         return;
-                    }
 
                     Object chat = getObjectField(chatLinker, Obfuscator.chat.MESSAGEVIEWHOLDER_VAR2);
 
-                    if (chat == null) {
-                        Logger.log("Null Chat Object", LogType.CHAT);
+                    if (chat == null)
                         return;
-                    }
+
 
                     if (chatClass.isInstance(chat)) {
                         Boolean isSaved = (Boolean) callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISSAVED);
@@ -83,8 +81,10 @@ public class Chat {
                             return;
                         }
 
-                        if (!isSaved && !isFailed)
+                        if (!isSaved && !isFailed) {
+                            Logger.log("Performed chat save", LogType.CHAT);
                             callMethod(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_SAVE);
+                        }
                     }
                 } catch (Throwable t) {
                     Logger.log("Error saving chat message", t, LogType.CHAT);
