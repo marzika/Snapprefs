@@ -282,7 +282,7 @@ public class HookMethods
                 }
             });
 
-            final int maxRecordTime = 20000;
+            final int maxRecordTime = 30000;
 
             // If maxRecordTime is same as SC timecap, let SC perform as normal
             if( maxRecordTime > 10000 ) {
