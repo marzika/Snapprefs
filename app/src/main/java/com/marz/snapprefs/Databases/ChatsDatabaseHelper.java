@@ -134,7 +134,7 @@ public class ChatsDatabaseHelper extends CoreDatabaseHandler {
 
         idHolder[0] = chatMessageId;
         return super.containsObject(ChatEntry.TABLE_NAME, ChatEntry.COLUMN_NAME_MESSAGE_ID,
-                idHolder, null, keyProjection);
+                idHolder);
     }
 
     public boolean containsConversation(String conversationId) {
@@ -146,7 +146,7 @@ public class ChatsDatabaseHelper extends CoreDatabaseHandler {
         idHolder[0] = conversationId;
 
         return super.containsObject(ConversationEntry.TABLE_NAME, ConversationEntry.COLUMN_NAME_CONVERSATION_ID,
-                idHolder, null, convKeyProjection);
+                idHolder);
     }
 
     @SuppressWarnings("unchecked")

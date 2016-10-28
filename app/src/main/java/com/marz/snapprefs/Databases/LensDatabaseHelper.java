@@ -129,7 +129,7 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
         String sortOrder =
                 LensEntry.COLUMN_NAME_MCODE + " DESC";
 
-        return super.containsObject(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE, selectionArgs, sortOrder, fullProjection);
+        return super.containsObject(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE, selectionArgs);
     }
 
     public boolean toggleLensActiveState(String mCode) throws Exception {

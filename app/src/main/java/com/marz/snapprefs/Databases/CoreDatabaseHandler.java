@@ -10,7 +10,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.Logger.LogType;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -89,31 +88,29 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
         return getDatabase().insert(tableName, null, values);
     }
 
-    public boolean containsObject(String tableName, String columnName, String[] selectionArgs,
-                                  String sortOrder, String[] projection) {
-        Logger.log("Checking if object is in database", LogType.DATABASE);
-
+    public boolean containsObject(String tableName, String columnName, String[] selectionArgs) {
         String selection = columnName + " = ?";
         Cursor cursor = getDatabase().query(
                 tableName,
-                projection,
+                null,
                 selection,
                 selectionArgs,
                 null,
                 null,
-                sortOrder
+                null
         );
 
-        Logger.log("Query count: " + cursor.getCount());
+        boolean contains = cursor.getCount() != 0;
+
+        Logger.log(String.format("Is %s in [Table:%s][Column:%s]: %s", Arrays.toString(selectionArgs), tableName, columnName, contains ? "YES" : "NO"), LogType.DATABASE);
 
         cursor.close();
 
-        return cursor.getCount() != 0;
+        return contains;
     }
 
     public int getCount(String tableName, String columnName, String[] selectionArgs, String[] projection) {
         String selection = columnName + " = ?";
-        Logger.log("Getting count", Logger.LogType.DATABASE);
 
         Cursor cursor = getDatabase().query(
                 tableName,                     // The table to query
@@ -127,14 +124,12 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
 
         int count = cursor.getCount();
         cursor.close();
-        Logger.log("Query count: " + count, LogType.DATABASE);
+        Logger.log(String.format("Count of %s in [Table:%s][Column:%s] = [%s]", Arrays.toString(selectionArgs), tableName, columnName, count), LogType.DATABASE);
         return count;
     }
 
     public ContentValues getContent(String tableName, String columnName, String[] selectionArgs,
                                     String sortOrder, String[] projection) {
-        Logger.log("Getting lens from database", LogType.DATABASE);
-
         String selection = columnName + " = ?";
         Cursor cursor = getDatabase().query(
                 tableName,                     // The table to query
@@ -146,7 +141,7 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
                 sortOrder                                 // The sort order
         );
 
-        Logger.log("Query count: " + cursor.getCount(), LogType.DATABASE);
+        Logger.log(String.format("Getting content %s from [Table:%s][Column:%s]", Arrays.toString(selectionArgs), tableName, columnName), LogType.DATABASE);
 
         if (!cursor.moveToFirst()) {
             Logger.log("Error moving cursor to first row", LogType.DATABASE);
@@ -161,14 +156,12 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
             return null;
         }
 
-        Logger.log("Queried database to get content: " + content.size(), LogType.DATABASE);
+        Logger.log(String.format("Retried [%s] content objects from DB", content.size()), LogType.DATABASE);
         return content;
     }
 
     public Object getBuiltContent(String tableName, String columnName, String[] selectionArgs,
                                   String sortOrder, String[] projection, CallbackHandler callbackHandler) {
-        Logger.log("Getting lens from database", LogType.DATABASE);
-
         String selection = columnName + " = ?";
         Cursor cursor = getDatabase().query(
                 tableName,                     // The table to query
@@ -181,7 +174,8 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
         );
         callbackHandler.addParams(cursor);
 
-        Logger.log("Query count: " + cursor.getCount(), LogType.DATABASE);
+        Logger.log(String.format("Getting built Object %s from [Table:%s][Column:%s]", Arrays.toString(selectionArgs), tableName, columnName), LogType.DATABASE);
+
 
         if (!cursor.moveToFirst()) {
             Logger.log("Error moving cursor to first row", LogType.DATABASE);
@@ -221,7 +215,6 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
         }
 
         while (!cursor.isAfterLast()) {
-            Logger.log("Looping cursor result", LogType.DATABASE);
             ContentValues value = getValuesFromCursor(cursor, projection);
 
             if (value.size() > 0)
@@ -230,15 +223,13 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
             cursor.moveToNext();
         }
 
-        Logger.log("Completed getting lenses", LogType.DATABASE);
-
+        Logger.log(String.format("Retrieved [%s] content objects", content.size()), LogType.DATABASE);
 
         cursor.close();
         return content;
     }
 
     public ArrayList<ContentValues> getAllContent(String tableName, String[] projection) {
-        Logger.log("Getting all lenses from database", LogType.DATABASE);
         Cursor cursor = getDatabase().rawQuery("SELECT * FROM " + tableName, null);
 
         Logger.log("Query size: " + cursor.getCount(), LogType.DATABASE);
@@ -296,13 +287,12 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
     }
 
     Object getAllBuiltObjects(String tableName, String where, String orderBy, CallbackHandler callbackHandler) {
-        Logger.log("Getting all lenses from database", LogType.DATABASE);
         Cursor cursor = getDatabase().rawQuery(
                 "SELECT * FROM " + tableName +
                         (where != null ? " WHERE " + where : "") +
                         (orderBy != null ? " ORDER BY " + orderBy : ""), null);
 
-        Logger.log("Query size: " + cursor.getCount(), LogType.DATABASE);
+        Logger.log(String.format("Building [%s] queried objects", cursor.getCount()), LogType.DATABASE);
 
         callbackHandler.addParams(cursor);
 
@@ -413,12 +403,10 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
     @SuppressWarnings("TryWithIdenticalCatches")
     private Object invokeCallback(CallbackHandler callbackHandler) {
         try {
-            Logger.log("Performing invocation of builder method: " + callbackHandler.method.getName() + "|" + Arrays.toString(callbackHandler.parameters), LogType.DATABASE);
             return callbackHandler.method.invoke(callbackHandler.caller, callbackHandler.parameters);
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            Logger.log("Error building callback method", e, LogType.DATABASE);
         }
 
         return null;
@@ -465,10 +453,9 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
          */
         static CallbackHandler getCallback(Object clazz, String methodName, Class<?>... classType) {
             try {
-                Logger.log("Trying to build callback method", LogType.DATABASE);
                 return new CallbackHandler(clazz, clazz.getClass().getMethod(methodName, classType));
             } catch (NoSuchMethodException e) {
-                Logger.log("ERROR GETTING CALLBACK", e, LogType.DATABASE);
+                Logger.log("Error creating callback method", e, LogType.DATABASE);
                 return null;
             }
         }
@@ -483,10 +470,7 @@ class CoreDatabaseHandler extends SQLiteOpenHelper {
 
             this.parameters = newParamList;
 
-            for (Object param : parameters)
-                Logger.log("New parameter: " + param.getClass().getCanonicalName(), LogType.DATABASE);
-
-            return newParamList;
+            return this.parameters;
         }
     }
 }

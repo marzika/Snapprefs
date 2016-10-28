@@ -22,8 +22,7 @@ class CachedDatabaseHandler extends CoreDatabaseHandler {
         super(context, databaseName, entries, DATABASE_VERSION);
     }
 
-    public boolean containsObject(String tableName, String columnName, String[] selectionArgs,
-                                  String sortOrder, String[] projection) {
+    public boolean containsObject(String tableName, String columnName, String[] selectionArgs) {
         String key = String.format("%s%s%s%s", "containsObject", tableName, columnName, Arrays.toString(selectionArgs));
 
         if (!objectCache.isEmpty()) {
@@ -33,7 +32,7 @@ class CachedDatabaseHandler extends CoreDatabaseHandler {
                 return (boolean) cachedResult;
         }
 
-        boolean result = super.containsObject(tableName, columnName, selectionArgs, sortOrder, projection);
+        boolean result = super.containsObject(tableName, columnName, selectionArgs);
         objectCache.put(key, result);
         return result;
     }

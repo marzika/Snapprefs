@@ -118,7 +118,6 @@ public class Chat {
 
                         Object chatMessage = param.args[0];
                         String type = (String) getObjectField(chatMessage, "type");
-                        Logger.log(String.format("Packet class [%s] Packet Type [%s]", chatMessage.getClass(), type), LogType.CHAT);
 
                         if (chatDetailsClass.isInstance(chatMessage) && type.equals("chat_message"))
                             handleChatMessage(chatMessage);
