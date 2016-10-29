@@ -49,14 +49,13 @@ public class ChatLogsMessagesFragment extends Fragment implements OnFocusChangeL
         logList.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
-                Logger.log("Clicked");
                 final ChatData item = (ChatData) logList.getItemAtPosition(i);
                 String message = item.getText();
                 ClipboardManager clipboard = (ClipboardManager) view.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("text label", message);
                 clipboard.setPrimaryClip(clip);
+                Logger.log("Copied chat message to clipboard", LogType.CHAT);
                 Toast.makeText(getContext(), "Message copied", Toast.LENGTH_SHORT).show();
-                return;
             }
         });
 
