@@ -1,8 +1,11 @@
 package com.marz.snapprefs.Fragments;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,6 +14,7 @@ import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -25,8 +29,10 @@ import com.marz.snapprefs.Util.ConversationItem;
 /**
  * Used to reduce calls to the database by storing contents in a hashmap
  * Created by Andre on 26/10/2016.
+ * Modified by ethan on 29/10/2016
  */
 
+@SuppressLint("ValidFragment")
 public class ChatLogsMessagesFragment extends Fragment implements OnFocusChangeListener {
     private ConversationItem conversation;
     private ChatLogAdapter adapter;
@@ -35,11 +41,24 @@ public class ChatLogsMessagesFragment extends Fragment implements OnFocusChangeL
     public ChatLogsMessagesFragment(ConversationItem item) {
         this.conversation = item;
     }
-
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View mainView = inflater.inflate(R.layout.chatlogs_messages, container, false);
         logList = (ListView) mainView.findViewById(R.id.list_message_logs);
+
+        logList.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, final int i, long l) {
+                Logger.log("Clicked");
+                final ChatData item = (ChatData) logList.getItemAtPosition(i);
+                String message = item.getText();
+                ClipboardManager clipboard = (ClipboardManager) view.getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("text label", message);
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(getContext(), "Message copied", Toast.LENGTH_SHORT).show();
+                return;
+            }
+        });
 
         logList.setOnItemLongClickListener(new OnItemLongClickListener() {
             @Override
@@ -50,7 +69,7 @@ public class ChatLogsMessagesFragment extends Fragment implements OnFocusChangeL
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("Delete Message");
                 builder.setMessage("Are you sure you would like to delete this message?");
-                builder.setPositiveButton("Yes", new OnClickListener() {
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         if( !Chat.getChatDBHelper(getContext()).removeChat(item.getMessageId()))
