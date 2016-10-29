@@ -8,7 +8,7 @@ import java.util.Date;
  */
 
 public class ChatData {
-    private final static SimpleDateFormat sdf = new SimpleDateFormat("HH:mm\ndd MMM");
+    private final static SimpleDateFormat sdf = new SimpleDateFormat("HH:mm\ndd MMM\nyyyy");
     private String conversationId;
     private String messageId;
     private String text;
