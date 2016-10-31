@@ -10,20 +10,27 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.SnapData.FlagState;
 import com.marz.snapprefs.Util.CommonUtils;
+import com.marz.snapprefs.Util.FlingSaveGesture;
+import com.marz.snapprefs.Util.GestureEvent;
 import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.NotificationUtils.ToastType;
 import com.marz.snapprefs.Util.SavingUtils;
+import com.marz.snapprefs.Util.StringUtils;
+import com.marz.snapprefs.Util.SweepSaveGesture;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -42,41 +49,49 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
+import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
 
 public class Saving {
     //public static final String SNAPCHAT_PACKAGE_NAME = "com.snapchat.android";
-    public static Resources mSCResources;
-    public static XC_LoadPackage.LoadPackageParam lpparam2;
+    private static Resources mSCResources;
+    private static XC_LoadPackage.LoadPackageParam lpparam2;
     private static SimpleDateFormat dateFormat =
             new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.getDefault());
     private static SimpleDateFormat dateFormatSent =
             new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
-    private static XModuleResources mResources;
     private static ConcurrentHashMap<String, SnapData> hashSnapData = new ConcurrentHashMap<>();
     private static boolean printFlags = true;
     private static String currentSnapKey;
     private static Context relativeContext;
     //TODO implement user selected save mode
     private static boolean asyncSaveMode = true;
+    private static Object enum_NO_AUTO_ADVANCE;
+    private static GestureEvent gestureEvent;
+    private static boolean gestureCalledInternally = false;
 
     static void initSaving(final XC_LoadPackage.LoadPackageParam lpparam,
                            final XModuleResources modRes, final Context snapContext) {
-        mResources = modRes;
         lpparam2 = lpparam;
 
         if (mSCResources == null) mSCResources = snapContext.getResources();
 
         try {
-            ClassLoader cl = lpparam.classLoader;
+            final ClassLoader cl = lpparam.classLoader;
+
+            final Class storyClass = findClass(Obfuscator.save.STORYSNAP_CLASS, cl);
+            Class AdvanceType = findClass(Obfuscator.misc.ADVANCE_TYPE_CLASS, cl);
+            enum_NO_AUTO_ADVANCE = getStaticObjectField(AdvanceType, Obfuscator.misc.NO_AUTO_ADVANCE_OBJECT);
 
             /**
              * Called whenever a video is decrypted by snapchat
              * Will pre-load the next snap in the list
              */
+            // UPDATED METHOD & CONTENT 9.39.5
             findAndHookConstructor(Obfuscator.save.DECRYPTEDSNAPVIDEO_CLASS, cl, findClass(
-                    Obfuscator.save.CACHE_CLASS, cl), String.class, Bitmap.class,
+                    Obfuscator.save.CACHE_CLASS, cl), String.class, Bitmap.class, String.class, long.class,
                     new XC_MethodHook() {
                         @Override
                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -94,21 +109,204 @@ public class Saving {
 
             /**
              * Called whenever a bitmap is set to the view (I believe)
-             */
+             **/
+            // UPDATED METHOD & CONTENT 9.39.5
             findAndHookMethod(Obfuscator.save.IMAGESNAPRENDERER_CLASS2, cl, Obfuscator.save.IMAGESNAPRENDERER_NEW_BITMAP, Bitmap.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     try {
                         handleImagePayload(snapContext, param);
                     } catch (Exception e) {
-                        Logger.log("Exception handling Image Payload\n" + e.getMessage());
+                        Logger.log("Exception handling Image Payload", e);
                     }
+                }
+            });
+
+            findAndHookMethod(Obfuscator.save.STORY_DETAILS_PACKET, cl, Obfuscator.save.SDP_GET_ENUM_METHOD, String.class, Object.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+
+                    String key = (String) param.args[0];
+                    if (key.equals("auto_advance_mode"))
+                        param.args[1] = enum_NO_AUTO_ADVANCE;
+                }
+            });
+
+            if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S ||
+                    Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_F2S) {
+                findAndHookMethod(Obfuscator.save.DIRECTIONAL_LAYOUT_CLASS, cl, "dispatchTouchEvent", MotionEvent.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+
+                        if (gestureCalledInternally)
+                            return;
+
+                        if (gestureEvent == null) {
+                            if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S)
+                                gestureEvent = new SweepSaveGesture();
+                            else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_F2S)
+                                gestureEvent = new FlingSaveGesture();
+                            else {
+                                Logger.log("No gesture method provided");
+                                return;
+                            }
+                        }
+
+                        Logger.log("Dispatching touch event");
+                        String mKey = (String) getAdditionalInstanceField(param.thisObject, "mKey");
+
+                        if (mKey != null) {
+                            if (gestureEvent.onTouch((FrameLayout) param.thisObject, (MotionEvent) param.args[0], SnapType.STORY) ==
+                                    GestureEvent.ReturnType.TAP) {
+                                gestureCalledInternally = true;
+                                Logger.log("Performed TAP?");
+                                param.setResult(callMethod(param.thisObject, "dispatchTouchEvent", param.args[0]));
+                            } else
+                                param.setResult(true);
+                        }
+
+                        gestureCalledInternally = false;
+                    }
+                });
+            }
+
+            findAndHookMethod(Obfuscator.save.STORY_VIEWER_MEDIA_CACHE, cl, Obfuscator.save.VIEWING_STORY_METHOD,
+                    String.class, findClass(Obfuscator.save.STORY_DETAILS_PACKET, cl), ImageView.class, findClass(Obfuscator.save.VIEWING_STORY_VAR4, cl), new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            Log.d("snapprefs", "### START StoryViewerMediaCache ###");
+                            Object godPacket = param.args[1];
+                            Object storyList = getObjectField(param.thisObject, Obfuscator.save.SVMC_STORYLIST_OBJECT);
+                            String POSTER_USERNAME = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "POSTER_USERNAME");
+                            String CLIENT_ID = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "CLIENT_ID");
+                            Object storySnap = callMethod(storyList, Obfuscator.save.SDP_GET_OBJECT, POSTER_USERNAME, CLIENT_ID);
+
+                            if (storySnap == null) {
+                                Logger.log("Null storysnap?");
+                                return;
+                            }
+
+                            String storyUsername = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "POSTER_USERNAME");
+
+                            if (storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader))) {
+                                Logger.log("Story is yours");
+                                return;
+                            }
+
+                            View view = (View) param.args[2];
+
+                            if (Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_AUTO) {
+                                FrameLayout snapContainer = scanForStoryContainer(view);
+                                String mKey = (String) getObjectField(storySnap, "mId");
+
+                                if (snapContainer != null) {
+                                    if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON)
+                                        HookedLayouts.assignStoryButton(snapContainer, snapContext, mKey);
+                                    else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S ||
+                                            Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_F2S) {
+                                        FrameLayout snapContainerParent = (FrameLayout) snapContainer.getParent();
+
+                                        if (snapContainerParent != null)
+                                            setAdditionalInstanceField(snapContainerParent, "mKey", mKey);
+                                    }
+                                }
+                            }
+
+                            setAdditionalInstanceField(view, "StorySnap", storySnap);
+                            Log.d("snapprefs", "StoryViewerMediaCache.a : KEY " + getObjectField(storySnap, "mId"));
+                            Log.d("snapprefs", "Str: " + param.args[0]);
+                            Log.d("snapprefs", "### END StoryViewerMediaCache ###");
+                        }
+                    });
+
+            findAndHookConstructor(Obfuscator.save.STORY_IMAGE_HOLDER, cl, ImageView.class, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+
+                    Object storySnap = getAdditionalInstanceField(param.args[0], "StorySnap");
+
+                    if (storySnap != null) {
+                        Log.d("snapprefs", "### START gC <INIT> ###");
+
+                        String storyUsername = (String) getObjectField(storySnap, "mUsername");
+
+                        if (storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader))) {
+                            Logger.log("Story is yours");
+                            return;
+                        }
+
+                        setAdditionalInstanceField(param.thisObject, "StorySnap", storySnap);
+                        Log.d("snapprefs", "Key: " + getObjectField(storySnap, "mId"));
+                        Log.d("snapprefs", "### END gC <INIT> ###");
+                    }
+
+                }
+            });
+
+            findAndHookMethod(Obfuscator.save.STORY_LOADER, cl, Obfuscator.save.SL_ISVIEWING_METHOD, storyClass, new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+                    Log.d("snapprefs", "asT.i");
+
+                    Object storySnap = param.args[0];
+
+                    if (storySnap == null) {
+                        Log.d("snapprefs", "Null StorySnap");
+                        return;
+                    }
+
+                    String storyUsername = (String) getObjectField(storySnap, "mUsername");
+
+                    if (storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader))) {
+                        Logger.log("Story is yours");
+                        return;
+                    }
+
+                    handleSnapHeader(snapContext, storySnap);
+                }
+            });
+
+            findAndHookMethod(Obfuscator.save.STORY_IMAGE_HOLDER, cl, "onResourceReady", Object.class, findClass(Obfuscator.save.SL_VAR2, cl), new XC_MethodHook() {
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    super.beforeHookedMethod(param);
+                    Object storySnap = getAdditionalInstanceField(param.thisObject, "StorySnap");
+
+                    if (storySnap == null) {
+                        return;
+                    }
+
+                    Log.d("snapprefs", "### START gC onResourceReady ###");
+
+                    Object image = param.args[0];
+
+                    if (!(image instanceof Bitmap)) {
+                        Log.d("snapprefs", "### RETURNED gC onResourceReady - Not bitmap ###");
+                        return;
+                    }
+
+                    String storyUsername = (String) getObjectField(storySnap, "mUsername");
+
+                    if (storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader))) {
+                        Logger.log("Story is yours");
+                        return;
+                    }
+
+
+                    String mKey = (String) getObjectField(storySnap, "mId");
+                    handleImagePayload(snapContext, mKey, (Bitmap) image);
                 }
             });
 
             /**
              * Called every time a snap is viewed - Quite reliable
              */
+            // UPDATED METHOD & CONTENT 9.39.5
             findAndHookMethod(Obfuscator.save.RECEIVEDSNAP_CLASS, cl, Obfuscator.save
                     .RECEIVEDSNAP_BEING_SEEN, boolean.class, new XC_MethodHook() {
                 @Override
@@ -117,6 +315,7 @@ public class Saving {
 
                     boolean isBeingViewed = (boolean) param.args[0];
 
+                    Logger.log("Viewing snap: " + isBeingViewed);
                     if (isBeingViewed) {
                         Object obj = param.thisObject;
 
@@ -128,12 +327,12 @@ public class Saving {
                     }
                 }
             });
-
-            findAndHookMethod(Obfuscator.save.SNAPPREVIEWFRAGMENT_CLASS, lpparam.classLoader, Obfuscator.save.SNAPPREVIEWFRAGMENT_METHOD1, new XC_MethodHook() {
+            // UPDATED METHOD & CONTENT 9.39.5
+            findAndHookMethod(Obfuscator.save.SNAPPREVIEWFRAGMENT_CLASS, lpparam.classLoader, Obfuscator.save.SNAPPREVIEWFRAGMENT_METHOD1, boolean.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     try {
-                        if( Preferences.getBool(Prefs.SAVE_SENT_SNAPS) )
+                        if (Preferences.getBool(Prefs.SAVE_SENT_SNAPS))
                             handleSentSnap(param.thisObject, snapContext);
                     } catch (Exception e) {
                         Logger.log("Error getting sent media", e);
@@ -146,6 +345,7 @@ public class Saving {
              * our limit and hide the counter if we need it.
              */
 
+            // UPDATED METHOD & CONTENT 9.39.5
             findAndHookMethod(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader, Obfuscator.save.RECEIVEDSNAP_DISPLAYTIME, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
@@ -164,18 +364,22 @@ public class Saving {
                 }
             });
             if (Preferences.getBool(Prefs.HIDE_TIMER_SNAP)) {
+                // UPDATED METHOD & CONTENT
                 findAndHookMethod(Obfuscator.save.CLASS_SNAP_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_SNAPTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
             if (Preferences.getBool(Prefs.HIDE_TIMER_STORY)) {
+                // UPDATED METHOD & CONTENT
                 findAndHookMethod(Obfuscator.save.CLASS_STORY_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_STORYTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
             if (Preferences.getBool(Prefs.LOOPING_VIDS)) {
+                // UPDATED METHOD & CONTENT
                 findAndHookMethod(Obfuscator.save.CLASS_TEXTURE_VIDEO_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_TVV_START, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         callMethod(param.thisObject, Obfuscator.save.METHOD_TVV_SETLOOPING, true);
                     }
                 });
+                // UPDATED METHOD & CONTENT
                 findAndHookMethod(Obfuscator.save.CLASS_SNAP_COUNTDOWN_CONTROLLER, lpparam.classLoader, Obfuscator.save.METHOD_SCC_VAR1, long.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -185,6 +389,7 @@ public class Saving {
                 });
             }
             //List<Bitmap> a = this.i.a(this.F.g(), ProfileImageSize.MEDIUM);
+            // UPDATED METHOD & CONTENT 9.39.5
             findAndHookMethod(Obfuscator.save.CLASS_FRIEND_MINI_PROFILE_POPUP_FRAGMENT, lpparam.classLoader, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_GET_CACHED_PROFILE_PICTURES, new XC_MethodHook() {
                 @Override
                 protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
@@ -205,7 +410,7 @@ public class Saving {
                             //^.a(F.g(), ProfileImageSize.MEDIUM)
                             List<Bitmap> profileImages = (List<Bitmap>) callMethod(i, Obfuscator.save.PROFILE_IMAGES_CACHE_GET_PROFILE_IMAGES, new Class[]{String.class, profileImageSizeClass}, username, MEDIUM);
                             String filePath = SavingUtils.generateFilePath("ProfileImages", username);
-                            if(Preferences.getBool(Prefs.DEBUGGING)) {
+                            if (Preferences.getBool(Prefs.DEBUGGING)) {
                                 Logger.printTitle("Profile Image Saving Debug Information");
                                 Logger.printMessage("Profile Image Size Inner Class: " + profileImageSizeClass);
                                 Logger.printMessage("friendObject: " + friendObject);
@@ -221,13 +426,13 @@ public class Saving {
                                 Logger.printFilledRow();
                             }
                             final File profileImagesFolder = new File(filePath);
-                            if(!profileImagesFolder.mkdirs() && !profileImagesFolder.exists() ){
+                            if (!profileImagesFolder.mkdirs() && !profileImagesFolder.exists()) {
                                 Logger.log("Error creating ProfileImages and/or Username folder");
                                 return false;
                             }
 
-                            if(profileImages == null) {
-                                SavingUtils.vibrate(HookMethods.context, false);
+                            if (profileImages == null) {
+                                SavingUtils.vibrate(snapContext, false);
                                 NotificationUtils.showStatefulMessage("Error Saving Profile Images For " + username + "\nIf The Profile Image Is Not Blank Please Enable Debug Mode And Rep", ToastType.BAD, lpparam.classLoader);
                                 return false;
                             }
@@ -241,39 +446,71 @@ public class Saving {
                                 } catch (NoSuchAlgorithmException e) {
                                     e.printStackTrace();
                                 }
-                                if(f == null) {
+                                if (f == null) {
                                     NotificationUtils.showStatefulMessage("File f is null!", ToastType.BAD, lpparam.classLoader);
+                                    Logger.logStackTrace();
                                     return false;
                                 }
-                                if(f.exists()) {
+                                if (f.exists()) {
                                     NotificationUtils.showStatefulMessage("Profile Images already Exist.", ToastType.BAD, lpparam.classLoader);
                                     return true;
                                 }
-                                if(SavingUtils.saveJPG(f, profileImages.get(iterator), HookMethods.context)) {
+
+                                if (SavingUtils.saveJPG(f, profileImages.get(iterator), snapContext, false)) {
                                     succCounter++;
                                 }
                             }
                             Boolean succ = (succCounter == sizeOfProfileImages);
                             NotificationUtils.showStatefulMessage("Saved " + succCounter + "/" + sizeOfProfileImages + " profile images.", succ ? ToastType.GOOD : ToastType.BAD, lpparam.classLoader);
-                            SavingUtils.vibrate(HookMethods.context, succ);
+                            SavingUtils.vibrate(snapContext, succ);
                             return true;
                         }
                     });
                 }
             });
-        } catch (Exception e) {
-            Logger.log("Error occured: Snapprefs doesn't currently support this version, wait for an update", e);
 
-            findAndHookMethod("com.snapchat.android.LandingPageActivity", lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
+            //HookMethods.hookAllMethods("Ce", cl, true);
+        } catch (Exception e) {
+            Logger.log("Error occurred: Snapprefs doesn't currently support this version, wait for an update", e);
+
+            findAndHookMethod(Obfuscator.save.LANDINGPAGEACTIVITY_CLASS, lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Toast.makeText((Context) param.thisObject, "This version of snapchat is currently not supported by Snapprefs.", Toast.LENGTH_LONG)
+                    Toast.makeText((Context) param.thisObject, "This version of Snapchat is currently not supported by Snapprefs.", Toast.LENGTH_LONG)
                             .show();
                 }
             });
         }
     }
 
-    public static void handleSentSnap(Object snapPreviewFragment, Context snapContext) {
+    private static FrameLayout scanForStoryContainer(View view) {
+        if (view == null) {
+            Logger.log("Called scan with Null view");
+            return null;
+        }
+
+        Object parent = view.getParent();
+
+        if (parent != null) {
+            if (parent instanceof View) {
+                int id = ((View) parent).getId();
+                Logger.log("Scanned ID: " + id);
+
+                if (id == Obfuscator.save.OPERA_PAGE_VIEW_ID) {
+                    Logger.log("Found Opera container");
+                    return (FrameLayout) parent;
+                } else {
+                    Logger.log("Failed scan attempt");
+                    return scanForStoryContainer((View) parent);
+                }
+            }
+        }
+
+        Logger.log("Null scan attempt");
+        return null;
+    }
+
+    // UPDATED 9.39.5
+    private static void handleSentSnap(Object snapPreviewFragment, Context snapContext) {
         try {
             Logger.printTitle("Handling SENT snap");
             Activity activity = (Activity) callMethod(snapPreviewFragment, "getActivity");
@@ -307,7 +544,7 @@ public class Saving {
             Logger.printMessage("Saving with filename: " + filename);
             Logger.printMessage("MediaBryo Type: " + bryoName);
 
-            if (bryoName.equals("VZ")) {
+            if (bryoName.equals(Obfuscator.save.CLASS_MEDIABRYO_VIDEO)) {
                 Logger.printMessage("Media Type: VIDEO");
                 Uri uri = (Uri) getObjectField(mediaBryo, Obfuscator.save.OBJECT_MVIDEOURI);
 
@@ -332,7 +569,7 @@ public class Saving {
                     response = saveSnap(SnapType.SENT, MediaType.VIDEO,
                             snapContext, null, videoStream, filename, null);
                 }
-            } else if (bryoName.equals("VC")) {
+            } else if (bryoName.equals(Obfuscator.save.SNAPIMAGEBRYO_CLASS)) {
                 Logger.printMessage("Media Type: IMAGE");
                 Bitmap bmp = (Bitmap) callMethod(snapEditorView, Obfuscator.save.METHOD_GET_SENT_BITMAP, activity, true);
                 if (bmp != null) {
@@ -352,16 +589,13 @@ public class Saving {
                 Logger.printFinalMessage("Saved sent snap");
                 createStatefulToast("Saved send snap", ToastType.GOOD);
                 snapData.addFlag(FlagState.SAVED);
-                return;
             } else if (response == SaveResponse.FAILED) {
                 Logger.printFinalMessage("Error saving snap");
                 createStatefulToast("Error saving snap", ToastType.BAD);
                 snapData.addFlag(FlagState.FAILED);
-                return;
             } else {
                 Logger.printFinalMessage("Unhandled save response");
                 createStatefulToast("Unhandled save response", ToastType.WARNING);
-                return;
             }
         } catch (Exception e) {
             Logger.log("Error getting sent media", e);
@@ -376,11 +610,13 @@ public class Saving {
 
             if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
                 if (currentSnapData.getSnapType() == SnapType.STORY &&
-                        Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_S2S) {
+                        Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_S2S &&
+                        Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_F2S) {
                     Logger.printFinalMessage("Tried to perform story S2S from different mode");
                     return;
                 } else if (currentSnapData.getSnapType() == SnapType.SNAP &&
-                        Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_S2S) {
+                        Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_S2S &&
+                        Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_F2S) {
                     Logger.printFinalMessage("Tried to perform snap S2S from different mode");
                     return;
                 }
@@ -391,12 +627,19 @@ public class Saving {
         performManualSnapDataSave(currentSnapData, relativeContext);
     }
 
-    public static void performButtonSave() {
+    static void performButtonSave() {
+        if (currentSnapKey != null) {
+            performButtonSave(currentSnapKey);
+        }
+    }
+
+    public static void performButtonSave(String mKey) {
         SnapData currentSnapData = null;
         Logger.printTitle("Launching BUTTON Save");
 
-        if (currentSnapKey != null) {
-            currentSnapData = hashSnapData.get(currentSnapKey);
+        if (mKey != null) {
+            Logger.log("Checking key: " + mKey);
+            currentSnapData = hashSnapData.get(mKey);
 
             if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
                 if (currentSnapData.getSnapType() == SnapType.STORY &&
@@ -415,7 +658,7 @@ public class Saving {
         performManualSnapDataSave(currentSnapData, relativeContext);
     }
 
-    public static void performManualSnapDataSave(SnapData snapData, Context context) {
+    private static void performManualSnapDataSave(SnapData snapData, Context context) {
         if (snapData != null && context != null) {
             Logger.printMessage("Found SnapData to save");
             Logger.printMessage("Key: " + snapData.getmKey());
@@ -449,23 +692,28 @@ public class Saving {
         }
     }
 
+    //UPDATED to 9.39.5
     private static void handleSnapHeader(Context context, Object receivedSnap) throws Exception {
+
         Logger.printTitle("Handling SnapData HEADER");
         Logger.printMessage("Header object: " + receivedSnap.getClass().getCanonicalName());
 
         String mId = (String) getObjectField(receivedSnap, Obfuscator.save.OBJECT_MID);
-        SnapType snapType = null;
+
+        SnapType snapType;
 
         String className = receivedSnap.getClass().getCanonicalName();
 
-        if(className.equals(Obfuscator.save.STORYSNAP_CLASS))
-            snapType = SnapType.STORY;
-        else if( className.equals(Obfuscator.save.RECEIVEDSNAP_CLASS))
-            snapType = SnapType.SNAP;
-        else
-        {
-            Logger.log("Obfuscator out of date for SnapType in SAVING CLASS");
-            return;
+        switch (className) {
+            case Obfuscator.save.STORYSNAP_CLASS:
+                snapType = SnapType.STORY;
+                break;
+            case Obfuscator.save.RECEIVEDSNAP_CLASS:
+                snapType = SnapType.SNAP;
+                break;
+            default:
+                Logger.log("Obfuscator out of date for SnapType in SAVING CLASS");
+                return;
         }
 
         Logger.printMessage("SnapType: " + snapType.name);
@@ -527,12 +775,13 @@ public class Saving {
      * @param param
      * @throws Exception
      */
+    // UPDATED METHOD 9.39.5
     private static void handleVideoPayload(Context context, XC_MethodHook.MethodHookParam param)
             throws Exception {
 
         Logger.printTitle("Handling VIDEO Payload");
 
-        // Grab the MediaCache - Class: ahJ
+        // Grab the MediaCache - Class: ahm
         Object mCache = param.args[0];
 
         if (mCache == null) {
@@ -540,7 +789,7 @@ public class Saving {
             return;
         }
 
-        // Grab the MediaKey - Variable: ahJ.mKey
+        // Grab the MediaKey - Variable: ahm.mKey
         String mKey = (String) param.args[1];
 
         if (mKey == null) {
@@ -548,12 +797,13 @@ public class Saving {
             return;
         }
 
-        Logger.printMessage("Key: " + mKey);
+        String parsedKey = StringUtils.stripKey(mKey);
+        Logger.printMessage("Key: " + parsedKey);
 
         // Grab the Key to Item Map (Contains file paths)
         @SuppressWarnings("unchecked")
         Map<String, Object> mKeyToItemMap =
-                (Map<String, Object>) getObjectField(mCache, "mKeyToItemMap");
+                (Map<String, Object>) getObjectField(mCache, Obfuscator.save.CACHE_KEYTOITEMMAP);
 
         if (mKeyToItemMap == null) {
             Logger.printFinalMessage("Mkey-Item Map not found");
@@ -570,7 +820,7 @@ public class Saving {
         }
 
         // Get the path of the video file
-        String mAbsoluteFilePath = (String) getObjectField(item, "mAbsoluteFilePath");
+        String mAbsoluteFilePath = (String) getObjectField(item, Obfuscator.save.CACHE_ITEM_PATH);
 
         if (mAbsoluteFilePath == null) {
             Logger.printFinalMessage("No path object found");
@@ -591,12 +841,8 @@ public class Saving {
         } else
             Logger.printMessage("Path: " + mAbsoluteFilePath);
 
-        // Split the mKey as story videos are post-fixed with an extra code
-        if (mKey.contains("#"))
-            mKey = mKey.split("#")[0];
-
         // Get the snapdata associated with the mKey above
-        SnapData snapData = hashSnapData.get(mKey);
+        SnapData snapData = hashSnapData.get(parsedKey);
 
         // Print the snapdata's current flags
         printFlags(snapData);
@@ -608,8 +854,8 @@ public class Saving {
         } else if (snapData == null) {
             // If the snapdata doesn't exist, create a new one with the provided mKey
             Logger.printMessage("No SnapData found for Payload... Creating new");
-            snapData = new SnapData(mKey);
-            hashSnapData.put(mKey, snapData);
+            snapData = new SnapData(parsedKey);
+            hashSnapData.put(parsedKey, snapData);
             Logger.printMessage("Hash Size: " + hashSnapData.size());
         }
 
@@ -638,17 +884,32 @@ public class Saving {
      * @param param
      * @throws Exception
      */
-    public static void handleImagePayload(Context context, XC_MethodHook.MethodHookParam param)
+    // UPDATED TO LATEST 9.39.5
+    private static void handleImagePayload(Context context, XC_MethodHook.MethodHookParam param)
+            throws Exception {
+        // Class: ahZ - holds the mKey for the payload
+        Object keyholder = getObjectField(param.thisObject, Obfuscator.save.OBJECT_KEYHOLDERCLASSOBJECT);
+        // Get the mKey out of ahZ
+        String mKey = (String) getObjectField(keyholder, Obfuscator.save.OBJECT_KEYHOLDER_KEY);
+
+        Bitmap bmp = (Bitmap) param.args[0];
+
+        handleImagePayload(context, mKey, bmp);
+    }
+
+    private static void handleImagePayload(Context context, String mKey, Bitmap originalBmp)
             throws Exception {
         Logger.printTitle("Handling IMAGE Payload");
-        Logger.printMessage("Getting Bitmap");
 
-        // Class: ahZ - holds the mKey for the payload
-        Object obj = getObjectField(param.thisObject, Obfuscator.save.OBJECT_KEYHOLDERCLASS);
-        // Get the mKey out of ahZ
-        String mKey = (String) getObjectField(obj, "mKey");
+        if (mKey == null) {
+            Logger.printFinalMessage("Image Payload Null Key");
+            return;
+        } else if (originalBmp == null) {
+            Logger.printFinalMessage("Tried to attach Null Bitmap");
+            return;
+        }
+
         Logger.printMessage("Key: " + mKey);
-
         // Find the snapData associated with the mKey
         SnapData snapData = hashSnapData.get(mKey);
 
@@ -666,16 +927,7 @@ public class Saving {
             Logger.printMessage("Hash Size: " + hashSnapData.size());
         }
 
-        // Get the bitmap payload
-        Bitmap originalBmp = (Bitmap) param.args[0];
-
-        if (originalBmp == null) {
-            Logger.printFinalMessage("Tried to attach Null Bitmap");
-            return;
-        }
-
-        if( originalBmp.isRecycled() )
-        {
+        if (originalBmp.isRecycled()) {
             Logger.printFinalMessage("Bitmap is already recycled");
             snapData.addFlag(FlagState.FAILED);
             createStatefulToast("Error saving image", ToastType.BAD);
@@ -728,15 +980,11 @@ public class Saving {
         Logger.printMessage("Passed payload checks");
 
         if (snapData.getSnapType() == SnapType.SNAP &&
-                (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.DO_NOT_SAVE ||
-                        Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON ||
-                        Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S)) {
+                Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_AUTO) {
             Logger.printMessage("Snap save mode check failed");
             return false;
         } else if (snapData.getSnapType() == SnapType.STORY &&
-                (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.DO_NOT_SAVE ||
-                        Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON ||
-                        Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_S2S)) {
+                Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_AUTO) {
             Logger.printMessage("Story save mode check failed");
             return false;
         }
@@ -753,17 +1001,9 @@ public class Saving {
      * @return True if contains any of the flags
      */
     private static boolean scanForExisting(SnapData snapData, FlagState flagState) {
-        if (snapData.hasFlag(FlagState.SAVED))
-            return true;
-        else if (snapData.hasFlag(flagState))
-            return true;
-        else if (snapData.hasFlag(FlagState.PROCESSING))
-            return true;
-        else
-            return false;
-        /*return !snapData.hasFlag(FlagState.SAVED) ||
-                (snapData.hasFlag(flagState) || snapData.hasFlag(FlagState.SAVED)) &&
-                (!snapData.hasFlag(FlagState.FAILED) || !snapData.hasFlag(FlagState.COMPLETED));*/
+        return snapData.hasFlag(FlagState.SAVED) ||
+                snapData.hasFlag(flagState) ||
+                snapData.hasFlag(FlagState.PROCESSING);
     }
 
     /**
@@ -773,7 +1013,7 @@ public class Saving {
      * @param snapData
      * @throws Exception
      */
-    public static void handleSave(Context context, SnapData snapData) throws Exception {
+    private static void handleSave(Context context, SnapData snapData) throws Exception {
         // Ensure snapData is ready for saving
         if (snapData.hasFlag(FlagState.COMPLETED)) {
             Logger.printMessage("Saving Snap");
@@ -940,9 +1180,9 @@ public class Saving {
      * @return
      * @throws Exception
      */
-    public static SaveResponse saveSnap(SnapType snapType, MediaType mediaType, Context context,
-                                        Bitmap image, FileInputStream video, String filename,
-                                        String sender) throws Exception {
+    static SaveResponse saveSnap(SnapType snapType, MediaType mediaType, Context context,
+                                 Bitmap image, FileInputStream video, String filename,
+                                 String sender) throws Exception {
         File directory;
 
         try {
@@ -1001,12 +1241,16 @@ public class Saving {
         return SaveResponse.FAILED;
     }
 
-    public static void createStatefulToast(String message, ToastType type) {
+    static void createStatefulToast(String message, ToastType type) {
         NotificationUtils.showStatefulMessage(message, type, lpparam2.classLoader);
     }
 
-    public static File createFileDir(String category, String sender) throws IOException {
-        File directory = new File(Preferences.getSavePath());
+    private static File createFileDir(String category, String sender) throws IOException {
+        String savePath = Preferences.getSavePath();
+        if (savePath == null)
+            savePath = Preferences.getContentPath();
+
+        File directory = new File(savePath);
 
         if (Preferences.getBool(Prefs.SORT_BY_CATEGORY) || (Preferences.getBool(Prefs.SORT_BY_USERNAME) && sender == null)) {
             directory = new File(directory, category);
@@ -1038,11 +1282,11 @@ public class Saving {
         }
     }
 
-    public enum SaveResponse {
+    enum SaveResponse {
         SUCCESS, FAILED, ONGOING, EXISTING
     }
 
-    public enum MediaType {
+    enum MediaType {
         IMAGE(".jpg", "Image"),
         IMAGE_OVERLAY(".png", "Overlay"),
         VIDEO(".mp4", "Video");
@@ -1056,7 +1300,7 @@ public class Saving {
         }
     }
 
-    public static class AsyncSaveSnapData extends AsyncTask<Object, Void, Boolean> {
+    private static class AsyncSaveSnapData extends AsyncTask<Object, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Object... params) {
             Context context = (Context) params[0];

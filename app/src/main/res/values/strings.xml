@@ -18,6 +18,9 @@
     <string name="hidebf_text">Hide Best-Friends</string>
     <string name="hidebf_summary">Hides your Best-Friends from you</string>
 
+    <string name="auto_advance_title">Disable Auto-Advance</string>
+    <string name="auto_advance_summary">Disables the story Auto-Advance function</string>
+
     <string name="hidelive_text">Hide Live stories</string>
     <string name="hidelive_summary">Hides the Live stories section on the Stories screen</string>
     <string name="hidepeople_text">Hide People From Stories</string>
@@ -151,6 +154,7 @@
         <item>Sweep to Save</item>
         <item>Don\'t Save</item>
         <item>Auto Save</item>
+        <item>Fling to Save</item>
     </string-array>
 
     <string-array name="pref_save_mode_values" translatable="false">
@@ -158,6 +162,7 @@
         <item>1</item>
         <item>2</item>
         <item>3</item>
+        <item>4</item>
     </string-array>
 
     <!-- Viewing settings -->
@@ -364,8 +369,22 @@
     <string name="pref_save_chat_image_summary">When enabled open the chat image and tap and hold to save, for  videos use the button.</string>
     <string name="pref_save_chat_text_title">Enable Chat Text Auto-Save</string>
     <string name="pref_save_chat_text_summary">When enabled sent and received Chats will be saved automatically</string>
+    <string name="pref_save_chat_logging_title">Enable Chat Logging into Database</string>
+    <string name="pref_save_chat_logging_summary">When enabled chat messages are logged to a database and are viewable in Snapprefs</string>
     <string name="pref_save_integration_title">Enable Snapchat integration</string>
     <string name="pref_save_integration_summary">When enabled you can launch Snapprefs\'s settings by pulling down Snapchat\'s settings bar and clicking on Snapprefs</string>
     <string name="licenses">Snapprefs is licensed under GNU GPLv3. \n\nUsed libraries - License:\nInstagram Filters for Android - Apache License 2.0\nckChangeLog - Apache License 2.0\nColorPicker for Android - Apache License 2.0\nNoNonsense-FilePicker - MPL 2.0\nmp4parser - Free License\n\nModule was originally based on:\nKeepchat - GNU GPLv3\nSnapshare - GNU GPLv3\n\nSnapchat™ is the property of Snapchat Inc.\nSnapprefs is in no way affiliated with, authorized, maintained, sponsored or endorsed by the Snapchat Inc. or any of its affiliates or subsidiaries. This is an independent application.</string>
     <string name="hide_text">Show Icon In Launcher</string>
+    <string name="hide_current_sc_lenses_switch_txt">Hide Lenses Currently Provided By SnapChat</string>
+    <string name="enable_sort_by_sel_time_switch_txt">Enable Sorting Lenses By Selection Time</string>
+    <string name="auto_enable_lenses_switch_txt">Enable Lenses When Collected</string>
+    <string name="fully_close_sc_lense_screen_txt">Snapchat needs to be fully closed to update the lens list</string>
+    <string name="lense_unassigned_txt">Unassigned</string>
+    <string name="sel_lense_count_heading_txt">Selected Lenses Count</string>
+    <string name="total_lenses_collected_heading_txt">Total Lenses Collected</string>
+    <string name="select_lenses_btn_txt">Select Lenses</string>
+    <string name="select_lense_button_heading_txt">Select lenses to load</string>
+    <string name="lense_master_switch_loading_system_txt">Lens Loading System</string>
+    <string name="lense_master_switch_lense_system_txt">Lens Collection System</string>
+    <string name="lense_master_switches_heading_txt">Master Switches</string>
 </resources>

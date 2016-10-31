@@ -3,6 +3,7 @@ package com.marz.snapprefs;
 import android.content.SharedPreferences;
 import android.os.Environment;
 
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Settings.MiscSettings;
 
 import java.io.File;
@@ -21,6 +22,7 @@ public class Preferences {
     public static final int DO_NOT_SAVE = 2;
     public static final int SAVE_BUTTON = 0;
     public static final int SAVE_AUTO = 3;
+    public static final int SAVE_F2S = 4;
     public static final int TOAST_LENGTH_SHORT = 0;
     public static final int TOAST_LENGTH_LONG = 1;
     public static final int TIMER_MINIMUM_DISABLED = 0;
@@ -37,19 +39,19 @@ public class Preferences {
 
         if (prefsFile.exists()) {
             prefsFile.setReadable(true, false);
-            Logger.log("XPrefs file exists: " + prefsFile.getPath());
+            Logger.log("XPrefs file exists: " + prefsFile.getPath(), LogType.PREFS);
         }
 
-        Logger.log("Loading preferences");
+        Logger.log("Loading preferences", LogType.PREFS);
 
 
-        Logger.log("Null preferences... Creating new");
-        Logger.log("Package name: " + HookMethods.PACKAGE_NAME);
+        Logger.log("Null preferences... Creating new", LogType.PREFS);
+        Logger.log("Package name: " + HookMethods.PACKAGE_NAME, LogType.PREFS);
 
         xSPrefs = new XSharedPreferences(HookMethods.PACKAGE_NAME, HookMethods.PACKAGE_NAME + "_preferences");
 
 
-        Logger.log("Making readable");
+        Logger.log("Making readable", LogType.PREFS);
         xSPrefs.makeWorldReadable();
 
         return xSPrefs;
@@ -70,12 +72,12 @@ public class Preferences {
             boolean triggerSpinExcess = false;
             int currentExcess = 0;
 
-            Logger.log("Starting spin");
+            Logger.log("Starting spin locker", LogType.PREFS);
             do {
                 spinCount++;
 
-                if ((spinCount % 100) == 0)
-                    Logger.log("Current spin count: " + spinCount);
+                if ((spinCount % 500) == 0)
+                    Logger.log("Current spin count: " + spinCount, LogType.PREFS);
 
                 if (spinCount > 35000)
                     break;
@@ -91,7 +93,7 @@ public class Preferences {
 
             } while (currentExcess < SPIN_EXCESS);
 
-            Logger.log("Completed " + spinCount + " spins");
+            Logger.log("Completed " + spinCount + " spins", LogType.PREFS);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (NoSuchFieldException e) {
@@ -105,16 +107,16 @@ public class Preferences {
         sharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sPrefs, String key) {
-                Logger.log("SharedPreference changed: " + key);
+                Logger.log("SharedPreference changed: " + key, LogType.PREFS);
                 Prefs preference = Prefs.getPrefFromKey(key);
 
                 if (preference == null) {
-                    Logger.log("No value found in the internal preference list: " + key);
+                    Logger.log("No value found in the internal preference list: " + key, LogType.PREFS);
                     return;
                 }
 
                 if (preference.defaultVal == null) {
-                    Logger.log("No default value found in the internal preference list");
+                    Logger.log("No default value found in the internal preference list", LogType.PREFS);
                     return;
                 }
 
@@ -129,16 +131,16 @@ public class Preferences {
     }
 
     public static void loadMap(SharedPreferences sharedPreferences) {
-        Logger.log("loading preference map: " + (sharedPreferences != null));
+        Logger.log("loading preference map: " + (sharedPreferences != null), LogType.PREFS);
 
         if (sharedPreferences == null)
             return;
 
         Map<String, ?> map = sharedPreferences.getAll();
-        Logger.log("Map size: " + (map != null ? map.size() : "null"));
+        Logger.log("Map size: " + (map != null ? map.size() : "null"), LogType.PREFS);
 
         if (map == null) {
-            Logger.log("Null map :(");
+            Logger.log("Null preference map", LogType.PREFS.setForced());
             return;
         }
 
@@ -146,16 +148,16 @@ public class Preferences {
         preferenceMap = new ConcurrentHashMap<>();
         for (String key : map.keySet()) {
             if (key == null) {
-                Logger.log("Null key");
+                Logger.log("Null preference key", LogType.PREFS.setForced());
                 continue;
             }
             Object obj = map.get(key);
 
             if (obj == null) {
-                Logger.log("Loading null object for: " + key);
+                Logger.log("Loaded null object for: " + key, LogType.PREFS.setForced());
                 return;
             }
-            Logger.log("Loaded preference: " + key + " val: " + obj);
+            //Logger.log("Loaded preference: " + key + " val: " + obj);
             preferenceMap.put(key, obj);
         }
     }
@@ -313,7 +315,7 @@ public class Preferences {
             String newPath = assignDefaultSavePath();
 
             if (newPath == null) {
-                Logger.log("[SEVERE ERROR] PROBLEM ASSIGNING SAVEPATH! Probably too close to runtime");
+                Logger.log("[SEVERE ERROR] PROBLEM ASSIGNING SAVEPATH! Probably too close to runtime", LogType.PREFS.setForced());
                 return null;
             }
             else
@@ -323,6 +325,10 @@ public class Preferences {
         return getString(Prefs.SAVE_PATH);
     }
 
+    public static String getContentPath() {
+        return getExternalPath() + "/Snapprefs";
+    }
+
     public static String getFilterPath() {
         String path = getString(Prefs.CUSTOM_FILTER_LOCATION);
 
@@ -330,7 +336,7 @@ public class Preferences {
             String newPath = (String) (Prefs.CUSTOM_FILTER_LOCATION.defaultVal = getSavePath() + "/Filters");
 
             if (newPath == null) {
-                Logger.log("[SEVERE ERROR] PROBLEM ASSIGNING SAVEPATH! Probably too close to runtime");
+                Logger.log("[SEVERE ERROR] PROBLEM ASSIGNING SAVEPATH! Probably too close to runtime", LogType.PREFS.setForced());
                 return null;
             }
             else
@@ -350,7 +356,7 @@ public class Preferences {
             return Environment.getExternalStorageDirectory().getAbsolutePath();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            Logger.log("Get external path exception", e);
+            Logger.log("Get external path exception", e, LogType.PREFS);
         }
 
         return Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -408,6 +414,8 @@ public class Preferences {
         LENSES_COLLECT("pref_key_collect_lenses", true),
         LENSES_AUTO_ENABLE("pref_key_auto_enable_lenses", false),
         LENSES_FORCED("pref_key_forced_lenses", true),
+        LENSES_SORT_BY_SEL("pref_key_sort_by_sel", true),
+        LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES("pref_key_hide_curr_provided_sc_lenses", false),
         ACCEPTED_TOU("acceptedToU", false),
         SELECT_STORY("pref_key_selectstory", false),
         SELECT_VENUE("pref_key_selectvenue", false),
@@ -418,6 +426,9 @@ public class Preferences {
         CAPTION_UNLIMITED_FAT("pref_caption_unlimited_fat", false),
         CHECK_SIZE("pref_size_disabled", true),
         TIMBER("pref_timber", false),
+        AUTO_ADVANCE("pref_key_auto_advance", false),
+        CHAT_LOGGING("pref_key_chat_logging", true),
+
         VFILTER_AMARO("AMARO", false),
         VFILTER_F1997("F1997", false),
         VFILTER_BRANNAN("BRANNAN", false),

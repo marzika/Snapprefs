@@ -409,7 +409,7 @@ public class ActivateFragment extends Fragment {
     }
 
     public String readStringPreference(String key) {
-        SharedPreferences prefs = MainActivity.getPrefereces();
+        SharedPreferences prefs = MainActivity.getPreferences();
         return prefs.getString(key, null);
     }
 

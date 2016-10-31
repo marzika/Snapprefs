@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -36,7 +37,9 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.marz.snapprefs.Databases.LensDatabaseHelper;
 import com.marz.snapprefs.Tabs.BuyTabFragment;
+import com.marz.snapprefs.Tabs.ChatLogsTabFragment;
 import com.marz.snapprefs.Tabs.DataTabFragment;
 import com.marz.snapprefs.Tabs.DeluxeTabFragment;
 import com.marz.snapprefs.Tabs.FiltersTabFragment;
@@ -47,7 +50,6 @@ import com.marz.snapprefs.Tabs.SavingTabFragment;
 import com.marz.snapprefs.Tabs.SharingTabFragment;
 import com.marz.snapprefs.Tabs.SpoofingTabFragment;
 import com.marz.snapprefs.Tabs.TextTabFragment;
-import com.marz.snapprefs.Databases.LensDatabaseHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -88,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
     private static UUID deviceUuid;
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
-    FragmentManager mFragmentManager;
+    public static FragmentManager mFragmentManager;
     FragmentTransaction mFragmentTransaction;
     HashMap<Integer, Fragment> cache = new HashMap<>();
     GoogleCloudMessaging gcm;
@@ -121,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         return deviceUuid != null ? deviceUuid.toString() : (String) Preferences.Prefs.DEVICE_ID.defaultVal;
     }
 
-    public static SharedPreferences getPrefereces() {
+    public static SharedPreferences getPreferences() {
         return prefs;
     }
 
@@ -145,12 +147,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = this;
+        Logger.loadSelectedLogTypes();
         ChangeLog cl = new ChangeLog(context);
         createDeviceId();
+        /*Obfuscator.writeGsonFile();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Obfuscator.readJsonFile();
 
         if (cl.isFirstRun()) {
             cl.getLogDialog().show();
-        }
+        }*/
 
         Logger.log("MainActivity: createPrefsIfNotExisting");
         createPrefsIfNotExisting();
@@ -285,14 +295,21 @@ public class MainActivity extends AppCompatActivity {
                 menuItem.setCheckable(true);
                 menuItem.setChecked(true);
                 Iterator<MenuItem> it = items.iterator();
+
+                mFragmentManager.popBackStack();
+                FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction().replace(R.id.containerView, getForId(menuItem.getItemId()));
+
                 while (it.hasNext()) {
                     MenuItem item = it.next();
                     if (!item.equals(menuItem)) {
                         item.setChecked(false);
+
+                        if( item.getItemId() == R.id.nav_item_main)
+                            fragmentTransaction.addToBackStack("Main");
                     }
                 }
                 items.add(menuItem);
-                mFragmentManager.beginTransaction().replace(R.id.containerView, getForId(menuItem.getItemId())).commit();
+                fragmentTransaction.commit();
                 return false;
             }
 
@@ -365,8 +382,12 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_item_lenses:
                     cache.put(id, new LensesTabFragment());
                     break;
+                case R.id.nav_item_chat:
+                    cache.put(id, new ChatLogsTabFragment());
+                    break;
             }
         }
+
         return cache.get(id);
     }
 
@@ -430,9 +451,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public String readStringPreference(String key) {
-        SharedPreferences prefs = getPrefereces();
-        String returned = prefs.getString(key, null);
-        return returned;
+        SharedPreferences prefs = getPreferences();
+        return prefs.getString(key, null);
     }
 
     private SharedPreferences createPrefsIfNotExisting() {
@@ -446,6 +466,10 @@ public class MainActivity extends AppCompatActivity {
         prefs = this.getSharedPreferences(this.getPackageName() + "_preferences", Activity.MODE_WORLD_READABLE);
 
         return prefs;
+    }
+
+    public static boolean isNetworkAvailable(final Context context) {
+        return ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo() != null;
     }
 
     public void saveInSharedPref(String result) {
