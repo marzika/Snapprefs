@@ -24,8 +24,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.DebugHelper;
+import com.marz.snapprefs.Util.NotificationUtils;
 import com.marz.snapprefs.Util.XposedUtils;
 
 import java.io.File;
@@ -49,6 +51,7 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.callStaticMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
 import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
@@ -75,14 +78,6 @@ public class HookMethods
 
     public static int px(float f) {
         return Math.round((f * SnapContext.getResources().getDisplayMetrics().density));
-    }
-
-    public static void printStackTraces() {
-        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-        for (StackTraceElement element : stackTraceElements) {
-            Logger.log("Class name :: " + element.getClassName() + "  || method name :: " +
-                    element.getMethodName());
-        }
     }
 
     public static String getSCUsername(ClassLoader cl) {
@@ -209,6 +204,10 @@ public class HookMethods
             } catch (Resources.NotFoundException ignore) {
             }
 
+            try {
+                NotificationUtils.handleInitPackageResources(modRes);
+            } catch( Resources.NotFoundException ignore) {}
+
             if (Preferences.shouldAddGhost()) {
                 try {
                     HookedLayouts.addIcons(resparam, mResources);
@@ -246,7 +245,6 @@ public class HookMethods
 
             try {
                 XposedUtils.log("----------------- SNAPPREFS HOOKED -----------------", false);
-                Logger.loadSelectedLogTypes();
 
                 Object activityThread =
                         callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
@@ -272,6 +270,8 @@ public class HookMethods
                 return;
             }
 
+
+            Logger.loadSelectedLogTypes();
             Logger.log("Loading map from xposed");
             Preferences.loadMapFromXposed();
             findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
@@ -286,32 +286,36 @@ public class HookMethods
             final int maxRecordTime = 30000;
 
             // If maxRecordTime is same as SC timecap, let SC perform as normal
-            if( maxRecordTime > 10000 ) {
-                findAndHookMethod("abc", lpparam.classLoader, "handleMessage", Message.class, new XC_MethodHook() {
-                    boolean internallyCalled = false;
+            if (maxRecordTime > 10000) {
+                try {
+                    findAndHookMethod("abc", lpparam.classLoader, "handleMessage", Message.class, new XC_MethodHook() {
+                        boolean internallyCalled = false;
 
-                    @Override
-                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                        super.beforeHookedMethod(param);
-                        Message message = (Message) param.args[0];
-                        Logger.log("HandleMessageId: " + message.what);
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            super.beforeHookedMethod(param);
+                            Message message = (Message) param.args[0];
+                            Logger.log("HandleMessageId: " + message.what);
 
-                        if (message.what == 15 && !internallyCalled) {
-                            if (maxRecordTime > 10000) {
-                                internallyCalled = true;
+                            if (message.what == 15 && !internallyCalled) {
+                                if (maxRecordTime > 10000) {
+                                    internallyCalled = true;
 
-                                Handler handler = message.getTarget();
-                                Message newMessage = Message.obtain(handler, 15);
+                                    Handler handler = message.getTarget();
+                                    Message newMessage = Message.obtain(handler, 15);
 
-                                handler.sendMessageDelayed(newMessage, maxRecordTime - 10000);
-                                Logger.log(String.format("Triggering video end in %s more ms", maxRecordTime - 10000));
-                            }
+                                    handler.sendMessageDelayed(newMessage, maxRecordTime - 10000);
+                                    Logger.log(String.format("Triggering video end in %s more ms", maxRecordTime - 10000));
+                                }
 
-                            param.setResult(null);
-                        } else if (internallyCalled)
-                            internallyCalled = false;
-                    }
-                });
+                                param.setResult(null);
+                            } else if (internallyCalled)
+                                internallyCalled = false;
+                        }
+                    });
+                } catch( Throwable t ) {
+                    Logger.log("Error hooking unlimited recording", t, LogType.FORCED);
+                }
             }
 
             /*findAndHookMethod("android.os.Handler", lpparam.classLoader, "sendMessageDelayed", Message.class, long.class, new XC_MethodHook() {
@@ -345,18 +349,6 @@ public class HookMethods
                     Friendmojis.init(lpparam);
                     DebugHelper.init(lpparam);
                     Logger.log("Application hook: " + param.thisObject.getClass().getCanonicalName());
-
-                    if (Preferences.getLicence() == 1 || Preferences.getLicence() == 2) {
-                        if (Preferences.getBool(Prefs.REPLAY)) {
-                            //Premium.initReplay(lpparam, modRes, SnapContext);
-                        }
-                        if (Preferences.getBool(Prefs.TYPING)) {
-                            Premium.initTyping(lpparam, modRes, SnapContext);
-                        }
-                        if (Preferences.getBool(Prefs.STEALTH) && Preferences.getLicence() == 2) {
-                            Premium.initViewed(lpparam, modRes, SnapContext);
-                        }
-                    }
 
                     XC_MethodHook initHook = new XC_MethodHook() {
                         @Override
@@ -425,6 +417,9 @@ public class HookMethods
                             if (Preferences.getBool(Prefs.TIMER_COUNTER)) {
                                 Misc.initTimer(lpparam, mResources);
                             }
+
+                            ClassLoader cl = lpparam.classLoader;
+
                             if (Preferences.getBool(Prefs.CHAT_AUTO_SAVE)) {
                                 Chat.initTextSave(lpparam, SnapContext);
                             }
@@ -451,6 +446,55 @@ public class HookMethods
                             if (Preferences.getBool(Prefs.CUSTOM_STICKER)) {
                                 Stickers.initStickers(lpparam, modRes, SnapContext);
                             }
+
+                            if (Preferences.getLicence() > 0)
+                                Premium.initPremium(lpparam);
+
+                            findAndHookMethod("GB", cl, "a", findClass("aMj", cl), new XC_MethodHook() {
+                                @Override
+                                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                                    super.beforeHookedMethod(param);
+                                    Logger.log("GB: " + param.args[0].toString());
+                                }
+                            });
+
+                            findAndHookMethod("com.snapchat.android.util.chat.SecureChatSession", cl, "a", findClass("aMj", cl),
+                                    findClass("GJ", cl), new XC_MethodHook() {
+                                        @Override
+                                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                                            super.beforeHookedMethod(param);
+                                            Object packet = param.args[0];
+
+                                            Logger.log("SecureChatSession: " + packet.toString(), LogType.PREMIUM);
+                                        }
+                                    });
+
+                            HookMethods.hookAllMethods("com.snapchat.videochat.v2.SCADLServiceListenerV2", cl, false, false);
+                            HookMethods.hookAllMethods("com.snapchat.videochat.v2.SCVideoChatManagerV2", cl, false, false   );
+                            /*hookAllConstructors(ahO, new XC_MethodHook() {
+                                        @Override
+                                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                                            super.afterHookedMethod(param);
+
+                                            Logger.log("EventType: " + getObjectField(param.thisObject, "mEventName"));
+                                        }
+                                    });
+
+                            findAndHookMethod("ahO", cl, "a", String.class, Object.class, new XC_MethodHook() {
+                                @Override
+                                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                                    super.beforeHookedMethod(param);
+                                    Logger.log(String.format("Object event [Key:%s][Object:%s]", param.args[0], param.args[1]));
+                                }
+                            });
+
+                            findAndHookMethod("ahO", cl, "a", String.class, new XC_MethodHook() {
+                                @Override
+                                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                                    super.beforeHookedMethod(param);
+                                    Logger.log(String.format("String event [Key:%s]", param.args[0]));
+                                }
+                            });*/
                         }
                     };
 
@@ -650,8 +694,8 @@ public class HookMethods
                         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                             //this.mIsVisible && this.n.e() != 0 && this.n.e() != 2 && !this.n.c()
                             boolean isVisible = XposedHelpers.getBooleanField(param.thisObject, Obfuscator.flash.ISVISIBLE_FIELD);
-                            Object swipeLayout = XposedHelpers.getObjectField(param.thisObject, Obfuscator.flash.SWIPELAYOUT_FIELD);
-                            int resId = (int) XposedHelpers.getObjectField(swipeLayout, Obfuscator.flash.GETRESID_OBJECT);
+                            Object swipeLayout = getObjectField(param.thisObject, Obfuscator.flash.SWIPELAYOUT_FIELD);
+                            int resId = (int) getObjectField(swipeLayout, Obfuscator.flash.GETRESID_OBJECT);
                             boolean c = (boolean) XposedHelpers.callMethod(swipeLayout, Obfuscator.flash.ISSCROLLED_METHOD);
                             if (isVisible && resId != 0 && resId != 2 && !c) {
                                 int keycode = XposedHelpers.getIntField(param.args[0], Obfuscator.flash.KEYCODE_FIELD);
@@ -659,7 +703,7 @@ public class HookMethods
                                     if (System.currentTimeMillis() - lastChange > 500) {
                                         lastChange = System.currentTimeMillis();
                                         frontFlash = !frontFlash;
-                                        XposedHelpers.callMethod(XposedHelpers.getObjectField(param.thisObject, Obfuscator.flash.OVERLAY_FIELD), Obfuscator.flash.FLASH_METHOD, new Class[]{boolean.class}, frontFlash);
+                                        XposedHelpers.callMethod(getObjectField(param.thisObject, Obfuscator.flash.OVERLAY_FIELD), Obfuscator.flash.FLASH_METHOD, new Class[]{boolean.class}, frontFlash);
                                     }
                                     param.setResult(null);
                                 }

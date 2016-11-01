@@ -94,7 +94,7 @@ public class HookedLayouts {
                 TextView orig1 =
                         (TextView) ((TableRow) navigation.getChildAt(0)).getChildAt(1);
                 TableRow row = new TableRow(navigation.getContext());
-                row.setTag("Hello");
+                row.setTag("Snapprefs Link");
                 row.setLayoutParams(navigation.getChildAt(0).getLayoutParams());
                 ImageView iv = new ImageView(navigation.getContext());
                 iv.setImageDrawable(mResources.getDrawable(R.drawable.profile_snapprefs));
@@ -127,9 +127,7 @@ public class HookedLayouts {
                     View nextChild = navigation.getChildAt(index);
 
                     if (nextChild.getTag() != null && nextChild.getTag() instanceof String) {
-                        if (nextChild.getTag().equals("Hello")) {
-                            Logger.log("IT EQUALS IT MOTHA: " + containsRow);
-
+                        if (nextChild.getTag().equals("Snapprefs Link")) {
                             if (containsRow)
                                 navigation.removeView(nextChild);
                             else
@@ -723,7 +721,7 @@ public class HookedLayouts {
 
                             for (int i = 1; i <= 5; i++) {
                                 Button btn = new Button(context);
-                                btn.setId(i);
+                                btn.setId(+i);
                                 final int id_ = btn.getId();
                                 btn.setText("Color: " + id_);
                                 btn.setBackgroundColor(colorsText[i - 1]);
@@ -1046,7 +1044,7 @@ public class HookedLayouts {
 
                             for (int i = 1; i <= 5; i++) {
                                 Button btn = new Button(context);
-                                btn.setId(i);
+                                btn.setId(+i);
                                 final int id_ = btn.getId();
                                 btn.setText("Color: " + id_);
                                 btn.setBackgroundColor(colorsBg[i - 1]);

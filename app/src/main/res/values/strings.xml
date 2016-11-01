@@ -69,7 +69,7 @@
     <string name="pref_sticker_readme_summary2">Example SVGs/PNGs can be found at https://github.com/Ranks/emojione</string>
     <string name="pref_filter_readme_title">HOW TO USE</string>
     <string name="pref_filter_readme_summary">Your custom filter has to be named as "banner_filter.png"/"fullscreen_filter.png" in the folder which is by default /sdcard/Snapprefs/Filters. If you changed the filter image, you have to restart Snapchat for the changes to take effect.\nResolution for Fullscreen Filters: 1080x1920\nResolution for Banner Filters: 821x323</string>
-    <string name="pref_discover_readme_title">HOW TO USE</string>
+    <string name="pref_discover_readme_title">Something To Note</string>
     <string name="pref_weather_summary_off">Weather will NOT be spoofed</string>
     <string name="pref_weather_summary_on">Weather will be spoofed</string>
     <string name="pref_weather_title">Weather Spoofing</string>
@@ -358,7 +358,16 @@
     <string name="pref_viewed_summary_off">Stealth viewing will NOT be executed</string>
     <string name="pref_viewed_summary_on">Stealth viewing will be executed</string>
     <string name="pref_viewed_title">Stealth Viewing</string>
-    <string name="pref_viewed_readme_summary">After the snaps are loaded, enable Airplane mode, view the desired snap, then KILL SNAPCHAT from the Recent Apps page. You can disable Airplane mode now.</string>
+    <string name="pref_viewed_readme_summary">When using Stealth Viewing you may sometimes receive \"ghost snaps\" whereby old snaps display again, this is normal and is due to the way we handle the stealth viewing</string>
+
+    <string name="pref_stealth_saving_summary_off">Stealth saving will NOT be executed</string>
+    <string name="pref_stealth_saving_summary_on">Stealth saving will be executed</string>
+    <string name="pref_stealth_saving_title">Stealth Saving</string>
+
+    <string name="pref_stealth_notification_summary_off">Stealth notifications will NOT be used</string>
+    <string name="pref_stealth_notification_summary_on">Stealth notifications will be used</string>
+    <string name="pref_stealth_notification_title">Stealth Notifications</string>
+
     <string name="pref_paint_title">Paint Tools</string>
     <string name="pref_paint_cb_summary_off">Paint Tools are not enabled</string>
     <string name="pref_paint_cb_summary_on">Paint Tools are enabled</string>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Util.FileUtils;
 
 import java.util.Random;
@@ -64,7 +65,7 @@ public class Spoofing {
                 String temp = FileUtils.readFromFile(context, "weather");
                 setObjectField(param.thisObject, "mTempC", String.valueOf(temp));
                 setObjectField(param.thisObject, "mTempF", String.valueOf(temp));
-                Logger.log("set the temperatures", true);
+                Logger.log("set the temperatures", LogType.DEBUG);
             }
         });
     }

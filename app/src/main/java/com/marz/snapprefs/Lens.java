@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.XModuleResources;
 
 import com.marz.snapprefs.Databases.LensDatabaseHelper;
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.LensData;
 import com.marz.snapprefs.Util.LensData.LensType;
@@ -69,7 +70,7 @@ class Lens {
 
                         List<Object> oldGeoLensList;
 
-                        if( param.args[0] != null )
+                        if (param.args[0] != null)
                             oldGeoLensList = (List<Object>) param.args[0];
                         else
                             oldGeoLensList = new ArrayList<>();
@@ -86,7 +87,7 @@ class Lens {
                         super.beforeHookedMethod(param);
                         List<Object> oldScheduledLensList;
 
-                        if( param.args[0] != null )
+                        if (param.args[0] != null)
                             oldScheduledLensList = (List<Object>) param.args[0];
                         else
                             oldScheduledLensList = new ArrayList<>();
@@ -105,36 +106,35 @@ class Lens {
     }
 
     private static void buildModifiedList(List<Object> list, LensType type) {
-        Logger.log("Original lens list size: " + list.size());
+        Logger.log("Original lens list size: " + list.size(), LogType.LENS);
 
         final LinkedHashMap<String, Object> queriedList = (LinkedHashMap<String, Object>) MainActivity.lensDBHelper.getAllOfType(type);
         final boolean canInjectLenses = queriedList != null;
 
-        if( !canInjectLenses ) {
-            Logger.log("No lenses to load for type: " + type);
-        }
+        if (!canInjectLenses)
+            Logger.log("No lenses to load for type: " + type, LogType.LENS);
 
         HashSet<String> containedList = new HashSet<>();
 
-        for( Object lens : list ) {
+        for (Object lens : list) {
             String mCode = (String) getObjectField(lens, "mCode");
 
-            if(Preferences.getBool(Prefs.LENSES_COLLECT) &&
+            if (Preferences.getBool(Prefs.LENSES_COLLECT) &&
                     (!canInjectLenses || !queriedList.containsKey(mCode))) {
                 performLensSave(lens, type);
             }
 
-            if(!Preferences.getBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES) && canInjectLenses)
+            if (!Preferences.getBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES) && canInjectLenses)
                 containedList.add(mCode);
         }
 
-        if(Preferences.getBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES))
+        if (Preferences.getBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES))
             list.clear();
 
-        if(!Preferences.getBool(Prefs.LENSES_LOAD) || !canInjectLenses)
+        if (!Preferences.getBool(Prefs.LENSES_LOAD) || !canInjectLenses)
             return;
 
-        Logger.log("Potential lenses to load: " + queriedList.size());
+        Logger.log("Potential lenses to load: " + queriedList.size(), LogType.LENS);
 
         int injectedLensCount = 0;
         for (Object lensObj : queriedList.values()) {
@@ -149,7 +149,7 @@ class Lens {
             injectedLensCount++;
         }
 
-        Logger.log(String.format("Injected %s %s Lenses", injectedLensCount, String.valueOf(type)));
+        Logger.log(String.format("Injected %s %s Lenses", injectedLensCount, String.valueOf(type)), LogType.LENS);
     }
 
     private static Object buildModifiedLens(LensData lensData, LensType type) {
@@ -172,15 +172,15 @@ class Lens {
 
     private static void performLensSave(Object lens, LensType type) {
         LensData lensData = buildSaveableLensData(lens, type);
-        Logger.log("Inserting lens of type: " + type);
+        Logger.log("Inserting lens of type: " + type, LogType.LENS);
 
         try {
             MainActivity.lensDBHelper.insertLens(lensData);
-        } catch( Exception e ) {
-            if( lensData == null || lensData.mCode == null )
-                Logger.log("Error inserting lens", e);
+        } catch (Exception e) {
+            if (lensData == null || lensData.mCode == null)
+                Logger.log("Error inserting lens", e, LogType.LENS);
             else
-                Logger.log("Error inserting lens: "  + lensData.mCode, e);
+                Logger.log("Error inserting lens: " + lensData.mCode, e, LogType.LENS);
         }
     }
 

@@ -160,7 +160,7 @@ public class ChatsDatabaseHelper extends CoreDatabaseHandler {
         CallbackHandler callback = getCallback(this, "getAllChatsFromCursor", Cursor.class);
         return (ArrayList<Object>) getAllBuiltObjects(ChatEntry.TABLE_NAME,
                 ChatEntry.COLUMN_NAME_CONVERSATION_ID + " = '" + conversationId + "'",
-                ChatEntry.COLUMN_NAME_TIMESTAMP + " ASC", callback);
+                ChatEntry.COLUMN_NAME_TIMESTAMP + " DESC", callback);
     }
 
     @SuppressWarnings("unchecked")

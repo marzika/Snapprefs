@@ -37,33 +37,34 @@ import java.util.List;
  * Created by Andre on 16/09/2016.
  */
 public class LensesFragment extends Fragment {
-    private static final DialogInterface.OnClickListener onSelectAllClick = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            MainActivity.lensDBHelper.setActiveStateOfAllLenses(true);
-
-            for( LensContainerData containerData : iconMap.values() )
-                containerData.inflatedLayout.setBackgroundResource(R.drawable.lens_bg_selected);
-        }
-    };
-
-    private static final DialogInterface.OnClickListener onDeslectAllClick = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            MainActivity.lensDBHelper.setActiveStateOfAllLenses(false);
-
-            for( LensContainerData containerData : iconMap.values() )
-                containerData.inflatedLayout.setBackgroundResource(R.drawable.lens_bg_unselected);
-        }
-    };
-
     private static final List<String> stringFilter = Arrays.asList(
             "code_scheduled_lens_-_",
             "len_",
             "code_special_lens_-_"
     );
-
     private static HashMap<String, LensContainerData> iconMap = new HashMap<>();
+    private static final DialogInterface.OnClickListener onSelectAllClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            MainActivity.lensDBHelper.setActiveStateOfAllLenses(true);
+
+            for (LensContainerData containerData : iconMap.values()) {
+                containerData.inflatedLayout.setBackgroundResource(R.drawable.lens_bg_selected);
+                containerData.inflatedLayout.invalidate();
+            }
+        }
+    };
+    private static final DialogInterface.OnClickListener onDeslectAllClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            MainActivity.lensDBHelper.setActiveStateOfAllLenses(false);
+
+            for (LensContainerData containerData : iconMap.values()) {
+                containerData.inflatedLayout.setBackgroundResource(R.drawable.lens_bg_unselected);
+                containerData.inflatedLayout.invalidate();
+            }
+        }
+    };
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         final int lensListSize = (int) MainActivity.lensDBHelper.getRowCount();
@@ -157,13 +158,13 @@ public class LensesFragment extends Fragment {
             Button btnDeselectAll = (Button) view.findViewById(R.id.btn_deselect_all_lenses);
 
             final AlertDialog.Builder selectBuilder = new AlertDialog.Builder(context);
-            selectBuilder.setTitle("Confirm Select All");
-            selectBuilder.setMessage("Are you sure you want to enable all lenses?");
             selectBuilder.setNegativeButton("Cancel", null);
 
             btnSelectAll.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    selectBuilder.setTitle("Confirm Select All");
+                    selectBuilder.setMessage("Are you sure you want to enable all lenses?");
                     selectBuilder.setPositiveButton("Select All", onSelectAllClick);
                     selectBuilder.show();
                 }
@@ -172,6 +173,8 @@ public class LensesFragment extends Fragment {
             btnDeselectAll.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    selectBuilder.setTitle("Confirm Deselect All");
+                    selectBuilder.setMessage("Are you sure you want to disable all lenses?");
                     selectBuilder.setPositiveButton("Deselect All", onDeslectAllClick);
                     selectBuilder.show();
                 }

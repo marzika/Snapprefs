@@ -42,6 +42,7 @@ public class Logger {
     private static boolean defaultPrefix = true;
 
     private static boolean loggingEnabled = true;
+    private static boolean hasLoaded = false;
     private static HashSet<String> logTypes = new HashSet<>();
 
     /**
@@ -188,8 +189,9 @@ public class Logger {
     }
 
     public static void log(String message, @Nullable LogType logType) {
-        if (!loggingEnabled || !Preferences.getBool(Preferences.Prefs.DEBUGGING) &&
-                (logType != null && !logType.isForced()))
+        if (hasLoaded &&
+                (!loggingEnabled || !Preferences.getBool(Preferences.Prefs.DEBUGGING) &&
+                        logType != null && !logType.isForced()))
             return;
 
         if (logType == null) {
@@ -233,6 +235,7 @@ public class Logger {
         try {
             reader = new FileReader(logTypeFile);
             logTypes = gson.fromJson(reader, HashSet.class);
+            hasLoaded = true;
             log(String.format("Loaded %s log types", logTypes.toString()), LogType.FORCED);
         } catch (FileNotFoundException e) {
             log("LogType list file not found", LogType.FORCED);
@@ -286,7 +289,39 @@ public class Logger {
         for (LogType type : LogType.values())
             logTypes.add(type.name());
 
+        hasLoaded = true;
         saveSelectedLogTypes();
+    }
+
+    public static void setLogTypeState(String type, boolean state) {
+        if (!state) {
+            if (logTypes.remove(type)) {
+                saveSelectedLogTypes();
+                Logger.log("Successfully disabled LogType " + type, LogType.DEBUG);
+            }
+            else
+                Logger.log("Couldn't disable LogType " + type, LogType.DEBUG);
+        } else {
+            if (logTypeContainsName(type) && logTypes.add(type)) {
+                saveSelectedLogTypes();
+                Logger.log("Successfully enabled LogType " + type, LogType.DEBUG);
+            }
+            else
+                Logger.log("Couldn't enable LogType " + type, LogType.DEBUG);
+        }
+    }
+
+    private static boolean logTypeContainsName(String name) {
+        for (LogType type : LogType.values()) {
+            if (type.name().equals(name))
+                return true;
+        }
+
+        return false;
+    }
+
+    public static HashSet<String> getActiveLogTypes() {
+        return logTypes;
     }
 
     public enum LogType {
@@ -297,6 +332,8 @@ public class Logger {
         DATABASE("Database"),
         SAVING("Saving"),
         PREFS("Prefs"),
+        FILTER("Filter"),
+        PREMIUM("Premium"),
         FORCED("Forced", true);
 
         public String tag;
