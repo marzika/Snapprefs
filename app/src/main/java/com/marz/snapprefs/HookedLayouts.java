@@ -219,7 +219,7 @@ public class HookedLayouts {
                             p.setXfermode(null);
                             p.setStyle(Paint.Style.STROKE);
                             p.setColor(Color.WHITE);
-                            p.setStrokeWidth(px(4));
+                            p.setStrokeWidth(px(8));
                             c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
                             upload.setImageDrawable(new BitmapDrawable(output));
                         }

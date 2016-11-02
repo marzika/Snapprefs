@@ -8,14 +8,16 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         android:layout_above="@+id/linear">
 
         <ScrollView
             android:id="@+id/scrollView7"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:gravity="center"
+            android:layout_weight="1"
             android:layoutMode="clipBounds">
 
             <GridLayout
@@ -27,6 +29,7 @@
                 android:columnCount="4"
                 android:layoutMode="clipBounds"
                 android:orientation="horizontal"
+                android:layout_weight="1"
                 android:useDefaultMargins="false"></GridLayout>
         </ScrollView>
     </RelativeLayout>

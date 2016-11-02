@@ -430,6 +430,7 @@ public class Preferences {
         TIMBER("pref_timber", false),
         AUTO_ADVANCE("pref_key_auto_advance", false),
         CHAT_LOGGING("pref_key_chat_logging", true),
+        GROUPS("pref_key_groups", false),
 
         VFILTER_AMARO("AMARO", false),
         VFILTER_F1997("F1997", false),

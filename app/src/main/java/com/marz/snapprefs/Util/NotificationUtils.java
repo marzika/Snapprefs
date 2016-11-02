@@ -92,6 +92,7 @@ public class NotificationUtils {
             return;
 
         final int offset = 20;
+        final boolean longLength = Preferences.getInt(Prefs.TOAST_LENGTH) == Preferences.TOAST_LENGTH_LONG;
 
         if (lastToastType == null || type != lastToastType) {
             lastToastType = type;
@@ -110,7 +111,7 @@ public class NotificationUtils {
                 Toast statusToast = new Toast(HookMethods.SnapContext);
                 statusToast.setView(view);
                 statusToast.setGravity(Gravity.BOTTOM | Gravity.START, offset, offset);
-                statusToast.setDuration(Toast.LENGTH_LONG);
+                statusToast.setDuration(longLength ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
                 statusToast.show();
             }
         });

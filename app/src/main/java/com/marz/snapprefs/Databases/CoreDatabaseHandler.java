@@ -22,8 +22,8 @@ import static com.marz.snapprefs.Databases.CoreDatabaseHandler.DBUtils.formatExc
  */
 
 class CoreDatabaseHandler extends SQLiteOpenHelper {
-    private static String DATABASE_NAME;
-    private static String[] SQL_CREATE_ENTRIES;
+    private String DATABASE_NAME;
+    private String[] SQL_CREATE_ENTRIES;
     private SQLiteDatabase writableDatabase;
 
     CoreDatabaseHandler(Context context, String databaseName, String[] entries, int DATABASE_VERSION) {

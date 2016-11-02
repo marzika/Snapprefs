@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Preferences.Prefs;
 
 import java.io.File;
@@ -66,9 +67,14 @@ public class GroupDialog extends DialogFragment {
             public void run() {
                 File[] files = Groups.groupsDir.listFiles();
                 if (files == null) {
-                    Groups.groupsDir.mkdir();
-                    files = Groups.groupsDir.listFiles();
+                    if (Groups.groupsDir.mkdir())
+                        Logger.log("Created Groups folder", LogType.GROUPS);
+                    else
+                        Logger.log("Failed to create Groups folder", LogType.GROUPS);
+
+                    return;
                 }
+
                 Arrays.sort(files);
                 List<String> al = new ArrayList<>();
                 // add elements to al, including duplicates
@@ -77,10 +83,16 @@ public class GroupDialog extends DialogFragment {
                 Groups.groups.clear();
                 Groups.groups.addAll(linkedHashSet);
                 final int N = Groups.groups.size();
+                final File[] finalFiles = files;
                 // total number of textviews to add
                 for (int i = 0; i < N; i++) {
-                    final File[] finalFiles = files;
                     final int finalI = i;
+
+                    if (finalI >= finalFiles.length) {
+                        Logger.log(String.format("Tried to create group [Index:%s][MaxIndex:%s]", finalI, finalFiles.length - 1), LogType.GROUPS);
+                        break;
+                    }
+
                     Runnable addRowsRunnable = new Runnable() {
                         @Override
                         public void run() {
@@ -125,15 +137,15 @@ public class GroupDialog extends DialogFragment {
                         add.setText("Add new Group");
                         add.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                         boolean shouldShowAdd = true;
-                        if (Groups.groups.size() == 3 && Preferences.getLicence() == 0) {
+
+                        if (Groups.groups.size() == 3 && Preferences.getLicence() == 0)
                             shouldShowAdd = false;
-                        }
-                        if (Preferences.getLicence() != 0 && !Preferences.getBool(Prefs.UNLIM_GROUPS)) {
+
+                        if (Preferences.getLicence() != 0 && !Preferences.getBool(Prefs.UNLIM_GROUPS))
                             shouldShowAdd = false;
-                        }
-                        if (shouldShowAdd) {
+
+                        if (shouldShowAdd)
                             v.addView(add);
-                        }
 
                         add.setOnClickListener(new View.OnClickListener() {
                             @Override

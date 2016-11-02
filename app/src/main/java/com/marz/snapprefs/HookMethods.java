@@ -386,7 +386,9 @@ public class HookMethods
                                     Preferences.getBool(Prefs.DISCOVER_UI)) {
                                 Stories.initStories(lpparam);
                             }
-                            Groups.initGroups(lpparam);
+                            if (Preferences.getBool(Prefs.GROUPS)) {
+                                Groups.initGroups(lpparam);
+                            }
                             if (Preferences.shouldAddGhost()) {
                                 HookedLayouts.initVisiblity(lpparam);
                             }
@@ -450,27 +452,6 @@ public class HookMethods
                             if (Preferences.getLicence() > 0)
                                 Premium.initPremium(lpparam);
 
-                            findAndHookMethod("GB", cl, "a", findClass("aMj", cl), new XC_MethodHook() {
-                                @Override
-                                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                                    super.beforeHookedMethod(param);
-                                    Logger.log("GB: " + param.args[0].toString());
-                                }
-                            });
-
-                            findAndHookMethod("com.snapchat.android.util.chat.SecureChatSession", cl, "a", findClass("aMj", cl),
-                                    findClass("GJ", cl), new XC_MethodHook() {
-                                        @Override
-                                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                                            super.beforeHookedMethod(param);
-                                            Object packet = param.args[0];
-
-                                            Logger.log("SecureChatSession: " + packet.toString(), LogType.PREMIUM);
-                                        }
-                                    });
-
-                            HookMethods.hookAllMethods("com.snapchat.videochat.v2.SCADLServiceListenerV2", cl, false, false);
-                            HookMethods.hookAllMethods("com.snapchat.videochat.v2.SCVideoChatManagerV2", cl, false, false   );
                             /*hookAllConstructors(ahO, new XC_MethodHook() {
                                         @Override
                                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
