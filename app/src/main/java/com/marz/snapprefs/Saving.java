@@ -678,7 +678,7 @@ public class Saving {
                         handleSave(context, snapData);
                 } else {
                     if (snapData.hasFlag(FlagState.SAVED)) {
-                        createStatefulToast("Snap recently saved", ToastType.GOOD);
+                        createStatefulToast("Snap recently saved", ToastType.WARNING);
                         Logger.printFinalMessage("Snap recently saved");
                     }
                 }

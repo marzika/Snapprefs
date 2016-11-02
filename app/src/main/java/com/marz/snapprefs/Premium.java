@@ -18,7 +18,7 @@ public class Premium {
         final ClassLoader cl = lpparam.classLoader;
         final boolean blockPresence = Preferences.getBool(Prefs.HIDE_TYPING_AND_PRESENCE) && Preferences.getLicence() >= 1;
         final boolean stealthViewing = Preferences.getBool(Prefs.STEALTH_VIEWING) && Preferences.getLicence() >= 2;
-        final boolean stealthSaving = Preferences.getBool(Prefs.STEALTH_SAVING) && Preferences.getLicence() >= 2;
+        final boolean stealthSaving = Preferences.getBool(Prefs.STEALTH_CHAT_SAVING) && Preferences.getLicence() >= 2;
 
         if (blockPresence || stealthViewing || stealthSaving) {
 
@@ -29,7 +29,7 @@ public class Premium {
                             super.beforeHookedMethod(param);
                             Object packet = param.args[1];
 
-                            Logger.log("GNPacket: " + packet.toString(), LogType.PREMIUM);
+                            //Logger.log("GNPacket: " + packet.toString(), LogType.PREMIUM);
 
                             String type = (String) getObjectField(packet, "type");
                             switch (type) {
@@ -38,7 +38,7 @@ public class Premium {
                                         Logger.log("Performing presence block", LogType.PREMIUM);
                                         initPresenceBlocking(lpparam.classLoader, packet);
                                     }
-                                    Logger.log("Presence: " + packet.toString(), LogType.PREMIUM);
+                                    //Logger.log("Presence: " + packet.toString(), LogType.PREMIUM);
                                     break;
                                 case "snap_state":
                                     boolean isReplayed = (boolean) getObjectField(packet, "replayed");
@@ -47,22 +47,21 @@ public class Premium {
                                         Logger.log("Performing stealth view", LogType.PREMIUM);
                                         setObjectField(packet, "viewed", false);
                                     }
-                                    Logger.log("State: " + packet.toString(), LogType.PREMIUM);
+                                    //Logger.log("State: " + packet.toString(), LogType.PREMIUM);
                                     break;
                                 case "message_release":
                                     if (stealthViewing) {
                                         Logger.log("Performing stealth release", LogType.PREMIUM);
-                                        setObjectField(packet, "releaseType", "RELEASE");
                                         param.setResult(null);
                                     }
-                                    Logger.log("Release: " + packet.toString(), LogType.PREMIUM);
+                                    //Logger.log("Release: " + packet.toString(), LogType.PREMIUM);
                                     break;
                                 case "message_state":
                                     if (stealthSaving) {
                                         Logger.log("Performing stealth save", LogType.PREMIUM);
                                         setObjectField(packet, "state", "unsaved");
                                     }
-                                    Logger.log("Message state: " + packet.toString(), LogType.PREMIUM);
+                                    //Logger.log("Message state: " + packet.toString(), LogType.PREMIUM);
                                     break;
                             }
                         }
@@ -75,9 +74,8 @@ public class Premium {
         Map<String, Boolean> presences = (Map<String, Boolean>) getObjectField(presenceObj, "presences");
         Boolean presenceState = presences.get(yourUsername);
 
-        if (presenceState != null) {
-            Logger.log("Updating presences", LogType.PREMIUM);
+        if (presenceState != null)
             presences.put(yourUsername, Boolean.FALSE);
-        }
+
     }
 }

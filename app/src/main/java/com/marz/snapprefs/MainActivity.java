@@ -39,7 +39,6 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.marz.snapprefs.Databases.LensDatabaseHelper;
 import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Tabs.BuyTabFragment;
 import com.marz.snapprefs.Tabs.ChatLogsTabFragment;
@@ -88,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int ACTION_PLAY_SERVICES_DIALOG = 100;
     public static Context context;
     public static SharedPreferences prefs = null;
-    public static LensDatabaseHelper lensDBHelper;
     private static FileObserver observer;
     private static UUID deviceUuid;
     DrawerLayout mDrawerLayout;
@@ -331,8 +329,6 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         mDrawerToggle.syncState();
-
-        lensDBHelper = new LensDatabaseHelper(this.getApplicationContext());
     }
 
     private void handleBackStack() {
