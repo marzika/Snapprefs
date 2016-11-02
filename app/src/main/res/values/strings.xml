@@ -218,7 +218,7 @@
         <item>10</item>
     </string-array>
 
-    <string name="pref_max_recording_time_default">20</string>
+    <string name="pref_max_recording_time_default">10</string>
     <string name="pref_max_recording_time_summary">Tap here to enter a maximum recording time.</string>
     <string name="pref_max_recording_time_title">Maximum Recording Time</string>
 
