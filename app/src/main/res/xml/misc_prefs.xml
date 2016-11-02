@@ -33,6 +33,11 @@
         android:entryValues="@array/pref_forcenavbar_values"
         android:key="pref_key_forcenavbar"
         android:title="@string/pref_forcenavbar_title" />
+    <EditTextPreference
+        android:defaultValue="@string/pref_max_recording_time_default"
+        android:key="pref_key_max_recording_time"
+        android:summary="@string/pref_max_recording_time_summary"
+        android:title="@string/pref_max_recording_time_title" />
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_key_timercounter"
