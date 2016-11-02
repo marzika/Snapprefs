@@ -282,8 +282,7 @@ public class HookMethods
                 }
             });
 
-            // Temporarily hardcoded until @m1kep implements his cap selector
-            final int maxRecordTime = 30000;
+            final int maxRecordTime = Integer.parseInt(Preferences.getString(Prefs.MAX_RECORDING_TIME).trim());
 
             // If maxRecordTime is same as SC timecap, let SC perform as normal
             if (maxRecordTime > 10000) {
