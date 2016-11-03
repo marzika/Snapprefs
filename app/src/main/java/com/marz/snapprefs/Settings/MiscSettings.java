@@ -111,7 +111,7 @@ public class MiscSettings extends PreferenceFragmentCompat {
             logSwitch.setPadding(pad, pad / 2, pad, pad / 2);
             logSwitch.setText(logType.name());
             logSwitch.setChecked(activeTypes.contains(logType.name()));
-            logSwitch.setTextSize(8f * scale);
+            logSwitch.setTextSize(7f * scale);
             logSwitch.setTextColor(Color.GRAY);
             logSwitch.setTag(logType.name());
 

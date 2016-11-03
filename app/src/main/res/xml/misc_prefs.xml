@@ -48,7 +48,7 @@
         android:key="pref_key_launcher"
         android:title="@string/hide_text" />
     <CheckBoxPreference
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="pref_key_groups"
         android:title="@string/pref_groups_title" />
     <Preference

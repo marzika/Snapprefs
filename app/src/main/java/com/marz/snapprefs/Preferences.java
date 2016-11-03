@@ -431,7 +431,7 @@ public class Preferences {
         TIMBER("pref_timber", false),
         AUTO_ADVANCE("pref_key_auto_advance", false),
         CHAT_LOGGING("pref_key_chat_logging", true),
-        GROUPS("pref_key_groups", false),
+        GROUPS("pref_key_groups", true),
 
         VFILTER_AMARO("AMARO", false),
         VFILTER_F1997("F1997", false),
@@ -460,8 +460,8 @@ public class Preferences {
         PREF_KEY_SAVE_LOCATION("pref_key_save_location", ""),
         PREF_KEY_HIDE_LOCATION("pref_key_hide_location", ""),
 
-        SAVEMODE_SNAP("pref_key_save", SAVE_AUTO),
-        SAVEMODE_STORY("pref_key_save_story", SAVE_AUTO),
+        SAVEMODE_SNAP("pref_key_save", SAVE_BUTTON),
+        SAVEMODE_STORY("pref_key_save_story", SAVE_BUTTON),
         TOAST_LENGTH("pref_key_toasts_duration", TOAST_LENGTH_LONG),
         TIMER_MINIMUM("pref_key_timer_minimum", TIMER_MINIMUM_DISABLED),
         FORCE_NAVBAR("pref_key_forcenavbar", 0),
