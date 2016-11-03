@@ -282,7 +282,7 @@ public class HookMethods
                 }
             });
 
-            final int maxRecordTime = Integer.parseInt(Preferences.getString(Prefs.MAX_RECORDING_TIME).trim());
+            final int maxRecordTime = Integer.parseInt(Preferences.getString(Prefs.MAX_RECORDING_TIME).trim()) * 1000;
 
             // If maxRecordTime is same as SC timecap, let SC perform as normal
             if (maxRecordTime > 10000) {
