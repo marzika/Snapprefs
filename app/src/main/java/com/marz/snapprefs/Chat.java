@@ -31,6 +31,7 @@ import java.util.Map;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
+import static com.marz.snapprefs.Util.StringUtils.obfus;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
@@ -316,8 +317,10 @@ public class Chat {
                                                 Logger.log("We have the timestamp " + timestamp, LogType.CHAT);
                                                 String sender = (String) getObjectField(chatMedia, "am");
                                                 Logger.log("We have the sender " + sender, LogType.CHAT);
-                                                String filename = sender + "_" + savingDateFormat.format(timestamp);
-                                                Logger.log("We have the file name " + filename, LogType.CHAT);
+                                                String formattedTimestamp = savingDateFormat.format(timestamp);
+                                                String mId = (String) getObjectField(chatMedia, "j");
+                                                String filename = String.format("%s_%s%s", sender, formattedTimestamp, mId.hashCode() % 999999);
+                                                Logger.log("We have the file name " + obfus(sender) + "_" + formattedTimestamp, LogType.CHAT);
 
                                                 FileInputStream video = new FileInputStream(videoUri.getPath());
                                                 Saving.SaveResponse response = Saving.saveSnap(Saving.SnapType.CHAT, Saving.MediaType.VIDEO, view.getContext(), null, video, filename, sender);
@@ -405,9 +408,11 @@ public class Chat {
                                     Long timestamp = (Long) callMethod(chatMedia, "i"); // model.chat.Chat
                                     Logger.log("We have the timestamp " + timestamp, LogType.CHAT);
                                     String sender = (String) getObjectField(chatMedia, "am");
-                                    Logger.log("We have the sender " + sender, LogType.CHAT);
-                                    String filename = sender + "_" + savingDateFormat.format(timestamp);
-                                    Logger.log("We have the file name " + filename, LogType.CHAT);
+                                    Logger.log("We have the sender " + obfus(sender), LogType.CHAT);
+                                    String formattedTimestamp = savingDateFormat.format(timestamp);
+                                    String mId = (String) getObjectField(chatMedia, "j");
+                                    String filename = String.format("%s_%s%s", sender, formattedTimestamp, mId.hashCode() % 999999);
+                                    Logger.log("We have the file name " + obfus(sender) + "_" + formattedTimestamp, LogType.CHAT);
 
                                     Saving.SaveResponse response = Saving.saveSnap(Saving.SnapType.CHAT, Saving.MediaType.IMAGE, imageView.getContext(), chatImage, null, filename, sender);
                                     if (response == Saving.SaveResponse.SUCCESS) {

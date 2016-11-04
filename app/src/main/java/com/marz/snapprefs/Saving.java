@@ -45,6 +45,7 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
+import static com.marz.snapprefs.Util.StringUtils.obfus;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
@@ -662,7 +663,7 @@ public class Saving {
         if (snapData != null && context != null) {
             Logger.printMessage("Found SnapData to save");
             Logger.printMessage("Key: " + snapData.getmKey());
-            Logger.printMessage("Sender: " + snapData.getStrSender());
+            Logger.printMessage("Sender: " + obfus(snapData.getStrSender()));
             Logger.printMessage("Timestamp: " + snapData.getStrTimestamp());
             Logger.printMessage("SnapType: " + snapData.getSnapType());
             Logger.printMessage("MediaType: " + snapData.getMediaType());
@@ -728,7 +729,7 @@ public class Saving {
             strSender = (String) getObjectField(receivedSnap, "mUsername");
 
         Logger.printMessage("Key: " + mKey);
-        Logger.printMessage("Sender: " + strSender);
+        Logger.printMessage("Sender: " + obfus(strSender));
 
         SnapData snapData = hashSnapData.get(mKey);
 
@@ -1145,7 +1146,7 @@ public class Saving {
                         (FileInputStream) payload, filename, snapData.getStrSender());
             }
             case IMAGE: {
-                Logger.printMessage("Image " + snapData.getStrSender() + " opened");
+                Logger.printMessage("Image " + snapData.getSnapType().name + " opened");
 
                 return saveSnap(snapData.getSnapType(), MediaType.IMAGE, context,
                         (Bitmap) payload, null, filename, snapData.getStrSender());
@@ -1195,7 +1196,7 @@ public class Saving {
         if (mediaType == MediaType.IMAGE) {
             File imageFile = new File(directory, filename + MediaType.IMAGE.fileExtension);
             if (imageFile.exists()) {
-                Logger.printMessage("Image already exists: " + filename);
+                Logger.printMessage("Image already exists: " + obfus(filename));
                 SavingUtils.vibrate(context, false);
                 return SaveResponse.EXISTING;
             }
