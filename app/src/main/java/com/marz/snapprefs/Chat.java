@@ -18,6 +18,7 @@ import com.marz.snapprefs.Obfuscator.chat;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.ChatData;
 import com.marz.snapprefs.Util.NotificationUtils;
+import com.marz.snapprefs.Util.NotificationUtils.ToastType;
 
 import java.io.FileInputStream;
 import java.text.SimpleDateFormat;
@@ -190,20 +191,26 @@ public class Chat {
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         super.beforeHookedMethod(param);
 
-                        if(!Preferences.getBool(Prefs.CHAT_MEDIA_SAVE))
+                        if (!Preferences.getBool(Prefs.CHAT_MEDIA_SAVE))
                             return;
+
+                        Logger.log("Getting Chat Video Media Key", LogType.CHAT);
 
                         Object chatMedia = param.args[1];
                         String mKey = (String) getObjectField(chatMedia, "H");
-                        Logger.log("Chat media! " + chatMedia);
 
-                        String mMediaUrl = (String) getObjectField(chatMedia, "G");
-
-                        if (!chatMediaMap.containsKey(mKey)) {
-                            Logger.log("Adding mediaUrl: " + mKey, LogType.CHAT);
-                            chatMediaMap.put(mKey, chatMedia);
+                        if (mKey == null) {
+                            Logger.log("No mKey found!", LogType.CHAT);
+                            return;
                         }
-                    }p
+
+                        Logger.log("Found mKey: " + mKey, LogType.CHAT);
+
+                        if (!chatMediaMap.containsKey(mKey))
+                            chatMediaMap.put(mKey, chatMedia);
+                        else
+                            Logger.log("Map already contains key", LogType.CHAT);
+                    }
                 });
 
         findAndHookMethod("aFj", lpparam.classLoader, "b", new XC_MethodHook() {
@@ -211,8 +218,10 @@ public class Chat {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 super.beforeHookedMethod(param);
 
-                if(!Preferences.getBool(Prefs.CHAT_MEDIA_SAVE))
+                if (!Preferences.getBool(Prefs.CHAT_MEDIA_SAVE))
                     return;
+
+                Logger.log("Finding Video URL from key", LogType.CHAT);
 
                 Object godPacket = getObjectField(param.thisObject, "e");
                 Map<String, Object> map = (Map<String, Object>) getObjectField(godPacket, "c");
@@ -220,16 +229,18 @@ public class Chat {
                 String mKey = (String) map.get("image_key");
                 String mMediaUrl = (String) map.get("video_uri");
 
+                Logger.log(String.format("Checking for [MKey:%s] with [URL:%s]", mKey, mMediaUrl), LogType.CHAT);
+
                 Object chatMedia = chatMediaMap.get(mKey);
 
                 if (chatMedia == null) {
-                    Logger.log("Null Chat Media", LogType.CHAT);
+                    Logger.log("No mKey found in map", LogType.CHAT);
                     return;
                 }
 
                 chatMediaMap.remove(mKey);
                 chatMediaMap.put(mMediaUrl, chatMedia);
-                Logger.log("Added media: " + mMediaUrl, LogType.CHAT);
+                Logger.log("Assigned ChatMedia with key: " + mMediaUrl, LogType.CHAT);
             }
         });
 
@@ -241,7 +252,7 @@ public class Chat {
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         super.beforeHookedMethod(param);
 
-                        if(!Preferences.getBool(Prefs.CHAT_MEDIA_SAVE))
+                        if (!Preferences.getBool(Prefs.CHAT_MEDIA_SAVE))
                             return;
 
                         MotionEvent event = (MotionEvent) param.args[0];
@@ -251,55 +262,66 @@ public class Chat {
                             gestureDetector = new GestureDetector(new MediaGestureListener((ViewGroup) param.thisObject) {
                                 @Override
                                 public void onLongPress(MotionEvent e) {
+                                    Logger.log("Video long press detected!", LogType.CHAT);
 
-                                    int childCount = this.mediaLayout.getChildCount();
+                                    try {
+                                        int childCount = this.mediaLayout.getChildCount();
 
-                                    if (childCount > 0) {
-                                        FrameLayout videoLayout = (FrameLayout) this.mediaLayout.getChildAt(0);
+                                        if (childCount > 0) {
+                                            FrameLayout videoLayout = (FrameLayout) this.mediaLayout.getChildAt(0);
 
-                                        for (int i = 0; i < videoLayout.getChildCount(); i++) {
-                                            View view = videoLayout.getChildAt(i);
+                                            for (int i = 0; i < videoLayout.getChildCount(); i++) {
+                                                View view = videoLayout.getChildAt(i);
 
-                                            if (view.getId() != +2131690096)
-                                                return;
+                                                if (view.getId() != +2131690096)
+                                                    return;
 
-                                            Uri videoUri = (Uri) getObjectField(view, "b");
+                                                Logger.log("Found TexturedVideoView", LogType.CHAT);
 
-                                            if (videoUri == null) {
-                                                Logger.log("Null Video URI", LogType.CHAT);
-                                                return;
-                                            }
+                                                Uri videoUri = (Uri) getObjectField(view, "b");
 
-                                            Logger.log("URI: " + videoUri.toString());
-                                            Object chatMedia = chatMediaMap.get(videoUri.toString());
+                                                if (videoUri == null) {
+                                                    Logger.log("Null Video URI", LogType.CHAT);
+                                                    return;
+                                                }
 
-                                            Logger.log("ChatMedia: " + chatMedia, LogType.CHAT);
-                                            Long timestamp = (Long) callMethod(chatMedia, "i"); // model.chat.Chat
-                                            Logger.log("We have the timestamp " + timestamp.toString());
-                                            String sender = (String) getObjectField(chatMedia, "am");
-                                            Logger.log("We have the sender " + sender);
-                                            String filename = sender + "_" + savingDateFormat.format(timestamp);
-                                            Logger.log("We have the file name " + filename);
+                                                String strVideoUrl = videoUri.getPath();
+                                                Logger.log("URI: " + videoUri.getPath());
+                                                Object chatMedia = chatMediaMap.get(strVideoUrl);
 
-                                            try {
+                                                if (chatMedia == null) {
+                                                    Logger.log("No ChatMedia found for URL: " + strVideoUrl, LogType.CHAT);
+                                                    return;
+                                                }
+
+                                                Logger.log("Found ChatMedia for saving", LogType.CHAT);
+                                                Long timestamp = (Long) callMethod(chatMedia, "i"); // model.chat.Chat
+                                                Logger.log("We have the timestamp " + timestamp.toString());
+                                                String sender = (String) getObjectField(chatMedia, "am");
+                                                Logger.log("We have the sender " + sender);
+                                                String filename = sender + "_" + savingDateFormat.format(timestamp);
+                                                Logger.log("We have the file name " + filename);
+
                                                 FileInputStream video = new FileInputStream(videoUri.getPath());
                                                 Saving.SaveResponse response = Saving.saveSnap(Saving.SnapType.CHAT, Saving.MediaType.VIDEO, view.getContext(), null, video, filename, sender);
                                                 if (response == Saving.SaveResponse.SUCCESS) {
-                                                    Logger.printFinalMessage("Saved Chat Video");
+                                                    Logger.log("Saved Chat Video", LogType.CHAT);
                                                     Saving.createStatefulToast("Saved Chat Video", NotificationUtils.ToastType.GOOD);
                                                 } else if (response == Saving.SaveResponse.EXISTING) {
-                                                    Logger.printFinalMessage("Chat Video exists");
+                                                    Logger.log("Chat Video exists", LogType.CHAT);
                                                     Saving.createStatefulToast("Chat Video exists", NotificationUtils.ToastType.WARNING);
                                                 } else if (response == Saving.SaveResponse.FAILED) {
-                                                    Logger.printFinalMessage("Error saving Chat Video");
+                                                    Logger.log("Error saving Chat Video", LogType.CHAT);
                                                     Saving.createStatefulToast("Error saving Chat Video", NotificationUtils.ToastType.BAD);
                                                 } else {
-                                                    Logger.printFinalMessage("Unhandled save response");
+                                                    Logger.log("Unhandled save response", LogType.CHAT);
                                                     Saving.createStatefulToast("Unhandled save response", NotificationUtils.ToastType.WARNING);
                                                 }
-                                            } catch (Exception ignored) {
                                             }
                                         }
+                                    } catch (Exception ex) {
+                                        Logger.log("Problems saving video!", ex, LogType.CHAT.setForced());
+                                        Saving.createStatefulToast("Problem saving video!", ToastType.BAD);
                                     }
                                 }
                             });
@@ -321,7 +343,7 @@ public class Chat {
                     protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
                         super.afterHookedMethod(param);
 
-                        if(!Preferences.getBool(Prefs.CHAT_MEDIA_SAVE))
+                        if (!Preferences.getBool(Prefs.CHAT_MEDIA_SAVE))
                             return;
 
                         final ImageView imageView = (ImageView) getObjectField(param.thisObject, "n");
@@ -329,36 +351,47 @@ public class Chat {
                         imageView.setOnLongClickListener(new View.OnLongClickListener() {
                             @Override
                             public boolean onLongClick(View v) {
-                                Logger.log("----------------------- SNAPPREFS ------------------------");
-                                Logger.log("Button press on chat image detected");
-
-                                Bitmap chatImage = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-                                final Object godPacket = getObjectField(param.thisObject, "e");
-                                final Map<String, Object> map = (Map<String, Object>) getObjectField(godPacket, "c");
-
-                                if( map == null ) {
-                                    Logger.log("Null packet map");
-                                    return true;
-                                }
-
-                                final String mKey = (String) map.get("image_key");
-
-                                if( mKey == null ) {
-                                    Logger.log("Null mKey");
-                                    return true;
-                                }
-
-                                final Object chatMedia = chatMediaMap.get(mKey);
-
-                                Logger.log("ChatMedia: " + chatMedia, LogType.CHAT);
-                                Long timestamp = (Long) callMethod(chatMedia, "i"); // model.chat.Chat
-                                Logger.log("We have the timestamp " + timestamp.toString());
-                                String sender = (String) getObjectField(chatMedia, "am");
-                                Logger.log("We have the sender " + sender);
-                                String filename = sender + "_" + savingDateFormat.format(timestamp);
-                                Logger.log("We have the file name " + filename);
-
                                 try {
+                                    Logger.log("Image long press detected", LogType.CHAT);
+
+                                    Bitmap chatImage = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+
+                                    if (chatImage == null) {
+                                        Logger.log("Null chat image", LogType.CHAT);
+                                        return true;
+                                    }
+
+                                    final Object godPacket = getObjectField(param.thisObject, "e");
+                                    final Map<String, Object> map = (Map<String, Object>) getObjectField(godPacket, "c");
+
+                                    if (map == null) {
+                                        Logger.log("Null packet map");
+                                        return true;
+                                    }
+
+                                    final String mKey = (String) map.get("image_key");
+
+                                    if (mKey == null) {
+                                        Logger.log("Null image mKey");
+                                        return true;
+                                    }
+
+                                    Logger.log("Finding ChatMedia with key: " + mKey, LogType.CHAT);
+
+                                    final Object chatMedia = chatMediaMap.get(mKey);
+
+                                    if (chatMedia == null) {
+                                        Logger.log("Couldn't find ChatMedia", LogType.CHAT);
+                                        return true;
+                                    }
+
+                                    Long timestamp = (Long) callMethod(chatMedia, "i"); // model.chat.Chat
+                                    Logger.log("We have the timestamp " + timestamp.toString());
+                                    String sender = (String) getObjectField(chatMedia, "am");
+                                    Logger.log("We have the sender " + sender);
+                                    String filename = sender + "_" + savingDateFormat.format(timestamp);
+                                    Logger.log("We have the file name " + filename);
+
                                     Saving.SaveResponse response = Saving.saveSnap(Saving.SnapType.CHAT, Saving.MediaType.IMAGE, imageView.getContext(), chatImage, null, filename, sender);
                                     if (response == Saving.SaveResponse.SUCCESS) {
                                         Logger.printFinalMessage("Saved Chat image");
@@ -373,18 +406,18 @@ public class Chat {
                                         Logger.printFinalMessage("Unhandled save response");
                                         Saving.createStatefulToast("Unhandled save response", NotificationUtils.ToastType.WARNING);
                                     }
-                                } catch (Exception ignored) {
-                                }
 
-                                return false;
+                                    return false;
+                                } catch( Exception e ) {
+                                    Logger.log("Exception saving chat image!", e, LogType.CHAT.setForced());
+                                    Saving.createStatefulToast("Exception saving Chat image", NotificationUtils.ToastType.BAD);
+
+                                    return true;
+                                }
                             }
                         });
                     }
                 });
-    }
-
-    void performVideoSave(Object videoObj) {
-
     }
 
     private static class MediaGestureListener extends GestureDetector.SimpleOnGestureListener {
