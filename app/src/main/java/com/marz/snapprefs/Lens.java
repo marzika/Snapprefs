@@ -139,7 +139,8 @@ public class Lens {
             String mCode = (String) getObjectField(lens, "mCode");
 
             if (Preferences.getBool(Prefs.LENSES_COLLECT) &&
-                    (!canInjectLenses || !queriedList.containsKey(mCode))) {
+                    (!canInjectLenses || !queriedList.containsKey(mCode)) &&
+                    !getLensDatabase().containsLens(mCode)) {
                 performLensSave(lens, type);
             }
 
