@@ -239,8 +239,14 @@ public class Chat {
                 }
 
                 chatMediaMap.remove(mKey);
-                chatMediaMap.put(mMediaUrl, chatMedia);
-                Logger.log("Assigned ChatMedia with key: " + mMediaUrl, LogType.CHAT);
+
+                String[] arrSplitUrl = mMediaUrl.split("media_cache/");
+
+                if( arrSplitUrl.length > 0 ) {
+                    String splitUrl = arrSplitUrl[1];
+                    chatMediaMap.put(splitUrl, chatMedia);
+                    Logger.log("Assigned ChatMedia with key: " + splitUrl, LogType.CHAT);
+                }
             }
         });
 
@@ -286,11 +292,19 @@ public class Chat {
                                                 }
 
                                                 String strVideoUrl = videoUri.getPath();
-                                                Logger.log("URI: " + videoUri.getPath());
-                                                Object chatMedia = chatMediaMap.get(strVideoUrl);
+                                                String[] arrSplitUrl = strVideoUrl.split("media_cache/");
+
+                                                if( arrSplitUrl.length <= 0 ) {
+                                                    Logger.log("Split url is malformed", LogType.CHAT);
+                                                    return;
+                                                }
+
+                                                String splitUrl = arrSplitUrl[1];
+                                                Logger.log("URI: " + splitUrl);
+                                                Object chatMedia = chatMediaMap.get(splitUrl);
 
                                                 if (chatMedia == null) {
-                                                    Logger.log("No ChatMedia found for URL: " + strVideoUrl, LogType.CHAT);
+                                                    Logger.log("No ChatMedia found for URL: " + splitUrl, LogType.CHAT);
                                                     return;
                                                 }
 
