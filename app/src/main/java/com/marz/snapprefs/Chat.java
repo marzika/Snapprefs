@@ -36,7 +36,9 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
+import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
 
 public class Chat {
     public static HashSet<String> loadedMessages = new HashSet<>();
@@ -232,7 +234,7 @@ public class Chat {
 
                 String[] arrSplitUrl = mMediaUrl.split("media_cache/");
 
-                if( arrSplitUrl.length <= 0 ) {
+                if (arrSplitUrl.length <= 0) {
                     Logger.log("Malformed Video URL", LogType.CHAT);
                     return;
                 }
@@ -289,21 +291,29 @@ public class Chat {
                                                 Logger.log("Found TexturedVideoView", LogType.CHAT);
 
                                                 Uri videoUri = (Uri) getObjectField(view, "b");
+                                                String splitUrl;
 
                                                 if (videoUri == null) {
-                                                    Logger.log("Null Video URI", LogType.CHAT);
-                                                    return;
+                                                    Logger.log("Null Video URI - Stage 1", LogType.CHAT);
+                                                    splitUrl = (String) getAdditionalInstanceField(view, "MediaURL");
+
+                                                    if( splitUrl == null ) {
+                                                        Logger.log("Null Video URI - Stage 2... Aborting", LogType.CHAT);
+                                                        return;
+                                                    }
+                                                } else {
+
+                                                    String strVideoUrl = videoUri.getPath();
+                                                    String[] arrSplitUrl = strVideoUrl.split("media_cache/");
+
+                                                    if (arrSplitUrl.length <= 0) {
+                                                        Logger.log("Split url is malformed", LogType.CHAT);
+                                                        return;
+                                                    }
+
+                                                    splitUrl = arrSplitUrl[1];
                                                 }
 
-                                                String strVideoUrl = videoUri.getPath();
-                                                String[] arrSplitUrl = strVideoUrl.split("media_cache/");
-
-                                                if( arrSplitUrl.length <= 0 ) {
-                                                    Logger.log("Split url is malformed", LogType.CHAT);
-                                                    return;
-                                                }
-
-                                                String splitUrl = arrSplitUrl[1];
                                                 Logger.log("CachedFilename: " + splitUrl);
                                                 Object chatMedia = chatMediaMap.get(splitUrl);
 
@@ -355,6 +365,32 @@ public class Chat {
                     }
                 });
 
+        findAndHookMethod("com.snapchat.opera.shared.view.TextureVideoView", lpparam.classLoader, "b",
+                new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+                        Logger.log("Clearing Video URI", LogType.CHAT);
+
+                        Uri videoUri = (Uri) getObjectField(param.thisObject, "b");
+                        if( videoUri == null ) {
+                            Logger.log("TextureVideoView tried to clear null Uri", LogType.CHAT);
+                            return;
+                        }
+
+                        String strVideoUrl = videoUri.getPath();
+                        String[] arrSplitUrl = strVideoUrl.split("media_cache/");
+
+                        if (arrSplitUrl.length <= 0) {
+                            Logger.log("Split url is malformed", LogType.CHAT);
+                            return;
+                        }
+
+                        String splitUrl = arrSplitUrl[1];
+                        setAdditionalInstanceField(param.thisObject, "MediaURL", splitUrl);
+                        Logger.log("Set additional MediaURL", LogType.CHAT);
+                    }
+                });
         findAndHookConstructor("aEU", lpparam.classLoader, findClass("aEE", lpparam.classLoader),
                 findClass("amw", lpparam.classLoader), Context.class, findClass("uk.co.senab.photoview.PhotoView", lpparam.classLoader),
                 findClass("aEm", lpparam.classLoader), findClass("aEM", lpparam.classLoader),
@@ -411,8 +447,8 @@ public class Chat {
                                     Logger.log("We have the sender " + obfus(sender), LogType.CHAT);
                                     String formattedTimestamp = savingDateFormat.format(timestamp);
                                     String mId = (String) getObjectField(chatMedia, "j");
-                                    String filename = String.format("%s_%s%s", sender, formattedTimestamp, mId.hashCode() % 999999);
-                                    Logger.log("We have the file name " + obfus(sender) + "_" + formattedTimestamp, LogType.CHAT);
+                                    String filename = String.format("%s_%s_%s", sender, formattedTimestamp, mId.hashCode() % 999999);
+                                    Logger.log("We have the file name " + obfus(sender) + "_" + formattedTimestamp + "_" + (mId.hashCode() % 999999), LogType.CHAT);
 
                                     Saving.SaveResponse response = Saving.saveSnap(Saving.SnapType.CHAT, Saving.MediaType.IMAGE, imageView.getContext(), chatImage, null, filename, sender);
                                     if (response == Saving.SaveResponse.SUCCESS) {
