@@ -248,7 +248,6 @@ public class Chat {
                         ViewGroup viewGroup = (ViewGroup) param.thisObject;
 
                         if (gestureDetector == null) {
-                            Logger.log("Null gesture detector", LogType.CHAT);
                             gestureDetector = new GestureDetector(new MediaGestureListener((ViewGroup) param.thisObject) {
                                 @Override
                                 public void onLongPress(MotionEvent e) {
@@ -279,7 +278,7 @@ public class Chat {
                                             Logger.log("We have the timestamp " + timestamp.toString());
                                             String sender = (String) getObjectField(chatMedia, "am");
                                             Logger.log("We have the sender " + sender);
-                                            String filename = sender + "_" + dateFormat.format(timestamp);
+                                            String filename = sender + "_" + savingDateFormat.format(timestamp);
                                             Logger.log("We have the file name " + filename);
 
                                             try {
@@ -356,7 +355,7 @@ public class Chat {
                                 Logger.log("We have the timestamp " + timestamp.toString());
                                 String sender = (String) getObjectField(chatMedia, "am");
                                 Logger.log("We have the sender " + sender);
-                                String filename = sender + "_" + dateFormat.format(timestamp);
+                                String filename = sender + "_" + savingDateFormat.format(timestamp);
                                 Logger.log("We have the file name " + filename);
 
                                 try {
