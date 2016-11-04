@@ -229,7 +229,16 @@ public class Chat {
                 String mKey = (String) map.get("image_key");
                 String mMediaUrl = (String) map.get("video_uri");
 
-                Logger.log(String.format("Checking for [MKey:%s] with [URL:%s]", mKey, mMediaUrl), LogType.CHAT);
+                String[] arrSplitUrl = mMediaUrl.split("media_cache/");
+
+                if( arrSplitUrl.length <= 0 ) {
+                    Logger.log("Malformed Video URL", LogType.CHAT);
+                    return;
+                }
+
+                String splitUrl = arrSplitUrl[1];
+
+                Logger.log(String.format("Checking for [MKey:%s] with [URL:%s]", mKey, splitUrl), LogType.CHAT);
 
                 Object chatMedia = chatMediaMap.get(mKey);
 
@@ -239,14 +248,8 @@ public class Chat {
                 }
 
                 chatMediaMap.remove(mKey);
-
-                String[] arrSplitUrl = mMediaUrl.split("media_cache/");
-
-                if( arrSplitUrl.length > 0 ) {
-                    String splitUrl = arrSplitUrl[1];
-                    chatMediaMap.put(splitUrl, chatMedia);
-                    Logger.log("Assigned ChatMedia with key: " + splitUrl, LogType.CHAT);
-                }
+                chatMediaMap.put(splitUrl, chatMedia);
+                Logger.log("Assigned ChatMedia with key: " + splitUrl, LogType.CHAT);
             }
         });
 
@@ -300,7 +303,7 @@ public class Chat {
                                                 }
 
                                                 String splitUrl = arrSplitUrl[1];
-                                                Logger.log("URI: " + splitUrl);
+                                                Logger.log("CachedFilename: " + splitUrl);
                                                 Object chatMedia = chatMediaMap.get(splitUrl);
 
                                                 if (chatMedia == null) {
@@ -310,11 +313,11 @@ public class Chat {
 
                                                 Logger.log("Found ChatMedia for saving", LogType.CHAT);
                                                 Long timestamp = (Long) callMethod(chatMedia, "i"); // model.chat.Chat
-                                                Logger.log("We have the timestamp " + timestamp.toString());
+                                                Logger.log("We have the timestamp " + timestamp, LogType.CHAT);
                                                 String sender = (String) getObjectField(chatMedia, "am");
-                                                Logger.log("We have the sender " + sender);
+                                                Logger.log("We have the sender " + sender, LogType.CHAT);
                                                 String filename = sender + "_" + savingDateFormat.format(timestamp);
-                                                Logger.log("We have the file name " + filename);
+                                                Logger.log("We have the file name " + filename, LogType.CHAT);
 
                                                 FileInputStream video = new FileInputStream(videoUri.getPath());
                                                 Saving.SaveResponse response = Saving.saveSnap(Saving.SnapType.CHAT, Saving.MediaType.VIDEO, view.getContext(), null, video, filename, sender);
@@ -379,14 +382,14 @@ public class Chat {
                                     final Map<String, Object> map = (Map<String, Object>) getObjectField(godPacket, "c");
 
                                     if (map == null) {
-                                        Logger.log("Null packet map");
+                                        Logger.log("Null packet map", LogType.CHAT);
                                         return true;
                                     }
 
                                     final String mKey = (String) map.get("image_key");
 
                                     if (mKey == null) {
-                                        Logger.log("Null image mKey");
+                                        Logger.log("Null image mKey", LogType.CHAT);
                                         return true;
                                     }
 
@@ -400,24 +403,24 @@ public class Chat {
                                     }
 
                                     Long timestamp = (Long) callMethod(chatMedia, "i"); // model.chat.Chat
-                                    Logger.log("We have the timestamp " + timestamp.toString());
+                                    Logger.log("We have the timestamp " + timestamp, LogType.CHAT);
                                     String sender = (String) getObjectField(chatMedia, "am");
-                                    Logger.log("We have the sender " + sender);
+                                    Logger.log("We have the sender " + sender, LogType.CHAT);
                                     String filename = sender + "_" + savingDateFormat.format(timestamp);
-                                    Logger.log("We have the file name " + filename);
+                                    Logger.log("We have the file name " + filename, LogType.CHAT);
 
                                     Saving.SaveResponse response = Saving.saveSnap(Saving.SnapType.CHAT, Saving.MediaType.IMAGE, imageView.getContext(), chatImage, null, filename, sender);
                                     if (response == Saving.SaveResponse.SUCCESS) {
-                                        Logger.printFinalMessage("Saved Chat image");
+                                        Logger.log("Saved Chat image", LogType.CHAT);
                                         Saving.createStatefulToast("Saved Chat image", NotificationUtils.ToastType.GOOD);
                                     } else if (response == Saving.SaveResponse.EXISTING) {
-                                        Logger.printFinalMessage("Chat image exists");
+                                        Logger.log("Chat image exists", LogType.CHAT);
                                         Saving.createStatefulToast("Chat image exists", NotificationUtils.ToastType.WARNING);
                                     } else if (response == Saving.SaveResponse.FAILED) {
-                                        Logger.printFinalMessage("Error saving Chat image");
+                                        Logger.log("Error saving Chat image", LogType.CHAT);
                                         Saving.createStatefulToast("Error saving Chat image", NotificationUtils.ToastType.BAD);
                                     } else {
-                                        Logger.printFinalMessage("Unhandled save response");
+                                        Logger.log("Unhandled save response", LogType.CHAT);
                                         Saving.createStatefulToast("Unhandled save response", NotificationUtils.ToastType.WARNING);
                                     }
 
