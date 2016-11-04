@@ -203,7 +203,7 @@ public class Chat {
                             Logger.log("Adding mediaUrl: " + mKey, LogType.CHAT);
                             chatMediaMap.put(mKey, chatMedia);
                         }
-                    }p
+                    }
                 });
 
         findAndHookMethod("aFj", lpparam.classLoader, "b", new XC_MethodHook() {
