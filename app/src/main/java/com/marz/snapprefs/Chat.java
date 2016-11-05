@@ -234,7 +234,7 @@ public class Chat {
 
                 String[] arrSplitUrl = mMediaUrl.split("media_cache/");
 
-                if (arrSplitUrl.length <= 0) {
+                if (arrSplitUrl.length <= 1) {
                     Logger.log("Malformed Video URL", LogType.CHAT);
                     return;
                 }
@@ -381,7 +381,7 @@ public class Chat {
                         String strVideoUrl = videoUri.getPath();
                         String[] arrSplitUrl = strVideoUrl.split("media_cache/");
 
-                        if (arrSplitUrl.length <= 0) {
+                        if (arrSplitUrl.length <= 1) {
                             Logger.log("Split url is malformed", LogType.CHAT);
                             return;
                         }
