@@ -49,6 +49,9 @@
         android:title="@string/hide_text" />
     <CheckBoxPreference
         android:defaultValue="true"
-        android:key="pref_key_debug"
-        android:title="@string/debug_text" />
+        android:key="pref_key_groups"
+        android:title="@string/pref_groups_title" />
+    <Preference
+        android:title="Debug Options"
+        android:key="pref_key_debug_options"/>
 </PreferenceScreen>

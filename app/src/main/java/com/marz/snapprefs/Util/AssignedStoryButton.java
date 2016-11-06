@@ -8,8 +8,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
 import com.marz.snapprefs.HookMethods;
+import com.marz.snapprefs.HookedLayouts;
 import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.Preferences;
+import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Saving;
 
 import static com.marz.snapprefs.HookedLayouts.px;
@@ -20,15 +22,15 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
  */
 
 public class AssignedStoryButton extends ImageButton {
-    private boolean areParamsSet = false;
     public boolean shouldAbortAssignment = false;
+    private boolean areParamsSet = false;
     private String assignedmKey;
 
     public AssignedStoryButton(Context context) {
         super(context);
 
         this.setBackgroundColor(0);
-        this.setAlpha(0.8f);
+        this.setAlpha(Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? 0f : 0.8f);
         this.setImageBitmap(HookMethods.saveImg);
         this.setVisibility(Preferences.getInt(Preferences.Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON
                 ? View.VISIBLE : View.INVISIBLE);
@@ -57,19 +59,29 @@ public class AssignedStoryButton extends ImageButton {
 
     public void buildParams(FrameLayout frameLayout, Context context) {
         Logger.log("Building params");
-        final FrameLayout.LayoutParams layoutParams =
-                new FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.WRAP_CONTENT,
-                        FrameLayout.LayoutParams.WRAP_CONTENT);
-
-        FrameLayout.LayoutParams newParams = (FrameLayout.LayoutParams) callMethod(frameLayout, "generateLayoutParams", layoutParams);
 
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 
         boolean horizontalPosition = Preferences.getBool(Preferences.Prefs.BUTTON_POSITION);
-        int scaledSize = px(65, metrics.density);
+        int unscaledSize = Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? HookedLayouts.stealthButtonSize : 65;
+        int scaledSize = px(unscaledSize, metrics.density);
         int newX = horizontalPosition ? 0 : metrics.widthPixels - scaledSize;
         int newY = metrics.heightPixels - scaledSize;
+
+        FrameLayout.LayoutParams layoutParams;
+
+        if (Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON)) {
+            layoutParams =
+                    new FrameLayout.LayoutParams(scaledSize, scaledSize);
+        } else {
+            layoutParams =
+                    new FrameLayout.LayoutParams(
+                            FrameLayout.LayoutParams.WRAP_CONTENT,
+                            FrameLayout.LayoutParams.WRAP_CONTENT);
+        }
+
+        FrameLayout.LayoutParams newParams = (FrameLayout.LayoutParams) callMethod(frameLayout, "generateLayoutParams", layoutParams);
+
 
         //noinspection ResourceType
         newParams.setMargins(newX, newY, newX, newY);

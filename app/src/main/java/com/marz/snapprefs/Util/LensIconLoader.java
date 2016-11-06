@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.marz.snapprefs.Fragments.LensesFragment;
 import com.marz.snapprefs.Logger;
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.MainActivity;
 import com.marz.snapprefs.Preferences;
 
@@ -25,6 +26,74 @@ import java.net.URL;
  * Created by Andre on 16/09/2016.
  */
 public class LensIconLoader {
+    @Nullable
+    private static Bitmap retrieveAppropriateBitmap(String url, Context context) {
+        File iconDirectory = new File(Preferences.getSavePath(), "/LensIcon/");
+
+        if (!iconDirectory.exists() && !iconDirectory.mkdirs()) {
+            return getBitmapFromURL(url, 1, context);
+        }
+
+        String hashedFileName = hashBuilder(url);
+        File iconFile = new File(iconDirectory, hashedFileName + ".png");
+        Bitmap bmp;
+
+        if (iconFile.exists()) {
+            bmp = loadBitmapFromFile(iconFile);
+
+            if (bmp != null)
+                return bmp;
+        }
+
+        bmp = getBitmapFromURL(url, 1, context);
+
+        if (bmp == null)
+            return null;
+
+        SavingUtils.savePNGAsync(iconFile, bmp, context, false);
+
+        MainActivity.writeNoMediaFile(Preferences.getSavePath() + "/LensIcon");
+
+        return bmp;
+    }
+
+    private static Bitmap loadBitmapFromFile(File iconFile) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        return BitmapFactory.decodeFile(iconFile.getPath(), options);
+    }
+
+    @Nullable
+    private static Bitmap getBitmapFromURL(String src, int sampleSize, Context context) {
+        if (!MainActivity.isNetworkAvailable(context))
+            return null;
+
+        Bitmap bmImg;
+        URL myFileUrl;
+
+        try {
+            myFileUrl = new URL(src);
+
+            HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
+            conn.setDoInput(true);
+            conn.connect();
+            InputStream is = conn.getInputStream();
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = sampleSize;
+
+            return BitmapFactory.decodeStream(is, null, options);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            Log.d("Error", e.toString());
+            return null;
+        }
+    }
+
+    private static String hashBuilder(String inputVal) {
+        return Integer.toString(inputVal.hashCode() % 999999999);
+    }
+
     public static class AsyncLensIconDownloader extends AsyncTask<Object, Void, Boolean> {
         @Override
         protected Boolean doInBackground(Object... params) {
@@ -38,8 +107,10 @@ public class LensIconLoader {
                 final TextView textView = pair.textView;
                 final Bitmap bmp = retrieveAppropriateBitmap(url, context);
 
-                if (bmp == null)
+                if (bmp == null) {
+                    Logger.log("Could not retrieve Lens Icon", LogType.LENS);
                     return null;
+                }
 
                 float density = context.getResources().getDisplayMetrics().density;
                 final int imgSize = (int) (65f * density);
@@ -48,91 +119,14 @@ public class LensIconLoader {
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Logger.log("Loading image: " + url);
                         button.setImageBitmap(bmp);
                     }
                 });
             } catch (Throwable e) {
-                Logger.log("Error inside async", e);
+                Logger.log("Error inside async", e, LogType.LENS);
             }
 
-
             return null;
         }
-    }
-
-    @Nullable
-    public static Bitmap retrieveAppropriateBitmap( String url, Context context )
-    {
-        File iconDirectory = new File(Preferences.getSavePath(), "/LensIcon/");
-
-        if( !iconDirectory.exists() && !iconDirectory.mkdirs()) {
-            return getBitmapFromURL(url, 1, context);
-        }
-
-        String hashedFileName = hashBuilder(url);
-        File iconFile = new File( iconDirectory, hashedFileName + ".png");
-
-        Logger.log("IconFile: " + iconFile.getPath());
-        if(iconFile.exists())
-        {
-            Bitmap bmp = loadBitmapFromFile(iconFile);
-
-            if(bmp != null)
-                return bmp;
-        }
-
-        Bitmap bmp = getBitmapFromURL(url, 1, context);
-
-        if( bmp == null )
-            return null;
-
-        SavingUtils.savePNGAsync(iconFile, bmp, context, false);
-
-
-        File nomediaFile = new File( Preferences.getSavePath(), "/LensIcon/.nomedia");
-
-        if( !nomediaFile.exists() )
-            MainActivity.writeNoMediaFile(Preferences.getSavePath() + "/LensIcon");
-
-        return bmp;
-    }
-
-    public static Bitmap loadBitmapFromFile(File iconFile)
-    {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        return BitmapFactory.decodeFile(iconFile.getPath(), options);
-    }
-
-    public static Bitmap getBitmapFromURL(String src, int sampleSize, Context context) {
-        if( !MainActivity.isNetworkAvailable(context))
-            return null;
-
-        Bitmap bmImg;
-        URL myFileUrl = null;
-
-        try {
-            myFileUrl = new URL(src);
-
-            HttpURLConnection conn= (HttpURLConnection)myFileUrl.openConnection();
-            conn.setDoInput(true);
-            conn.connect();
-            InputStream is = conn.getInputStream();
-
-            BitmapFactory.Options options=new BitmapFactory.Options();
-            options.inSampleSize = sampleSize;
-
-            return BitmapFactory.decodeStream(is, null, options);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            Log.d("Error", e.toString());
-            return null;
-        }
-    }
-
-    public static String hashBuilder(String inputVal)
-    {
-        return Integer.toString(inputVal.hashCode() % 999999999);
     }
 }

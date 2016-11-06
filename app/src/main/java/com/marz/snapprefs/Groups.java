@@ -46,26 +46,23 @@ public class Groups {
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 readGroups();
                 ArrayList result = (ArrayList) param.getResult();
-                ArrayList newResult = new ArrayList();
+                ArrayList<Object> newResult = new ArrayList<>();
                 Object edit = XposedHelpers.newInstance(Ly, "edit", "Edit groups");
                 XposedHelpers.setAdditionalInstanceField(edit, "editGroups", true);
-                if (!result.contains(edit)) {
+                if (!result.contains(edit))
                     newResult.add(edit);
-                }
+
                 for (Group g : groups) {
                     Object group = XposedHelpers.newInstance(Ly, "group_" + g.name, g.name);
                     XposedHelpers.setAdditionalInstanceField(group, "group", g);
-                    if (!result.contains(group)) {
+                    if (!result.contains(group))
                         newResult.add(group);
-                    }
                 }
                 newResult.addAll(result);
                 param.setResult(newResult);
             }
         });
 
-        //TODO UPDATE THE CONTENTS OF THIS HOOK
-        // Andre: I'm not sure on how it works
         XposedHelpers.findAndHookMethod(Obfuscator.groups.STORYSECTION_CLASS, lpparam.classLoader, "onBindViewHolder", findClass("android.support.v7.widget.RecyclerView$u", lpparam.classLoader), int.class, new XC_MethodHook() {
 
             @Override
@@ -182,12 +179,11 @@ public class Groups {
                             NotificationUtils.showMessage("You disabled the option to have more than 3 groups", Color.RED, NotificationUtils.LENGTH_SHORT, HookMethods.classLoader);
                             return;
                         }
-                        if (!groups.contains(currentGroup)) {
-                            groups.add(currentGroup);
+                        if (!groups.add(currentGroup))
                             numGroups++; //add limit for Free users
-                        }
                     }
                 }
+
                 Collections.sort(groups, new Groups.groupComparator());
             }
         }).start();

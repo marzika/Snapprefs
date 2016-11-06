@@ -1,8 +1,14 @@
 package com.marz.snapprefs.Util;
 
+import android.content.Context;
 import android.content.res.XModuleResources;
-import android.content.res.XResources;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
+import android.view.Gravity;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.marz.snapprefs.HookMethods;
 import com.marz.snapprefs.Obfuscator;
@@ -13,7 +19,6 @@ import com.marz.snapprefs.R;
 import java.util.Map;
 
 import de.robv.android.xposed.XposedHelpers;
-import de.robv.android.xposed.callbacks.XC_InitPackageResources;
 
 /**
  * Created by MARZ on 2016. 02. 18..
@@ -21,22 +26,23 @@ import de.robv.android.xposed.callbacks.XC_InitPackageResources;
 public class NotificationUtils {
     public static final int LENGTH_LONG = 3500; // 3.5 seconds
     public static final int LENGTH_SHORT = 2000; // 2 seconds
-    public static int DEFAULT_ICON;
+    private static int DEFAULT_ICON;
+    private static Drawable statusDrawable;
+    private static ToastType lastToastType;
 
-    public static void handleInitPackageResources(XC_InitPackageResources.InitPackageResourcesParam resparam) throws Throwable {
-        if (resparam.packageName.equalsIgnoreCase("com.snapchat.android")) {
-            int drawable = R.drawable.snapprefs_btn_check_on_pressed_holo_light;
-            XModuleResources modRes = XModuleResources.createInstance(HookMethods.MODULE_PATH, resparam.res);
-            DEFAULT_ICON = XResources.getFakeResId(modRes, drawable);
-            resparam.res.setReplacement(DEFAULT_ICON, modRes.fwd(drawable));
-        }
+    public static void handleInitPackageResources(XModuleResources modRes) throws Throwable {
+        statusDrawable = modRes.getDrawable(R.drawable.status_toast);
+    }
+
+    public static void handleInitLocalResource(Context context) {
+        statusDrawable = context.getResources().getDrawable(R.drawable.status_toast);
     }
 
     public static void showMessage(String string, int color, int duration, ClassLoader classLoader) {
         showMessage(string, null, color, -1, duration, -1, classLoader);
     }
 
-    public static void showMessage(String string, String title, int color, int textColor, int duration, int icon, ClassLoader classLoader) {
+    private static void showMessage(String string, String title, int color, int textColor, int duration, int icon, ClassLoader classLoader) {
         Object aVar = null;
         Object a = XposedHelpers.callStaticMethod(XposedHelpers.findClass(Obfuscator.notification.NOTIFICATION_CLASS_1, classLoader), "a");
         //Object CHAT_V2 = XposedHelpers.getStaticObjectField(XposedHelpers.findClass("com.snapchat.android.util.debug.FeatureFlagManager$FeatureFlag", classLoader), "CHAT_V2");
@@ -48,13 +54,9 @@ public class NotificationUtils {
             Map<String, ?> notifyMap = (Map<String, ?>) XposedHelpers.getObjectField(a, "b");
             aVar = notifyMap.get(notifyString);
         }
-        if (aVar == null) {
-            //aVar = XposedHelpers.callMethod(a, "b");
+        if (aVar == null)
             aVar = XposedHelpers.newInstance(XposedHelpers.findClass(Obfuscator.notification.NOTIFICATION_CLASS_1 + "$a", classLoader), notifyString);
-        }
-        //} else {
-        //    aVar = XposedHelpers.callMethod(a, "b");
-        //}
+
         Object notificationMaker = XposedHelpers.newInstance(XposedHelpers.findClass(Obfuscator.notification.NOTIFICATION_CLASS_2, classLoader), new Class[]{String.class, String.class, int.class}, string, XposedHelpers.getObjectField(aVar, "a"), color);
         XposedHelpers.setObjectField(notificationMaker, "alternateNotificationPanel", null);
         XposedHelpers.setBooleanField(notificationMaker, "hideTitleBar", true);
@@ -74,11 +76,45 @@ public class NotificationUtils {
         if (!Preferences.getBool(Prefs.TOAST_ENABLED))
             return;
 
-        NotificationUtils.showMessage(
-                message,
-                type.color,
-                SavingUtils.getToastLength(),
-                cl);
+        if (Preferences.getBool(Prefs.STEALTH_NOTIFICATIONS))
+            showStealthToast(type);
+        else {
+            NotificationUtils.showMessage(
+                    message,
+                    type.color,
+                    SavingUtils.getToastLength(),
+                    cl);
+        }
+    }
+
+    private static void showStealthToast(ToastType type) {
+        if (statusDrawable == null)
+            return;
+
+        final int offset = 20;
+        final boolean longLength = Preferences.getInt(Prefs.TOAST_LENGTH) == Preferences.TOAST_LENGTH_LONG;
+
+        if (lastToastType == null || type != lastToastType) {
+            lastToastType = type;
+
+            statusDrawable.setColorFilter(new
+                    PorterDuffColorFilter(type.color, PorterDuff.Mode.MULTIPLY));
+        }
+
+        final ImageView view = new ImageView(HookMethods.SnapContext);
+        view.setImageDrawable(statusDrawable);
+        view.bringToFront();
+
+        HookMethods.SnapContext.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast statusToast = new Toast(HookMethods.SnapContext);
+                statusToast.setView(view);
+                statusToast.setGravity(Gravity.BOTTOM | Gravity.START, offset, offset);
+                statusToast.setDuration(longLength ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
+                statusToast.show();
+            }
+        });
     }
 
     public enum ToastType {

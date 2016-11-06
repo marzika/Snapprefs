@@ -69,7 +69,7 @@
     <string name="pref_sticker_readme_summary2">Example SVGs/PNGs can be found at https://github.com/Ranks/emojione</string>
     <string name="pref_filter_readme_title">HOW TO USE</string>
     <string name="pref_filter_readme_summary">Your custom filter has to be named as "banner_filter.png"/"fullscreen_filter.png" in the folder which is by default /sdcard/Snapprefs/Filters. If you changed the filter image, you have to restart Snapchat for the changes to take effect.\nResolution for Fullscreen Filters: 1080x1920\nResolution for Banner Filters: 821x323</string>
-    <string name="pref_discover_readme_title">HOW TO USE</string>
+    <string name="pref_discover_readme_title">Something To Note</string>
     <string name="pref_weather_summary_off">Weather will NOT be spoofed</string>
     <string name="pref_weather_summary_on">Weather will be spoofed</string>
     <string name="pref_weather_title">Weather Spoofing</string>
@@ -359,7 +359,20 @@
     <string name="pref_viewed_summary_off">Stealth viewing will NOT be executed</string>
     <string name="pref_viewed_summary_on">Stealth viewing will be executed</string>
     <string name="pref_viewed_title">Stealth Viewing</string>
-    <string name="pref_viewed_readme_summary">After the snaps are loaded, enable Airplane mode, view the desired snap, then KILL SNAPCHAT from the Recent Apps page. You can disable Airplane mode now.</string>
+    <string name="pref_viewed_readme_summary">When using Stealth Viewing you may sometimes receive \"ghost snaps\" whereby old snaps display again, this is normal and is due to the way we handle the stealth viewing</string>
+
+    <string name="pref_stealth_chat_saving_summary_off">Stealth chat saving will NOT be executed</string>
+    <string name="pref_stealth_chat_saving_summary_on">Stealth chat saving will be executed</string>
+    <string name="pref_stealth_chat_saving_title">Stealth Chat Saving</string>
+
+    <string name="pref_stealth_saving_button_summary_off">Stealth saving button will NOT be used</string>
+    <string name="pref_stealth_saving_button_summary_on">Stealth saving button will be used</string>
+    <string name="pref_stealth_saving_button_title">Stealth Saving Button</string>
+
+    <string name="pref_stealth_notification_summary_off">Stealth notifications will NOT be used</string>
+    <string name="pref_stealth_notification_summary_on">Stealth notifications will be used</string>
+    <string name="pref_stealth_notification_title">Stealth Notifications</string>
+
     <string name="pref_paint_title">Paint Tools</string>
     <string name="pref_paint_cb_summary_off">Paint Tools are not enabled</string>
     <string name="pref_paint_cb_summary_on">Paint Tools are enabled</string>
@@ -370,10 +383,13 @@
     <string name="pref_save_chat_image_summary">When enabled open the chat image and tap and hold to save, for  videos use the button.</string>
     <string name="pref_save_chat_text_title">Enable Chat Text Auto-Save</string>
     <string name="pref_save_chat_text_summary">When enabled sent and received Chats will be saved automatically</string>
+    <string name="pref_save_chat_logging_title">Enable Chat Logging into Database</string>
+    <string name="pref_save_chat_logging_summary">When enabled chat messages are logged to a database and are viewable in Snapprefs</string>
     <string name="pref_save_integration_title">Enable Snapchat integration</string>
     <string name="pref_save_integration_summary">When enabled you can launch Snapprefs\'s settings by pulling down Snapchat\'s settings bar and clicking on Snapprefs</string>
     <string name="licenses">Snapprefs is licensed under GNU GPLv3. \n\nUsed libraries - License:\nInstagram Filters for Android - Apache License 2.0\nckChangeLog - Apache License 2.0\nColorPicker for Android - Apache License 2.0\nNoNonsense-FilePicker - MPL 2.0\nmp4parser - Free License\n\nModule was originally based on:\nKeepchat - GNU GPLv3\nSnapshare - GNU GPLv3\n\nSnapchat™ is the property of Snapchat Inc.\nSnapprefs is in no way affiliated with, authorized, maintained, sponsored or endorsed by the Snapchat Inc. or any of its affiliates or subsidiaries. This is an independent application.</string>
     <string name="hide_text">Show Icon In Launcher</string>
+    <string name="pref_groups_title">Enable Custom Groups</string>
     <string name="hide_current_sc_lenses_switch_txt">Hide Lenses Currently Provided By SnapChat</string>
     <string name="enable_sort_by_sel_time_switch_txt">Enable Sorting Lenses By Selection Time</string>
     <string name="auto_enable_lenses_switch_txt">Enable Lenses When Collected</string>
