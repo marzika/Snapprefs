@@ -57,6 +57,10 @@
             android:id="@+id/nav_item_lenses"
             android:icon="@drawable/lenses"
             android:title="Lens Collector / Loader" />
+        <item
+            android:id="@+id/nav_item_chat"
+            android:icon="@drawable/chatlog"
+            android:title="Chat Logs" />
     </menu>
 </item>
 </menu>

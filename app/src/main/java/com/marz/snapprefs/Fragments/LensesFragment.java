@@ -20,34 +20,54 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Common;
-import com.marz.snapprefs.Databases.LensDatabaseHelper;
+import com.marz.snapprefs.Lens;
 import com.marz.snapprefs.Logger;
-import com.marz.snapprefs.MainActivity;
 import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.R;
 import com.marz.snapprefs.Util.LensData;
 import com.marz.snapprefs.Util.LensIconLoader;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * Created by Andre on 16/09/2016.
  */
 public class LensesFragment extends Fragment {
-    private static final ArrayList<String> stringFilter = new ArrayList<String>() {
-        {
-            add("code_scheduled_lens_-_");
-            add("len_");
-            add("code_special_lens_-_");
+    private static final List<String> stringFilter = Arrays.asList(
+            "code_scheduled_lens_-_",
+            "len_",
+            "code_special_lens_-_"
+    );
+    private static HashMap<String, LensContainerData> iconMap = new HashMap<>();
+    private static final DialogInterface.OnClickListener onSelectAllClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            Lens.getLensDatabase().setActiveStateOfAllLenses(true);
+            for (LensContainerData containerData : iconMap.values()) {
+                containerData.inflatedLayout.setBackgroundResource(R.drawable.lens_bg_selected);
+                containerData.inflatedLayout.invalidate();
+            }
         }
     };
-    private static HashMap<String, LensContainerData> iconMap = new HashMap<>();
+    private static final DialogInterface.OnClickListener onDeslectAllClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            Lens.getLensDatabase().setActiveStateOfAllLenses(false);
+
+            for (LensContainerData containerData : iconMap.values()) {
+                containerData.inflatedLayout.setBackgroundResource(R.drawable.lens_bg_unselected);
+                containerData.inflatedLayout.invalidate();
+            }
+        }
+    };
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        final int lensListSize = (int) MainActivity.lensDBHelper.getRowCount();
-        int selectedLensSize = MainActivity.lensDBHelper.getActiveLensCount();
+        final int lensListSize = (int) Lens.getLensDatabase(container.getContext()).getRowCount();
+        int selectedLensSize = Lens.getLensDatabase(container.getContext()).getActiveLensCount();
 
         View view = inflater.inflate(R.layout.lensloader_layout,
                 container, false);
@@ -58,10 +78,14 @@ public class LensesFragment extends Fragment {
         Switch loadLensSwitch = (Switch) view.findViewById(R.id.lensloader_toggle);
         Switch collectLensSwitch = (Switch) view.findViewById(R.id.lenscollector_toggle);
         Switch autoEnableSwitch = (Switch) view.findViewById(R.id.autoenable_switch);
+        Switch sortBySelDate = (Switch) view.findViewById(R.id.sort_lens_by_sel_date);
+        Switch hideCurrProvidedSCLenses = (Switch) view.findViewById(R.id.hide_current_snapchat_lenses);
 
         loadLensSwitch.setChecked(Preferences.getBool(Prefs.LENSES_LOAD));
         collectLensSwitch.setChecked(Preferences.getBool(Prefs.LENSES_COLLECT));
         autoEnableSwitch.setChecked(Preferences.getBool(Prefs.LENSES_AUTO_ENABLE));
+        sortBySelDate.setChecked(Preferences.getBool(Prefs.LENSES_SORT_BY_SEL));
+        hideCurrProvidedSCLenses.setChecked(Preferences.getBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES));
 
         loadLensSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -84,6 +108,20 @@ public class LensesFragment extends Fragment {
             }
         });
 
+        sortBySelDate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                Preferences.putBool(Prefs.LENSES_SORT_BY_SEL.key, isChecked);
+            }
+        });
+
+        hideCurrProvidedSCLenses.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Preferences.putBool(Prefs.LENSES_HIDE_CURRENTLY_PROVIDED_SC_LENSES.key, isChecked);
+            }
+        });
+
         totalLensesTextView.setText(String.format("%s", lensListSize));
         loadedLensesTextView.setText(String.format("%s", selectedLensSize));
 
@@ -100,12 +138,9 @@ public class LensesFragment extends Fragment {
     }
 
     public static class DialogHelper {
-        public static void lensDialog(final Context context, final TextView loadedLensesTextView, LayoutInflater inflater,
-                                      ViewGroup container) {
-            if (MainActivity.lensDBHelper == null)
-                MainActivity.lensDBHelper = new LensDatabaseHelper(context);
-
-            ArrayList<Object> lensList = MainActivity.lensDBHelper.getAllLenses();
+        static void lensDialog(final Context context, final TextView loadedLensesTextView, LayoutInflater inflater,
+                               ViewGroup container) {
+            LinkedHashMap<String, Object> lensList = (LinkedHashMap<String, Object>) Lens.getLensDatabase(context).getAllLenses();
 
             if (lensList == null) {
                 Logger.log("Tried to create dialog with no lenses");
@@ -114,11 +149,37 @@ public class LensesFragment extends Fragment {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Select Lenses");
+
             View view = inflater.inflate(R.layout.lenslist_layout, container, false);
 
             GridLayout gridLayout = (GridLayout) view.findViewById(R.id.lensloader_gridholder);
+            Button btnSelectAll = (Button) view.findViewById(R.id.btn_select_all_lenses);
+            Button btnDeselectAll = (Button) view.findViewById(R.id.btn_deselect_all_lenses);
 
-            for (Object lensObj : lensList) {
+            final AlertDialog.Builder selectBuilder = new AlertDialog.Builder(context);
+            selectBuilder.setNegativeButton("Cancel", null);
+
+            btnSelectAll.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    selectBuilder.setTitle("Confirm Select All");
+                    selectBuilder.setMessage("Are you sure you want to enable all lenses?");
+                    selectBuilder.setPositiveButton("Select All", onSelectAllClick);
+                    selectBuilder.show();
+                }
+            });
+
+            btnDeselectAll.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    selectBuilder.setTitle("Confirm Deselect All");
+                    selectBuilder.setMessage("Are you sure you want to disable all lenses?");
+                    selectBuilder.setPositiveButton("Deselect All", onDeslectAllClick);
+                    selectBuilder.show();
+                }
+            });
+
+            for (Object lensObj : lensList.values()) {
                 final LensData lensData = (LensData) lensObj;
 
                 // Set up Lens Container \\
@@ -134,7 +195,7 @@ public class LensesFragment extends Fragment {
                         String mCode = (String) btn.getTag();
                         Logger.log("Clicked lens item: " + mCode);
                         try {
-                            boolean activeState = MainActivity.lensDBHelper.toggleLensActiveState(mCode);
+                            boolean activeState = Lens.getLensDatabase(context).toggleLensActiveState(mCode);
                             inflatedLayout.setBackgroundResource(activeState ? R.drawable.lens_bg_selected :
                                     R.drawable.lens_bg_unselected);
                             inflatedLayout.invalidate();
@@ -143,7 +204,6 @@ public class LensesFragment extends Fragment {
                         }
                     }
                 });
-
                 ImageView iconImageView = (ImageView) inflatedLayout.findViewById(R.id.lensIconView);
 
                 TextView iconName = (TextView) inflatedLayout.findViewById(R.id.lensTextView);
@@ -161,7 +221,13 @@ public class LensesFragment extends Fragment {
                 if (containerData == null || containerData.bmp == null) {
                     containerData = new LensContainerData(inflatedLayout, iconImageView, iconName, lensData.mIconLink, null);
                     iconMap.put(lensData.mCode, containerData);
-                    new LensIconLoader.AsyncLensIconDownloader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, containerData, context);
+                    //TODO Implement try/catch
+
+                    try {
+                        new LensIconLoader.AsyncLensIconDownloader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, containerData, context);
+                    } catch (Throwable e) {
+                        Logger.log("Error loading lens", e);
+                    }
                 } else {
                     iconImageView.setImageBitmap(containerData.bmp);
                     iconImageView.invalidate();
@@ -178,17 +244,18 @@ public class LensesFragment extends Fragment {
             builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    int selectedLensSize = MainActivity.lensDBHelper.getActiveLensCount();
+                    int selectedLensSize = Lens.getLensDatabase(context).getActiveLensCount();
                     loadedLensesTextView.setText(String.format("%s", selectedLensSize));
                 }
             });
             builder.setNegativeButton(Common.dialog_cancel, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    int selectedLensSize = MainActivity.lensDBHelper.getActiveLensCount();
+                    int selectedLensSize = Lens.getLensDatabase(context).getActiveLensCount();
                     loadedLensesTextView.setText(String.format("%s", selectedLensSize));
                 }
             });
+
 
             builder.show();
         }
@@ -201,7 +268,7 @@ public class LensesFragment extends Fragment {
         public String url;
         public Bitmap bmp;
 
-        public LensContainerData(LinearLayout inflatedLayout, ImageView iconImageView, TextView textView, String url, Bitmap bmp) {
+        LensContainerData(LinearLayout inflatedLayout, ImageView iconImageView, TextView textView, String url, Bitmap bmp) {
             this.inflatedLayout = inflatedLayout;
             this.iconImageView = iconImageView;
             this.textView = textView;

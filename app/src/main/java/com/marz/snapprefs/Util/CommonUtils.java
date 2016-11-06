@@ -30,6 +30,10 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.widget.Toast;
 
+import com.marz.snapprefs.BuildConfig;
+import com.marz.snapprefs.Common;
+import com.marz.snapprefs.Logger;
+import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.R;
 
 import java.io.ByteArrayOutputStream;
@@ -133,12 +137,32 @@ public class CommonUtils {
     }
 
     /**
-     * Checks whether Snapshare is enabled. If it's enabled, Xposed should hook this method and return true.
+     * Checks whether Snapprefs is enabled. If it's enabled, Xposed should hook this method and return {@link com.marz.snapprefs.Common#MODULE_ENABLED_CHECK_INT}.
      *
-     * @return If Snapshare is enabled or not
+     * @return Number that should be incremented for each build at {@link com.marz.snapprefs.Common#MODULE_ENABLED_CHECK_INT}
      */
-    public static boolean isModuleEnabled() {
-        return true;
+    public static int isModuleEnabled() {
+        return -1;
+    }
+
+    /**
+     * Gets the status(Activate, Not Actived, Needs Restart) of Snapprefs
+     * .
+     * @return Returns one of the following values based on its findings: {@link Common#MODULE_STATUS_ACTIVATED}, {@link Common#MODULE_STATUS_NOT_ACTIVATED}, {@link Common#MODULE_STATUS_NOT_RESTARTED}
+     */
+    public static int getModuleStatus(){
+        if(Preferences.getBool(Preferences.Prefs.DEBUGGING)) {
+            Logger.log("isModuleEnabled return value: " + isModuleEnabled());
+            Logger.log("MODULE_ENABLED_CHECK_INT value: " + Common.MODULE_ENABLED_CHECK_INT);
+        }
+        int enabledCheckInt = CommonUtils.isModuleEnabled();
+        if(enabledCheckInt == (BuildConfig.BUILD_TYPE == "debug" ? Common.MODULE_ENABLED_CHECK_INT : BuildConfig.VERSION_CODE)) {
+            return Common.MODULE_STATUS_ACTIVATED;
+        }
+        if(enabledCheckInt == -1) {
+            return Common.MODULE_STATUS_NOT_ACTIVATED;
+        }
+        return Common.MODULE_STATUS_NOT_RESTARTED;
     }
 
     /**

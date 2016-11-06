@@ -7,55 +7,103 @@ import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
 
 import com.marz.snapprefs.Logger;
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.Util.LensData;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import static com.marz.snapprefs.Databases.CoreDatabaseHandler.CallbackHandler.getCallback;
 
 /**
  * Created by Andre on 16/09/2016.
  */
-public class LensDatabaseHelper extends CoreDatabaseHandler {
-    public static final int DATABASE_VERSION = 2;
-    public static final String DATABASE_NAME = Preferences.getSavePath() + "/Lenses.db";
-    public static final String[] fullProjection = {
+public class LensDatabaseHelper extends CachedDatabaseHandler {
+    private static final int DATABASE_VERSION = 5;
+    private static final String DATABASE_NAME = Preferences.getContentPath() + "/Lenses.db";
+    private static final String[] fullProjection = {
             LensEntry.COLUMN_NAME_MCODE,
             LensEntry.COLUMN_NAME_GPLAYID,
+            LensEntry.COLUMN_NAME_TYPE,
             LensEntry.COLUMN_NAME_MHINTID,
             LensEntry.COLUMN_NAME_MICONLINK,
             LensEntry.COLUMN_NAME_MID,
             LensEntry.COLUMN_NAME_MLENSLINK,
             LensEntry.COLUMN_NAME_MSIGNATURE,
-            LensEntry.COLUMN_NAME_ACTIVE
+            LensEntry.COLUMN_NAME_ACTIVE,
+            LensEntry.COLUMN_NAME_SEL_TIME
     };
     private static final String TEXT_TYPE = " TEXT";
+    private static final String INT_TYPE = " INTEGER";
     private static final String COMMA_SEP = ",";
+    private static final String DEF_SEL_TIME_VAL = "2000000000";
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + LensEntry.TABLE_NAME;
-    private static final String SQL_CREATE_ENTRIES =
+    private static final String[] SQL_CREATE_ENTRIES = {
             "CREATE TABLE " + LensEntry.TABLE_NAME + " (" +
-                    LensEntry.COLUMN_NAME_MCODE + TEXT_TYPE + " PRIMARY KEY," +
+                    LensEntry.COLUMN_NAME_MCODE + TEXT_TYPE + " PRIMARY KEY" + COMMA_SEP +
                     LensEntry.COLUMN_NAME_GPLAYID + TEXT_TYPE + COMMA_SEP +
+                    LensEntry.COLUMN_NAME_TYPE + TEXT_TYPE + " DEFAULT 'SCHEDULED'," +
                     LensEntry.COLUMN_NAME_MHINTID + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MICONLINK + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MID + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MLENSLINK + TEXT_TYPE + COMMA_SEP +
                     LensEntry.COLUMN_NAME_MSIGNATURE + TEXT_TYPE + COMMA_SEP +
-                    LensEntry.COLUMN_NAME_ACTIVE + " INTEGER DEFAULT 0 )";
+                    LensEntry.COLUMN_NAME_ACTIVE + INT_TYPE + " DEFAULT 0," +
+                    LensEntry.COLUMN_NAME_SEL_TIME + INT_TYPE + " DEFAULT " + DEF_SEL_TIME_VAL + " )" };
 
     public LensDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, SQL_CREATE_ENTRIES, DATABASE_VERSION);
     }
 
+    @Override
     public void onCreate(SQLiteDatabase db) {
         super.onCreate(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 2) {
-            db.execSQL("ALTER TABLE " + LensEntry.TABLE_NAME +
-                    " ADD COLUMN " + LensEntry.COLUMN_NAME_ACTIVE + " INTEGER DEFAULT 0");
+        Logger.log(String.format("Upgrading LensDB from v%s to v%s", oldVersion, newVersion), LogType.DATABASE.setForced());
+
+        if( oldVersion == 4 ) {
+            Logger.log("Performing deep db upgrade", LogType.DATABASE);
+            onUpgrade(db, 1, newVersion);
+            return;
+        }
+
+        if (oldVersion <= 1 && !super.checkIfColumnExists(db, LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_ACTIVE)) {
+            try {
+                db.execSQL("ALTER TABLE " + LensEntry.TABLE_NAME +
+                        " ADD COLUMN " + LensEntry.COLUMN_NAME_ACTIVE + " INTEGER DEFAULT 0");
+
+                Logger.log(String.format("Added column %s to table %s", LensEntry.COLUMN_NAME_ACTIVE, LensEntry.TABLE_NAME), LogType.DATABASE);
+            } catch (Exception e) {
+                Logger.log("Error altering table", e, LogType.DATABASE);
+            }
+        }
+
+        if (oldVersion <= 2 && !super.checkIfColumnExists(db, LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_SEL_TIME)) {
+            try {
+                db.execSQL("ALTER TABLE " + LensEntry.TABLE_NAME +
+                        " ADD COLUMN " + LensEntry.COLUMN_NAME_SEL_TIME + " INTEGER DEFAULT " + DEF_SEL_TIME_VAL);
+
+                Logger.log(String.format("Added column %s to table %s", LensEntry.COLUMN_NAME_SEL_TIME, LensEntry.TABLE_NAME), LogType.DATABASE);
+            } catch (Exception e) {
+                Logger.log("Error altering table", e, LogType.DATABASE);
+            }
+        }
+
+        if(oldVersion <= 3 && !super.checkIfColumnExists(db, LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_TYPE)) {
+            try {
+                db.execSQL("ALTER TABLE " + LensEntry.TABLE_NAME +
+                        " ADD COLUMN " + LensEntry.COLUMN_NAME_TYPE + " TEXT DEFAULT 'SCHEDULED'");
+
+                Logger.log(String.format("Added column %s to table %s", LensEntry.COLUMN_NAME_TYPE, LensEntry.TABLE_NAME), LogType.DATABASE);
+            } catch (Exception e) {
+                Logger.log("Error altering table", e, LogType.DATABASE);
+            }
         }
     }
 
@@ -69,28 +117,29 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
     }
 
     public void insertLens(LensData lensData) {
-        Logger.log("Inserting new lens: " + lensData.mCode);
+        Logger.log("Inserting new lens: " + lensData.mCode, LogType.DATABASE);
         long newRowId = super.insertValues(LensEntry.TABLE_NAME, lensData.getContent());
-        Logger.log("New Lens Row ID: " + newRowId);
+        Logger.log("New Lens Row ID: " + newRowId, LogType.DATABASE);
     }
 
     public boolean containsLens(String mCode) {
-        Logger.log("Getting lens from database");
+        Logger.log("Getting lens from database", LogType.DATABASE);
 
         String[] selectionArgs = {mCode};
         String sortOrder =
                 LensEntry.COLUMN_NAME_MCODE + " DESC";
 
-        return super.containsObject(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE, selectionArgs, sortOrder, fullProjection);
+        return super.containsObject(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE, selectionArgs);
     }
 
     public boolean toggleLensActiveState(String mCode) throws Exception {
-        Logger.log("Toggling lens state");
+        Logger.log("Toggling lens state", LogType.DATABASE);
         boolean activeState = !getLensActiveState(mCode);
-        Logger.log("Current state: " + activeState);
+        Logger.log("Current state: " + activeState, LogType.DATABASE);
 
         ContentValues values = new ContentValues();
         values.put(LensEntry.COLUMN_NAME_ACTIVE, activeState ? 1 : 0);
+        values.put(LensEntry.COLUMN_NAME_SEL_TIME, (activeState ? Long.toString(System.currentTimeMillis()) : Integer.toString(2000000000)));
 
         String[] selectionArgs = {mCode};
 
@@ -99,15 +148,15 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
         return activeState;
     }
 
-    public boolean getLensActiveState(String mCode) throws Exception {
-        Logger.log("Getting lens from database");
+    private boolean getLensActiveState(String mCode) throws Exception {
+        Logger.log("Getting lens from database", LogType.DATABASE);
 
         String[] selectionArgs = {mCode};
         String sortOrder =
                 LensEntry.COLUMN_NAME_MCODE + " DESC";
 
         String[] projection = {LensEntry.COLUMN_NAME_ACTIVE};
-        Logger.log("Performing query: " + LensEntry.COLUMN_NAME_MCODE + mCode);
+        Logger.log("Performing query: " + LensEntry.COLUMN_NAME_MCODE + mCode, LogType.DATABASE);
 
         ContentValues values = super.getContent(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE, selectionArgs, sortOrder, projection);
         int activeState = (int) values.get(LensEntry.COLUMN_NAME_ACTIVE);
@@ -115,55 +164,79 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
     }
 
     public int getActiveLensCount() {
-        Logger.log("Getting lens from database");
+        //Logger.log("Getting lens from database");
 
         String[] selectionArgs = {"1"};
 
-        int count = super.getCount(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_ACTIVE, selectionArgs, fullProjection);
+        //Logger.log("Query count: " + count);
 
-        Logger.log("Query count: " + count);
+        return super.getCount(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_ACTIVE, selectionArgs, fullProjection);
+    }
 
-        return count;
+    public void setActiveStateOfAllLenses(boolean newState) {
+
+        getDatabase().execSQL("UPDATE " + LensDatabaseHelper.LensEntry.TABLE_NAME + " SET " +
+                LensDatabaseHelper.LensEntry.COLUMN_NAME_ACTIVE + "=" + (newState ? "1" : "0"));
+
+        super.invalidateCache();
     }
 
     public LensData getLens(String mCode) {
-        Logger.log("Getting lens from database");
+        //Logger.log("Getting lens from database");
 
         String[] selectionArgs = {mCode};
         String sortOrder =
                 LensEntry.COLUMN_NAME_MCODE + " DESC";
 
-        CallbackHandler callback = getCallback("getLensFromCursor", LensDatabaseHelper.class, Cursor.class);
-        LensData lensData = (LensData) super.getBuiltContent(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE,
+        CallbackHandler callback = getCallback(this, "getLensFromCursor", LensDatabaseHelper.class, Cursor.class);
+
+        //Logger.log("Queried database to get lens: " + lensData.mCode);
+        return (LensData) super.getBuiltContent(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE,
                 selectionArgs, sortOrder, fullProjection, callback);
-
-        Logger.log("Queried database to get lens: " + lensData.mCode);
-        return lensData;
     }
 
-    // TODO Setup proper callback handling
-    public ArrayList<Object> getAllExcept(ArrayList<String> blacklist) {
-        CallbackHandler callback = getCallback("getAllLensesFromCursor", Cursor.class);
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getAllExcept(ArrayList<String> blacklist) {
+        CallbackHandler callback = getCallback(this, "getAllLensesFromCursor", Cursor.class);
 
-        return super.getAllBuiltObjectsExcept(LensEntry.TABLE_NAME,
-                LensEntry.COLUMN_NAME_MCODE, blacklist, callback);
+        String orderBy = Preferences.getBool(Preferences.Prefs.LENSES_SORT_BY_SEL) ?
+                LensEntry.COLUMN_NAME_SEL_TIME + " ASC" : null;
+
+        return (Map<String, Object>) super.getAllBuiltObjectsExcept(LensEntry.TABLE_NAME,
+                    LensEntry.COLUMN_NAME_MCODE, orderBy, blacklist, callback);
     }
 
-    public ArrayList<Object> getAllActive() {
-        CallbackHandler callback = getCallback("getAllLensesFromCursor", Cursor.class);
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getAllOfType(LensData.LensType type) {
+        CallbackHandler callback = getCallback(this, "getAllLensesFromCursor", Cursor.class);
+
+        String orderBy = Preferences.getBool(Preferences.Prefs.LENSES_SORT_BY_SEL) ?
+                LensEntry.COLUMN_NAME_SEL_TIME + " ASC" : null;
+
+        return (Map<String, Object>) super.getAllBuiltObjects(
+                LensEntry.TABLE_NAME,
+                LensEntry.COLUMN_NAME_TYPE + " = '" + type + "'",
+                orderBy,
+                callback);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getAllActive() {
+        CallbackHandler callback = getCallback(this, "getAllLensesFromCursor", Cursor.class);
 
         String selection = LensEntry.COLUMN_NAME_ACTIVE + " = ?";
         String[] selectionArgs = {"1"};
 
-        return super.performQueryForBuiltObjects(LensEntry.TABLE_NAME,
+        return (Map<String, Object>) super.performQueryForBuiltObjects(LensEntry.TABLE_NAME,
                 selection, selectionArgs, fullProjection, null, callback);
     }
 
-    public ArrayList<Object> getAllLenses() {
-        Logger.log("Getting all lenses from database");
-        CallbackHandler callback = getCallback("getAllLensesFromCursor", Cursor.class);
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getAllLenses() {
+        Logger.log("Getting all lenses from database", LogType.DATABASE);
+        CallbackHandler callback = getCallback(this, "getAllLensesFromCursor", Cursor.class);
 
-        return super.getAllBuiltObjects(LensEntry.TABLE_NAME, callback);
+        return (Map<String, Object>) super.getAllBuiltObjects(LensEntry.TABLE_NAME, callback);
     }
 
     public void deleteLens(String mCode) {
@@ -184,19 +257,19 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
      * @param cursor
      * @return lensDataList
      */
-    public ArrayList<LensData> getAllLensesFromCursor(Cursor cursor) {
-        ArrayList<LensData> lensDataList = new ArrayList<>();
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    public Map<String, LensData> getAllLensesFromCursor(Cursor cursor) {
+        Map<String, LensData> lensDataList = new LinkedHashMap<>();
 
         while (!cursor.isAfterLast()) {
-            Logger.log("Looping cursor result");
             LensData lensData = getLensFromCursor(cursor);
 
             if (lensData == null) {
-                Logger.log("Null lensdata pulled");
+                Logger.log("Null lensdata pulled", LogType.DATABASE);
                 continue;
             }
 
-            lensDataList.add(lensData);
+            lensDataList.put(lensData.mCode, lensData);
             cursor.moveToNext();
         }
 
@@ -208,12 +281,13 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
      * @param cursor
      * @return lensData
      */
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public LensData getLensFromCursor(Cursor cursor) {
         LensData lensData = new LensData();
 
         try {
             lensData.mCode = cursor.getString(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_MCODE));
-            lensData.mGplayIapId = cursor.getString(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_GPLAYID));
+            //lensData.mGplayIapId = cursor.getString(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_GPLAYID));
             lensData.mHintId = cursor.getString(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_MHINTID));
             lensData.mIconLink = cursor.getString(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_MICONLINK));
             lensData.mId = cursor.getString(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_MID));
@@ -221,35 +295,37 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
             lensData.mSignature = cursor.getString(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_MSIGNATURE));
             short activeState = cursor.getShort(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_ACTIVE));
             lensData.mActive = activeState != 0;
+            lensData.selTime = cursor.getInt(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_SEL_TIME));
 
-            Logger.log("Queried database for lens: " + lensData.mCode + " Active: " + lensData.mActive);
+            String strLensType = cursor.getString(cursor.getColumnIndexOrThrow(LensEntry.COLUMN_NAME_TYPE));
+
+            boolean hasAssignedType = false;
+            if( strLensType != null ) {
+                try {
+                    lensData.mType = LensData.LensType.valueOf(strLensType);
+                    hasAssignedType = true;
+                } catch( Exception e ) {
+                    Logger.log("Unknown Lens type: " + strLensType, LogType.DATABASE);
+                }
+            }
+
+            if( !hasAssignedType )
+                lensData.mType = LensData.LensType.SCHEDULED;
+
+            //Logger.log("Queried database for lens: " + lensData.mCode + " Active: " + lensData.mActive);
         } catch (IllegalArgumentException e) {
-            Logger.log("Issue querying database", e);
+            Logger.log("Issue querying database", e, LogType.DATABASE);
             return null;
         }
 
         return lensData;
     }
 
-    /**
-     * Usage: getCallback("methodToCall", ParameterClassTypes...);
-     * @param methodName - The name of the method to call
-     * @param classType - The list of Classes called as the method parameters
-     * @return CallbackHandler - The object holding the callback data
-     */
-    public CallbackHandler getCallback(String methodName, Class... classType) {
-        try {
-            Logger.log("Trying to build callback method");
-            return new CallbackHandler(this, LensDatabaseHelper.class.getMethod(methodName, classType));
-        } catch (NoSuchMethodException e) {
-            Logger.log("ERROR GETTING CALLBACK", e);
-            return null;
-        }
-    }
-
+    @SuppressWarnings({"unused", "WeakerAccess"})
     public static class LensEntry implements BaseColumns {
         public static final String TABLE_NAME = "LensTable";
         public static final String COLUMN_NAME_MCODE = "mCode";
+        public static final String COLUMN_NAME_TYPE = "mType";
         public static final String COLUMN_NAME_GPLAYID = "mGplayIapId";
         public static final String COLUMN_NAME_MHINTID = "mHintId";
         public static final String COLUMN_NAME_MICONLINK = "mIconLink";
@@ -257,5 +333,6 @@ public class LensDatabaseHelper extends CoreDatabaseHandler {
         public static final String COLUMN_NAME_MLENSLINK = "mLensLink";
         public static final String COLUMN_NAME_MSIGNATURE = "mSignature";
         public static final String COLUMN_NAME_ACTIVE = "mActiveState";
+        public static final String COLUMN_NAME_SEL_TIME = "selDateTime";
     }
 }

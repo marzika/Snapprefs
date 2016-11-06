@@ -1,6 +1,6 @@
 Snapprefs
 =========
-[![Build Status](http://138.68.21.49:8080/job/SNAPPREFS/badge/icon)](http://138.68.21.49:8080/job/SNAPPREFS) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
+[![Build Status](http://snapprefsjenkins.hopto.org:8080/job/SNAPPREFS%20-%20stable/badge/icon)](http://jenkins.snapprefs.com) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
 
 Overview
 -------
@@ -110,12 +110,16 @@ Installation
 
 Latest automatic builds (provided by m1kep):
 -------
-[Available as Jenkins artifacts](http://138.68.21.49:8080/job/SNAPPREFS/lastSuccessfulBuild/artifact/app/build/outputs/apk/)
+Available as Jenkins artifacts:
+
+[Official Branches](http://jenkins.snapprefs.com)
+
+[UN-Official Branches](http://138.68.21.49:8080/job/SNAPPREFS/lastSuccessfulBuild/artifact/app/build/outputs/apk/)
 
 License
 -------
 The whole project is licensed under the GNU GPLv3, which can be found in the LICENSE file.
-The license is also included to the app in the /assets/ folder.
+The license is also included with the app in the /assets/ folder.
 
 *Copyright (C) 2014-2016 Marcell Mészáros*
 

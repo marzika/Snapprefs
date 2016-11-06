@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
 
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Util.FileUtils;
 
 import java.util.Random;
@@ -31,7 +32,7 @@ public class Spoofing {
     }
 
     static void initLocation(final LoadPackageParam lpparam, final Context context) {
-        findAndHookMethod(Obfuscator.spoofing.LOCATION_CLASS, lpparam.classLoader, Obfuscator.spoofing.LOCATION_GETLOCATION, new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.spoofing.LOCATION_CLASS, lpparam.classLoader, Obfuscator.spoofing.LOCATION_GETLOCATION, findClass(Obfuscator.spoofing.LOCATION_GETLOCATION_PARAM, lpparam.classLoader), new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 String rawLatitude = FileUtils.readFromSDFolder("latitude");
@@ -64,7 +65,7 @@ public class Spoofing {
                 String temp = FileUtils.readFromFile(context, "weather");
                 setObjectField(param.thisObject, "mTempC", String.valueOf(temp));
                 setObjectField(param.thisObject, "mTempF", String.valueOf(temp));
-                Logger.log("set the temperatures", true);
+                Logger.log("set the temperatures", LogType.DEBUG);
             }
         });
     }

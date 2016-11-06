@@ -16,6 +16,11 @@
         android:summary="@string/hidebf_summary"
         android:title="@string/hidebf_text" />
     <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_auto_advance"
+        android:summary="@string/auto_advance_summary"
+        android:title="@string/auto_advance_title" />
+    <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_key_paint_checkbox"
         android:summaryOff="@string/pref_paint_cb_summary_off"
@@ -44,6 +49,9 @@
         android:title="@string/hide_text" />
     <CheckBoxPreference
         android:defaultValue="true"
-        android:key="pref_key_debug"
-        android:title="@string/debug_text" />
+        android:key="pref_key_groups"
+        android:title="@string/pref_groups_title" />
+    <Preference
+        android:title="Debug Options"
+        android:key="pref_key_debug_options"/>
 </PreferenceScreen>

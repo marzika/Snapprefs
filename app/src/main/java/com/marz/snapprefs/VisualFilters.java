@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 
+import com.marz.snapprefs.Logger.LogType;
+
 import java.util.ArrayList;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -116,7 +118,7 @@ public class VisualFilters {
 
     public static void initVisualFilters(final XC_LoadPackage.LoadPackageParam lpparam){
         setPreferences();
-        XposedHelpers.findAndHookMethod(Obfuscator.visualfilters.FILTERMETRICSPROVIDER_CLASS, lpparam.classLoader, "d", XposedHelpers.findClass(Obfuscator.save.SENT_CLASS, lpparam.classLoader), new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod(Obfuscator.visualfilters.FILTERMETRICSPROVIDER_CLASS, lpparam.classLoader, Obfuscator.visualfilters.VISUAL_FILTER_TYPE_CHECK_METHOD, XposedHelpers.findClass(Obfuscator.visualfilters.VISUAL_FILTER_TYPE_CHECK_METHOD_PARAMETER_CLASS, lpparam.classLoader), new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 if (param.hasThrowable()) {
@@ -139,7 +141,7 @@ public class VisualFilters {
             }
         });
         //change getName method of filters
-        findAndHookMethod("afo", lpparam.classLoader, "a", new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.visualfilters.VISUALFILTERBASE, lpparam.classLoader, "a", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (XposedHelpers.getAdditionalInstanceField(param.thisObject, FILTER_TYPE) != null)
@@ -172,7 +174,7 @@ public class VisualFilters {
                     if (XposedHelpers.getAdditionalInstanceField(afh, FILTER_TYPE) != null) return;
                     Class<?> afn = lpparam.classLoader.loadClass(Obfuscator.visualfilters.FILTERSLOADER_2_CLASS);
                     Class<?> afi = lpparam.classLoader.loadClass(Obfuscator.visualfilters.ADDER_CLASS);
-                    Object grey = XposedHelpers.callStaticMethod(lpparam.classLoader.loadClass("com.snapchat.android.app.shared.model.filter.VisualFilterType"), "valueOf", "GREYSCALE");
+                    Object grey = XposedHelpers.callStaticMethod(lpparam.classLoader.loadClass("com.snapchat.android.app.shared.feature.preview.model.filter.VisualFilterType"), "valueOf", "GREYSCALE");
                     if (afn.isInstance(afh)) {
                         Object visualFilterType = XposedHelpers.getObjectField(afh, "b");
                         if (visualFilterType == grey) {
@@ -181,7 +183,7 @@ public class VisualFilters {
                                 if(added.contains(fType.toString())){
                                     continue;
                                 }
-                                Object filter = XposedHelpers.newInstance(lpparam.classLoader.loadClass(Obfuscator.visualfilters.ADDER_3_PARAM), new Class[]{lpparam.classLoader.loadClass("com.snapchat.android.app.shared.model.filter.VisualFilterType")}, grey);
+                                Object filter = XposedHelpers.newInstance(lpparam.classLoader.loadClass(Obfuscator.visualfilters.ADDER_3_PARAM), new Class[]{lpparam.classLoader.loadClass("com.snapchat.android.app.shared.feature.preview.model.filter.VisualFilterType")}, grey);
                                 XposedHelpers.setAdditionalInstanceField(filter, FILTER_TYPE, fType);
                                 Object wrapper = XposedHelpers.newInstance(fk, new Class[]{lpparam.classLoader.loadClass(Obfuscator.visualfilters.FILTERS_CLASS)}, filter);
                                 XposedHelpers.callMethod(param.thisObject, "a", wrapper);
@@ -197,7 +199,7 @@ public class VisualFilters {
                                 if(added2.contains(fType.toString())){
                                     continue;
                                 }
-                                Object filter = XposedHelpers.newInstance(lpparam.classLoader.loadClass(Obfuscator.visualfilters.ADDER_CLASS), new Class[]{Context.class, lpparam.classLoader.loadClass("com.snapchat.photoeffect.LibPhotoEffect"), lpparam.classLoader.loadClass("com.snapchat.android.app.shared.model.filter.VisualFilterType")}, context, null, grey);
+                                Object filter = XposedHelpers.newInstance(lpparam.classLoader.loadClass(Obfuscator.visualfilters.ADDER_CLASS), new Class[]{Context.class, lpparam.classLoader.loadClass("com.snapchat.photoeffect.LibPhotoEffect"), lpparam.classLoader.loadClass(Obfuscator.visualfilters.VISUALFILTER_TYPE)}, context, null, grey);
                                 XposedHelpers.setAdditionalInstanceField(filter, FILTER_TYPE, fType);
                                 Object wrapper = XposedHelpers.newInstance(fk, new Class[]{lpparam.classLoader.loadClass(Obfuscator.visualfilters.FILTERS_CLASS)}, filter);
                                 XposedHelpers.callMethod(param.thisObject, "a", wrapper);
@@ -209,12 +211,12 @@ public class VisualFilters {
             }
         });
         //just picking context
-        Class <?> mediabryoSnapType = findClass("com.snapchat.android.model.Mediabryo$SnapType", lpparam.classLoader);
+        Class <?> mediabryoSnapType = findClass(Obfuscator.visualfilters.BRYO_SNAPTYPE, lpparam.classLoader);
         findAndHookMethod(Obfuscator.visualfilters.ADDER_PARAM, lpparam.classLoader, "a", boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, mediabryoSnapType, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (context == null) {
-                    context = (Context) XposedHelpers.getObjectField(param.thisObject, "g");
+                    context = (Context) XposedHelpers.getObjectField(param.thisObject, "b");
                 }
             }
         });
@@ -226,12 +228,17 @@ public class VisualFilters {
                     return;
                 Bitmap bitmap1 = (Bitmap) param.args[0];
                 Bitmap bitmap2 = (Bitmap) param.args[1];
-                applyFilter(bitmap1, bitmap2, (FilterType) XposedHelpers.getAdditionalInstanceField(param.thisObject, FILTER_TYPE));
+
+                try {
+                    applyFilter(bitmap1, bitmap2, (FilterType) XposedHelpers.getAdditionalInstanceField(param.thisObject, FILTER_TYPE));
+                } catch( Throwable t) {
+                    Logger.log("Error applying filter", t, LogType.FILTER);
+                }
                 param.setResult(true);
             }
         });
         //Add filter title
-        findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, "d", new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, Obfuscator.visualfilters.FILTER_GETVIEW, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (XposedHelpers.getAdditionalInstanceField(param.thisObject, FILTER_TYPE) == null || XposedHelpers.getAdditionalInstanceField(param.thisObject, NULLIFY_FLAG) != null)
@@ -265,7 +272,7 @@ public class VisualFilters {
             }
         });
         //title nullifier
-        findAndHookMethod(Obfuscator.visualfilters.FILTERSLOADER_CLASS, lpparam.classLoader, "e", new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.visualfilters.FILTERSLOADER_CLASS, lpparam.classLoader, "d", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (XposedHelpers.getAdditionalInstanceField(param.thisObject, FILTER_TITLE) != null) {
@@ -276,7 +283,7 @@ public class VisualFilters {
             }
         });
         //title fade out
-        findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, "h", new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, "g", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (XposedHelpers.getAdditionalInstanceField(param.thisObject, FILTER_TITLE) != null) {
@@ -286,7 +293,7 @@ public class VisualFilters {
             }
         });
         //title animation reset
-        findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, "i", new XC_MethodHook() {
+        findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, "h", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (XposedHelpers.getAdditionalInstanceField(param.thisObject, FILTER_TITLE) != null) {
@@ -330,26 +337,10 @@ public class VisualFilters {
         GPUImage gpuImage = new GPUImage(context);
         gpuImage.setImage(source);
         gpuImage.setFilter(type.getFilter());
-        try
-        {
-            Bitmap filtered = gpuImage.getBitmapWithFilterApplied();
+        Bitmap filtered = gpuImage.getBitmapWithFilterApplied();
 
-            int[] pixels = new int[filtered.getHeight() * filtered.getWidth()];
-            filtered.getPixels(pixels, 0, filtered.getWidth(), 0, 0, filtered.getWidth(), filtered.getHeight());
-            result.setPixels(pixels, 0, filtered.getWidth(), 0, 0, filtered.getWidth(), filtered.getHeight());
-        } catch( NullPointerException e )
-        {
-            Logger.log("Error loading filter: " + type.toString() );
-            return;
-        }
-//        Canvas canvas = new Canvas(result);
-//
-//        Paint paint = new Paint();
-//        paint.setColor(Color.WHITE);
-//        paint.setTextSize(50);
-//        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
-//
-//        canvas.drawBitmap(result, 0, 0, paint);
-//        canvas.drawText(type.name(), 150, 150, paint);
+        int[] pixels = new int[filtered.getHeight() * filtered.getWidth()];
+        filtered.getPixels(pixels, 0, filtered.getWidth(), 0, 0, filtered.getWidth(), filtered.getHeight());
+        result.setPixels(pixels, 0, filtered.getWidth(), 0, 0, filtered.getWidth(), filtered.getHeight());
     }
 }

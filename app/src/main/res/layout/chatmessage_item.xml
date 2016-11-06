@@ -2,39 +2,52 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:layout_marginTop="10dp">
+    android:layout_height="wrap_content">
 
-    <TextView android:id="@+id/text_list_date"
-        android:background="@color/primary_light"
-        android:text="Gabe can piss off"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
+    <RelativeLayout
+        android:background="@drawable/conversation_message_container"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="10px"
-        android:layout_marginTop="5px"/>
-    <TextView android:id="@+id/text_list_steps"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:padding="10px"
-        android:layout_below="@+id/text_list_date"/>
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:layout_toLeftOf="@+id/text_log_date"
+        android:layout_toStartOf="@+id/text_log_date">
+
+        <TextView android:id="@+id/text_list_log_friend"
+            android:background="@color/primary_light"
+            android:text="#Undefined#"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="10px"
+            android:layout_margin="2dp" />
+
+        <TextView android:id="@+id/text_list_message"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="10px"
+            android:layout_below="@+id/text_list_log_friend"
+            android:text="#Undefined#"
+            android:layout_marginBottom="2dp"
+            android:layout_toRightOf="@+id/text_log_date"
+            android:layout_toEndOf="@+id/text_log_date" />
+
+    </RelativeLayout>
 
     <TextView
+        android:text="#Undefined#"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="High Score"
-        android:id="@+id/text_high_score"
-        android:layout_gravity="right"
-        android:layout_alignTop="@+id/text_list_date"
-        android:layout_alignBottom="@+id/text_list_steps"
-        android:textAlignment="center"
-        android:gravity="center_vertical"
-        android:layout_marginLeft="10px"
-        android:paddingLeft="10px"
-        android:paddingRight="10px"
-        android:layout_marginRight="25px"
-        android:visibility="gone" />
+        android:gravity="center"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:id="@+id/text_log_date"
+        android:textColor="@color/accent"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
 </RelativeLayout>

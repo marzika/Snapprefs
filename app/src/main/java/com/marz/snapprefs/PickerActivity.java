@@ -28,7 +28,7 @@ public class PickerActivity extends Activity {
 
         if (Intent.ACTION_RUN.equals(action)) {
                 Intent galleryPickerIntent = new Intent(Intent.ACTION_PICK);
-                galleryPickerIntent.setType("video/*, image/*");
+                galleryPickerIntent.setType("image/* video/*");
                 startActivityForResult(galleryPickerIntent, SELECT_GALLERY);
 
             } else {
@@ -47,7 +47,7 @@ public class PickerActivity extends Activity {
                 intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(toSend));
                 intent.setType(getMime(mediaUri));
                 intent.setAction(Intent.ACTION_SEND);
-                intent.setComponent(ComponentName.unflattenFromString("com.snapchat.android/.LandingPageActivity"));
+                intent.setComponent(ComponentName.unflattenFromString("com.marz.snapprefs/.ReceiveMediaActivity"));
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             }

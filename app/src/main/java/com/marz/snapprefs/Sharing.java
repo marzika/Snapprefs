@@ -213,7 +213,8 @@ public class Sharing {
                     }
                 });*/
 
-                findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Bitmap.class, new XC_MethodHook() {
+                Class<?> TAKE_PHOTO_METHOD = findClass(Obfuscator.sharing.TAKE_PHOTO_METHOD, lpparam.classLoader);
+                findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Bitmap.class, TAKE_PHOTO_METHOD, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         param.args[0] = mediaImg.getContent();
