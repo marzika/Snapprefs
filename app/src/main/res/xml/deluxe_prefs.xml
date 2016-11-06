@@ -6,6 +6,24 @@
         android:summaryOff="@string/pref_viewed_summary_off"
         android:summaryOn="@string/pref_viewed_summary_on"
         android:title="@string/pref_viewed_title" />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_stealth_chat_saving"
+        android:summaryOff="@string/pref_stealth_chat_saving_summary_off"
+        android:summaryOn="@string/pref_stealth_chat_saving_summary_on"
+        android:title="@string/pref_stealth_chat_saving_title"/>
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_stealth_notification"
+        android:summaryOff="@string/pref_stealth_notification_summary_off"
+        android:summaryOn="@string/pref_stealth_notification_summary_on"
+        android:title="@string/pref_stealth_notification_title"/>
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_key_stealth_saving_button"
+        android:summaryOff="@string/pref_stealth_saving_button_summary_off"
+        android:summaryOn="@string/pref_stealth_saving_button_summary_on"
+        android:title="@string/pref_stealth_saving_button_title"/>
     <Preference
         android:key="pref_viewed_readme"
         android:summary="@string/pref_viewed_readme_summary"

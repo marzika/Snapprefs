@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Util.BiHashMap;
 
 import java.io.BufferedInputStream;
@@ -167,27 +168,27 @@ public class Stickers {
             findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "open", String.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    Logger.log("Open asset: " + param.args[0], true);
+                    Logger.log("Open asset: " + param.args[0], LogType.DEBUG);
                     String str = (String) param.args[0];
                     if (str.contains("twemoji_2_")) {
                         String url = Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/" + str;
                         File file;
                         try {
-                            Logger.log("Sdcard path: " + url, true);
+                            Logger.log("Sdcard path: " + url, LogType.DEBUG);
                             file = new File(url);
                         } catch (Exception e){
-                            Logger.log("Stickers file/folder not found", true);
+                            Logger.log("Stickers file/folder not found", LogType.DEBUG);
                             return;
                         }
 
                         if( !file.exists() ) {
-                            Logger.log( "Error loading STICKERS file: " + str );
+                            Logger.log( "Error loading STICKERS file: " + str, LogType.DEBUG);
                             return;
                         }
                         InputStream is = null;
                         is = new BufferedInputStream(new FileInputStream(file));
                         param.setResult(is);
-                        Logger.log("setResult for AssetManager", true);
+                        Logger.log("setResult for AssetManager", LogType.DEBUG);
                     }
                 }
             });
