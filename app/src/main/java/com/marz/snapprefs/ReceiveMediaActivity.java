@@ -72,7 +72,7 @@ public class ReceiveMediaActivity extends Activity implements DialogInterface.On
                     }
                     File out = File.createTempFile("share", ".no_media", directory);
                     Log.d(Common.LOG_TAG, "Received Media share of type " + type + "\nand URI " + mediaUri.toString() + "\nCalling hooked Snapchat with same Intent.");
-                    if (CommonUtils.isModuleEnabled()) {
+                    if (CommonUtils.getModuleStatus() == Common.MODULE_STATUS_ACTIVATED) {
                         if (type.startsWith("image/")) {
                             finish = false;
                             UCrop.Options options = new UCrop.Options();
@@ -130,7 +130,11 @@ public class ReceiveMediaActivity extends Activity implements DialogInterface.On
     private AlertDialog createXposedDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(this, android.R.style.Theme_DeviceDefault_Dialog));
         dialogBuilder.setTitle(getString(R.string.app_name));
-        dialogBuilder.setMessage(getString(R.string.module_not_enabled));
+        if(CommonUtils.getModuleStatus() == Common.MODULE_STATUS_NOT_ACTIVATED) {
+            dialogBuilder.setMessage(getString(R.string.module_not_enabled));
+        } else {
+            dialogBuilder.setMessage(getString(R.string.device_needs_restart_for_update));
+        }
         dialogBuilder.setPositiveButton(getString(R.string.open_xposed_installer), this);
         dialogBuilder.setNegativeButton(getString(R.string.close), this);
         return dialogBuilder.create();

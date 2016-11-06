@@ -25,6 +25,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -52,6 +53,7 @@ import com.marz.snapprefs.Tabs.SavingTabFragment;
 import com.marz.snapprefs.Tabs.SharingTabFragment;
 import com.marz.snapprefs.Tabs.SpoofingTabFragment;
 import com.marz.snapprefs.Tabs.TextTabFragment;
+import com.marz.snapprefs.Util.CommonUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -162,6 +164,20 @@ public class MainActivity extends AppCompatActivity {
         if (cl.isFirstRun()) {
             cl.getLogDialog().show();
         }*/
+        Logger.log("MainActivity: Checking if module is enabled.");
+        int moduleStatus = CommonUtils.getModuleStatus();
+        if(moduleStatus != Common.MODULE_STATUS_ACTIVATED) {
+            if (moduleStatus == Common.MODULE_STATUS_NOT_ACTIVATED) {
+                Toast toast = Toast.makeText(getApplicationContext(), "Module Does Not Appear To Be Activated!", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
+                toast.show();
+            } else {
+                Toast toast = Toast.makeText(getApplicationContext(), "Please Restart Device For Hooks To Update!", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
+                toast.show();
+            }
+        }
+
 
         Logger.log("MainActivity: createPrefsIfNotExisting");
         createPrefsIfNotExisting();

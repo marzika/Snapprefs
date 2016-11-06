@@ -240,8 +240,13 @@ public class HookMethods
     @Override
     public void handleLoadPackage(final LoadPackageParam lpparam) throws Throwable {
         try {
-            if (!lpparam.packageName.equals(Common.PACKAGE_SNAP))
+            if (!lpparam.packageName.equals(Common.PACKAGE_SNAP) && !lpparam.packageName.equals(Common.PACKAGE_SP))
                 return;
+
+            if(lpparam.packageName.equals(Common.PACKAGE_SP)) {
+                findAndHookMethod("com.marz.snapprefs.Util.CommonUtils", lpparam.classLoader, "isModuleEnabled", XC_MethodReplacement.returnConstant((BuildConfig.BUILD_TYPE == "debug" ? Common.MODULE_ENABLED_CHECK_INT : BuildConfig.VERSION_CODE)));
+                return;
+            }
 
             try {
                 XposedUtils.log("----------------- SNAPPREFS HOOKED -----------------", false);
@@ -317,31 +322,6 @@ public class HookMethods
                     Logger.log("Error hooking unlimited recording", t, LogType.FORCED);
                 }
             }
-
-            /*findAndHookMethod("android.os.Handler", lpparam.classLoader, "sendMessageDelayed", Message.class, long.class, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    Message message = (Message) param.args[0];
-
-                    //TODO Check message for target abc
-                    //Logger.log("MessageName: " + message.get);
-
-                    if((long)param.args[1]==10000){
-                        Logger.printFinalMessage("sendMessageDelayed - " + param.args[1]);
-                        Logger.log("Message: " + param.args[0].toString(), LogType.FORCED);
-                        param.args[1]=12000000L;
-                        Logger.logStackTrace();
-                    }
-                }
-            });*/
-            /* Not needed as they are not setting a sizelimit anymore, yay
-            findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxFileSize", long.class, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) {//1730151
-                    Logger.printFinalMessage("setMaxFileSize - " + param.args[0]);
-                    param.args[0] = 5190453;//5190453
-                }
-            });*/
 
             findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
