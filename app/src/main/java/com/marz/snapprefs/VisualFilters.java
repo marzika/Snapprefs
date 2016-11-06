@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 
+import com.marz.snapprefs.Logger.LogType;
+
 import java.util.ArrayList;
 
 import de.robv.android.xposed.XC_MethodHook;
@@ -226,7 +228,12 @@ public class VisualFilters {
                     return;
                 Bitmap bitmap1 = (Bitmap) param.args[0];
                 Bitmap bitmap2 = (Bitmap) param.args[1];
-                applyFilter(bitmap1, bitmap2, (FilterType) XposedHelpers.getAdditionalInstanceField(param.thisObject, FILTER_TYPE));
+
+                try {
+                    applyFilter(bitmap1, bitmap2, (FilterType) XposedHelpers.getAdditionalInstanceField(param.thisObject, FILTER_TYPE));
+                } catch( Throwable t) {
+                    Logger.log("Error applying filter", t, LogType.FILTER);
+                }
                 param.setResult(true);
             }
         });
@@ -330,26 +337,10 @@ public class VisualFilters {
         GPUImage gpuImage = new GPUImage(context);
         gpuImage.setImage(source);
         gpuImage.setFilter(type.getFilter());
-        try
-        {
-            Bitmap filtered = gpuImage.getBitmapWithFilterApplied();
+        Bitmap filtered = gpuImage.getBitmapWithFilterApplied();
 
-            int[] pixels = new int[filtered.getHeight() * filtered.getWidth()];
-            filtered.getPixels(pixels, 0, filtered.getWidth(), 0, 0, filtered.getWidth(), filtered.getHeight());
-            result.setPixels(pixels, 0, filtered.getWidth(), 0, 0, filtered.getWidth(), filtered.getHeight());
-        } catch( NullPointerException e )
-        {
-            Logger.log("Error loading filter: " + type.toString() );
-            return;
-        }
-//        Canvas canvas = new Canvas(result);
-//
-//        Paint paint = new Paint();
-//        paint.setColor(Color.WHITE);
-//        paint.setTextSize(50);
-//        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
-//
-//        canvas.drawBitmap(result, 0, 0, paint);
-//        canvas.drawText(type.name(), 150, 150, paint);
+        int[] pixels = new int[filtered.getHeight() * filtered.getWidth()];
+        filtered.getPixels(pixels, 0, filtered.getWidth(), 0, 0, filtered.getWidth(), filtered.getHeight());
+        result.setPixels(pixels, 0, filtered.getWidth(), 0, 0, filtered.getWidth(), filtered.getHeight());
     }
 }

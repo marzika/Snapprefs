@@ -8,11 +8,12 @@ import android.provider.BaseColumns;
 
 import com.google.gson.Gson;
 import com.marz.snapprefs.Logger;
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.Util.ChatData;
+import com.marz.snapprefs.Util.ConversationItem;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static com.marz.snapprefs.Databases.CoreDatabaseHandler.CallbackHandler.getCallback;
 
@@ -20,37 +21,29 @@ import static com.marz.snapprefs.Databases.CoreDatabaseHandler.CallbackHandler.g
  * Created by Andre on 20/10/2016.
  */
 
-public class ChatsDatabaseHelper extends CachedDatabaseHandler {
-    private static final int DATABASE_VERSION = 2;
+public class ChatsDatabaseHelper extends CoreDatabaseHandler {
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = Preferences.getContentPath() + "/ChatMessages.db";
     private static final String TEXT_TYPE = " TEXT";
     private static final String INT_TYPE = " INTEGER";
     private static final String COMMA_SEP = ",";
     private static final String[] SQL_CREATE_ENTRIES = {
+            "CREATE TABLE " + ConversationEntry.TABLE_NAME + " (" +
+                    ConversationEntry.COLUMN_NAME_CONVERSATION_ID + TEXT_TYPE + " PRIMARY KEY," +
+                    ConversationEntry.COLUMN_NAME_FRIEND_NAME + TEXT_TYPE + " NOT NULL )",
+
             "CREATE TABLE " + ChatEntry.TABLE_NAME + " (" +
-                    ChatEntry.COLUMN_NAME_UNIQUE_ID + TEXT_TYPE + " PRIMARY KEY," +
-                    ChatEntry.COLUMN_NAME_TYPE + TEXT_TYPE + COMMA_SEP +
-                    ChatEntry.COLUMN_NAME_MEDIA_TYPE + TEXT_TYPE + COMMA_SEP +
-                    ChatEntry.COLUMN_NAME_MESSAGE_ID + TEXT_TYPE + COMMA_SEP +
+                    ChatEntry.COLUMN_NAME_MESSAGE_ID + TEXT_TYPE + " PRIMARY KEY," +
                     ChatEntry.COLUMN_NAME_CONVERSATION_ID + TEXT_TYPE + COMMA_SEP +
                     ChatEntry.COLUMN_NAME_MESSAGE_TEXT + TEXT_TYPE + COMMA_SEP +
                     ChatEntry.COLUMN_NAME_SENDER + TEXT_TYPE + COMMA_SEP +
-                    ChatEntry.COLUMN_NAME_RECIPIENT_GSON + TEXT_TYPE + COMMA_SEP +
-                    ChatEntry.COLUMN_NAME_TIMESTAMP + INT_TYPE + COMMA_SEP +
-                    ChatEntry.COLUMN_NAME_ITER_TOKEN + TEXT_TYPE + COMMA_SEP +
-                    ChatEntry.COLUMN_NAME_SEQ_NUM + INT_TYPE + COMMA_SEP +
-                    ChatEntry.COLUMN_NAME_SNAP_WIDTH + INT_TYPE + COMMA_SEP +
-                    ChatEntry.COLUMN_NAME_SNAP_HEIGHT + INT_TYPE + COMMA_SEP +
-                    ChatEntry.COLUMN_NAME_SNAP_IV + TEXT_TYPE + COMMA_SEP +
-                    ChatEntry.COLUMN_NAME_SNAP_KEY + TEXT_TYPE + COMMA_SEP +
-                    ChatEntry.COLUMN_NAME_SNAP_DURATION + INT_TYPE + COMMA_SEP +
-                    ChatEntry.COLUMN_NAME_MEDIA_URL + INT_TYPE + COMMA_SEP +
-                    ChatEntry.COLUMN_NAME_MEDIA_ID + TEXT_TYPE + " )",
+                    ChatEntry.COLUMN_NAME_TIMESTAMP + INT_TYPE + " )",
     };
     private static byte[] keyBytes;
     private Gson gson;
     private String[] idHolder = new String[1];
-    private String[] keyProjection = {ChatEntry.COLUMN_NAME_UNIQUE_ID};
+    private String[] keyProjection = {ChatEntry.COLUMN_NAME_MESSAGE_ID};
+    private String[] convKeyProjection = {ConversationEntry.COLUMN_NAME_CONVERSATION_ID};
 
     public ChatsDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, SQL_CREATE_ENTRIES, DATABASE_VERSION);
@@ -63,7 +56,12 @@ public class ChatsDatabaseHelper extends CachedDatabaseHandler {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Logger.log(String.format("Upgrading LensDB from v%s to v%s", oldVersion, newVersion));
+        Logger.log(String.format("Upgrading ChatDB from v%s to v%s", oldVersion, newVersion), LogType.DATABASE);
+
+        if (oldVersion < 3) {
+            db.execSQL("DROP TABLE ChatMessages");
+            onCreate(db);
+        }
     }
 
     @Override
@@ -75,47 +73,80 @@ public class ChatsDatabaseHelper extends CachedDatabaseHandler {
         return super.getRowCount(ChatEntry.TABLE_NAME);
     }
 
+    public long getRowCount(String tableName) {
+        return super.getRowCount(tableName);
+    }
+
     public boolean insertChat(ChatData chatData) {
-        if (this.containsChat(chatData.getUniqueId())) {
-            Logger.log("Already contains chat: " + chatData.getText());
+        if (this.containsChat(chatData.getMessageId())) {
+            Logger.log("Already contains chat: " + chatData.getText(), LogType.DATABASE);
             return false;
         }
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(ChatEntry.COLUMN_NAME_CONVERSATION_ID, chatData.getConversationId());
-        contentValues.put(ChatEntry.COLUMN_NAME_TYPE, String.valueOf(chatData.getMessageType()));
-        contentValues.put(ChatEntry.COLUMN_NAME_UNIQUE_ID, chatData.getUniqueId());
         contentValues.put(ChatEntry.COLUMN_NAME_MESSAGE_ID, chatData.getMessageId());
         contentValues.put(ChatEntry.COLUMN_NAME_MESSAGE_TEXT, chatData.getText());
-
         contentValues.put(ChatEntry.COLUMN_NAME_SENDER, chatData.getSender());
-        contentValues.put(ChatEntry.COLUMN_NAME_RECIPIENT_GSON, gson.toJson(chatData.getRecipients(), List.class));
         contentValues.put(ChatEntry.COLUMN_NAME_TIMESTAMP, chatData.getTimestamp());
-        contentValues.put(ChatEntry.COLUMN_NAME_ITER_TOKEN, chatData.getIter_token());
-        contentValues.put(ChatEntry.COLUMN_NAME_SEQ_NUM, chatData.getSeq_num());
-
-        contentValues.put(ChatEntry.COLUMN_NAME_SNAP_KEY, chatData.getSnapKey());
-        contentValues.put(ChatEntry.COLUMN_NAME_SNAP_IV, chatData.getSnapIV());
-        contentValues.put(ChatEntry.COLUMN_NAME_SNAP_WIDTH, chatData.getSnapWidth());
-        contentValues.put(ChatEntry.COLUMN_NAME_SNAP_HEIGHT, chatData.getSnapHeight());
-        contentValues.put(ChatEntry.COLUMN_NAME_SNAP_DURATION, chatData.getSnapDuration());
-        contentValues.put(ChatEntry.COLUMN_NAME_MEDIA_URL, chatData.getMediaURL());
-        contentValues.put(ChatEntry.COLUMN_NAME_MEDIA_ID, chatData.getMediaID());
-        contentValues.put(ChatEntry.COLUMN_NAME_MEDIA_TYPE, String.valueOf(chatData.getMediaType()));
 
         long rowsInserted = super.insertValues(ChatEntry.TABLE_NAME, contentValues);
 
-        return rowsInserted > 0;
+        if (rowsInserted >= 0)
+            Logger.log("Inserted chat object", LogType.DATABASE);
+
+        if (!this.containsConversation(chatData.getConversationId())) {
+            contentValues = new ContentValues();
+            contentValues.put(ConversationEntry.COLUMN_NAME_CONVERSATION_ID, chatData.getConversationId());
+            contentValues.put(ConversationEntry.COLUMN_NAME_FRIEND_NAME, chatData.getFriendName());
+
+            long conversationRow = super.insertValues(ConversationEntry.TABLE_NAME, contentValues);
+
+            if (conversationRow > 0)
+                Logger.log("Created new Conversation", LogType.DATABASE);
+        }
+
+        return rowsInserted >= 0;
     }
 
-    public boolean containsChat(String chatUniqueId) {
-        if (chatUniqueId == null) {
-            Logger.log("Supplied null ID for DB Contains Check");
+    public boolean removeChat(String messageId) {
+        idHolder[0] = messageId;
+
+        int rowAffected = super.deleteObject(ChatEntry.TABLE_NAME, ChatEntry.COLUMN_NAME_MESSAGE_ID, idHolder);
+
+        return rowAffected >= 0;
+    }
+
+    public boolean removeConversation(String conversationId) {
+        idHolder[0] = conversationId;
+
+        int rowAffected = super.deleteObject(ConversationEntry.TABLE_NAME, ConversationEntry.COLUMN_NAME_CONVERSATION_ID, idHolder);
+        rowAffected += super.deleteObject(ChatEntry.TABLE_NAME, ChatEntry.COLUMN_NAME_CONVERSATION_ID, idHolder);
+
+        return rowAffected >= 0;
+    }
+
+    public boolean containsChat(String chatMessageId) {
+        if (chatMessageId == null) {
+            Logger.log("Supplied null ID for DB Contains Check", LogType.DATABASE);
             return false;
         }
 
-        idHolder[0] = chatUniqueId;
-        return super.containsObject(ChatEntry.TABLE_NAME, ChatEntry.COLUMN_NAME_UNIQUE_ID, idHolder, null, keyProjection);
+        idHolder[0] = chatMessageId;
+        return super.containsObject(ChatEntry.TABLE_NAME, ChatEntry.COLUMN_NAME_MESSAGE_ID,
+                idHolder);
+    }
+
+    public boolean containsConversation(String conversationId) {
+        if (conversationId == null) {
+            Logger.log("Supplied null ID for DB Contains Check", LogType.DATABASE);
+            return false;
+        }
+
+        idHolder[0] = conversationId;
+
+        return super.containsObject(ConversationEntry.TABLE_NAME, ConversationEntry.COLUMN_NAME_CONVERSATION_ID,
+                idHolder);
     }
 
     @SuppressWarnings("unchecked")
@@ -127,7 +158,9 @@ public class ChatsDatabaseHelper extends CachedDatabaseHandler {
     @SuppressWarnings("unchecked")
     public ArrayList<Object> getAllChatsFrom(String conversationId) {
         CallbackHandler callback = getCallback(this, "getAllChatsFromCursor", Cursor.class);
-        return (ArrayList<Object>) getAllBuiltObjects(ChatEntry.TABLE_NAME, ChatEntry.COLUMN_NAME_CONVERSATION_ID + " = '" + conversationId + "'", null, callback);
+        return (ArrayList<Object>) getAllBuiltObjects(ChatEntry.TABLE_NAME,
+                ChatEntry.COLUMN_NAME_CONVERSATION_ID + " = '" + conversationId + "'",
+                ChatEntry.COLUMN_NAME_TIMESTAMP + " DESC", callback);
     }
 
     @SuppressWarnings("unchecked")
@@ -137,9 +170,18 @@ public class ChatsDatabaseHelper extends CachedDatabaseHandler {
         return (ArrayList<Object>) getAllBuiltObjects(
                 ChatEntry.TABLE_NAME,
                 ChatEntry.COLUMN_NAME_CONVERSATION_ID + " = '" + conversationId + "'" +
-                        " AND " + ChatEntry.COLUMN_NAME_UNIQUE_ID + " NOT IN " + formattedBlacklist,
-                null,
+                        " AND " + ChatEntry.COLUMN_NAME_MESSAGE_ID + " NOT IN " + formattedBlacklist,
+                ChatEntry.COLUMN_NAME_TIMESTAMP + " ASC",
                 callback);
+    }
+
+    @SuppressWarnings("unchecked")
+    public ArrayList<Object> getAllConversations() {
+        Logger.log("Getting all conversations", LogType.DATABASE);
+        CallbackHandler callback = getCallback(this, "getAllConversationsFromCursor", Cursor.class);
+
+        return (ArrayList<Object>) getAllBuiltObjects(
+                ConversationEntry.TABLE_NAME, null, null, callback);
     }
 
     /**
@@ -157,7 +199,7 @@ public class ChatsDatabaseHelper extends CachedDatabaseHandler {
             ChatData chatData = getChatFromCursor(cursor);
 
             if (chatData == null) {
-                Logger.log("Null chatdata pulled");
+                Logger.log("Null chatdata pulled", LogType.DATABASE);
                 cursor.moveToNext();
                 continue;
             }
@@ -180,86 +222,96 @@ public class ChatsDatabaseHelper extends CachedDatabaseHandler {
 
         try {
             ChatData chatData = new ChatData();
-            String strType = cursor.getString(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_TYPE));
-            ChatData.MessageType messageType;
-
-            try {
-                messageType = ChatData.MessageType.valueOf(strType);
-            } catch (IllegalArgumentException e) {
-                Logger.log("Unknown message type: " + strType);
-                return null;
-            }
-
-            chatData.setMessageType(messageType);
             chatData.setConversationId(cursor.getString(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_CONVERSATION_ID)));
             chatData.setMessageId(cursor.getString(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_MESSAGE_ID)));
-            chatData.setUniqueId(cursor.getString(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_UNIQUE_ID)));
             chatData.setSender(cursor.getString(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_SENDER)));
-            chatData.setIter_token(cursor.getString(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_ITER_TOKEN)));
-            chatData.setSeq_num(cursor.getLong(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_SEQ_NUM)));
+            chatData.setText(cursor.getString(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_MESSAGE_TEXT)));
             chatData.setTimestamp(cursor.getLong(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_TIMESTAMP)));
 
-            String jsonRecipients = cursor.getString(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_RECIPIENT_GSON));
-            List<String> recipients = gson.fromJson(jsonRecipients, List.class);
-            chatData.setRecipients(recipients);
-
-            if (messageType == ChatData.MessageType.TEXT) {
-                chatData.setText(cursor.getString(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_MESSAGE_TEXT)));
-                return chatData;
-            } else if (messageType == ChatData.MessageType.MEDIA) {
-                String strMediaType = cursor.getString(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_MEDIA_TYPE));
-
-                ChatData.MediaType mediaType;
-
-                try {
-                    mediaType = ChatData.MediaType.valueOf(strMediaType);
-                } catch (IllegalArgumentException e) {
-                    Logger.log("Unknown media type: " + strMediaType);
-                    return null;
-                }
-
-                chatData.setMediaType(mediaType);
-                chatData.setSnapKey(cursor.getString(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_SNAP_KEY)));
-                chatData.setSnapIV(cursor.getString(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_SNAP_IV)));
-                chatData.setMediaID(cursor.getString(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_MEDIA_ID)));
-                chatData.setMediaURL(cursor.getString(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_MEDIA_URL)));
-                chatData.setSnapDuration(cursor.getInt(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_SNAP_DURATION)));
-                chatData.setSnapDuration(cursor.getInt(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_SNAP_DURATION)));
-                chatData.setSnapWidth(cursor.getInt(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_SNAP_WIDTH)));
-                chatData.setSnapHeight(cursor.getInt(cursor.getColumnIndexOrThrow(ChatEntry.COLUMN_NAME_SNAP_HEIGHT)));
-
-                return chatData;
-            }
-
+            return chatData;
             //Logger.log("Queried database for lens: " + lensData.mCode + " Active: " + lensData.mActive);
         } catch (Exception e) {
             Logger.log("Issue querying database", e);
+            return null;
+        }
+    }
+
+    /**
+     * DO NOT REMOVE - It is used as a callback from the core handler
+     *
+     * @param cursor
+     * @return chatDataList
+     */
+    @SuppressWarnings({"unused", "WeakerAccess"})
+    public ArrayList<ConversationItem> getAllConversationsFromCursor(Cursor cursor) {
+        ArrayList<ConversationItem> conversationList = new ArrayList<>();
+
+        while (!cursor.isAfterLast()) {
+            //Logger.log("Looping cursor result");
+
+            try {
+                ConversationItem conversationItem = getConversationFromCursor(cursor);
+
+                if (conversationItem == null) {
+                    Logger.log("Null conversation pulled", LogType.DATABASE);
+                    cursor.moveToNext();
+                    continue;
+                }
+
+                conversationList.add(conversationItem);
+            } catch( Exception e ){
+                Logger.log("Error creating conversation", e, LogType.DATABASE);
+            }
+
+            cursor.moveToNext();
+        }
+
+        return conversationList;
+    }
+
+    /**
+     * DO NOT REMOVE - It is used as a callback from the core handler
+     *
+     * @param cursor
+     * @return chatData
+     */
+    @SuppressWarnings({"unused", "WeakerAccess", "unchecked"})
+    public ConversationItem getConversationFromCursor(Cursor cursor) {
+
+        try {
+            ConversationItem conversation = new ConversationItem();
+            conversation.conversationId = cursor.getString(cursor.getColumnIndexOrThrow(ConversationEntry.COLUMN_NAME_CONVERSATION_ID));
+            conversation.friendName = cursor.getString(cursor.getColumnIndexOrThrow(ConversationEntry.COLUMN_NAME_FRIEND_NAME));
+
+            if (conversation.conversationId != null) {
+                ArrayList<Object> messageList = this.getAllChatsFrom(conversation.conversationId);
+
+                if (messageList != null) {
+                    conversation.messageList = messageList;
+
+                    return conversation;
+                }
+            }
+        } catch (Exception e) {
+            Logger.log("Issue querying database", e, LogType.DATABASE);
             return null;
         }
 
         return null;
     }
 
+    private static class ConversationEntry implements BaseColumns {
+        static final String TABLE_NAME = "Conversations";
+        static final String COLUMN_NAME_FRIEND_NAME = "friend_name";
+        static final String COLUMN_NAME_CONVERSATION_ID = "conversation_id";
+    }
+
     private static class ChatEntry implements BaseColumns {
         static final String TABLE_NAME = "ChatMessages";
-        static final String COLUMN_NAME_TYPE = "type";
-        static final String COLUMN_NAME_CONVERSATION_ID = "conversation_id";//statefulChatFeedItem.M_()
-        static final String COLUMN_NAME_UNIQUE_ID = "unique_id";
+        static final String COLUMN_NAME_CONVERSATION_ID = "conversation_id";
         static final String COLUMN_NAME_MESSAGE_ID = "message_id";//statefulChatFeedItem.M_()
         static final String COLUMN_NAME_MESSAGE_TEXT = "text";
         static final String COLUMN_NAME_SENDER = "sender";//statefulChatFeedItem.am
-        static final String COLUMN_NAME_RECIPIENT_GSON = "recipient";//statefulChatFeedItem.al List<String>
-        static final String COLUMN_NAME_ITER_TOKEN = "iter_token";//Ie.l
-        static final String COLUMN_NAME_SEQ_NUM = "seq_num";//Ie.z() - Long
         static final String COLUMN_NAME_TIMESTAMP = "timestamp";//Long.valueOf(statefulChatFeedItem.i())
-        static final String COLUMN_NAME_SNAP_WIDTH = "snap_width";
-        static final String COLUMN_NAME_SNAP_HEIGHT = "snap_height";
-        static final String COLUMN_NAME_SNAP_IV = "snap_iv";
-        static final String COLUMN_NAME_SNAP_KEY = "snap_key";
-        static final String COLUMN_NAME_SNAP_DURATION = "snap_duration";
-        static final String COLUMN_NAME_MEDIA_URL = "media_url";
-        static final String COLUMN_NAME_MEDIA_ID = "media_id";
-        static final String COLUMN_NAME_MEDIA_TYPE = "media_type";
-        static final String COLUMN_NAME_ENCRYPTED = "encrypted";
     }
 }

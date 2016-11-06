@@ -13,9 +13,11 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.FileObserver;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentManager.BackStackEntry;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -37,8 +39,9 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.marz.snapprefs.Databases.LensDatabaseHelper;
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Tabs.BuyTabFragment;
+import com.marz.snapprefs.Tabs.ChatLogsTabFragment;
 import com.marz.snapprefs.Tabs.DataTabFragment;
 import com.marz.snapprefs.Tabs.DeluxeTabFragment;
 import com.marz.snapprefs.Tabs.FiltersTabFragment;
@@ -84,12 +87,11 @@ public class MainActivity extends AppCompatActivity {
     private static final int ACTION_PLAY_SERVICES_DIALOG = 100;
     public static Context context;
     public static SharedPreferences prefs = null;
-    public static LensDatabaseHelper lensDBHelper;
     private static FileObserver observer;
     private static UUID deviceUuid;
     DrawerLayout mDrawerLayout;
     NavigationView mNavigationView;
-    FragmentManager mFragmentManager;
+    public static FragmentManager mFragmentManager;
     FragmentTransaction mFragmentTransaction;
     HashMap<Integer, Fragment> cache = new HashMap<>();
     GoogleCloudMessaging gcm;
@@ -146,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = this;
+        Logger.loadSelectedLogTypes();
         ChangeLog cl = new ChangeLog(context);
         createDeviceId();
         /*Obfuscator.writeGsonFile();
@@ -288,19 +291,28 @@ public class MainActivity extends AppCompatActivity {
 
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 mDrawerLayout.closeDrawers();
                 menuItem.setCheckable(true);
                 menuItem.setChecked(true);
                 Iterator<MenuItem> it = items.iterator();
+
+                handleBackStack();
+                FragmentTransaction fragmentTransaction = mFragmentManager.beginTransaction();
+
                 while (it.hasNext()) {
                     MenuItem item = it.next();
                     if (!item.equals(menuItem)) {
                         item.setChecked(false);
+
+                        if( item.getItemId() == R.id.nav_item_main)
+                            fragmentTransaction.addToBackStack(item.getTitle().toString());
                     }
                 }
+
+                fragmentTransaction.replace(R.id.containerView, getForId(menuItem.getItemId()));
                 items.add(menuItem);
-                mFragmentManager.beginTransaction().replace(R.id.containerView, getForId(menuItem.getItemId())).commit();
+                fragmentTransaction.commit();
                 return false;
             }
 
@@ -317,25 +329,21 @@ public class MainActivity extends AppCompatActivity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         mDrawerToggle.syncState();
-
-        lensDBHelper = new LensDatabaseHelper(this.getApplicationContext());
     }
 
-    /*public int readLicense(String deviceID, String confirmationID) {
-        int status;
-        if (confirmationID != null) {
-            SharedPreferences prefs = getSharedPreferences("com.marz.snapprefs_preferences", MODE_PRIVATE);
-            String dvcid = prefs.getString("device_id", null);
-            if (dvcid != null && dvcid.equals(deviceID)) {
-                status = prefs.getInt(deviceID, 0);
-            } else {
-                status = 0;
-            }
-        } else {
-            status = 0;
+    private void handleBackStack() {
+        int count = mFragmentManager.getBackStackEntryCount() - 1;
+
+        for(int i = count; i > -1; i--) {
+            BackStackEntry stackEntry = mFragmentManager.getBackStackEntryAt(i);
+
+            if( stackEntry == null )
+                return;
+
+            Logger.log(String.format("Removed [%s][Index:%s] from back stack", stackEntry.getName(), i), LogType.DEBUG);
+            mFragmentManager.popBackStack(stackEntry.getName(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
-        return status;
-    }*/
+    }
 
     public Fragment getForId(int id) {
         if (cache.get(id) == null) {
@@ -373,8 +381,12 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_item_lenses:
                     cache.put(id, new LensesTabFragment());
                     break;
+                case R.id.nav_item_chat:
+                    cache.put(id, new ChatLogsTabFragment());
+                    break;
             }
         }
+
         return cache.get(id);
     }
 
@@ -387,9 +399,6 @@ public class MainActivity extends AppCompatActivity {
             String newLocation = data.getData().toString().substring(7);
 
             Preferences.putString(PREF_KEY_SAVE_LOCATION.key, newLocation);
-
-            //Preference pref = PreferenceFragmentCompat.findPreference(PREF_KEY_SAVE_LOCATION);
-            //pref.setSummary(newLocation);
         }
         if (requestCode == REQUEST_HIDE_DIR && resultCode == Activity.RESULT_OK) {
             String newHiddenLocation = data.getData().toString().substring(7);
@@ -407,16 +416,27 @@ public class MainActivity extends AppCompatActivity {
     public static boolean writeNoMediaFile(String directoryPath) {
         String storageState = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(storageState)) {
+            FileOutputStream noMediaOutStream = null;
+
             try {
                 File noMedia = new File(directoryPath, ".nomedia");
+
                 if (noMedia.exists()) {
                     return true;
                 }
-                FileOutputStream noMediaOutStream = new FileOutputStream(noMedia);
+
+                noMediaOutStream = new FileOutputStream(noMedia);
                 noMediaOutStream.write(0);
-                noMediaOutStream.close();
             } catch (Exception e) {
                 return false;
+            }
+            finally {
+                try {
+                    if( noMediaOutStream != null ) {
+                        noMediaOutStream.flush();
+                        noMediaOutStream.close();
+                    }
+                } catch (IOException ignored) { }
             }
         } else {
             return false;

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_marginTop="10dp">
+
+    <TextView android:id="@+id/text_list_friend"
+        android:background="@drawable/conversation_message"
+        android:text="#Undefined#"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#444"
+        android:layout_width="fill_parent"
+        android:layout_marginTop="5dp"
+        android:layout_toStartOf="@+id/txt_message_count"
+        android:layout_toLeftOf="@+id/txt_message_count"
+        android:layout_height="50dp"
+        android:gravity="fill_vertical"
+        android:layout_marginLeft="5dp"
+        android:paddingLeft="20dp" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_message_count"
+        android:layout_alignTop="@+id/text_list_friend"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:gravity="center"
+        android:layout_alignBottom="@+id/text_list_friend"
+        android:background="@drawable/conversation_message_count"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="-2dp" />
+
+</RelativeLayout>

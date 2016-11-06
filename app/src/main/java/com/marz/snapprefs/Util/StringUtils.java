@@ -684,4 +684,23 @@ public class StringUtils {
 
         return finalOutput;
     }
+
+    public static String obfus(String input) {
+        StringBuilder builder = new StringBuilder();
+        char[] charArray = input.toCharArray();
+        boolean shouldSkip = false;
+
+        for(char character : charArray) {
+            if(shouldSkip) {
+                builder.append('*');
+                shouldSkip = false;
+                continue;
+            }
+
+            builder.append(character);
+            shouldSkip = true;
+        }
+
+        return builder.toString();
+    }
 }

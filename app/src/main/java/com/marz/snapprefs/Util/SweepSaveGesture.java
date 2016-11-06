@@ -18,12 +18,15 @@ import static com.marz.snapprefs.Util.GestureEvent.ReturnType.TAP;
  * Created by Andre on 07/09/2016.
  */
 public class SweepSaveGesture implements GestureEvent {
-    private static final int MIN_DISTANCE = 150;
+    private static final int MIN_DISTANCE = 200;
     private float xStart;
     private float yStart;
     private float xEnd;
     private float yEnd;
+    private double distance;
+    private double maxDistance;
     private int minSweepDistance;
+    private boolean isMovingBack;
     private boolean hasAssignedStart = false;
 
     public SweepSaveGesture() {
@@ -43,22 +46,38 @@ public class SweepSaveGesture implements GestureEvent {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                reset();
                 xStart = Math.abs(event.getRawX());
                 yStart = Math.abs(event.getRawY());
                 v.getParent().requestDisallowInterceptTouchEvent(true);
-                hasAssignedStart = true;
                 return TAP;
-            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_MOVE:
                 xEnd = Math.abs(event.getRawX());
                 yEnd = Math.abs(event.getRawY());
-                Logger.log("Position: " + xStart + "/" + xEnd + " | " + yStart + "/" + yEnd);
-
-                double distance = Math.hypot(xStart - xEnd,
+                distance = Math.hypot(xStart - xEnd,
                         yStart - yEnd);
 
-                Logger.log("Distance: " + distance);
-                if (hasAssignedStart && distance > minSweepDistance) {
-                    Logger.log("Performed swipe: " + distance);
+                Logger.log(String.format("[Dist:%s][MaxDist:%s][MinSweep:%s]", distance, maxDistance, minSweepDistance));
+
+                if (!isMovingBack) {
+                    if (distance >= (maxDistance - 1))
+                        maxDistance = distance;
+                    else if (maxDistance >= minSweepDistance) {
+                        isMovingBack = true;
+                        xStart = xEnd;
+                        yStart = yEnd;
+                        distance = 0;
+                        Logger.log("Starting to move back");
+                    }
+                }
+
+                return FAILED;
+            case MotionEvent.ACTION_UP:
+                Logger.log("Position: " + xStart + "/" + xEnd + " | " + yStart + "/" + yEnd);
+
+                Logger.log("Distance: " + distance + " Is moving back? " + isMovingBack);
+                if (isMovingBack && distance > (minSweepDistance * 0.3)) {
+                    Logger.log("Performed sweep: " + distance);
                     Saving.performS2SSave();
 
                     reset();
@@ -77,6 +96,7 @@ public class SweepSaveGesture implements GestureEvent {
         xEnd = 0;
         yStart = 0;
         yEnd = 0;
-        hasAssignedStart = false;
+        maxDistance = 0;
+        isMovingBack = false;
     }
 }

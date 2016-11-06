@@ -27,6 +27,7 @@ import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -77,6 +78,7 @@ import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
  * Created by MARZ on 2016. 04. 08..
  */
 public class HookedLayouts {
+    public static final int stealthButtonSize = 130;
     public static ImageButton upload = null;
     public static RelativeLayout outerOptionsLayout = null;
     public static ImageButton saveSnapButton;
@@ -94,7 +96,7 @@ public class HookedLayouts {
                 TextView orig1 =
                         (TextView) ((TableRow) navigation.getChildAt(0)).getChildAt(1);
                 TableRow row = new TableRow(navigation.getContext());
-                row.setTag("Hello");
+                row.setTag("Snapprefs Link");
                 row.setLayoutParams(navigation.getChildAt(0).getLayoutParams());
                 ImageView iv = new ImageView(navigation.getContext());
                 iv.setImageDrawable(mResources.getDrawable(R.drawable.profile_snapprefs));
@@ -127,9 +129,7 @@ public class HookedLayouts {
                     View nextChild = navigation.getChildAt(index);
 
                     if (nextChild.getTag() != null && nextChild.getTag() instanceof String) {
-                        if (nextChild.getTag().equals("Hello")) {
-                            Logger.log("IT EQUALS IT MOTHA: " + containsRow);
-
+                        if (nextChild.getTag().equals("Snapprefs Link")) {
                             if (containsRow)
                                 navigation.removeView(nextChild);
                             else
@@ -221,7 +221,7 @@ public class HookedLayouts {
                             p.setXfermode(null);
                             p.setStyle(Paint.Style.STROKE);
                             p.setColor(Color.WHITE);
-                            p.setStrokeWidth(px(4));
+                            p.setStrokeWidth(px(8));
                             c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
                             upload.setImageDrawable(new BitmapDrawable(output));
                         }
@@ -264,10 +264,24 @@ public class HookedLayouts {
 
         int horizontalPosition = Preferences.getBool(Prefs.BUTTON_POSITION) ? Gravity.START : Gravity.END;
 
-        final FrameLayout.LayoutParams layoutParams =
-                new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
-                        FrameLayout.LayoutParams.WRAP_CONTENT,
-                        Gravity.BOTTOM | horizontalPosition);
+        FrameLayout.LayoutParams scaledLayoutParams = null;
+
+        if(Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON)) {
+            DisplayMetrics metrics = localContext.getResources().getDisplayMetrics();
+
+            int unscaledSize = Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? stealthButtonSize : 65;
+            int scaledSize = px(unscaledSize, metrics.density);
+            scaledLayoutParams =
+                    new FrameLayout.LayoutParams(scaledSize, scaledSize,
+                            Gravity.BOTTOM | horizontalPosition);
+        } else {
+            scaledLayoutParams =
+                    new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+                            FrameLayout.LayoutParams.WRAP_CONTENT,
+                            Gravity.BOTTOM | horizontalPosition);
+        }
+
+        final FrameLayout.LayoutParams layoutParams = scaledLayoutParams;
 
         resparam.res.hookLayout(Common.PACKAGE_SNAP, "layout", "view_snap", new XC_LayoutInflated() {
             private GestureEvent gestureEvent;
@@ -283,7 +297,7 @@ public class HookedLayouts {
                 saveSnapButton = new ImageButton(localContext);
                 saveSnapButton.setLayoutParams(layoutParams);
                 saveSnapButton.setBackgroundColor(0);
-                saveSnapButton.setAlpha(1f);
+                saveSnapButton.setAlpha(Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? 0f : 1f);
                 saveSnapButton.setImageBitmap(HookMethods.saveImg);
                 saveSnapButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
                         ? View.VISIBLE : View.INVISIBLE);
@@ -723,7 +737,7 @@ public class HookedLayouts {
 
                             for (int i = 1; i <= 5; i++) {
                                 Button btn = new Button(context);
-                                btn.setId(i);
+                                btn.setId(+i);
                                 final int id_ = btn.getId();
                                 btn.setText("Color: " + id_);
                                 btn.setBackgroundColor(colorsText[i - 1]);
@@ -1046,7 +1060,7 @@ public class HookedLayouts {
 
                             for (int i = 1; i <= 5; i++) {
                                 Button btn = new Button(context);
-                                btn.setId(i);
+                                btn.setId(+i);
                                 final int id_ = btn.getId();
                                 btn.setText("Color: " + id_);
                                 btn.setBackgroundColor(colorsBg[i - 1]);
