@@ -287,12 +287,12 @@ public class HookMethods
                 }
             });
 
-            // If maxRecordTime is same as SC timecap, let SC perform as normal
             findAndHookMethod("abc", lpparam.classLoader, "handleMessage", Message.class, new XC_MethodHook() {
                 boolean internallyCalled = false;
                 int maxRecordTime = Integer.parseInt(Preferences.getString(Prefs.MAX_RECORDING_TIME).trim()) * 1000;
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    // If maxRecordTime is same as SC timecap, let SC perform as normal
                     if (maxRecordTime > 10000) {
                         super.beforeHookedMethod(param);
                         Message message = (Message) param.args[0];
