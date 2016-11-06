@@ -282,65 +282,34 @@ public class HookMethods
                 }
             });
 
-            final int maxRecordTime = Integer.parseInt(Preferences.getString(Prefs.MAX_RECORDING_TIME).trim()) * 1000;
-
             // If maxRecordTime is same as SC timecap, let SC perform as normal
-            if (maxRecordTime > 10000) {
-                try {
-                    findAndHookMethod("abc", lpparam.classLoader, "handleMessage", Message.class, new XC_MethodHook() {
-                        boolean internallyCalled = false;
-
-                        @Override
-                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                            super.beforeHookedMethod(param);
-                            Message message = (Message) param.args[0];
-                            Logger.log("HandleMessageId: " + message.what);
-
-                            if (message.what == 15 && !internallyCalled) {
-                                if (maxRecordTime > 10000) {
-                                    internallyCalled = true;
-
-                                    Handler handler = message.getTarget();
-                                    Message newMessage = Message.obtain(handler, 15);
-
-                                    handler.sendMessageDelayed(newMessage, maxRecordTime - 10000);
-                                    Logger.log(String.format("Triggering video end in %s more ms", maxRecordTime - 10000));
-                                }
-
-                                param.setResult(null);
-                            } else if (internallyCalled)
-                                internallyCalled = false;
-                        }
-                    });
-                } catch( Throwable t ) {
-                    Logger.log("Error hooking unlimited recording", t, LogType.FORCED);
-                }
-            }
-
-            /*findAndHookMethod("android.os.Handler", lpparam.classLoader, "sendMessageDelayed", Message.class, long.class, new XC_MethodHook() {
+            findAndHookMethod("abc", lpparam.classLoader, "handleMessage", Message.class, new XC_MethodHook() {
+                boolean internallyCalled = false;
+                int maxRecordTime = Integer.parseInt(Preferences.getString(Prefs.MAX_RECORDING_TIME).trim()) * 1000;
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    Message message = (Message) param.args[0];
+                    if (maxRecordTime > 10000) {
+                        super.beforeHookedMethod(param);
+                        Message message = (Message) param.args[0];
+                        Logger.log("HandleMessageId: " + message.what);
 
-                    //TODO Check message for target abc
-                    //Logger.log("MessageName: " + message.get);
+                        if (message.what == 15 && !internallyCalled) {
+                            if (maxRecordTime > 10000) {
+                                internallyCalled = true;
 
-                    if((long)param.args[1]==10000){
-                        Logger.printFinalMessage("sendMessageDelayed - " + param.args[1]);
-                        Logger.log("Message: " + param.args[0].toString(), LogType.FORCED);
-                        param.args[1]=12000000L;
-                        Logger.logStackTrace();
+                                Handler handler = message.getTarget();
+                                Message newMessage = Message.obtain(handler, 15);
+
+                                handler.sendMessageDelayed(newMessage, maxRecordTime - 10000);
+                                Logger.log(String.format("Triggering video end in %s more ms", maxRecordTime - 10000));
+                            }
+
+                            param.setResult(null);
+                        } else if (internallyCalled)
+                            internallyCalled = false;
                     }
                 }
-            });*/
-            /* Not needed as they are not setting a sizelimit anymore, yay
-            findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxFileSize", long.class, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) {//1730151
-                    Logger.printFinalMessage("setMaxFileSize - " + param.args[0]);
-                    param.args[0] = 5190453;//5190453
-                }
-            });*/
+            });
 
             findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
