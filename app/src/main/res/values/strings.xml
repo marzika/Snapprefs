@@ -299,7 +299,8 @@
 
     <!-- Dialogs -->
     <string name="module_not_enabled">Snapprefs is not enabled. Please enable it in Xposed Installer and reboot your device.</string>
-    <string name="size_error">"The video you shared is too large (%1$s), it probably won't send. Snapshat only supports files up to %2$s."</string>
+    <string name="device_needs_restart_for_update">Snapprefs was updated. Please restart your device for the changes to take affect.</string>
+    <string name="size_error">"The video you shared is too large (%1$s), it probably won't send. Snapchat only supports files up to %2$s."</string>
     <string name="unable_open_xposed">Unable to open Xposed Installer, is it installed?</string>
 
     <string name="open_xposed_installer">Open Xposed Installer</string>
