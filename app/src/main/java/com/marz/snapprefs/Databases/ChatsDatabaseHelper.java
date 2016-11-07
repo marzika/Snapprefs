@@ -18,7 +18,8 @@ import java.util.ArrayList;
 import static com.marz.snapprefs.Databases.CoreDatabaseHandler.CallbackHandler.getCallback;
 
 /**
- * Created by Andre on 20/10/2016.
+ * This class was created by Andre R M (SID: 701439)
+ * It and its contents are free to use by all
  */
 
 public class ChatsDatabaseHelper extends CoreDatabaseHandler {

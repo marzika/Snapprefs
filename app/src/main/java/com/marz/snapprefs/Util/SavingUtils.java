@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Vibrator;
 
 import com.marz.snapprefs.Logger;
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.Preferences.Prefs;
 
@@ -41,7 +42,7 @@ public abstract class SavingUtils {
         boolean state = false;
 
         if (bmp == null) {
-            Logger.printMessage("saveJPG - Passed Null Image");
+            Logger.printMessage("saveJPG - Passed Null Image", LogType.SAVING);
 
             if (shouldVibrate)
                 vibrate(context, false);
@@ -63,7 +64,7 @@ public abstract class SavingUtils {
 
             state = true;
         } catch (Exception e) {
-            Logger.printMessage("Exception while saving an image: " + e.getMessage());
+            Logger.printMessage("Exception while saving an image: " + e.getMessage(), LogType.SAVING);
 
             if (shouldVibrate)
                 vibrate(context, false);
@@ -96,7 +97,7 @@ public abstract class SavingUtils {
     public static boolean savePNG(File fileToSave, Bitmap bmp, Context context, boolean shouldVibrate) {
         boolean state = false;
         if (bmp == null) {
-            Logger.printMessage("savePNG - Passed Null Image");
+            Logger.printMessage("savePNG - Passed Null Image", LogType.SAVING);
 
             if (shouldVibrate)
                 vibrate(context, false);
@@ -115,7 +116,7 @@ public abstract class SavingUtils {
 
             state = true;
         } catch (Exception e) {
-            Logger.printMessage("Exception while saving an image: " + e.getMessage());
+            Logger.printMessage("Exception while saving an image: " + e.getMessage(), LogType.SAVING);
 
             if (shouldVibrate)
                 vibrate(context, false);
@@ -142,7 +143,7 @@ public abstract class SavingUtils {
     public static boolean saveVideo( File fileToSave, FileInputStream fileStream, Context context) {
         boolean state = false;
         if (fileStream == null) {
-            Logger.printMessage("saveVideo - Passed Null Video");
+            Logger.printMessage("saveVideo - Passed Null Video", LogType.SAVING);
             vibrate(context, false);
             return false;
         }
@@ -169,7 +170,7 @@ public abstract class SavingUtils {
 
             state = true;
         } catch (Exception e) {
-            Logger.printMessage("Exception while saving a video: " + e.getMessage());
+            Logger.printMessage("Exception while saving a video: " + e.getMessage(), LogType.SAVING);
             vibrate(context, false);
         } finally {
             try {
@@ -225,7 +226,7 @@ public abstract class SavingUtils {
      */
     private static void runMediaScanner(Context context, String... mediaPath) {
         try {
-            Logger.printMessage("MediaScanner started");
+            Logger.printMessage("MediaScanner started", LogType.SAVING);
             MediaScannerConnection.scanFile(context, mediaPath, null,
                     new MediaScannerConnection.OnScanCompletedListener() {
                         public void onScanCompleted(String path,
@@ -235,7 +236,7 @@ public abstract class SavingUtils {
                         }
                     });
         } catch (Exception e) {
-            Logger.printMessage("Error occurred while trying to run MediaScanner");
+            Logger.printMessage("Error occurred while trying to run MediaScanner", LogType.SAVING);
         }
     }
 

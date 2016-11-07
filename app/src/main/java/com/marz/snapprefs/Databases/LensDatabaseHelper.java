@@ -18,8 +18,10 @@ import java.util.Map;
 import static com.marz.snapprefs.Databases.CoreDatabaseHandler.CallbackHandler.getCallback;
 
 /**
- * Created by Andre on 16/09/2016.
+ * This class was created by Andre R M (SID: 701439)
+ * It and its contents are free to use by all
  */
+
 public class LensDatabaseHelper extends CachedDatabaseHandler {
     private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = Preferences.getContentPath() + "/Lenses.db";
@@ -203,7 +205,7 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
                 LensEntry.COLUMN_NAME_SEL_TIME + " ASC" : null;
 
         return (Map<String, Object>) super.getAllBuiltObjectsExcept(LensEntry.TABLE_NAME,
-                    LensEntry.COLUMN_NAME_MCODE, orderBy, blacklist, callback);
+                LensEntry.COLUMN_NAME_MCODE, orderBy, blacklist, callback);
     }
 
     @SuppressWarnings("unchecked")
