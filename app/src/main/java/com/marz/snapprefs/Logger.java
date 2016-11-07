@@ -34,6 +34,11 @@ import java.util.HashSet;
 
 import de.robv.android.xposed.XposedBridge;
 
+/**
+ * The latest part of this Logging System was created by Andre R M (SID: 701439)
+ * It and its contents are free to use by all
+ */
+
 public class Logger {
 
     private static final String LOG_TAG = "Snapprefs: ";
@@ -80,33 +85,26 @@ public class Logger {
         }
     }
 
-    public static void afterHook(String message) {
-        log("AfterHook: " + message, defaultPrefix, defaultForced);
-    }
-
-    public static void beforeHook(String message) {
-        log("BeforeHook: " + message, defaultPrefix, defaultForced);
-    }
-
     /**
      * Prints a title in a line width of at least {@link #printWidth} with areas before and after filled with '#'s
      *
      * @param message The message to print in the title
      */
-    public static void printTitle(String message) {
-        log("", defaultPrefix, defaultForced);
-        printFilledRow();
-        printMessage(message);
-        printFilledRow();
+    public static void printTitle(String message, LogType logType) {
+        logType.removeTag();
+        log("", logType);
+        printFilledRow(logType);
+        printMessage(message, logType);
+        printFilledRow(logType);
     }
 
     /**
-     * Prints a message with left and right aligned '#'s, to be used with {@link #printTitle(String)} and {@link #printFilledRow()}
+     * Prints a message with left and right aligned '#'s, to be used with {@link #printTitle(String, LogType)} and {@link #printFilledRow(LogType)}
      *
      * @param message The message to print between the '#'s
      */
-    public static void printMessage(String message) {
-        log("#" + StringUtils.center(message, printWidth) + "#", defaultPrefix, defaultForced);
+    public static void printMessage(String message, LogType logType) {
+        log("#" + StringUtils.center(message, printWidth) + "#", logType.removeTag());
     }
 
     /**
@@ -114,16 +112,17 @@ public class Logger {
      *
      * @param message The final message that is going to be printed
      */
-    static void printFinalMessage(String message) {
-        printMessage(message);
-        printFilledRow();
+    static void printFinalMessage(String message, LogType logType) {
+        logType.removeTag();
+        printMessage(message, logType);
+        printFilledRow(logType);
     }
 
     /**
      * Print a '#' Filled row of width {@link #printWidth}
      */
-    static void printFilledRow() {
-        log(StringUtils.repeat("#", printWidth + 2), defaultPrefix, defaultForced);
+    static void printFilledRow(LogType logType) {
+        log(StringUtils.repeat("#", printWidth + 2), logType.removeTag());
     }
 
     /**
@@ -200,7 +199,8 @@ public class Logger {
         }
 
         if (logType.isForced() || logTypes.contains(logType.name())) {
-            String outputMsg = logType.tag + " " + message;
+            String outputMsg = (logType.showTag ? logType.tag + " " : "" ) + message;
+
             assignPrefixAndPrint(outputMsg);
 
             if (logType.tempForce)
@@ -339,6 +339,7 @@ public class Logger {
         public String tag;
         private boolean isForced = false;
         private boolean tempForce = false;
+        private boolean showTag = true;
 
         LogType(String tag) {
             this.tag = String.format("[%s]", tag);
@@ -351,6 +352,11 @@ public class Logger {
 
         public LogType setForced() {
             this.tempForce = true;
+            return this;
+        }
+
+        public LogType removeTag() {
+            this.showTag = false;
             return this;
         }
 

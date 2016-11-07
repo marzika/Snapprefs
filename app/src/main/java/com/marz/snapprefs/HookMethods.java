@@ -282,7 +282,7 @@ public class HookMethods
             findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) {
-                    Logger.printFinalMessage("setMaxDuration - " + param.args[0]);
+                    Logger.printFinalMessage("setMaxDuration - " + param.args[0], LogType.SAVING);
                     param.args[0] = 12000000;//2 mins
                 }
             });
@@ -570,7 +570,7 @@ public class HookMethods
                     XposedHelpers.findAndHookMethod("TX$3", lpparam.classLoader, "onEditorAction", TextView.class, int.class, KeyEvent.class, new XC_MethodHook() {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                            Logger.printFinalMessage("onEditorAction: int= " + param.args[1]);
+                            Logger.printFinalMessage("onEditorAction: int= " + param.args[1], LogType.SAVING);
                         }
                     });
                     /*String vanillaCaptionEditTextClassName =

@@ -10,6 +10,7 @@ import android.widget.ImageButton;
 import com.marz.snapprefs.HookMethods;
 import com.marz.snapprefs.HookedLayouts;
 import com.marz.snapprefs.Logger;
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Saving;
@@ -38,7 +39,7 @@ public class AssignedStoryButton extends ImageButton {
         this.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Logger.printTitle("Performing Button Save");
+                Logger.printTitle("Performing Button Save", LogType.SAVING);
                 Saving.performButtonSave(assignedmKey);
             }
         });
