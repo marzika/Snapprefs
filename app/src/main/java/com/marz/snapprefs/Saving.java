@@ -10,13 +10,13 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.SnapData.FlagState;
 import com.marz.snapprefs.Util.CommonUtils;
@@ -102,8 +102,7 @@ public class Saving {
                                 handleVideoPayload(snapContext, param);
                             } catch (Exception e) {
                                 Logger.log(
-                                        "Exception handling Video Payload\n" +
-                                                e.getMessage());
+                                        "Exception handling Video Payload", e, LogType.SAVING);
                             }
                         }
                     });
@@ -118,19 +117,8 @@ public class Saving {
                     try {
                         handleImagePayload(snapContext, param);
                     } catch (Exception e) {
-                        Logger.log("Exception handling Image Payload", e);
+                        Logger.log("Exception handling Image Payload", e, LogType.SAVING);
                     }
-                }
-            });
-
-            findAndHookMethod(Obfuscator.save.STORY_DETAILS_PACKET, cl, Obfuscator.save.SDP_GET_ENUM_METHOD, String.class, Object.class, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    super.beforeHookedMethod(param);
-
-                    String key = (String) param.args[0];
-                    if (key.equals("auto_advance_mode"))
-                        param.args[1] = enum_NO_AUTO_ADVANCE;
                 }
             });
 
@@ -150,19 +138,18 @@ public class Saving {
                             else if (Preferences.getInt(Prefs.SAVEMODE_STORY) == Preferences.SAVE_F2S)
                                 gestureEvent = new FlingSaveGesture();
                             else {
-                                Logger.log("No gesture method provided");
+                                Logger.log("No gesture method provided", LogType.SAVING);
                                 return;
                             }
                         }
 
-                        Logger.log("Dispatching touch event");
                         String mKey = (String) getAdditionalInstanceField(param.thisObject, "mKey");
 
                         if (mKey != null) {
                             if (gestureEvent.onTouch((FrameLayout) param.thisObject, (MotionEvent) param.args[0], SnapType.STORY) ==
                                     GestureEvent.ReturnType.TAP) {
                                 gestureCalledInternally = true;
-                                Logger.log("Performed TAP?");
+                                Logger.log("Performed TAP?", LogType.SAVING);
                                 param.setResult(callMethod(param.thisObject, "dispatchTouchEvent", param.args[0]));
                             } else
                                 param.setResult(true);
@@ -178,7 +165,7 @@ public class Saving {
                         @Override
                         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                             super.beforeHookedMethod(param);
-                            Log.d("snapprefs", "### START StoryViewerMediaCache ###");
+                            Logger.log("### START StoryViewerMediaCache ###", LogType.SAVING);
                             Object godPacket = param.args[1];
                             Object storyList = getObjectField(param.thisObject, Obfuscator.save.SVMC_STORYLIST_OBJECT);
                             String POSTER_USERNAME = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "POSTER_USERNAME");
@@ -186,14 +173,14 @@ public class Saving {
                             Object storySnap = callMethod(storyList, Obfuscator.save.SDP_GET_OBJECT, POSTER_USERNAME, CLIENT_ID);
 
                             if (storySnap == null) {
-                                Logger.log("Null storysnap?");
+                                Logger.log("Null storysnap?", LogType.SAVING);
                                 return;
                             }
 
                             String storyUsername = (String) callMethod(godPacket, Obfuscator.save.SDP_GET_STRING, "POSTER_USERNAME");
 
                             if (storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader))) {
-                                Logger.log("Story is yours");
+                                Logger.log("Story is yours", LogType.SAVING);
                                 return;
                             }
 
@@ -217,9 +204,9 @@ public class Saving {
                             }
 
                             setAdditionalInstanceField(view, "StorySnap", storySnap);
-                            Log.d("snapprefs", "StoryViewerMediaCache.a : KEY " + getObjectField(storySnap, "mId"));
-                            Log.d("snapprefs", "Str: " + param.args[0]);
-                            Log.d("snapprefs", "### END StoryViewerMediaCache ###");
+                            Logger.log("StoryViewerMediaCache.a : KEY " + getObjectField(storySnap, "mId"), LogType.SAVING);
+                            Logger.log("Str: " + param.args[0], LogType.SAVING);
+                            Logger.log("### END StoryViewerMediaCache ###", LogType.SAVING);
                         }
                     });
 
@@ -231,18 +218,18 @@ public class Saving {
                     Object storySnap = getAdditionalInstanceField(param.args[0], "StorySnap");
 
                     if (storySnap != null) {
-                        Log.d("snapprefs", "### START gC <INIT> ###");
+                        Logger.log("### START gC <INIT> ###", LogType.SAVING);
 
                         String storyUsername = (String) getObjectField(storySnap, "mUsername");
 
                         if (storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader))) {
-                            Logger.log("Story is yours");
+                            Logger.log("Story is yours", LogType.SAVING);
                             return;
                         }
 
                         setAdditionalInstanceField(param.thisObject, "StorySnap", storySnap);
-                        Log.d("snapprefs", "Key: " + getObjectField(storySnap, "mId"));
-                        Log.d("snapprefs", "### END gC <INIT> ###");
+                        Logger.log("Key: " + getObjectField(storySnap, "mId"), LogType.SAVING);
+                        Logger.log("### END gC <INIT> ###", LogType.SAVING);
                     }
 
                 }
@@ -252,19 +239,19 @@ public class Saving {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
-                    Log.d("snapprefs", "asT.i");
+                    Logger.log("asT.i", LogType.SAVING);
 
                     Object storySnap = param.args[0];
 
                     if (storySnap == null) {
-                        Log.d("snapprefs", "Null StorySnap");
+                        Logger.log("Null StorySnap", LogType.SAVING);
                         return;
                     }
 
                     String storyUsername = (String) getObjectField(storySnap, "mUsername");
 
                     if (storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader))) {
-                        Logger.log("Story is yours");
+                        Logger.log("Story is yours", LogType.SAVING);
                         return;
                     }
 
@@ -282,19 +269,19 @@ public class Saving {
                         return;
                     }
 
-                    Log.d("snapprefs", "### START gC onResourceReady ###");
+                    Logger.log("### START gC onResourceReady ###", LogType.SAVING);
 
                     Object image = param.args[0];
 
                     if (!(image instanceof Bitmap)) {
-                        Log.d("snapprefs", "### RETURNED gC onResourceReady - Not bitmap ###");
+                        Logger.log("### RETURNED gC onResourceReady - Not bitmap ###", LogType.SAVING);
                         return;
                     }
 
                     String storyUsername = (String) getObjectField(storySnap, "mUsername");
 
                     if (storyUsername.equals(HookMethods.getSCUsername(lpparam.classLoader))) {
-                        Logger.log("Story is yours");
+                        Logger.log("Story is yours", LogType.SAVING);
                         return;
                     }
 
@@ -316,14 +303,14 @@ public class Saving {
 
                     boolean isBeingViewed = (boolean) param.args[0];
 
-                    Logger.log("Viewing snap: " + isBeingViewed);
+                    Logger.log("Viewing snap: " + isBeingViewed, LogType.SAVING);
                     if (isBeingViewed) {
                         Object obj = param.thisObject;
 
                         try {
                             handleSnapHeader(snapContext, obj);
                         } catch (Exception e) {
-                            Logger.log("Exception handling HEADER\n" + e.getMessage());
+                            Logger.log("Exception handling HEADER", e, LogType.SAVING);
                         }
                     }
                 }
@@ -336,7 +323,7 @@ public class Saving {
                         if (Preferences.getBool(Prefs.SAVE_SENT_SNAPS))
                             handleSentSnap(param.thisObject, snapContext);
                     } catch (Exception e) {
-                        Logger.log("Error getting sent media", e);
+                        Logger.log("Error getting sent media", e, LogType.SAVING);
                     }
                 }
             });
@@ -347,23 +334,46 @@ public class Saving {
              */
 
             // UPDATED METHOD & CONTENT 9.39.5
-            findAndHookMethod(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader, Obfuscator.save.RECEIVEDSNAP_DISPLAYTIME, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    //Logger.afterHook("RECEIVEDSNAP - DisplayTime");
-                    Double currentResult = (Double) param.getResult();
-                    if (Preferences.getBool(Prefs.TIMER_UNLIMITED)) {
-                        findAndHookMethod(Obfuscator.save.CLASS_SNAP_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_SNAPTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
-                        param.setResult((double) 9999.9F);
-                    } else {
-                        if ((double) Preferences.getInt(Prefs.TIMER_MINIMUM) !=
-                                Preferences.TIMER_MINIMUM_DISABLED &&
-                                currentResult < (double) Preferences.getInt(Prefs.TIMER_MINIMUM)) {
-                            param.setResult((double) Preferences.getInt(Prefs.TIMER_MINIMUM));
+            if (Preferences.getBool(Prefs.TIMER_UNLIMITED) || Preferences.getInt(Prefs.TIMER_MINIMUM) !=
+                    Preferences.TIMER_MINIMUM_DISABLED) {
+
+                findAndHookMethod(Obfuscator.save.STORY_DETAILS_PACKET, cl, Obfuscator.save.SDP_GET_ENUM_METHOD, String.class, Object.class, new XC_MethodHook() {
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        super.beforeHookedMethod(param);
+
+                        String key = (String) param.args[0];
+                        //Logger.log("aGgkey: " + key);
+                        if (Preferences.getBool(Prefs.TIMER_UNLIMITED) && key.equals("auto_advance_mode"))
+                            param.args[1] = enum_NO_AUTO_ADVANCE;
+                        else if (Preferences.getInt(Prefs.TIMER_MINIMUM) !=
+                                Preferences.TIMER_MINIMUM_DISABLED && key.equals("total_duration_sec")) {
+                            param.args[1] = 9999;
                         }
                     }
-                }
-            });
+                });
+
+                findAndHookMethod(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader, Obfuscator.save.RECEIVEDSNAP_DISPLAYTIME, new XC_MethodHook() {
+                    @Override
+                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                        //Logger.afterHook("RECEIVEDSNAP - DisplayTime");
+                        Double currentResult = (Double) param.getResult();
+                        Logger.log("Starting with viewtime: " + currentResult, LogType.SAVING);
+
+                        if (Preferences.getBool(Prefs.TIMER_UNLIMITED)) {
+                            findAndHookMethod(Obfuscator.save.CLASS_SNAP_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_SNAPTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
+                            param.setResult((double) 9999.9F);
+                        } else {
+                            if (Preferences.getInt(Prefs.TIMER_MINIMUM) !=
+                                    Preferences.TIMER_MINIMUM_DISABLED &&
+                                    currentResult < (double) Preferences.getInt(Prefs.TIMER_MINIMUM)) {
+                                param.setResult((double) Preferences.getInt(Prefs.TIMER_MINIMUM));
+                            }
+                        }
+                    }
+                });
+            }
+
             if (Preferences.getBool(Prefs.HIDE_TIMER_SNAP)) {
                 // UPDATED METHOD & CONTENT
                 findAndHookMethod(Obfuscator.save.CLASS_SNAP_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_SNAPTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
@@ -389,6 +399,7 @@ public class Saving {
                     }
                 });
             }
+
             //List<Bitmap> a = this.i.a(this.F.g(), ProfileImageSize.MEDIUM);
             // UPDATED METHOD & CONTENT 9.39.5
             findAndHookMethod(Obfuscator.save.CLASS_FRIEND_MINI_PROFILE_POPUP_FRAGMENT, lpparam.classLoader, Obfuscator.save.FRIEND_MINI_PROFILE_POPUP_GET_CACHED_PROFILE_PICTURES, new XC_MethodHook() {
@@ -412,19 +423,19 @@ public class Saving {
                             List<Bitmap> profileImages = (List<Bitmap>) callMethod(i, Obfuscator.save.PROFILE_IMAGES_CACHE_GET_PROFILE_IMAGES, new Class[]{String.class, profileImageSizeClass}, username, MEDIUM);
                             String filePath = SavingUtils.generateFilePath("ProfileImages", username);
                             if (Preferences.getBool(Prefs.DEBUGGING)) {
-                                Logger.printTitle("Profile Image Saving Debug Information");
-                                Logger.printMessage("Profile Image Size Inner Class: " + profileImageSizeClass);
-                                Logger.printMessage("friendObject: " + friendObject);
-                                Logger.printMessage("Medium: " + MEDIUM);
-                                Logger.printMessage("'i' Object: " + i);
-                                Logger.printMessage("profileImages List Object: " + profileImages);
-                                Logger.printFilledRow();
+                                Logger.printTitle("Profile Image Saving Debug Information", LogType.SAVING);
+                                Logger.printMessage("Profile Image Size Inner Class: " + profileImageSizeClass, LogType.SAVING);
+                                Logger.printMessage("friendObject: " + friendObject, LogType.SAVING);
+                                Logger.printMessage("Medium: " + MEDIUM, LogType.SAVING);
+                                Logger.printMessage("'i' Object: " + i, LogType.SAVING);
+                                Logger.printMessage("profileImages List Object: " + profileImages, LogType.SAVING);
+                                Logger.printFilledRow(LogType.SAVING);
 
-                                Logger.printTitle("Profile Image Saving Save Path Debug Information");
-                                Logger.printMessage("Sort by Category Pref: " + Preferences.getBool(Prefs.SORT_BY_CATEGORY));
-                                Logger.printMessage("Sort by Username Pref: " + Preferences.getBool(Prefs.SORT_BY_USERNAME));
-                                Logger.printMessage("File Path: " + filePath);
-                                Logger.printFilledRow();
+                                Logger.printTitle("Profile Image Saving Save Path Debug Information", LogType.SAVING);
+                                Logger.printMessage("Sort by Category Pref: " + Preferences.getBool(Prefs.SORT_BY_CATEGORY), LogType.SAVING);
+                                Logger.printMessage("Sort by Username Pref: " + Preferences.getBool(Prefs.SORT_BY_USERNAME), LogType.SAVING);
+                                Logger.printMessage("File Path: " + filePath, LogType.SAVING);
+                                Logger.printFilledRow(LogType.SAVING);
                             }
                             final File profileImagesFolder = new File(filePath);
                             if (!profileImagesFolder.mkdirs() && !profileImagesFolder.exists()) {
@@ -513,26 +524,26 @@ public class Saving {
     // UPDATED 9.39.5
     private static void handleSentSnap(Object snapPreviewFragment, Context snapContext) {
         try {
-            Logger.printTitle("Handling SENT snap");
+            Logger.printTitle("Handling SENT snap", LogType.SAVING);
             Activity activity = (Activity) callMethod(snapPreviewFragment, "getActivity");
             Object snapEditorView = getObjectField(snapPreviewFragment, Obfuscator.save.OBJECT_SNAP_EDITOR_VIEW);
             Object mediaBryo = getObjectField(snapEditorView, Obfuscator.save.OBJECT_MEDIABRYO);
 
             if (mediaBryo == null) {
-                Logger.printFinalMessage("MediaBryo not assigned - Halting process");
+                Logger.printFinalMessage("MediaBryo not assigned - Halting process", LogType.SAVING);
                 return;
             }
 
             String mKey = (String) getObjectField(mediaBryo, Obfuscator.save.OBJECT_MCLIENTID);
-            Logger.printMessage("mKey: " + mKey);
+            Logger.printMessage("mKey: " + mKey, LogType.SAVING);
 
             SnapData snapData = hashSnapData.get(mKey);
 
             if (snapData != null && !snapData.hasFlag(FlagState.FAILED)) {
-                Logger.printFinalMessage("Snap already handled");
+                Logger.printFinalMessage("Snap already handled", LogType.SAVING);
                 return;
             } else if (snapData == null) {
-                Logger.printMessage("SnapData not found - Creating new");
+                Logger.printMessage("SnapData not found - Creating new", LogType.SAVING);
                 snapData = new SnapData(mKey);
                 snapData.setSnapType(SnapType.SENT);
                 hashSnapData.put(mKey, snapData);
@@ -542,11 +553,11 @@ public class Saving {
             String filename = dateFormatSent.format(new Date());
             String bryoName = mediaBryo.getClass().getCanonicalName();
 
-            Logger.printMessage("Saving with filename: " + filename);
-            Logger.printMessage("MediaBryo Type: " + bryoName);
+            Logger.printMessage("Saving with filename: " + filename, LogType.SAVING);
+            Logger.printMessage("MediaBryo Type: " + bryoName, LogType.SAVING);
 
             if (bryoName.equals(Obfuscator.save.CLASS_MEDIABRYO_VIDEO)) {
-                Logger.printMessage("Media Type: VIDEO");
+                Logger.printMessage("Media Type: VIDEO", LogType.SAVING);
                 Uri uri = (Uri) getObjectField(mediaBryo, Obfuscator.save.OBJECT_MVIDEOURI);
 
                 if (uri == null)
@@ -558,44 +569,44 @@ public class Saving {
 
                     if (matcher.find()) {
                         try {
-                            Logger.printMessage("Original filename: " + matcher.group(0));
+                            Logger.printMessage("Original filename: " + matcher.group(0), LogType.SAVING);
                         } catch (IndexOutOfBoundsException ignore) {
-                            Logger.printMessage("Original filename: " + uri.getPath());
+                            Logger.printMessage("Original filename: " + uri.getPath(), LogType.SAVING);
                         }
                     } else
-                        Logger.printMessage("Original filename: " + uri.getPath());
+                        Logger.printMessage("Original filename: " + uri.getPath(), LogType.SAVING);
 
-                    Logger.printMessage("Uri valid - Trying to save");
+                    Logger.printMessage("Uri valid - Trying to save", LogType.SAVING);
                     FileInputStream videoStream = new FileInputStream(uri.getPath());
                     response = saveSnap(SnapType.SENT, MediaType.VIDEO,
                             snapContext, null, videoStream, filename, null);
                 }
             } else if (bryoName.equals(Obfuscator.save.SNAPIMAGEBRYO_CLASS)) {
-                Logger.printMessage("Media Type: IMAGE");
+                Logger.printMessage("Media Type: IMAGE", LogType.SAVING);
                 Bitmap bmp = (Bitmap) callMethod(snapEditorView, Obfuscator.save.METHOD_GET_SENT_BITMAP, activity, true);
                 if (bmp != null) {
-                    Logger.printMessage("Sent image found - Trying to save");
+                    Logger.printMessage("Sent image found - Trying to save", LogType.SAVING);
                     response = saveSnap(SnapType.SENT, MediaType.IMAGE,
                             snapContext, bmp, null, filename, null);
                 }
             }
 
             if (response == null) {
-                Logger.printMessage("Response not assigned - Assumed failed");
+                Logger.printMessage("Response not assigned - Assumed failed", LogType.SAVING);
                 response = SaveResponse.FAILED;
             }
 
             snapData.getFlags().clear();
             if (response == SaveResponse.SUCCESS) {
-                Logger.printFinalMessage("Saved sent snap");
+                Logger.printFinalMessage("Saved sent snap", LogType.SAVING);
                 createStatefulToast("Saved send snap", ToastType.GOOD);
                 snapData.addFlag(FlagState.SAVED);
             } else if (response == SaveResponse.FAILED) {
-                Logger.printFinalMessage("Error saving snap");
+                Logger.printFinalMessage("Error saving snap", LogType.SAVING);
                 createStatefulToast("Error saving snap", ToastType.BAD);
                 snapData.addFlag(FlagState.FAILED);
             } else {
-                Logger.printFinalMessage("Unhandled save response");
+                Logger.printFinalMessage("Unhandled save response", LogType.SAVING);
                 createStatefulToast("Unhandled save response", ToastType.WARNING);
             }
         } catch (Exception e) {
@@ -605,7 +616,7 @@ public class Saving {
 
     public static void performS2SSave() {
         SnapData currentSnapData = null;
-        Logger.printTitle("Launching S2S");
+        Logger.printTitle("Launching S2S", LogType.SAVING);
         if (currentSnapKey != null) {
             currentSnapData = hashSnapData.get(currentSnapKey);
 
@@ -613,18 +624,18 @@ public class Saving {
                 if (currentSnapData.getSnapType() == SnapType.STORY &&
                         Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_S2S &&
                         Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_F2S) {
-                    Logger.printFinalMessage("Tried to perform story S2S from different mode");
+                    Logger.printFinalMessage("Tried to perform story S2S from different mode", LogType.SAVING);
                     return;
                 } else if (currentSnapData.getSnapType() == SnapType.SNAP &&
                         Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_S2S &&
                         Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_F2S) {
-                    Logger.printFinalMessage("Tried to perform snap S2S from different mode");
+                    Logger.printFinalMessage("Tried to perform snap S2S from different mode", LogType.SAVING);
                     return;
                 }
             }
         }
 
-        Logger.printMessage("SnapData set: " + (currentSnapData != null));
+        Logger.printMessage("SnapData set: " + (currentSnapData != null), LogType.SAVING);
         performManualSnapDataSave(currentSnapData, relativeContext);
     }
 
@@ -636,37 +647,37 @@ public class Saving {
 
     public static void performButtonSave(String mKey) {
         SnapData currentSnapData = null;
-        Logger.printTitle("Launching BUTTON Save");
+        Logger.printTitle("Launching BUTTON Save", LogType.SAVING);
 
         if (mKey != null) {
-            Logger.log("Checking key: " + mKey);
+            Logger.printMessage("Checking key: " + mKey, LogType.SAVING);
             currentSnapData = hashSnapData.get(mKey);
 
             if (currentSnapData != null && currentSnapData.getSnapType() != null && relativeContext != null) {
                 if (currentSnapData.getSnapType() == SnapType.STORY &&
                         Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_BUTTON) {
-                    Logger.printFinalMessage("Tried to perform story button save from different mode");
+                    Logger.printFinalMessage("Tried to perform story button save from different mode", LogType.SAVING);
                     return;
                 } else if (currentSnapData.getSnapType() == SnapType.SNAP
                         && Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_BUTTON) {
-                    Logger.printFinalMessage("Tried to perform snap button save from different mode");
+                    Logger.printFinalMessage("Tried to perform snap button save from different mode", LogType.SAVING);
                     return;
                 }
             }
         }
 
-        Logger.printMessage("SnapData set: " + (currentSnapData != null));
+        Logger.printMessage("SnapData set: " + (currentSnapData != null), LogType.SAVING);
         performManualSnapDataSave(currentSnapData, relativeContext);
     }
 
     private static void performManualSnapDataSave(SnapData snapData, Context context) {
         if (snapData != null && context != null) {
-            Logger.printMessage("Found SnapData to save");
-            Logger.printMessage("Key: " + snapData.getmKey());
-            Logger.printMessage("Sender: " + obfus(snapData.getStrSender()));
-            Logger.printMessage("Timestamp: " + snapData.getStrTimestamp());
-            Logger.printMessage("SnapType: " + snapData.getSnapType());
-            Logger.printMessage("MediaType: " + snapData.getMediaType());
+            Logger.printMessage("Found SnapData to save", LogType.SAVING);
+            Logger.printMessage("Key: " + snapData.getmKey(), LogType.SAVING);
+            Logger.printMessage("Sender: " + obfus(snapData.getStrSender()), LogType.SAVING);
+            Logger.printMessage("Timestamp: " + snapData.getStrTimestamp(), LogType.SAVING);
+            Logger.printMessage("SnapType: " + snapData.getSnapType(), LogType.SAVING);
+            Logger.printMessage("MediaType: " + snapData.getMediaType(), LogType.SAVING);
             printFlags(snapData);
 
             try {
@@ -680,15 +691,15 @@ public class Saving {
                 } else {
                     if (snapData.hasFlag(FlagState.SAVED)) {
                         createStatefulToast("Snap recently saved", ToastType.WARNING);
-                        Logger.printFinalMessage("Snap recently saved");
+                        Logger.printFinalMessage("Snap recently saved", LogType.SAVING);
                     }
                 }
             } catch (Exception e) {
-                Logger.printFinalMessage("Exception saving snap");
+                Logger.printFinalMessage("Exception saving snap", LogType.SAVING);
                 createStatefulToast("Code exception saving snap", ToastType.BAD);
             }
         } else {
-            Logger.printFinalMessage("No SnapData to save");
+            Logger.printFinalMessage("No SnapData to save", LogType.SAVING);
             createStatefulToast("No SnapData to save", ToastType.WARNING);
         }
     }
@@ -696,8 +707,8 @@ public class Saving {
     //UPDATED to 9.39.5
     private static void handleSnapHeader(Context context, Object receivedSnap) throws Exception {
 
-        Logger.printTitle("Handling SnapData HEADER");
-        Logger.printMessage("Header object: " + receivedSnap.getClass().getCanonicalName());
+        Logger.printTitle("Handling SnapData HEADER", LogType.SAVING);
+        Logger.printMessage("Header object: " + receivedSnap.getClass().getCanonicalName(), LogType.SAVING);
 
         String mId = (String) getObjectField(receivedSnap, Obfuscator.save.OBJECT_MID);
 
@@ -713,11 +724,11 @@ public class Saving {
                 snapType = SnapType.SNAP;
                 break;
             default:
-                Logger.log("Obfuscator out of date for SnapType in SAVING CLASS");
+                Logger.printFinalMessage("Obfuscator out of date for SnapType in SAVING CLASS", LogType.SAVING);
                 return;
         }
 
-        Logger.printMessage("SnapType: " + snapType.name);
+        Logger.printMessage("SnapType: " + snapType.name, LogType.SAVING);
 
         String mKey = mId;
         String strSender;
@@ -728,32 +739,32 @@ public class Saving {
         } else
             strSender = (String) getObjectField(receivedSnap, "mUsername");
 
-        Logger.printMessage("Key: " + mKey);
-        Logger.printMessage("Sender: " + obfus(strSender));
+        Logger.printMessage("Key: " + mKey, LogType.SAVING);
+        Logger.printMessage("Sender: " + obfus(strSender), LogType.SAVING);
 
         SnapData snapData = hashSnapData.get(mKey);
 
         printFlags(snapData);
 
         if (snapData != null && scanForExisting(snapData, FlagState.HEADER)) {
-            Logger.printFinalMessage("Existing SnapData with HEADER found");
+            Logger.printFinalMessage("Existing SnapData with HEADER found", LogType.SAVING);
             return;
         } else if (snapData == null) {
             // If the snapdata doesn't exist, create a new one with the provided mKey
-            Logger.printMessage("No SnapData found for Header... Creating new");
+            Logger.printMessage("No SnapData found for Header... Creating new", LogType.SAVING);
             snapData = new SnapData(mKey);
             hashSnapData.put(mKey, snapData);
-            Logger.printMessage("Hash Size: " + hashSnapData.size());
+            Logger.printMessage("Hash Size: " + hashSnapData.size(), LogType.SAVING);
         }
 
         long lngTimestamp = (Long) callMethod(receivedSnap, Obfuscator.save.SNAP_GETTIMESTAMP);
         Date timestamp = new Date(lngTimestamp);
         String strTimestamp = dateFormat.format(timestamp);
 
-        Logger.printMessage("Timestamp: " + strTimestamp);
+        Logger.printMessage("Timestamp: " + strTimestamp, LogType.SAVING);
 
         snapData.setHeader(mId, mKey, strSender, strTimestamp, snapType);
-        Logger.printMessage("Header attached");
+        Logger.printMessage("Header attached", LogType.SAVING);
 
         if (shouldAutoSave(snapData)) {
             snapData.addFlag(FlagState.PROCESSING);
@@ -762,7 +773,7 @@ public class Saving {
             else
                 handleSave(context, snapData);
         } else {
-            Logger.printFinalMessage("Not saving this round");
+            Logger.printFinalMessage("Not saving this round", LogType.SAVING);
             printFlags(snapData);
             currentSnapKey = snapData.getmKey();
             relativeContext = context;
@@ -780,13 +791,13 @@ public class Saving {
     private static void handleVideoPayload(Context context, XC_MethodHook.MethodHookParam param)
             throws Exception {
 
-        Logger.printTitle("Handling VIDEO Payload");
+        Logger.printTitle("Handling VIDEO Payload", LogType.SAVING);
 
         // Grab the MediaCache - Class: ahm
         Object mCache = param.args[0];
 
         if (mCache == null) {
-            Logger.printFinalMessage("Null Cache passed");
+            Logger.printFinalMessage("Null Cache passed", LogType.SAVING);
             return;
         }
 
@@ -794,12 +805,12 @@ public class Saving {
         String mKey = (String) param.args[1];
 
         if (mKey == null) {
-            Logger.printFinalMessage("Null Key passed");
+            Logger.printFinalMessage("Null Key passed", LogType.SAVING);
             return;
         }
 
         String parsedKey = StringUtils.stripKey(mKey);
-        Logger.printMessage("Key: " + parsedKey);
+        Logger.printMessage("Key: " + parsedKey, LogType.SAVING);
 
         // Grab the Key to Item Map (Contains file paths)
         @SuppressWarnings("unchecked")
@@ -807,7 +818,7 @@ public class Saving {
                 (Map<String, Object>) getObjectField(mCache, Obfuscator.save.CACHE_KEYTOITEMMAP);
 
         if (mKeyToItemMap == null) {
-            Logger.printFinalMessage("Mkey-Item Map not found");
+            Logger.printFinalMessage("Mkey-Item Map not found", LogType.SAVING);
             return;
         }
 
@@ -815,8 +826,8 @@ public class Saving {
         Object item = mKeyToItemMap.get(mKey);
 
         if (item == null) {
-            Logger.printMessage("Item not found with key:");
-            Logger.printFinalMessage(mKey);
+            Logger.printMessage("Item not found with key:", LogType.SAVING);
+            Logger.printFinalMessage(mKey, LogType.SAVING);
             return;
         }
 
@@ -824,7 +835,7 @@ public class Saving {
         String mAbsoluteFilePath = (String) getObjectField(item, Obfuscator.save.CACHE_ITEM_PATH);
 
         if (mAbsoluteFilePath == null) {
-            Logger.printFinalMessage("No path object found");
+            Logger.printFinalMessage("No path object found", LogType.SAVING);
             return;
         }
 
@@ -835,12 +846,12 @@ public class Saving {
 
         if (matcher.find()) {
             try {
-                Logger.printMessage("Path: " + matcher.group(0));
+                Logger.printMessage("Path: " + matcher.group(0), LogType.SAVING);
             } catch (IndexOutOfBoundsException ignore) {
-                Logger.printMessage("Path: " + mAbsoluteFilePath);
+                Logger.printMessage("Path: " + mAbsoluteFilePath, LogType.SAVING);
             }
         } else
-            Logger.printMessage("Path: " + mAbsoluteFilePath);
+            Logger.printMessage("Path: " + mAbsoluteFilePath, LogType.SAVING);
 
         // Get the snapdata associated with the mKey above
         SnapData snapData = hashSnapData.get(parsedKey);
@@ -850,14 +861,14 @@ public class Saving {
 
         // Check if the snapdata exists and whether it has already been handled
         if (snapData != null && scanForExisting(snapData, FlagState.PAYLOAD)) {
-            Logger.printFinalMessage("Tried to modify existing data");
+            Logger.printFinalMessage("Tried to modify existing data", LogType.SAVING);
             return;
         } else if (snapData == null) {
             // If the snapdata doesn't exist, create a new one with the provided mKey
-            Logger.printMessage("No SnapData found for Payload... Creating new");
+            Logger.printMessage("No SnapData found for Payload... Creating new", LogType.SAVING);
             snapData = new SnapData(parsedKey);
             hashSnapData.put(parsedKey, snapData);
-            Logger.printMessage("Hash Size: " + hashSnapData.size());
+            Logger.printMessage("Hash Size: " + hashSnapData.size(), LogType.SAVING);
         }
 
         // Get the stream using the filepath provided
@@ -865,7 +876,7 @@ public class Saving {
 
         // Assign the payload to the snapdata
         snapData.setPayload(video);
-        Logger.printMessage("Successfully attached payload");
+        Logger.printMessage("Successfully attached payload", LogType.SAVING);
 
         // If set to button saving, do not save
         if (shouldAutoSave(snapData)) {
@@ -875,7 +886,7 @@ public class Saving {
             else
                 handleSave(context, snapData);
         } else
-            Logger.printFinalMessage("Not saving this round");
+            Logger.printFinalMessage("Not saving this round", LogType.SAVING);
     }
 
     /**
@@ -900,17 +911,17 @@ public class Saving {
 
     private static void handleImagePayload(Context context, String mKey, Bitmap originalBmp)
             throws Exception {
-        Logger.printTitle("Handling IMAGE Payload");
+        Logger.printTitle("Handling IMAGE Payload", LogType.SAVING);
 
         if (mKey == null) {
-            Logger.printFinalMessage("Image Payload Null Key");
+            Logger.printFinalMessage("Image Payload Null Key", LogType.SAVING);
             return;
         } else if (originalBmp == null) {
-            Logger.printFinalMessage("Tried to attach Null Bitmap");
+            Logger.printFinalMessage("Tried to attach Null Bitmap", LogType.SAVING);
             return;
         }
 
-        Logger.printMessage("Key: " + mKey);
+        Logger.printMessage("Key: " + mKey, LogType.SAVING);
         // Find the snapData associated with the mKey
         SnapData snapData = hashSnapData.get(mKey);
 
@@ -919,17 +930,17 @@ public class Saving {
 
         // Check if the snapData has been processed
         if (snapData != null && scanForExisting(snapData, FlagState.PAYLOAD)) {
-            Logger.printFinalMessage("Tried to modify existing data");
+            Logger.printFinalMessage("Tried to modify existing data", LogType.SAVING);
             return;
         } else if (snapData == null) {
-            Logger.printMessage("No SnapData found for Payload... Creating new");
+            Logger.printMessage("No SnapData found for Payload... Creating new", LogType.SAVING);
             snapData = new SnapData(mKey);
             hashSnapData.put(mKey, snapData);
-            Logger.printMessage("Hash Size: " + hashSnapData.size());
+            Logger.printMessage("Hash Size: " + hashSnapData.size(), LogType.SAVING);
         }
 
         if (originalBmp.isRecycled()) {
-            Logger.printFinalMessage("Bitmap is already recycled");
+            Logger.printFinalMessage("Bitmap is already recycled", LogType.SAVING);
             snapData.addFlag(FlagState.FAILED);
             createStatefulToast("Error saving image", ToastType.BAD);
             return;
@@ -937,11 +948,11 @@ public class Saving {
 
         Bitmap bmp = originalBmp.copy(Bitmap.Config.ARGB_8888, false);
 
-        Logger.printMessage("Pulled Bitmap");
+        Logger.printMessage("Pulled Bitmap", LogType.SAVING);
 
         // Assign the payload to the snapData
         snapData.setPayload(bmp);
-        Logger.printMessage("Successfully attached payload");
+        Logger.printMessage("Successfully attached payload", LogType.SAVING);
 
         if (shouldAutoSave(snapData)) {
             snapData.addFlag(FlagState.PROCESSING);
@@ -950,47 +961,47 @@ public class Saving {
             else
                 handleSave(context, snapData);
         } else
-            Logger.printFinalMessage("Not saving this round");
+            Logger.printFinalMessage("Not saving this round", LogType.SAVING);
     }
 
     private static boolean shouldAutoSave(SnapData snapData) {
-        Logger.printMessage("Performing saving checks");
+        Logger.printMessage("Performing saving checks", LogType.SAVING);
         if (!snapData.hasFlag(FlagState.COMPLETED)) {
-            Logger.printMessage("COMPLETED flag not assigned");
+            Logger.printMessage("COMPLETED flag not assigned", LogType.SAVING);
             return false;
         }
 
-        Logger.printMessage("COMPLETED flag is assigned");
+        Logger.printMessage("COMPLETED flag is assigned", LogType.SAVING);
 
         if (snapData.getSnapType() == null) {
-            Logger.printMessage("Header not assigned");
+            Logger.printMessage("Header not assigned", LogType.SAVING);
             snapData.removeFlag(FlagState.COMPLETED);
             snapData.removeFlag(FlagState.HEADER);
             return false;
         }
 
-        Logger.printMessage("Passed header check");
+        Logger.printMessage("Passed header check", LogType.SAVING);
 
         if (snapData.getPayload() == null) {
-            Logger.printMessage("Payload not assigned");
+            Logger.printMessage("Payload not assigned", LogType.SAVING);
             snapData.removeFlag(FlagState.PAYLOAD);
             snapData.removeFlag(FlagState.COMPLETED);
             return false;
         }
 
-        Logger.printMessage("Passed payload checks");
+        Logger.printMessage("Passed payload checks", LogType.SAVING);
 
         if (snapData.getSnapType() == SnapType.SNAP &&
                 Preferences.getInt(Prefs.SAVEMODE_SNAP) != Preferences.SAVE_AUTO) {
-            Logger.printMessage("Snap save mode check failed");
+            Logger.printMessage("Snap save mode check failed", LogType.SAVING);
             return false;
         } else if (snapData.getSnapType() == SnapType.STORY &&
                 Preferences.getInt(Prefs.SAVEMODE_STORY) != Preferences.SAVE_AUTO) {
-            Logger.printMessage("Story save mode check failed");
+            Logger.printMessage("Story save mode check failed", LogType.SAVING);
             return false;
         }
 
-        Logger.printMessage("Save checks passed, moving on");
+        Logger.printMessage("Save checks passed, moving on", LogType.SAVING);
         return true;
     }
 
@@ -1017,7 +1028,7 @@ public class Saving {
     private static void handleSave(Context context, SnapData snapData) throws Exception {
         // Ensure snapData is ready for saving
         if (snapData.hasFlag(FlagState.COMPLETED)) {
-            Logger.printMessage("Saving Snap");
+            Logger.printMessage("Saving Snap", LogType.SAVING);
 
             // Attempt to save the snap
             SaveResponse saveResponse = saveReceivedSnap(context, snapData);
@@ -1028,7 +1039,7 @@ public class Saving {
             // Handle the response from the save attempt
             switch (saveResponse) {
                 case SUCCESS: {
-                    Logger.printMessage("Wiping payload and adding SAVED flag");
+                    Logger.printMessage("Wiping payload and adding SAVED flag", LogType.SAVING);
 
                     // Wipe the payload to save memory
                     // Also assigns the SAVED flag to the snap
@@ -1037,11 +1048,11 @@ public class Saving {
 
                     createStatefulToast(snapData.getMediaType().typeName + " saved", ToastType.GOOD);
 
-                    Logger.printFinalMessage("Snap Saving Completed");
+                    Logger.printFinalMessage("Snap Saving Completed", LogType.SAVING);
                     return;
                 }
                 case FAILED: {
-                    Logger.printFinalMessage("Failed to save snap");
+                    Logger.printFinalMessage("Failed to save snap", LogType.SAVING);
 
                     // Assign a FAILED flag to the snap
                     // If the snap fails to save, a force close will likely be necessary
@@ -1058,14 +1069,14 @@ public class Saving {
                     return;
                 }
                 case ONGOING: {
-                    Logger.printFinalMessage("Handle save status ONGOING");
+                    Logger.printFinalMessage("Handle save status ONGOING", LogType.SAVING);
                     return;
                 }
                 case EXISTING: {
                     createStatefulToast(
                             snapData.getMediaType().typeName + " already exists", ToastType.WARNING);
 
-                    Logger.printMessage("Wiping payload and adding SAVED flag");
+                    Logger.printMessage("Wiping payload and adding SAVED flag", LogType.SAVING);
 
                     // Wipe the payload to save memory
                     // Also assigns the SAVED flag to the snap
@@ -1073,7 +1084,7 @@ public class Saving {
                     snapData.setSaved();
 
                     Logger.printFinalMessage(
-                            snapData.getMediaType().typeName + " already exists");
+                            snapData.getMediaType().typeName + " already exists", LogType.SAVING);
                 }
             }
         }
@@ -1089,16 +1100,16 @@ public class Saving {
         if (!printFlags)
             return;
 
-        Logger.printMessage("Flags:");
+        Logger.printMessage("Flags:", LogType.SAVING);
 
         if (snapData == null || snapData.getFlags().size() <= 0) {
-            Logger.printMessage("-  NONE  -");
+            Logger.printMessage("-  NONE  -", LogType.SAVING);
             return;
         }
 
         // Loop through the list of states and print them
         for (FlagState flagState : snapData.getFlags())
-            Logger.printMessage("-  " + flagState.toString() + "  -");
+            Logger.printMessage("-  " + flagState.toString() + "  -", LogType.SAVING);
     }
 
     /**
@@ -1114,16 +1125,16 @@ public class Saving {
 
         // Check if trying to save null snapData
         if (snapData == null) {
-            Logger.printMessage("Null SnapData");
+            Logger.printMessage("Null SnapData", LogType.SAVING);
             return SaveResponse.FAILED;
         } else if (!snapData.hasFlag(FlagState.COMPLETED)) {
             // If the snapData doesn't contains COMPLETED; Print out why and return
             String strMessage = snapData.hasFlag(FlagState.PAYLOAD) ? "PAYLOAD" :
                     "HEADER";
-            Logger.printMessage("Tried to save snap without assigned " + strMessage);
+            Logger.printMessage("Tried to save snap without assigned " + strMessage, LogType.SAVING);
             return SaveResponse.ONGOING;
         } else if (snapData.hasFlag(FlagState.SAVED)) {
-            Logger.printMessage("Tried to save a snap that has already been processed");
+            Logger.printMessage("Tried to save a snap that has already been processed", LogType.SAVING);
             return SaveResponse.EXISTING;
         }
 
@@ -1132,7 +1143,7 @@ public class Saving {
 
         // Check if it's null (Probably redundant)
         if (payload == null) {
-            Logger.printMessage("Attempted to save Null Payload");
+            Logger.printMessage("Attempted to save Null Payload", LogType.SAVING);
             return SaveResponse.FAILED;
         }
 
@@ -1140,13 +1151,13 @@ public class Saving {
 
         switch (snapData.getMediaType()) {
             case VIDEO: {
-                Logger.printMessage("Video " + snapData.getSnapType().name + " opened");
+                Logger.printMessage("Video " + snapData.getSnapType().name + " opened", LogType.SAVING);
 
                 return saveSnap(snapData.getSnapType(), MediaType.VIDEO, context, null,
                         (FileInputStream) payload, filename, snapData.getStrSender());
             }
             case IMAGE: {
-                Logger.printMessage("Image " + snapData.getSnapType().name + " opened");
+                Logger.printMessage("Image " + snapData.getSnapType().name + " opened", LogType.SAVING);
 
                 return saveSnap(snapData.getSnapType(), MediaType.IMAGE, context,
                         (Bitmap) payload, null, filename, snapData.getStrSender());
@@ -1162,7 +1173,7 @@ public class Saving {
                 break;
             }*/
             default: {
-                Logger.printMessage("Unknown MediaType");
+                Logger.printMessage("Unknown MediaType", LogType.SAVING);
                 return SaveResponse.FAILED;
             }
         }
@@ -1196,7 +1207,7 @@ public class Saving {
         if (mediaType == MediaType.IMAGE) {
             File imageFile = new File(directory, filename + MediaType.IMAGE.fileExtension);
             if (imageFile.exists()) {
-                Logger.printMessage("Image already exists: " + obfus(filename));
+                Logger.printMessage("Image already exists: " + obfus(filename), LogType.SAVING);
                 SavingUtils.vibrate(context, false);
                 return SaveResponse.EXISTING;
             }
@@ -1212,7 +1223,7 @@ public class Saving {
 
             if (Preferences.getBool(Prefs.OVERLAYS)) {
                 if (overlayFile.exists()) {
-                    Logger.printMessage("VideoOverlay already exists");
+                    Logger.printMessage("VideoOverlay already exists", LogType.SAVING);
                     SavingUtils.vibrate(context, false);
                     return SaveResponse.SUCCESS;
                 }
@@ -1227,7 +1238,7 @@ public class Saving {
             File videoFile = new File(directory, filename + MediaType.VIDEO.fileExtension);
 
             if (videoFile.exists()) {
-                Logger.printMessage("Video already exists");
+                Logger.printMessage("Video already exists", LogType.SAVING);
                 SavingUtils.vibrate(context, false);
                 return SaveResponse.EXISTING;
             }
@@ -1307,13 +1318,13 @@ public class Saving {
             Context context = (Context) params[0];
             SnapData snapData = (SnapData) params[1];
 
-            Logger.printMessage("Performing ASYNC save");
+            Logger.printMessage("Performing ASYNC save", LogType.SAVING);
 
             try {
                 Saving.handleSave(context, snapData);
                 return true;
             } catch (Exception e) {
-                Logger.log("Exception performing AsyncSave ", e);
+                Logger.log("Exception performing AsyncSave ", e, LogType.SAVING);
             }
             return false;
         }

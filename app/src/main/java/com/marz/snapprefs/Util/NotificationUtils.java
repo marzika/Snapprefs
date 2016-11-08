@@ -76,7 +76,7 @@ public class NotificationUtils {
         if (!Preferences.getBool(Prefs.TOAST_ENABLED))
             return;
 
-        if (Preferences.getBool(Prefs.STEALTH_NOTIFICATIONS))
+        if (Preferences.getBool(Prefs.STEALTH_NOTIFICATIONS) && Preferences.getLicence() < 2)
             showStealthToast(type);
         else {
             NotificationUtils.showMessage(
@@ -88,7 +88,7 @@ public class NotificationUtils {
     }
 
     private static void showStealthToast(ToastType type) {
-        if (statusDrawable == null)
+        if (Preferences.getLicence() < 2 || statusDrawable == null)
             return;
 
         final int offset = 20;

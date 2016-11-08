@@ -53,6 +53,7 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.AssignedStoryButton;
 import com.marz.snapprefs.Util.FlingSaveGesture;
@@ -326,7 +327,7 @@ public class HookedLayouts {
                 saveSnapButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Logger.printTitle("Performing Button Save");
+                        Logger.printTitle("Performing Button Save", LogType.SAVING);
                         Saving.performButtonSave();
                     }
                 });

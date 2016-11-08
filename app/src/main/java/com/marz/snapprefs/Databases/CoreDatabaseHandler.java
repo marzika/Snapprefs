@@ -18,7 +18,8 @@ import java.util.Iterator;
 import static com.marz.snapprefs.Databases.CoreDatabaseHandler.DBUtils.formatExclusionList;
 
 /**
- * Created by Andre on 23/09/2016.
+ * This class was created by Andre R M (SID: 701439)
+ * It and its contents are free to use by all
  */
 
 class CoreDatabaseHandler extends SQLiteOpenHelper {
