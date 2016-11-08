@@ -2,7 +2,7 @@ package com.marz.snapprefs;
 
 public final class Common {
     // Integer to be incremented for each build(To ensure proper hook checking)
-    public static final int MODULE_ENABLED_CHECK_INT = 14;
+    public static final int MODULE_ENABLED_CHECK_INT = 13;
     public static final int MODULE_STATUS_NOT_ACTIVATED = 0;
     public static final int MODULE_STATUS_NOT_RESTARTED = 1;
     public static final int MODULE_STATUS_ACTIVATED = 2;
