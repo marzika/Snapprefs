@@ -287,41 +287,34 @@ public class HookMethods
                 }
             });
 
-            // Temporarily hardcoded until @m1kep implements his cap selector
-            final int maxRecordTime = 30000;
+            findAndHookMethod(Obfuscator.timer.RECORDING_MESSAGE_HOOK_CLASS, lpparam.classLoader, Obfuscator.timer.RECORDING_MESSAGE_HOOK_METHOD, Message.class, new XC_MethodHook() {
+                boolean internallyCalled = false;
+                int maxRecordTime = Integer.parseInt(Preferences.getString(Prefs.MAX_RECORDING_TIME).trim()) * 1000;
+                @Override
+                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                    // If maxRecordTime is same as SC timecap, let SC perform as normal
+                    if (maxRecordTime > 10000) {
+                        super.beforeHookedMethod(param);
+                        Message message = (Message) param.args[0];
+                        Logger.log("HandleMessageId: " + message.what);
 
-            // If maxRecordTime is same as SC timecap, let SC perform as normal
-            if (maxRecordTime > 10000) {
-                try {
-                    findAndHookMethod("abc", lpparam.classLoader, "handleMessage", Message.class, new XC_MethodHook() {
-                        boolean internallyCalled = false;
+                        if (message.what == 15 && !internallyCalled) {
+                            if (maxRecordTime > 10000) {
+                                internallyCalled = true;
 
-                        @Override
-                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                            super.beforeHookedMethod(param);
-                            Message message = (Message) param.args[0];
-                            Logger.log("HandleMessageId: " + message.what);
+                                Handler handler = message.getTarget();
+                                Message newMessage = Message.obtain(handler, 15);
 
-                            if (message.what == 15 && !internallyCalled) {
-                                if (maxRecordTime > 10000) {
-                                    internallyCalled = true;
+                                handler.sendMessageDelayed(newMessage, maxRecordTime - 10000);
+                                Logger.log(String.format("Triggering video end in %s more ms", maxRecordTime - 10000));
+                            }
 
-                                    Handler handler = message.getTarget();
-                                    Message newMessage = Message.obtain(handler, 15);
-
-                                    handler.sendMessageDelayed(newMessage, maxRecordTime - 10000);
-                                    Logger.log(String.format("Triggering video end in %s more ms", maxRecordTime - 10000));
-                                }
-
-                                param.setResult(null);
-                            } else if (internallyCalled)
-                                internallyCalled = false;
-                        }
-                    });
-                } catch( Throwable t ) {
-                    Logger.log("Error hooking unlimited recording", t, LogType.FORCED);
+                            param.setResult(null);
+                        } else if (internallyCalled)
+                            internallyCalled = false;
+                    }
                 }
-            }
+            });
 
             findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
