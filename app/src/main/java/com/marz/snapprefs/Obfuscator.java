@@ -360,6 +360,8 @@ public class Obfuscator implements Serializable {
         public final static String TAKESNAPBUTTON_TIME = "b";
         public final static String TAKESNAPBUTTON_X = "o";//prev. n
         public final static String TAKESNAPBUTTON_Y = "p";//prev. o
+        public final static String RECORDING_MESSAGE_HOOK_CLASS = "abc";
+        public final static String RECORDING_MESSAGE_HOOK_METHOD = "handleMessage";
     }
     public static class chat {
         public final static String CHAT_CLASS = "Ie";

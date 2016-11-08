@@ -287,7 +287,7 @@ public class HookMethods
                 }
             });
 
-            findAndHookMethod("abc", lpparam.classLoader, "handleMessage", Message.class, new XC_MethodHook() {
+            findAndHookMethod(Obfuscator.timer.RECORDING_MESSAGE_HOOK_CLASS, lpparam.classLoader, Obfuscator.timer.RECORDING_MESSAGE_HOOK_METHOD, Message.class, new XC_MethodHook() {
                 boolean internallyCalled = false;
                 int maxRecordTime = Integer.parseInt(Preferences.getString(Prefs.MAX_RECORDING_TIME).trim()) * 1000;
                 @Override
