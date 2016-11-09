@@ -19,6 +19,7 @@ import android.widget.Switch;
 
 import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.Logger.LogType;
+import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.R;
 
 import java.io.File;
@@ -91,6 +92,16 @@ public class MiscSettings extends PreferenceFragmentCompat {
 
     private void displayDebugMenu(LayoutInflater inflater) {
         View view = inflater.inflate(R.layout.debug_layout, null, false);
+        Switch debugSwitch = (Switch) view.findViewById(R.id.switch_debug_master);
+
+        debugSwitch.setChecked(Preferences.getBool(Preferences.Prefs.DEBUGGING));
+
+        debugSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Preferences.putBool(Preferences.Prefs.DEBUGGING.key, isChecked);
+            }
+        });
         LinearLayout layout = (LinearLayout) view.findViewById(R.id.scroll_logtype_container);
         applyLogTypeSwitches(layout);
 
