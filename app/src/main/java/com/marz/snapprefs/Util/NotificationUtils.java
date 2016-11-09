@@ -76,7 +76,7 @@ public class NotificationUtils {
         if (!Preferences.getBool(Prefs.TOAST_ENABLED))
             return;
 
-        if (Preferences.getBool(Prefs.STEALTH_NOTIFICATIONS) && Preferences.getLicence() < 2)
+        if (Preferences.getBool(Prefs.STEALTH_NOTIFICATIONS) && Preferences.getLicence() >= 2)
             showStealthToast(type);
         else {
             NotificationUtils.showMessage(
