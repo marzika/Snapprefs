@@ -23,7 +23,6 @@ import static de.robv.android.xposed.XposedHelpers.callMethod;
  */
 
 public class AssignedStoryButton extends ImageButton {
-    public boolean shouldAbortAssignment = false;
     private boolean areParamsSet = false;
     private String assignedmKey;
 
@@ -33,8 +32,6 @@ public class AssignedStoryButton extends ImageButton {
         this.setBackgroundColor(0);
         this.setAlpha(Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? 0f : 0.8f);
         this.setImageBitmap(HookMethods.saveImg);
-        this.setVisibility(Preferences.getInt(Preferences.Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON
-                ? View.VISIBLE : View.INVISIBLE);
 
         this.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,8 +56,6 @@ public class AssignedStoryButton extends ImageButton {
     }
 
     public void buildParams(FrameLayout frameLayout, Context context) {
-        Logger.log("Building params");
-
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 
         boolean horizontalPosition = Preferences.getBool(Preferences.Prefs.BUTTON_POSITION);
@@ -87,9 +82,6 @@ public class AssignedStoryButton extends ImageButton {
         //noinspection ResourceType
         newParams.setMargins(newX, newY, newX, newY);
 
-        Logger.log("Margins: " + newParams.leftMargin + " " + newParams.topMargin + " " + newParams.rightMargin + " " + newParams.bottomMargin);
-
-        Logger.log("newParams: " + newParams);
         super.setLayoutParams(newParams);
         this.setAdjustViewBounds(true);
         super.setPadding(0, 0, 0, 0);
@@ -112,8 +104,5 @@ public class AssignedStoryButton extends ImageButton {
 
     public boolean areParamsSet() {
         return areParamsSet;
-    }
-
-    public void abortAssignment() {
     }
 }
