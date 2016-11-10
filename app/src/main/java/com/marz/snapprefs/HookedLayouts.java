@@ -158,7 +158,7 @@ public class HookedLayouts {
                     Logger.log("fullScreenFilter", true);
                 }
             });
-        }catch (Resources.NotFoundException ignore){
+        } catch (Resources.NotFoundException ignore) {
 
         }
     }
@@ -181,7 +181,7 @@ public class HookedLayouts {
                     layoutParams.topMargin = topMargin;
                     upload = new ImageButton(HookMethods.SnapContext);
                     upload.setLayoutParams(layoutParams);
-                    upload.setPadding(padding,padding,padding,padding);
+                    upload.setPadding(padding, padding, padding, padding);
                     upload.setBackgroundColor(0);
                     //Drawable uploadimg = HookMethods.SnapContext.getResources().getDrawable(+(int) Long.parseLong(Obfuscator.sharing.UPLOAD_ICON.substring(2), 16));
                     //upload.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
@@ -246,7 +246,7 @@ public class HookedLayouts {
                     relativeLayout.addView(upload);
                 }
             });
-        } catch (Resources.NotFoundException ignore){
+        } catch (Resources.NotFoundException ignore) {
         }
     }
 
@@ -267,7 +267,7 @@ public class HookedLayouts {
 
         FrameLayout.LayoutParams scaledLayoutParams = null;
 
-        if(Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON)) {
+        if (Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON)) {
             DisplayMetrics metrics = localContext.getResources().getDisplayMetrics();
 
             int unscaledSize = Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? stealthButtonSize : 65;
@@ -307,9 +307,9 @@ public class HookedLayouts {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
                         if (gestureEvent == null) {
-                            if( Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S)
+                            if (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S)
                                 gestureEvent = new SweepSaveGesture();
-                            else if( Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_F2S )
+                            else if (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_F2S)
                                 gestureEvent = new FlingSaveGesture();
                             else {
                                 Logger.log("No gesture method provided");
@@ -335,20 +335,11 @@ public class HookedLayouts {
         });
     }
 
-    public static void assignStoryButton(FrameLayout frameLayout, Context context, String mKey) {
-        AssignedStoryButton storyButton = retrieveStoryButton(frameLayout, context, mKey);
+    static void assignStoryButton(FrameLayout frameLayout, Context context, String mKey) {
 
-        if (storyButton == null) {
-            Logger.log("Could not assign a story button");
-            return;
-        }
+        AssignedStoryButton storyButton = new AssignedStoryButton(context);
+            storyButton.buildParams(frameLayout, context);
 
-        if (storyButton.shouldAbortAssignment) {
-            Logger.log("Layout already has button assigned");
-            return;
-        }
-
-        Logger.log("Frame type: " + frameLayout);
         Logger.log("Parent: " + storyButton.getParent());
 
         if (storyButton.getParent() == null) {
@@ -357,6 +348,8 @@ public class HookedLayouts {
             setAdditionalInstanceField(frameLayout, "mKey", mKey);
         }
 
+        storyButton.setVisibility(Preferences.getInt(Preferences.Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON
+                ? View.VISIBLE : View.INVISIBLE);
         storyButton.bringToFront();
         storyButton.invalidate();
         frameLayout.invalidate();
@@ -364,14 +357,12 @@ public class HookedLayouts {
         Logger.log("brought to front");
     }
 
-    public static AssignedStoryButton retrieveStoryButton(FrameLayout layout, Context context, String mKey) {
+    private static AssignedStoryButton retrieveStoryButton(FrameLayout layout, Context context, String mKey) {
         for (AssignedStoryButton button : storyButtonQueue) {
             Logger.log("Checking if button can be reassigned");
 
-            if (button.getParent().equals(layout)) {
-                button.abortAssignment();
+            if (button.getParent().equals(layout))
                 return button;
-            }
 
             if ((button.getAssignedmKey() != null && button.getAssignedmKey().equals(mKey)) ||
                     button.canBeReassigned()) {

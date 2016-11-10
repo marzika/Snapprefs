@@ -153,6 +153,10 @@ public class MainActivity extends AppCompatActivity {
         Logger.loadSelectedLogTypes();
         ChangeLog cl = new ChangeLog(context);
         createDeviceId();
+
+
+
+
         /*Obfuscator.writeGsonFile();
         try {
             Thread.sleep(2000);

@@ -505,15 +505,12 @@ public class Saving {
         if (parent != null) {
             if (parent instanceof View) {
                 int id = ((View) parent).getId();
-                Logger.log("Scanned ID: " + id);
 
                 if (id == Obfuscator.save.OPERA_PAGE_VIEW_ID) {
                     Logger.log("Found Opera container");
                     return (FrameLayout) parent;
-                } else {
-                    Logger.log("Failed scan attempt");
+                } else
                     return scanForStoryContainer((View) parent);
-                }
             }
         }
 
@@ -527,6 +524,12 @@ public class Saving {
             Logger.printTitle("Handling SENT snap", LogType.SAVING);
             Activity activity = (Activity) callMethod(snapPreviewFragment, "getActivity");
             Object snapEditorView = getObjectField(snapPreviewFragment, Obfuscator.save.OBJECT_SNAP_EDITOR_VIEW);
+
+            if( snapEditorView == null ) {
+                Logger.printFinalMessage("SnapEditorView not assigned - Halting process", LogType.SAVING);
+                return;
+            }
+
             Object mediaBryo = getObjectField(snapEditorView, Obfuscator.save.OBJECT_MEDIABRYO);
 
             if (mediaBryo == null) {
@@ -583,11 +586,14 @@ public class Saving {
                 }
             } else if (bryoName.equals(Obfuscator.save.SNAPIMAGEBRYO_CLASS)) {
                 Logger.printMessage("Media Type: IMAGE", LogType.SAVING);
-                Bitmap bmp = (Bitmap) callMethod(snapEditorView, Obfuscator.save.METHOD_GET_SENT_BITMAP, activity, true);
+                Bitmap bmp = (Bitmap) callMethod(snapEditorView, Obfuscator.save.METHOD_GET_SENT_BITMAP, activity);
                 if (bmp != null) {
                     Logger.printMessage("Sent image found - Trying to save", LogType.SAVING);
                     response = saveSnap(SnapType.SENT, MediaType.IMAGE,
                             snapContext, bmp, null, filename, null);
+                } else {
+                    Logger.printMessage("Couldn't find sent image!", LogType.SAVING);
+                    response = SaveResponse.FAILED;
                 }
             }
 
