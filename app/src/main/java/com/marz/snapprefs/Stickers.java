@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Util.BiHashMap;
 
 import java.io.BufferedInputStream;
@@ -16,20 +17,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
@@ -143,59 +134,65 @@ public class Stickers {
             }
         });*/
 
-            XposedHelpers.findAndHookMethod("com.snapchat.android.ui.stickers.preview.PreviewSticker", lpparam.classLoader, "onTouchEvent", MotionEvent.class, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    if (XposedHelpers.getAdditionalInstanceField(param.thisObject, "scale") == null)
-                        XposedHelpers.setAdditionalInstanceField(param.thisObject, "scale", 1.0F);
-                    float diff = ((ImageView) param.thisObject).getScaleY() - (float) XposedHelpers.getAdditionalInstanceField(param.thisObject, "scale");
-                    if (diff > .5F && !isResizing) {
-                        XposedHelpers.setAdditionalInstanceField(param.thisObject, "scale", ((ImageView) param.thisObject).getScaleY());
-                        Object aet = XposedHelpers.getObjectField(param.thisObject, "l");
-                        Object agm = XposedHelpers.getObjectField(aet, "a");
-                        byte[] bArr = null;
-                        try{
-                            bArr = (byte[]) XposedHelpers.callMethod(agm, "b", XposedHelpers.callMethod(aet, "b", XposedHelpers.getObjectField(param.thisObject, "c"))+".svg");
-                        }catch (NoSuchMethodError e){
-                            Logger.log("Scaling non-emoji sticker", true);
-                            return;
-                        }
-                        Object gz = newInstance(findClass(Obfuscator.stickers.SVG_CLASS, lpparam.classLoader));
-                        Object svg = XposedHelpers.callMethod(gz, "a", new ByteArrayInputStream(bArr));
-                        Bitmap emoji = Bitmap.createBitmap((int) (((ImageView) param.thisObject).getHeight() * ((ImageView) param.thisObject).getScaleY()), (int) (((ImageView) param.thisObject).getHeight() * ((ImageView) param.thisObject).getScaleY()), Bitmap.Config.ARGB_8888);
-                        new ResizeTask(param.thisObject, svg, emoji).execute();
+        //TODO: Vj = regular emoji sticker
+        //TODO: Vj.k -> akQ = aet
+        //TODO: akQ.f -> akV = agm aka FastZippedAssetReader -- MINOR REFACTOR HERE
+        XposedHelpers.findAndHookMethod("Vu", lpparam.classLoader, "a", MotionEvent.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                if (XposedHelpers.getAdditionalInstanceField(param.thisObject, "scale") == null)
+                    XposedHelpers.setAdditionalInstanceField(param.thisObject, "scale", 1.0F);
+                ImageView previevStickerView = (ImageView) XposedHelpers.getObjectField(param.thisObject, "f");
+                float diff = previevStickerView.getScaleY() - (float) XposedHelpers.getAdditionalInstanceField(param.thisObject, "scale");
+                if (diff > .5F && !isResizing) {
+                    XposedHelpers.setAdditionalInstanceField(param.thisObject, "scale", previevStickerView.getScaleY());
+                    byte[] bArr = null;
+                    try{
+                        Object aet = XposedHelpers.getObjectField(param.thisObject, "k");
+                        Object agm = XposedHelpers.getObjectField(aet, "f");
+                        String svgfile = XposedHelpers.callMethod(aet, "b", XposedHelpers.getObjectField(param.thisObject, "l"))+".svg";
+                        Logger.printMessage("SVGFILE: " + svgfile, LogType.DEBUG);
+                        bArr = (byte[]) XposedHelpers.callMethod(agm, "a", XposedHelpers.callMethod(aet, "b", XposedHelpers.getObjectField(param.thisObject, "l"))+".svg");
+                    }catch (NoSuchMethodError | NoSuchFieldError e2){
+                        Logger.log("Scaling non-emoji sticker", true);
+                        return;
                     }
+                    Object gz = newInstance(findClass(Obfuscator.stickers.SVG_CLASS, lpparam.classLoader));//new. hc
+                    Object svg = XposedHelpers.callMethod(gz, "a", new ByteArrayInputStream(bArr));//new.
+                    Bitmap emoji = Bitmap.createBitmap((int) (previevStickerView.getHeight() * previevStickerView.getScaleY()), (int) (previevStickerView.getHeight() * previevStickerView.getScaleY()), Bitmap.Config.ARGB_8888);
+                    new ResizeTask(previevStickerView, svg, emoji).execute();
                 }
-            });
+            }
+        });
 
-            findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "open", String.class, new XC_MethodHook() {
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    Logger.log("Open asset: " + param.args[0], true);
-                    String str = (String) param.args[0];
-                    if (str.contains("twemoji_2_")) {
-                        String url = Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/" + str;
-                        File file;
-                        try {
-                            Logger.log("Sdcard path: " + url, true);
-                            file = new File(url);
-                        } catch (Exception e){
-                            Logger.log("Stickers file/folder not found", true);
-                            return;
-                        }
-
-                        if( !file.exists() ) {
-                            Logger.log( "Error loading STICKERS file: " + str );
-                            return;
-                        }
-                        InputStream is = null;
-                        is = new BufferedInputStream(new FileInputStream(file));
-                        param.setResult(is);
-                        Logger.log("setResult for AssetManager", true);
+        findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "open", String.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                Logger.log("Open asset: " + param.args[0], LogType.DEBUG);
+                String str = (String) param.args[0];
+                if (str.contains("twemoji_2_")) {
+                    String url = Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/" + str;
+                    File file;
+                    try {
+                        Logger.log("Sdcard path: " + url, LogType.DEBUG);
+                        file = new File(url);
+                    } catch (Exception e){
+                        Logger.log("Stickers file/folder not found", LogType.DEBUG);
+                        return;
                     }
+
+                    if( !file.exists() ) {
+                        Logger.log( "Error loading STICKERS file: " + str, LogType.DEBUG);
+                        return;
+                    }
+                    InputStream is = null;
+                    is = new BufferedInputStream(new FileInputStream(file));
+                    param.setResult(is);
+                    Logger.log("setResult for AssetManager", LogType.DEBUG);
                 }
-            });
-        }
+            }
+        });
+    }
 
     public static byte[] readFile(String filename) {
         byte[] data = new byte[0];

@@ -1,10 +1,10 @@
 Snapprefs
 =========
-[![Build Status](http://138.68.21.49:8080/job/SNAPPREFS/badge/icon)](http://138.68.21.49:8080/job/SNAPPREFS) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
+[![Build Status](http://snapprefsjenkins.hopto.org:8080/job/SNAPPREFS%20-%20stable/badge/icon)](http://jenkins.snapprefs.com) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
 
 Overview
 -------
-Snapprefs is a project which offers enhanced features for Snapchat throught the [Xposed framework](http://forum.xda-developers.com/showthread.php?t=1574401).
+Snapprefs is a project which offers enhanced features for Snapchat through the [Xposed framework](http://forum.xda-developers.com/showthread.php?t=1574401).
 
 [Want to translate Snapprefs into your native language?](http://osl2hw5.oneskyapp.com/collaboration/project?id=154335)
 
@@ -18,6 +18,7 @@ Current features are:
   - Sweep to save
   - Save button
   - Autosave
+- Save profile images
 - Share from Gallery
 - Groups
 - Select All
@@ -35,7 +36,6 @@ Current features are:
   - Alignment(left, center, right)
   - Size(1-250)
   - Style(bold, italic, bold and italic, normal)
-  - Rainbow text(makes each letter separatedly colored)
   - Gradient
 - Background
   - Color(HSV)
@@ -71,9 +71,9 @@ Credits
 
 [Snapshare for their amazing work](https://github.com/P1nGu1n/Snapshare)
 
-manvir for his inspirating [SnapColors app](http://repo.xposed.info/module/com.manvir.snapcolors)
+manvir for his inspirational [SnapColors app](http://repo.xposed.info/module/com.manvir.snapcolors)
 
-elesbb for his inspirating [SnapChat Full Caption app](http://repo.xposed.info/module/com.elesbb.snapchatfullcaption)
+elesbb for his inspirational [SnapChat Full Caption app](http://repo.xposed.info/module/com.elesbb.snapchatfullcaption)
 
 chiralcode for his [ColorPicker](https://github.com/chiralcode/Android-Color-Picker)
 
@@ -102,7 +102,7 @@ Installation
 	* For Android 5.1 Touchwiz ROMs see [this XDA thread](http://forum.xda-developers.com/xposed/unofficial-xposed-samsung-lollipop-t3180960)
 	* For Android 6.0.x see [this XDA thread](http://forum.xda-developers.com/showthread.php?t=3034811)
 1. Download and install Snapprefs from [here](http://repo.xposed.info/module/com.marz.snapprefs)
-1. Enable Snappefs in the Xposed installer
+1. Enable Snapprefs in the Xposed installer
 1. Start Snapprefs one time
 1. Reboot
 1. Customize the options
@@ -110,12 +110,16 @@ Installation
 
 Latest automatic builds (provided by m1kep):
 -------
-[Available as Jenkins artifacts](http://138.68.21.49:8080/job/SNAPPREFS/lastSuccessfulBuild/artifact/app/build/outputs/apk/)
+Available as Jenkins artifacts:
+
+[Official Branches](http://jenkins.snapprefs.com)
+
+[UN-Official Branches](http://138.68.21.49:8080/job/SNAPPREFS/lastSuccessfulBuild/artifact/app/build/outputs/apk/)
 
 License
 -------
 The whole project is licensed under the GNU GPLv3, which can be found in the LICENSE file.
-The license is also included to the app in the /assets/ folder.
+The license is also included with the app in the /assets/ folder.
 
 *Copyright (C) 2014-2016 Marcell Mészáros*
 

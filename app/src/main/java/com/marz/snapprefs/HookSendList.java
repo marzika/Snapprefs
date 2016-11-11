@@ -51,7 +51,7 @@ public class HookSendList {
                 selectAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton compoundButton, boolean set) {
-                        Object hopefullySendToAdapter = getObjectField(param.thisObject, "f");
+                        Object hopefullySendToAdapter = getObjectField(param.thisObject, "g");
                         Logger.log("getBool(Prefs.SELECT_ALL): We have the ArrayAdapter", true);
                         final String adaptersType = getParameterTypes(new Object[]{hopefullySendToAdapter})[0].getCanonicalName();
                         final boolean isSendToAdapter = adaptersType.equals(Obfuscator.select.SENDTOADAPTER_CLASS);
@@ -131,7 +131,7 @@ public class HookSendList {
     public static CheckBox getCheckbox(Context c) {
         CheckBox cb = new CheckBox(c);
         try {
-            //Setting properties from snapchat's res/layout/send_to_item.xml checkbox
+            //Setting properties from Snapchat's res/layout/send_to_item.xml checkbox
             cb.setButtonDrawable(c.getResources().getIdentifier("send_to_button_selector", "drawable", "com.snapchat.android"));
             //May need to scale drawable bitmap...
             cb.setScaleX(0.7F);

@@ -1,26 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ScrollView
-        android:id="@+id/scrollView7"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center"
-        android:layoutMode="clipBounds">
+        android:layout_above="@+id/linear">
 
-        <GridLayout
-            android:id="@+id/lensloader_gridholder"
+        <ScrollView
+            android:id="@+id/scrollView7"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
-            android:alignmentMode="alignBounds"
-            android:columnCount="4"
-            android:layoutMode="clipBounds"
-            android:orientation="horizontal"
-            android:useDefaultMargins="false"></GridLayout>
-    </ScrollView>
-</LinearLayout>
+            android:gravity="center"
+            android:layoutMode="clipBounds">
+
+            <GridLayout
+                android:id="@+id/lensloader_gridholder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:alignmentMode="alignBounds"
+                android:columnCount="4"
+                android:layoutMode="clipBounds"
+                android:orientation="horizontal"
+                android:useDefaultMargins="false"></GridLayout>
+        </ScrollView>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/linear"
+        android:layout_alignParentBottom="true"
+        android:layout_height="40dp">
+
+        <Button
+            android:text="Select All"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:id="@+id/btn_select_all_lenses" />
+
+        <Button
+            android:text="Deselect All"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:id="@+id/btn_deselect_all_lenses" />
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,14 +1,29 @@
 package com.marz.snapprefs.Settings;
 
+import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.preference.Preference;
+import android.support.v7.preference.Preference.OnPreferenceClickListener;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.LinearLayout;
+import android.widget.Switch;
+
+import com.marz.snapprefs.Logger;
+import com.marz.snapprefs.Logger.LogType;
+import com.marz.snapprefs.Preferences;
+import com.marz.snapprefs.R;
 
 import java.io.File;
+import java.util.HashSet;
 
 /**
  * Created by MARZ on 2016. 02. 11..
@@ -32,6 +47,17 @@ public class MiscSettings extends PreferenceFragmentCompat {
                 ComponentName aliasName = new ComponentName(getActivity(), "com.marz.snapprefs.MainActivity-Alias");
                 packageManager.setComponentEnabledSetting(aliasName, state, PackageManager.DONT_KILL_APP);
                 return true;
+            }
+        });
+
+        final LayoutInflater inflater = getLayoutInflater(savedInstanceState);
+
+        Preference debugOptions = findPreference("pref_key_debug_options");
+        debugOptions.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                displayDebugMenu(inflater);
+                return false;
             }
         });
     }
@@ -64,4 +90,51 @@ public class MiscSettings extends PreferenceFragmentCompat {
         return this;
     }
 
+    private void displayDebugMenu(LayoutInflater inflater) {
+        View view = inflater.inflate(R.layout.debug_layout, null, false);
+        Switch debugSwitch = (Switch) view.findViewById(R.id.switch_debug_master);
+
+        debugSwitch.setChecked(Preferences.getBool(Preferences.Prefs.DEBUGGING));
+
+        debugSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Preferences.putBool(Preferences.Prefs.DEBUGGING.key, isChecked);
+            }
+        });
+        LinearLayout layout = (LinearLayout) view.findViewById(R.id.scroll_logtype_container);
+        applyLogTypeSwitches(layout);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+        builder.setView(view);
+        builder.setPositiveButton("Done", null);
+        builder.show();
+    }
+
+    private void applyLogTypeSwitches(LinearLayout layout) {
+        LogType[] logTypes = Logger.LogType.values();
+        final float scale = getContext().getResources().getDisplayMetrics().density;
+        HashSet<String> activeTypes = Logger.getActiveLogTypes();
+
+        for (LogType logType : logTypes) {
+            Switch logSwitch = new Switch(layout.getContext());
+            int pad = (int) (10f * scale);
+            logSwitch.setPadding(pad, pad / 2, pad, pad / 2);
+            logSwitch.setText(logType.name());
+            logSwitch.setChecked(activeTypes.contains(logType.name()));
+            logSwitch.setTextSize(7f * scale);
+            logSwitch.setTextColor(Color.GRAY);
+            logSwitch.setTag(logType.name());
+
+            logSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean state) {
+                    String tag = (String) compoundButton.getTag();
+                    Logger.setLogTypeState(tag, state);
+                }
+            });
+
+            layout.addView(logSwitch);
+        }
+    }
 }

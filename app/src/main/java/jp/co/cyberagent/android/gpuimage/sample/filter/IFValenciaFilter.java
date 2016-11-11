@@ -1,7 +1,5 @@
 package jp.co.cyberagent.android.gpuimage.sample.filter;
 
-import android.content.Context;
-
 /**
  * Created by sam on 14-8-9.
  */

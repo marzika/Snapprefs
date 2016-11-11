@@ -10,4 +10,9 @@
         android:key="pref_key_save_chat_image"
         android:summary="@string/pref_save_chat_image_summary"
         android:title="@string/pref_save_chat_image_title" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_key_chat_logging"
+        android:summary="@string/pref_save_chat_logging_summary"
+        android:title="@string/pref_save_chat_logging_title" />
 </PreferenceScreen>

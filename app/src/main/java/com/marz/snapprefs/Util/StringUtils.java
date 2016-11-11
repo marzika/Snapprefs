@@ -16,15 +16,6 @@ package com.marz.snapprefs.Util;
  * limitations under the License.
  */
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.text.Normalizer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.regex.Pattern;
 
 /**
  * <p>Operations on {@link java.lang.String} that are
@@ -667,5 +658,49 @@ public class StringUtils {
             return str.substring( 0, str.length() - remove.length() );
         }
         return str;
+    }
+
+    public static String stripKey( String input )
+    {
+        String finalOutput = input;
+
+        if( finalOutput.contains("https://app.snapchat.com/bq/auth_story_blobs") )
+            finalOutput = finalOutput.replace("https://app.snapchat.com/bq/auth_story_blobs", "");
+        else if( finalOutput.contains("encoding=compressed") )
+        {
+            String[] split = input.split("encoding=compressed");
+
+            if( split.length > 0 )
+                finalOutput = split[split.length - 1];
+        }
+
+        if( finalOutput.contains("#") )
+        {
+            String[] split = finalOutput.split("#");
+
+            if( split.length > 0 )
+                finalOutput = split[0];
+        }
+
+        return finalOutput;
+    }
+
+    public static String obfus(String input) {
+        StringBuilder builder = new StringBuilder();
+        char[] charArray = input.toCharArray();
+        boolean shouldSkip = false;
+
+        for(char character : charArray) {
+            if(shouldSkip) {
+                builder.append('*');
+                shouldSkip = false;
+                continue;
+            }
+
+            builder.append(character);
+            shouldSkip = true;
+        }
+
+        return builder.toString();
     }
 }

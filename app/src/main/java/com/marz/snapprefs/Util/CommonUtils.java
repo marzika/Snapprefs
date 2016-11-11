@@ -25,12 +25,18 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.widget.Toast;
 
+import com.marz.snapprefs.BuildConfig;
+import com.marz.snapprefs.Common;
+import com.marz.snapprefs.Logger;
+import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.R;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -131,12 +137,32 @@ public class CommonUtils {
     }
 
     /**
-     * Checks whether Snapshare is enabled. If it's enabled, Xposed should hook this method and return true.
+     * Checks whether Snapprefs is enabled. If it's enabled, Xposed should hook this method and return {@link com.marz.snapprefs.Common#MODULE_ENABLED_CHECK_INT}.
      *
-     * @return If Snapshare is enabled or not
+     * @return Number that should be incremented for each build at {@link com.marz.snapprefs.Common#MODULE_ENABLED_CHECK_INT}
      */
-    public static boolean isModuleEnabled() {
-        return true;
+    public static int isModuleEnabled() {
+        return -1;
+    }
+
+    /**
+     * Gets the status(Activate, Not Actived, Needs Restart) of Snapprefs
+     * .
+     * @return Returns one of the following values based on its findings: {@link Common#MODULE_STATUS_ACTIVATED}, {@link Common#MODULE_STATUS_NOT_ACTIVATED}, {@link Common#MODULE_STATUS_NOT_RESTARTED}
+     */
+    public static int getModuleStatus(){
+        if(Preferences.getBool(Preferences.Prefs.DEBUGGING)) {
+            Logger.log("isModuleEnabled return value: " + isModuleEnabled());
+            Logger.log("MODULE_ENABLED_CHECK_INT value: " + Common.MODULE_ENABLED_CHECK_INT);
+        }
+        int enabledCheckInt = CommonUtils.isModuleEnabled();
+        if(enabledCheckInt == (BuildConfig.BUILD_TYPE == "debug" ? Common.MODULE_ENABLED_CHECK_INT : BuildConfig.VERSION_CODE)) {
+            return Common.MODULE_STATUS_ACTIVATED;
+        }
+        if(enabledCheckInt == -1) {
+            return Common.MODULE_STATUS_NOT_ACTIVATED;
+        }
+        return Common.MODULE_STATUS_NOT_RESTARTED;
     }
 
     /**
@@ -160,6 +186,20 @@ public class CommonUtils {
         md.update(input.getBytes("UTF-8")); // Change this to "UTF-16" if needed
         byte[] digest = md.digest();
         return String.format("%064x", new java.math.BigInteger(1, digest));
+    }
+
+    // Based off of http://stackoverflow.com/questions/15158651/generate-a-md5-sum-from-an-android-bitmap-object
+    public static String sha256(Bitmap bmp) throws NoSuchAlgorithmException{
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] bitmapBytes = baos.toByteArray();
+        MessageDigest digest = MessageDigest.getInstance("SHA256");
+        byte [] hashedBmp = digest.digest(bitmapBytes);
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i  = 0; i < 10; i++) {
+            stringBuilder.append(Integer.toString((hashedBmp[i] & 0xff) + 0x100, 16).substring(1));
+        }
+        return stringBuilder.toString();
     }
 
 }

@@ -11,6 +11,8 @@ public class Friend implements Serializable {
 
     private String name;
 
+    private String displayName;
+
     private boolean isSelected;
 
     public Friend() {
@@ -22,9 +24,13 @@ public class Friend implements Serializable {
         this.name = name;
     }
 
-    public Friend(String name, boolean isSelected) {
+    public Friend(String name, String disName, boolean isSelected) {
 
         this.name = name;
+        if(disName != "") {
+            Logger.log("Logging Display Name In Friend.java: " + disName, true, true);
+        }
+        this.displayName = disName;
         this.isSelected = isSelected;
     }
 
@@ -34,6 +40,14 @@ public class Friend implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String disName) {
+        this.displayName = disName;
     }
 
     public boolean isSelected() {

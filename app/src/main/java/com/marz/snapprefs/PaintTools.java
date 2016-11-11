@@ -57,12 +57,10 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.findClass;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
-import static de.robv.android.xposed.XposedHelpers.callMethod;
 
 public class PaintTools {
     static int color = Color.RED;
@@ -89,11 +87,11 @@ public class PaintTools {
 
 
     public static void initPaint(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources mResources) {
-        final Bitmap[] bground = new Bitmap[1];
+        final Bitmap[] background = new Bitmap[1];
         findAndHookConstructor("com.snapchat.android.model.Mediabryo", lpparam.classLoader, findClass("com.snapchat.android.model.Mediabryo$a", lpparam.classLoader), new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                bground[0] = (Bitmap) getObjectField(param.thisObject, "mRawImageBitmap");
+                background[0] = (Bitmap) getObjectField(param.thisObject, "mRawImageBitmap");
             }
         });
         colorList.add(Color.RED);
@@ -103,12 +101,12 @@ public class PaintTools {
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 Object i = XposedHelpers.getObjectField(param.thisObject, "j");
                 if (i != null && type != null && type != DrawingType.DEFAULT) {//only if there is object being drawn
-                    XposedHelpers.callMethod(i, "a", param.args[0], param.args[1]);
+                    XposedHelpers.callMethod(i, "b", param.args[0], param.args[1]);//was a
                 }
             }
         });
         //it's not normally method onMove but i made it work like that xD (normally it just sets start of drawing)
-        XposedHelpers.findAndHookMethod(Obfuscator.paint.LEGACYCANVASVIEW_A, lpparam.classLoader, "a", float.class, float.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod(Obfuscator.paint.LEGACYCANVASVIEW_A, lpparam.classLoader, "b", float.class, float.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam methodHookParam) throws Throwable {
                 if (type == DrawingType.DEFAULT || type == null) return;
@@ -168,7 +166,7 @@ public class PaintTools {
             }
         });
 
-        XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, Context.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, Context.class, boolean.class,new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (param.args[0] != null) {
@@ -205,9 +203,9 @@ public class PaintTools {
                         paint.setAlpha(alpha);
                     }
                     if (shouldBlur) {
-                        if (bground[0] != null) {
+                        if (background[0] != null) {
                             paint.setColor(0x00000000);
-                            paint.setShader(new BitmapShader(bground[0], Shader.TileMode.REPEAT, Shader.TileMode.REPEAT));
+                            paint.setShader(new BitmapShader(background[0], Shader.TileMode.REPEAT, Shader.TileMode.REPEAT));
                         } else {
                             paint.setColor(0xccFFFFFF);
                         }
@@ -224,7 +222,7 @@ public class PaintTools {
             }
         });
 
-        findAndHookMethod("com.snapchat.android.analytics.AnalyticsEvents", lpparam.classLoader, "i", new XC_MethodHook() {
+        findAndHookMethod("com.snapchat.android.analytics.AnalyticsEvents", lpparam.classLoader, "h", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 try{
@@ -236,11 +234,11 @@ public class PaintTools {
             }
         });
         once = false;
-        XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.ColorPickerView", lpparam.classLoader, Context.class, AttributeSet.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookConstructor("com.snapchat.android.app.shared.feature.preview.ui.view.ColorPickerView", lpparam.classLoader, Context.class, AttributeSet.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
                 if (!once){
-                    View colorpickerview = (View) getObjectField(param.thisObject, "h");
+                    View colorPickerView = (View) getObjectField(param.thisObject, "j");
                     outerOptionsLayout = new RelativeLayout(HookMethods.SnapContext);
                     final GridView innerOptionsView = new GridView(HookMethods.SnapContext);
                     innerOptionsView.setAdapter(new OptionsAdapter(HookMethods.SnapContext, mResources));
@@ -255,7 +253,7 @@ public class PaintTools {
                     outerOptionsLayout.setVisibility(View.VISIBLE);
                     outerOptionsLayout.setBackgroundDrawable(mResources.getDrawable(R.drawable.drawingbackground));
                     outerOptionsLayout.addView(innerOptionsView, GridLayout.LayoutParams.MATCH_PARENT, GridLayout.LayoutParams.MATCH_PARENT);
-                    ((RelativeLayout)colorpickerview.getParent().getParent()).addView(outerOptionsLayout, outerOptionsLayoutParams);
+                    ((RelativeLayout)colorPickerView.getParent().getParent()).addView(outerOptionsLayout, outerOptionsLayoutParams);
                     once = true;
                 }
             }

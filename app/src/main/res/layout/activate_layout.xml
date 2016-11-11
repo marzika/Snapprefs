@@ -19,7 +19,7 @@
                 android:id="@+id/textView3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Redeem ID:"
+                android:text="License Code:"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/black" />
 
@@ -30,7 +30,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/default_gap"
                 android:gravity="center_vertical|center_horizontal"
-                android:hint="Type here your redeem ID"
+                android:hint="Type/Paste your License Code here"
                 android:inputType="textNoSuggestions|textVisiblePassword"
                 android:maxLength="20"
                 android:textColor="@color/black" />
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/default_gap_2x"
-                android:text="Redeem license" />
+                android:text="Activate license" />
 
             <TextView
                 android:id="@+id/textView"

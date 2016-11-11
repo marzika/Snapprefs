@@ -58,27 +58,27 @@ public class ActivateFragment extends Fragment {
         context = container.getContext();
         final TelephonyManager tm = (TelephonyManager) getActivity().getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
 
-        Button submitbtn = (Button) view.findViewById(R.id.submit);
+        Button submitBtn = (Button) view.findViewById(R.id.submit);
         final EditText cID = (EditText) view.findViewById(R.id.confirmationID);
         final TextView textView = (TextView) view.findViewById(R.id.textView);
-        final Button buynow = (Button) view.findViewById(R.id.button);
-        final Button applygod = (Button) view.findViewById(R.id.god);
+        final Button buyNowBtn = (Button) view.findViewById(R.id.button);
+        final Button applyForGodModeBtn = (Button) view.findViewById(R.id.god);
         final EditText name = (EditText) view.findViewById(R.id.username);
         final TextView god = (TextView) view.findViewById(R.id.god_desc);
         TextView dID = (TextView) view.findViewById(R.id.deviceID);
         god.setVisibility(View.GONE);
-        applygod.setVisibility(View.GONE);
+        applyForGodModeBtn.setVisibility(View.GONE);
         name.setVisibility(View.GONE);
         dID.setText(MainActivity.getDeviceId());
         cID.setText(readStringPreference("confirmation_id"));
         if (Preferences.getLicenceUsingID(MainActivity.getDeviceId()) == 0) {
             String text = "Your license status is: <font color='blue'>Free</font>";
             textView.setText(Html.fromHtml(text), TextView.BufferType.SPANNABLE);
-            applygod.setVisibility(View.GONE);
+            applyForGodModeBtn.setVisibility(View.GONE);
             god.setVisibility(View.GONE);
             name.setVisibility(View.GONE);
-            buynow.setText("Click here to buy a license");
-            buynow.setOnClickListener(new Button.OnClickListener() {
+            buyNowBtn.setText("Click here to buy a license");
+            buyNowBtn.setOnClickListener(new Button.OnClickListener() {
                 public void onClick(View v) {
                     new AlertDialog.Builder(context)
                             .setTitle("Buy a license")
@@ -98,15 +98,15 @@ public class ActivateFragment extends Fragment {
                             .show();
                 }
             });
-            buynow.setVisibility(View.VISIBLE);
+            buyNowBtn.setVisibility(View.VISIBLE);
         } else if (Preferences.getLicenceUsingID(MainActivity.getDeviceId()) == 1) {
             String text = "Your license status is: <font color='green'>Premium</font>";
             textView.setText(Html.fromHtml(text), TextView.BufferType.SPANNABLE);
-            buynow.setText("Click here to upgrade your license");
-            buynow.setVisibility(View.VISIBLE);
-            applygod.setVisibility(View.INVISIBLE);
+            buyNowBtn.setText("Click here to upgrade your license");
+            buyNowBtn.setVisibility(View.VISIBLE);
+            applyForGodModeBtn.setVisibility(View.INVISIBLE);
             god.setVisibility(View.INVISIBLE);
-            buynow.setOnClickListener(new Button.OnClickListener() {
+            buyNowBtn.setOnClickListener(new Button.OnClickListener() {
                 public void onClick(View v) {
                     new AlertDialog.Builder(context)
                             .setTitle("Upgrade your license")
@@ -123,8 +123,8 @@ public class ActivateFragment extends Fragment {
         } else if (Preferences.getLicenceUsingID(MainActivity.getDeviceId()) == 2) {
             String text = "Your license status is: <font color='#FFCC00'>Deluxe</font>";
             textView.setText(Html.fromHtml(text), TextView.BufferType.SPANNABLE);
-            buynow.setVisibility(View.GONE);
-            applygod.setVisibility(View.VISIBLE);
+            buyNowBtn.setVisibility(View.GONE);
+            applyForGodModeBtn.setVisibility(View.VISIBLE);
             name.setVisibility(View.VISIBLE);
             god.setVisibility(View.VISIBLE);
         }
@@ -132,12 +132,12 @@ public class ActivateFragment extends Fragment {
             //new Connection().execute(cID.getText().toString(), deviceID);
         }*/
 
-        submitbtn.setOnClickListener(new Button.OnClickListener() {
+        submitBtn.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 new Connection().execute(cID.getText().toString(), MainActivity.getDeviceId());
             }
         });
-        applygod.setOnClickListener(new View.OnClickListener() {
+        applyForGodModeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (name.getText().toString().trim().length() > 0) {
@@ -409,7 +409,7 @@ public class ActivateFragment extends Fragment {
     }
 
     public String readStringPreference(String key) {
-        SharedPreferences prefs = MainActivity.getPrefereces();
+        SharedPreferences prefs = MainActivity.getPreferences();
         return prefs.getString(key, null);
     }
 
