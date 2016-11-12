@@ -231,12 +231,10 @@ public class VisualFilters {
 
                 try {
                     applyFilter(bitmap1, bitmap2, (FilterType) XposedHelpers.getAdditionalInstanceField(param.thisObject, FILTER_TYPE));
-                    param.setResult(true);
                 } catch( Throwable t) {
                     Logger.log("Error applying filter", t, LogType.FILTER);
                 }
-
-                param.setResult(false);
+                param.setResult(true);
             }
         });
         //Add filter title
