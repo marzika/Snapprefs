@@ -145,7 +145,7 @@
 
             <Switch
                 android:id="@+id/autoenable_switch"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@+id/editText"
                 android:layout_alignLeft="@+id/btnLensSelector"
@@ -160,7 +160,7 @@
 
             <Switch
                 android:id="@+id/sort_lens_by_sel_date"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@id/editText"
                 android:layout_alignLeft="@id/btnLensSelector"
@@ -174,7 +174,7 @@
                 android:text="@string/enable_sort_by_sel_time_switch_txt" />
             <Switch
                 android:id="@+id/hide_current_snapchat_lenses"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignEnd="@id/editText"
                 android:layout_alignLeft="@id/btnLensSelector"
