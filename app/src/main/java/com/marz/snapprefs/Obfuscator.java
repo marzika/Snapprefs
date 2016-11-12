@@ -445,7 +445,7 @@ public class Obfuscator implements Serializable {
         public final static String BUS_POST = "a";
     }
     public static class navbar {
-        public final static String FORCENAVBAR_CLASS = "aMV"; // prev. SM
+        public final static String FORCENAVBAR_CLASS = "amv"; // prev. SM
         public final static String FORCENAVBAR_METHOD = "a";
     }
     public static class paint{
