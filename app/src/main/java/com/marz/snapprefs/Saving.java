@@ -586,7 +586,7 @@ public class Saving {
                 }
             } else if (bryoName.equals(Obfuscator.save.SNAPIMAGEBRYO_CLASS)) {
                 Logger.printMessage("Media Type: IMAGE", LogType.SAVING);
-                Bitmap bmp = (Bitmap) callMethod(snapEditorView, Obfuscator.save.METHOD_GET_SENT_BITMAP, activity);
+                Bitmap bmp = (Bitmap) callMethod(snapEditorView, Obfuscator.save.METHOD_GET_SENT_BITMAP, activity, true);
                 if (bmp != null) {
                     Logger.printMessage("Sent image found - Trying to save", LogType.SAVING);
                     response = saveSnap(SnapType.SENT, MediaType.IMAGE,
