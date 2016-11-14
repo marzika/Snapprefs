@@ -358,7 +358,6 @@ public class Saving {
                     protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                         //Logger.afterHook("RECEIVEDSNAP - DisplayTime");
                         Double currentResult = (Double) param.getResult();
-                        Logger.log("Starting with viewtime: " + currentResult, LogType.SAVING);
 
                         if (Preferences.getBool(Prefs.TIMER_UNLIMITED)) {
                             findAndHookMethod(Obfuscator.save.CLASS_SNAP_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_SNAPTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
