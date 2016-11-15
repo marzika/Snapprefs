@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.res.XModuleResources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.view.MotionEvent;
 import android.view.View;
@@ -45,23 +48,23 @@ public class MultiFilter {
         fc = findClass(Obfuscator.filters.OBJECT_CLASS, lpparam.classLoader);
         el = findClass(Obfuscator.filters.FILTER_CLASS, lpparam.classLoader);
         findAndHookMethod(Obfuscator.visualfilters.FILTERS_CLASS, lpparam.classLoader, "a", MotionEvent.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                try {
-                    if (((boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, "nowPlaying"))) {
-                        MotionEvent event = (MotionEvent) param.args[0];
-                        View view = (View) callMethod(param.thisObject, "c");//prev. d
-                        if (event.getRawY() > view.getHeight()/2) {
-                            param.setResult(true);
-                            NowPlaying.changeLayout();
-                            view.invalidate();
+                    @Override
+                    protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                        try {
+                            if (((boolean) XposedHelpers.getAdditionalInstanceField(param.thisObject, "nowPlaying"))) {
+                                MotionEvent event = (MotionEvent) param.args[0];
+                                View view = (View) callMethod(param.thisObject, "c");//prev. d
+                                if (event.getRawY() > view.getHeight() / 2) {
+                                    param.setResult(true);
+                                    NowPlaying.changeLayout();
+                                    view.invalidate();
+                                }
+                            }
+                        } catch (NullPointerException e) {
+                            //ignore, click doesn't happens on the NowPlaying filter
                         }
                     }
-                } catch (NullPointerException e) {
-                        //ignore, click doesn't happens on the NowPlaying filter
-                    }
                 }
-            }
         );
         findAndHookMethod(Obfuscator.filters.LOADER_CLASS, lpparam.classLoader, "a", Context.class, findClass(Obfuscator.filters.LOADER_FIRST, lpparam.classLoader), new XC_MethodHook() {
             @Override
@@ -86,7 +89,7 @@ public class MultiFilter {
                     added.add("NowPlaying");
                 }
                 for (File f : files) {
-                    addFilter(f.toString(), BitmapFactory.decodeFile(f.getPath()), param);
+                    addFilter(f.toString(), loadBitmap(f), param);
                 }
             }
         });
@@ -100,7 +103,7 @@ public class MultiFilter {
     }
 
     private static void addFilter(String id, Bitmap bitmap, XC_MethodHook.MethodHookParam param) {
-        if (added.contains(id)) {
+        if (added.contains(id) || bitmap == null) {
             return;
         }
         Object elObj = XposedHelpers.newInstance(el, param.args[1]);
@@ -113,5 +116,27 @@ public class MultiFilter {
         image.setTranslationY(0);
         ((List) param.getResult()).add(XposedHelpers.newInstance(fc, elObj));
         added.add(id);
+    }
+
+    public static Bitmap loadBitmap(final File f) {
+        if (added.contains(f.toString())) {
+            return null;
+        }
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(f.getPath(), options);
+        int imageHeight = options.outHeight;
+        int imageWidth = options.outWidth;
+        final Bitmap finalBmp = Bitmap.createBitmap(imageWidth, imageHeight, Bitmap.Config.ARGB_8888);
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                Bitmap bmp = BitmapFactory.decodeFile(f.getPath());
+                new Canvas(finalBmp).drawBitmap(bmp, 0, 0, new Paint());
+                bmp.recycle();
+                return null;
+            }
+        }.execute();
+        return finalBmp;
     }
 }
