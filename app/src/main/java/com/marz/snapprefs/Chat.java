@@ -375,7 +375,11 @@ public class Chat {
                         try{
                              videoUri = (Uri) getObjectField(param.thisObject, "b");
                         }catch (ClassCastException e){
-                            Logger.log("ClassCastException ignored: " + videoUri.getClass() + "to Uri", LogType.CHAT);
+                            if(videoUri==null){
+                                Logger.log("ClassCastException ignored: null to Uri", LogType.CHAT);
+                            } else{
+                                Logger.log("ClassCastException ignored: " + videoUri.getClass() + "to Uri", LogType.CHAT);
+                            }
                             return;
                         }
                         if( videoUri == null ) {
