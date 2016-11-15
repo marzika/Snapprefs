@@ -220,7 +220,7 @@
 
     <string name="pref_max_recording_time_default">10</string>
     <string name="pref_max_recording_time_summary">Tap here to enter a maximum recording time.</string>
-    <string name="pref_max_recording_time_title">Maximum Recording Time</string>
+    <string name="pref_max_recording_time_title">Maximum Recording Time (seconds)</string>
 
     <string name="pref_video_looping_title">Looping Videos</string>
     <string name="pref_video_looping_summary_off">Videos will play once</string>
