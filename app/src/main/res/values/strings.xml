@@ -365,7 +365,8 @@
     <string name="pref_support_faq_summary" translatable="false">Opens the XDA post containing the Frequently Asked Questions with answers.</string>
     <string name="title_activity_maps">Tap and Hold on a location to spoof</string>
     <string name="str_btn_find">Search</string>
-    <string name="hnt_et_location">Type here a location to find</string>
+    <string name="str_btn_reset">Reset</string>
+    <string name="hnt_et_location">Type a location to find</string>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
         AIzaSyDrN_SeVUZ1R7Qz-BggYYeyKuVdKU-NUmg
         <!--AIzaSyD-XNCHffArxbrgQ_-CS1nDXZRTfcEIlO4 DEBUG-->

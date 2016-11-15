@@ -13,6 +13,9 @@ android {
         versionName "2.0.0 beta"
 
     }
+    lintOptions{
+        checkReleaseBuilds false
+    }
 
     buildTypes {
         release {

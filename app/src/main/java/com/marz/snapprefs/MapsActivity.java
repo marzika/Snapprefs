@@ -46,6 +46,7 @@ public class MapsActivity extends Activity {
         map.getUiSettings().setZoomControlsEnabled(true);
         // Getting reference to btn_find of the layout activity_main
         Button btn_find = (Button) findViewById(R.id.btn_find);
+        Button btn_reset = (Button) findViewById(R.id.btn_reset);
 
         // Defining button click event listener for the find button
         OnClickListener findClickListener = new OnClickListener() {
@@ -64,9 +65,17 @@ public class MapsActivity extends Activity {
                 }
             }
         };
+        OnClickListener resetClickListener = new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FileUtils.writeToSDFolder(String.valueOf(-91), "latitude");
+                FileUtils.writeToSDFolder(String.valueOf(-181), "longitude");
+            }
+        };
 
         // Setting button click event listener for the find button
         btn_find.setOnClickListener(findClickListener);
+        btn_reset.setOnClickListener(resetClickListener);
     }
 
     // An AsyncTask class for accessing the GeoCoding Web Service
