@@ -27,6 +27,7 @@ import android.graphics.drawable.shapes.RectShape;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Html;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -72,6 +73,7 @@ import de.robv.android.xposed.callbacks.XC_InitPackageResources;
 import de.robv.android.xposed.callbacks.XC_LayoutInflated;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
+import static com.marz.snapprefs.Dialogs.rColor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
 
@@ -561,16 +563,21 @@ public class HookedLayouts {
     private static class OptionsAdapter extends BaseAdapter {
         private static LayoutInflater inflater = null;
         String[] options =
-                {"Text Color", "Text Size", "Text Transparency", "Text Gradient", "Text Alignment",
-                        "Text Style", "Text Font", "Background Color", "Background Transparency",
-                        "Background Gradient", "Reset"};
+                        {"Text Color", "Text Size", "Text Transparency",
+                        "Text Gradient", "Text Alignment", "Text Style",
+                        "Text Font", "Background Color", "Background Transparency",
+                        "Background Gradient", "Rainbow Text","Reset"};
+        // Text color - Text gradient - Text Transparency
+        // Bg color - Bg gradient - Bg Transparency
+        // Text size - Text font - Text style
+        // Text alignment - Rainbow Text - Reset
         Context context;
         XModuleResources mRes;
         int[] optionImageId =
                 {R.drawable.text_color, R.drawable.text_size, R.drawable.text_transparency,
                         R.drawable.text_gradient, R.drawable.text_alignment, R.drawable.text_style,
                         R.drawable.text_font, R.drawable.bg_color, R.drawable.bg_transparency,
-                        R.drawable.bg_gradient, R.drawable.reset};
+                        R.drawable.bg_gradient, R.drawable.rainbow, R.drawable.reset};
 
         public OptionsAdapter(Activity snapContext, XModuleResources mRes) {
             this.context = snapContext;
@@ -1150,7 +1157,25 @@ public class HookedLayouts {
                             builder.show();
                             return;
                         }
-                        case 10: { //reset
+                        case 10: { //rainbow
+                            String tempText = HookMethods.editText.getText().toString();
+                            tempText.replace("\\n", "<br />");
+                            tempText.replace("\\r", "<br />");
+                            String[] tempTextArray = tempText.split("");
+                            String newText = "";
+
+                            for (int i = 0; i <= tempText.length(); i++) {
+                                if (!tempTextArray[i].equals(" ")) {
+                                    int c = rColor.nextInt(329);
+                                    newText = newText + "<font color=" + Common.colors[c] + ">" + tempTextArray[i] + "</font>";
+                                } else {
+                                    newText = newText + " ";
+                                }
+                            }
+                            HookMethods.editText.setText(Html.fromHtml(newText));
+                            return;
+                        }
+                        case 11: { //reset
                             HookMethods.editText.setBackgroundDrawable(null);
                             HookMethods.editText.getPaint().reset();
                             HookMethods.editText.setTextColor(Color.WHITE);
