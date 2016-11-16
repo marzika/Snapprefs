@@ -392,6 +392,8 @@
     <string name="pref_viewed_summary_on">Stealth viewing will be executed</string>
     <string name="pref_viewed_title">Stealth Viewing</string>
     <string name="pref_viewed_readme_summary">When using Stealth Viewing you may sometimes receive \"ghost snaps\" whereby old snaps display again, this is normal and is due to the way we handle the stealth viewing</string>
+    <string name="pref_na_readme_title">NOT AVAILABLE</string>
+    <string name="pref_na_readme_summary">You don\'t have access to Deluxe options as you are a Premium user. Open the Buy menu to purchase the Deluxe option.</string>
 
     <string name="pref_stealth_chat_saving_summary_off">Stealth chat saving will NOT be executed</string>
     <string name="pref_stealth_chat_saving_summary_on">Stealth chat saving will be executed</string>
@@ -401,7 +403,7 @@
     <string name="pref_stealth_saving_button_summary_on">Stealth saving button will be used</string>
     <string name="pref_stealth_saving_button_title">Stealth Saving Button</string>
 
-    <string name="pref_stealth_notification_summary_off">Stealth notifications will NOT be used</string>
+    <string name="pref_stealth_notification_summary_off">Stealth notifications will NOT bee used</string>
     <string name="pref_stealth_notification_summary_on">Stealth notifications will be used</string>
     <string name="pref_stealth_notification_title">Stealth Notifications</string>
 

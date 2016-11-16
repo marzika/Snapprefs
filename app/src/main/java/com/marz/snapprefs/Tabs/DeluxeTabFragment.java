@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.marz.snapprefs.MainActivity;
+import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.R;
 import com.marz.snapprefs.Settings.BaseSettings;
 
@@ -65,9 +67,16 @@ public class DeluxeTabFragment extends Fragment {
         @Override
         public Fragment getItem(int position)
         {
-            switch (position){
-                case 0 : return new BaseSettings().setPreferenceId(R.xml.premium_prefs);
-                case 1 : return new BaseSettings().setPreferenceId(R.xml.deluxe_prefs);
+            if (Preferences.getLicenceUsingID(MainActivity.getDeviceId()) == 2) {
+                switch (position){
+                    case 0 : return new BaseSettings().setPreferenceId(R.xml.premium_prefs);
+                    case 1 : return new BaseSettings().setPreferenceId(R.xml.deluxe_prefs);
+                }
+            } else {
+                switch (position){
+                    case 0 : return new BaseSettings().setPreferenceId(R.xml.premium_prefs);
+                    case 1 : return new BaseSettings().setPreferenceId(R.xml.na_prefs);
+                }
             }
             return null;
         }
