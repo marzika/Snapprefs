@@ -303,14 +303,6 @@ public class VisualFilters {
                 }
             }
         });
-        findAndHookMethod(Obfuscator.save.LANDINGPAGEACTIVITY_CLASS, lpparam.classLoader, "onSnapCapturedEvent", findClass(Obfuscator.visualfilters.SNAPCHAPTUREDEVENT_CLASS, lpparam.classLoader), new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                added.clear();
-                added2.clear();
-                XposedBridge.log("CLEARING ADDED - VS");
-            }
-        });
     }
 
     private static void setPreferences() {

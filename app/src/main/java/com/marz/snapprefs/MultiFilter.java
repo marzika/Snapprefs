@@ -93,13 +93,6 @@ public class MultiFilter {
                 }
             }
         });
-        findAndHookMethod(Obfuscator.save.LANDINGPAGEACTIVITY_CLASS, lpparam.classLoader, "onSnapCapturedEvent", findClass(Obfuscator.filters.CAPTURED_FIRST, lpparam.classLoader), new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                added.clear();
-                XposedBridge.log("CLEARING ADDED");
-            }
-        });
     }
 
     private static void addFilter(String id, Bitmap bitmap, XC_MethodHook.MethodHookParam param) {

@@ -293,10 +293,10 @@ public class PaintTools {
         };
     }
     private static class OptionsAdapter extends BaseAdapter {
-        String[] options = {"alpha", "eraser", "color", "width", "history", "hex", "shape", "blur" , "gradient", "hide"};
+        String[] options = {"alpha", "eraser", "color", "gradient", "history", "hex", "shape", "blur" , "width", "hide"};
         Context context;
         XModuleResources mRes;
-        int [] optionImageId = {R.drawable.alpha, R.drawable.eraser, R.drawable.colorpicker, R.drawable.width, R.drawable.history, R.drawable.hashtag, R.drawable.shape, R.drawable.blur, R.drawable.draw_gradient, R.drawable.hide};
+        int [] optionImageId = {R.drawable.alpha, R.drawable.eraser, R.drawable.colorpicker, R.drawable.draw_gradient, R.drawable.history, R.drawable.hashtag, R.drawable.shape, R.drawable.blur, R.drawable.width, R.drawable.hide};
         private static LayoutInflater inflater=null;
 
         public OptionsAdapter(Activity snapContext, XModuleResources mRes) {
@@ -420,56 +420,99 @@ public class PaintTools {
                             colorPickerDialog.show();
                             return;
                         }
-                        case 3: {//width
+                        case 3: {//gradient
+                            shouldErase = false;
+                            shouldBlur = false;
                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            LinearLayout linearLayout = new LinearLayout(context);
-                            linearLayout.setOrientation(LinearLayout.VERTICAL);
-                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                            builder.setTitle("Drawing Gradient");
+                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                }
+                            });
+                            LinearLayout rootLayout = new LinearLayout(context);
+                            LinearLayout.LayoutParams rootParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            rootLayout.addView(inflater.inflate(HookMethods.modRes.getLayout(R.layout.gradient_layout), null), rootParams);
+                            final RadioGroup orientation = (RadioGroup) rootLayout.findViewById(R.id.orientation);
+                            final LinearLayout listLayout = (LinearLayout) rootLayout.findViewById(R.id.itemLayout);
+                            final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                    LinearLayout.LayoutParams.WRAP_CONTENT);
 
-                            final TextView tv = new TextView(context);
-                            tv.setText("Currently selected width: " + width);
-                            final SeekBar seekBar2 = new SeekBar(context);
-                            seekBar2.setMax(30);
-                            seekBar2.setProgress(width);
-                            seekBar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                                public void onProgressChanged(SeekBar seekBar2, int n, boolean bl) {
-                                    if (n == 0) {
-                                        n = n + 1;
+                            for (int i = 1; i <= 5; i++) {
+                                Button btn = new Button(context);
+                                btn.setId(i);
+                                final int id_ = btn.getId();
+                                btn.setText("Color: " + id_);
+                                btn.setBackgroundColor(colorsGrad[i - 1]);
+                                listLayout.addView(btn, params);
+                                final Button btn1 = ((Button) listLayout.findViewById(id_));
+                                btn1.setOnClickListener(new View.OnClickListener() {
+                                    public void onClick(View view) {
+                                        ColorPickerDialog colorPickerDialog = new ColorPickerDialog(context, colorsGrad[id_-1], new ColorPickerDialog.OnColorSelectedListener() {
+                                            @Override
+                                            public void onColorSelected(int color) {
+                                                // TODO Auto-generated method stub
+                                                colorsGrad[id_-1] = color;
+                                                btn1.setBackgroundColor(colorsGrad[id_-1]);
+                                            }
+                                        });
+                                        colorPickerDialog.setTitle("Color: " + id_);
+                                        colorPickerDialog.show();
                                     }
-                                    tv.setText("Currently selected width: " + n);
+                                });
+                                if (btn1.getId() <= currentItem[0]) {
+                                    btn1.setVisibility(View.VISIBLE);
+                                } else {
+                                    btn1.setVisibility(View.GONE);
                                 }
-
+                            }
+                            Button add = (Button) rootLayout.findViewById(R.id.add);
+                            add.setOnClickListener(new View.OnClickListener() {
                                 @Override
-                                public void onStartTrackingTouch(SeekBar arg0) {
-                                    // TODO Auto-generated method stub
-
-                                }
-
-                                @Override
-                                public void onStopTrackingTouch(SeekBar arg0) {
-                                    // TODO Auto-generated method stub
-
-                                }
-
-                            });
-                            builder.setNeutralButton(Common.dialog_default, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    width = 2;
-                                }
-                            });
-                            builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    width = seekBar2.getProgress();
-                                    if (width == 0) {
-                                        width = width + 1;
+                                public void onClick(View view) {
+                                    if (currentItem[0] < 5) {
+                                        currentItem[0]++;
+                                        listLayout.findViewById(currentItem[0]).setVisibility(View.VISIBLE);
+                                    } else {
+                                        Toast.makeText(context, "You cannot add more than 5 colors", Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
-                            linearLayout.addView(tv, params);
-                            linearLayout.addView(seekBar2, params);
-                            builder.setView(linearLayout);
+                            Button remove = (Button) rootLayout.findViewById(R.id.remove);
+                            remove.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    if (currentItem[0] > 2) {
+                                        listLayout.findViewById(currentItem[0]).setVisibility(View.GONE);
+                                        currentItem[0]--;
+                                    } else {
+                                        Toast.makeText(context, "You cannot have less than 2 colors", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            builder.setView(rootLayout);
+                            builder.setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    final int[] usedColors = new int[currentItem[0]];
+                                    System.arraycopy(colorsGrad, 0, usedColors, 0, currentItem[0]);
+                                    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+                                    Display display = wm.getDefaultDisplay();
+                                    Point size = new Point();
+                                    display.getSize(size);
+                                    Shader textShader = null;
+                                    int checkedID = orientation.getCheckedRadioButtonId();
+                                    if(checkedID == R.id.horizontal){
+                                        textShader = new LinearGradient(0, 0, size.x, 0, usedColors, null, Shader.TileMode.CLAMP);
+                                    } else if(checkedID == R.id.vertical){
+                                        textShader = new LinearGradient(0, 0, 0, size.y, usedColors, null, Shader.TileMode.CLAMP);
+                                    }
+                                    shader = textShader;
+                                    useShader = true;
+                                }
+                            });
                             builder.show();
                             return;
                         }
@@ -763,99 +806,56 @@ public class PaintTools {
                             shouldBlur = true;
                             return;
                         }
-                        case 8: {//gradient
-                            shouldErase = false;
-                            shouldBlur = false;
+                        case 8: {//width
                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setTitle("Drawing Gradient");
-                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                }
-                            });
-                            LinearLayout rootLayout = new LinearLayout(context);
-                            LinearLayout.LayoutParams rootParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                            rootLayout.addView(inflater.inflate(HookMethods.modRes.getLayout(R.layout.gradient_layout), null), rootParams);
-                            final RadioGroup orientation = (RadioGroup) rootLayout.findViewById(R.id.orientation);
-                            final LinearLayout listLayout = (LinearLayout) rootLayout.findViewById(R.id.itemLayout);
-                            final LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                                    LinearLayout.LayoutParams.MATCH_PARENT,
-                                    LinearLayout.LayoutParams.WRAP_CONTENT);
+                            LinearLayout linearLayout = new LinearLayout(context);
+                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+                            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
-                            for (int i = 1; i <= 5; i++) {
-                                Button btn = new Button(context);
-                                btn.setId(i);
-                                final int id_ = btn.getId();
-                                btn.setText("Color: " + id_);
-                                btn.setBackgroundColor(colorsGrad[i - 1]);
-                                listLayout.addView(btn, params);
-                                final Button btn1 = ((Button) listLayout.findViewById(id_));
-                                btn1.setOnClickListener(new View.OnClickListener() {
-                                    public void onClick(View view) {
-                                        ColorPickerDialog colorPickerDialog = new ColorPickerDialog(context, colorsGrad[id_-1], new ColorPickerDialog.OnColorSelectedListener() {
-                                            @Override
-                                            public void onColorSelected(int color) {
-                                                // TODO Auto-generated method stub
-                                                colorsGrad[id_-1] = color;
-                                                btn1.setBackgroundColor(colorsGrad[id_-1]);
-                                            }
-                                        });
-                                        colorPickerDialog.setTitle("Color: " + id_);
-                                        colorPickerDialog.show();
+                            final TextView tv = new TextView(context);
+                            tv.setText("Currently selected width: " + width);
+                            final SeekBar seekBar2 = new SeekBar(context);
+                            seekBar2.setMax(30);
+                            seekBar2.setProgress(width);
+                            seekBar2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                                public void onProgressChanged(SeekBar seekBar2, int n, boolean bl) {
+                                    if (n == 0) {
+                                        n = n + 1;
                                     }
-                                });
-                                if (btn1.getId() <= currentItem[0]) {
-                                    btn1.setVisibility(View.VISIBLE);
-                                } else {
-                                    btn1.setVisibility(View.GONE);
+                                    tv.setText("Currently selected width: " + n);
                                 }
-                            }
-                            Button add = (Button) rootLayout.findViewById(R.id.add);
-                            add.setOnClickListener(new View.OnClickListener() {
+
                                 @Override
-                                public void onClick(View view) {
-                                    if (currentItem[0] < 5) {
-                                        currentItem[0]++;
-                                        listLayout.findViewById(currentItem[0]).setVisibility(View.VISIBLE);
-                                    } else {
-                                        Toast.makeText(context, "You cannot add more than 5 colors", Toast.LENGTH_SHORT).show();
+                                public void onStartTrackingTouch(SeekBar arg0) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                                @Override
+                                public void onStopTrackingTouch(SeekBar arg0) {
+                                    // TODO Auto-generated method stub
+
+                                }
+
+                            });
+                            builder.setNeutralButton(Common.dialog_default, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    width = 2;
+                                }
+                            });
+                            builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    width = seekBar2.getProgress();
+                                    if (width == 0) {
+                                        width = width + 1;
                                     }
                                 }
                             });
-                            Button remove = (Button) rootLayout.findViewById(R.id.remove);
-                            remove.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    if (currentItem[0] > 2) {
-                                        listLayout.findViewById(currentItem[0]).setVisibility(View.GONE);
-                                        currentItem[0]--;
-                                    } else {
-                                        Toast.makeText(context, "You cannot have less than 2 colors", Toast.LENGTH_SHORT).show();
-                                    }
-                                }
-                            });
-                            builder.setView(rootLayout);
-                            builder.setPositiveButton("Apply", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    final int[] usedColors = new int[currentItem[0]];
-                                    System.arraycopy(colorsGrad, 0, usedColors, 0, currentItem[0]);
-                                    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-                                    Display display = wm.getDefaultDisplay();
-                                    Point size = new Point();
-                                    display.getSize(size);
-                                    Shader textShader = null;
-                                    int checkedID = orientation.getCheckedRadioButtonId();
-                                    if(checkedID == R.id.horizontal){
-                                        textShader = new LinearGradient(0, 0, size.x, 0, usedColors, null, Shader.TileMode.CLAMP);
-                                    } else if(checkedID == R.id.vertical){
-                                        textShader = new LinearGradient(0, 0, 0, size.y, usedColors, null, Shader.TileMode.CLAMP);
-                                    }
-                                    shader = textShader;
-                                    useShader = true;
-                                }
-                                });
+                            linearLayout.addView(tv, params);
+                            linearLayout.addView(seekBar2, params);
+                            builder.setView(linearLayout);
                             builder.show();
                             return;
                         }
