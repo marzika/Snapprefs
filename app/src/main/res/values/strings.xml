@@ -403,7 +403,7 @@
     <string name="pref_stealth_saving_button_summary_on">Stealth saving button will be used</string>
     <string name="pref_stealth_saving_button_title">Stealth Saving Button</string>
 
-    <string name="pref_stealth_notification_summary_off">Stealth notifications will NOT bee used</string>
+    <string name="pref_stealth_notification_summary_off">Stealth notifications will NOT be used</string>
     <string name="pref_stealth_notification_summary_on">Stealth notifications will be used</string>
     <string name="pref_stealth_notification_title">Stealth Notifications</string>
 
