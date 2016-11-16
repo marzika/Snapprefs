@@ -457,6 +457,16 @@ public class HookMethods
                             lpparam.classLoader, "onCreate", Bundle.class, initHook);
                     findAndHookMethod("com.snapchat.android.LandingPageActivity",
                             lpparam.classLoader, "onResume", initHook);
+                    findAndHookMethod(Obfuscator.save.LANDINGPAGEACTIVITY_CLASS, lpparam.classLoader, "onSnapCapturedEvent", findClass(Obfuscator.visualfilters.SNAPCHAPTUREDEVENT_CLASS, lpparam.classLoader), new XC_MethodHook() {
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            VisualFilters.added.clear();
+                            VisualFilters.added2.clear();
+                            MultiFilter.added.clear();
+                            PaintTools.once = false;
+                            XposedBridge.log("CLEARING ADDED");
+                        }
+                    });
 
         /*findAndHookMethod("com.snapchat.android.Timber", lpparam.classLoader, "c", String.class, String.class, Object[].class, new XC_MethodHook() {
             @Override
