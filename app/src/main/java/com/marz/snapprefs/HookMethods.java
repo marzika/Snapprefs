@@ -287,34 +287,6 @@ public class HookMethods
                 }
             });
 
-            findAndHookMethod(Obfuscator.timer.RECORDING_MESSAGE_HOOK_CLASS, lpparam.classLoader, Obfuscator.timer.RECORDING_MESSAGE_HOOK_METHOD, Message.class, new XC_MethodHook() {
-                boolean internallyCalled = false;
-                int maxRecordTime = Integer.parseInt(Preferences.getString(Prefs.MAX_RECORDING_TIME).trim()) * 1000;
-                @Override
-                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                    // If maxRecordTime is same as SC timecap, let SC perform as normal
-                    if (maxRecordTime > 10000) {
-                        super.beforeHookedMethod(param);
-                        Message message = (Message) param.args[0];
-                        Logger.log("HandleMessageId: " + message.what);
-
-                        if (message.what == 15 && !internallyCalled) {
-                            if (maxRecordTime > 10000) {
-                                internallyCalled = true;
-
-                                Handler handler = message.getTarget();
-                                Message newMessage = Message.obtain(handler, 15);
-
-                                handler.sendMessageDelayed(newMessage, maxRecordTime - 10000);
-                                Logger.log(String.format("Triggering video end in %s more ms", maxRecordTime - 10000));
-                            }
-
-                            param.setResult(null);
-                        } else if (internallyCalled)
-                            internallyCalled = false;
-                    }
-                }
-            });
 
             findAndHookMethod("android.app.Application", lpparam.classLoader, "attach", Context.class, new XC_MethodHook() {
                 @Override
@@ -322,6 +294,35 @@ public class HookMethods
                     Friendmojis.init(lpparam);
                     DebugHelper.init(lpparam);
                     Logger.log("Application hook: " + param.thisObject.getClass().getCanonicalName());
+
+                    findAndHookMethod(Obfuscator.timer.RECORDING_MESSAGE_HOOK_CLASS, lpparam.classLoader, Obfuscator.timer.RECORDING_MESSAGE_HOOK_METHOD, Message.class, new XC_MethodHook() {
+                        boolean internallyCalled = false;
+                        int maxRecordTime = Integer.parseInt(Preferences.getString(Prefs.MAX_RECORDING_TIME).trim()) * 1000;
+                        @Override
+                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                            // If maxRecordTime is same as SC timecap, let SC perform as normal
+                            if (maxRecordTime > 10000) {
+                                super.beforeHookedMethod(param);
+                                Message message = (Message) param.args[0];
+                                Logger.log("HandleMessageId: " + message.what);
+
+                                if (message.what == 15 && !internallyCalled) {
+                                    if (maxRecordTime > 10000) {
+                                        internallyCalled = true;
+
+                                        Handler handler = message.getTarget();
+                                        Message newMessage = Message.obtain(handler, 15);
+
+                                        handler.sendMessageDelayed(newMessage, maxRecordTime - 10000);
+                                        Logger.log(String.format("Triggering video end in %s more ms", maxRecordTime - 10000));
+                                    }
+
+                                    param.setResult(null);
+                                } else if (internallyCalled)
+                                    internallyCalled = false;
+                            }
+                        }
+                    });
 
                     XC_MethodHook initHook = new XC_MethodHook() {
                         @Override
@@ -525,47 +526,47 @@ public class HookMethods
                                 param.args[0] = 999999999;
                             }
                         });
+                        String snapCaptionView =
+                                "com.snapchat.android.app.shared.ui.caption.SnapCaptionView";
+                        hookAllConstructors(findClass(snapCaptionView, lpparam.classLoader), new XC_MethodHook() {
+                            @Override
+                            protected void afterHookedMethod(MethodHookParam param) {
+                                if (Preferences.getBool(Prefs.CAPTION_UNLIMITED_VANILLA)) {
+                                    XposedUtils.log("Unlimited vanilla captions - 1");
+                                    EditText vanillaCaptionEditText = (EditText) param.thisObject;
+                                    // Set single lines mode to false
+                                    vanillaCaptionEditText.setSingleLine(false);
+                                    vanillaCaptionEditText.setFilters(new InputFilter[0]);
+                                    // Remove actionDone IME option, by only setting flagNoExtractUi
+                                    vanillaCaptionEditText.setImeOptions(EditorInfo.IME_ACTION_NONE);
+                                    // Remove listener hiding keyboard when enter is pressed by setting the listener to null
+                                    vanillaCaptionEditText.setOnEditorActionListener(null);
+                                    // Remove listener for cutting of text when the first line is full by setting the text change listeners list to null
+                                    setObjectField(vanillaCaptionEditText, "mListeners", null);
+                                }
+                            }
+                        });
+                        XposedHelpers.findAndHookMethod("com.snapchat.android.app.shared.ui.caption.SnapCaptionView", lpparam.classLoader, "onCreateInputConnection", EditorInfo.class, new XC_MethodHook() {
+                            @Override
+                            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                                if (Preferences.getBool(Prefs.CAPTION_UNLIMITED_VANILLA)) {
+                                    XposedUtils.log("Unlimited vanilla captions - 2");
+                                    EditorInfo editorInfo = (EditorInfo) param.args[0];
+                                    editorInfo.imeOptions = EditorInfo.IME_ACTION_NONE;
+                                }
+                            }
+                        });
+                        XposedHelpers.findAndHookMethod("TX$3", lpparam.classLoader, "onEditorAction", TextView.class, int.class, KeyEvent.class, new XC_MethodHook() {
+                            @Override
+                            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                                Logger.printFinalMessage("onEditorAction: int= " + param.args[1], LogType.SAVING);
+                            }
+                        });
 
                         //findAndHookMethod("com.snapchat.android.ui.caption.CaptionEditText", lpparam.classLoader, "n", XC_MethodReplacement.DO_NOTHING);
                     }
                     // VanillaCaptionEditText was moved from an inner-class to a separate class in 8.1.0
                     // TODO Find below class - ENTIRE PACKAGE REFACTORED - DONE?
-                    String snapCaptionView =
-                            "com.snapchat.android.app.shared.ui.caption.SnapCaptionView";
-                    hookAllConstructors(findClass(snapCaptionView, lpparam.classLoader), new XC_MethodHook() {
-                        @Override
-                        protected void afterHookedMethod(MethodHookParam param) {
-                            if (Preferences.getBool(Prefs.CAPTION_UNLIMITED_VANILLA)) {
-                                XposedUtils.log("Unlimited vanilla captions - 1");
-                                EditText vanillaCaptionEditText = (EditText) param.thisObject;
-                                // Set single lines mode to false
-                                vanillaCaptionEditText.setSingleLine(false);
-                                vanillaCaptionEditText.setFilters(new InputFilter[0]);
-                                // Remove actionDone IME option, by only setting flagNoExtractUi
-                                vanillaCaptionEditText.setImeOptions(EditorInfo.IME_ACTION_NONE);
-                                // Remove listener hiding keyboard when enter is pressed by setting the listener to null
-                                vanillaCaptionEditText.setOnEditorActionListener(null);
-                                // Remove listener for cutting of text when the first line is full by setting the text change listeners list to null
-                                setObjectField(vanillaCaptionEditText, "mListeners", null);
-                            }
-                        }
-                    });
-                    XposedHelpers.findAndHookMethod("com.snapchat.android.app.shared.ui.caption.SnapCaptionView", lpparam.classLoader, "onCreateInputConnection", EditorInfo.class, new XC_MethodHook() {
-                        @Override
-                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                            if (Preferences.getBool(Prefs.CAPTION_UNLIMITED_VANILLA)) {
-                                XposedUtils.log("Unlimited vanilla captions - 2");
-                                EditorInfo editorInfo = (EditorInfo) param.args[0];
-                                editorInfo.imeOptions = EditorInfo.IME_ACTION_NONE;
-                            }
-                        }
-                    });
-                    XposedHelpers.findAndHookMethod("TX$3", lpparam.classLoader, "onEditorAction", TextView.class, int.class, KeyEvent.class, new XC_MethodHook() {
-                        @Override
-                        protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                            Logger.printFinalMessage("onEditorAction: int= " + param.args[1], LogType.SAVING);
-                        }
-                    });
                     /*String vanillaCaptionEditTextClassName =
                             "com.snapchat.android.ui.caption.VanillaCaptionEditText";
                     hookAllConstructors(findClass(vanillaCaptionEditTextClassName, lpparam.classLoader), new XC_MethodHook() {

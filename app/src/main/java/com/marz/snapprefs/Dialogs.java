@@ -51,6 +51,15 @@ public class Dialogs {
 
             }
         });
+
+        builder.setNeutralButton(Common.dialog_reset, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // TODO Auto-generated method stub
+                Spoofing.speed = -1;
+                Toast.makeText(SnapContext, "Speed reseted", Toast.LENGTH_SHORT).show();
+            }
+        });
         builder.show();
         return true;
     }
@@ -86,6 +95,14 @@ public class Dialogs {
             public void onClick(DialogInterface dialog, int which) {
                 // TODO Auto-generated method stub
 
+            }
+        });
+        builder.setNeutralButton(Common.dialog_reset, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // TODO Auto-generated method stub
+                FileUtils.writeToFile(String.valueOf(-1), SnapContext, "weather");
+                Toast.makeText(SnapContext, "Weather reseted", Toast.LENGTH_SHORT).show();
             }
         });
         builder.show();

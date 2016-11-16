@@ -22,6 +22,7 @@ public final class Common {
     final static String PACKAGE_SNAP = "com.snapchat.android";
     final static String PACKAGE_SP = "com.marz.snapprefs";
     final static String dialog_default = "Default";
+    final static String dialog_reset = "Reset";
     public final static String dialog_cancel = "Cancel";
     public final static String dialog_done = "Done";
     final static String dialog_title = "SnapPrefs Colour Manager";

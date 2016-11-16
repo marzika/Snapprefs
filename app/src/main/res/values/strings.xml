@@ -220,7 +220,7 @@
 
     <string name="pref_max_recording_time_default">10</string>
     <string name="pref_max_recording_time_summary">Tap here to enter a maximum recording time.</string>
-    <string name="pref_max_recording_time_title">Maximum Recording Time</string>
+    <string name="pref_max_recording_time_title">Maximum Recording Time (seconds)</string>
 
     <string name="pref_video_looping_title">Looping Videos</string>
     <string name="pref_video_looping_summary_off">Videos will play once</string>
@@ -365,7 +365,8 @@
     <string name="pref_support_faq_summary" translatable="false">Opens the XDA post containing the Frequently Asked Questions with answers.</string>
     <string name="title_activity_maps">Tap and Hold on a location to spoof</string>
     <string name="str_btn_find">Search</string>
-    <string name="hnt_et_location">Type here a location to find</string>
+    <string name="str_btn_reset">Reset</string>
+    <string name="hnt_et_location">Type a location to find</string>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
         AIzaSyDrN_SeVUZ1R7Qz-BggYYeyKuVdKU-NUmg
         <!--AIzaSyD-XNCHffArxbrgQ_-CS1nDXZRTfcEIlO4 DEBUG-->
