@@ -297,42 +297,51 @@ public class HookedLayouts {
                         liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP)
                 ).getParent();
 
-                saveSnapButton = new ImageButton(localContext);
-                saveSnapButton.setLayoutParams(layoutParams);
-                saveSnapButton.setBackgroundColor(0);
-                saveSnapButton.setAlpha(Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? 0f : 1f);
-                saveSnapButton.setImageBitmap(HookMethods.saveImg);
-                saveSnapButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
-                        ? View.VISIBLE : View.INVISIBLE);
+                int saveMode = Preferences.getInt(Prefs.SAVEMODE_SNAP);
 
-                frameLayout.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        if (gestureEvent == null) {
-                            if (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S)
-                                gestureEvent = new SweepSaveGesture();
-                            else if (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_F2S)
-                                gestureEvent = new FlingSaveGesture();
-                            else {
-                                Logger.log("No gesture method provided");
-                                return false;
-                            }
+                if(saveMode == Preferences.SAVE_BUTTON) {
+                    saveSnapButton = new ImageButton(localContext);
+                    saveSnapButton.setLayoutParams(layoutParams);
+                    saveSnapButton.setBackgroundColor(0);
+                    saveSnapButton.setAlpha(Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? 0f : 1f);
+                    saveSnapButton.setImageBitmap(HookMethods.saveImg);
+                    saveSnapButton.setVisibility(View.VISIBLE);
+
+                    frameLayout.addView(saveSnapButton);
+                    saveSnapButton.bringToFront();
+
+                    saveSnapButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Logger.printTitle("Performing Button Save", LogType.SAVING);
+                            Saving.performButtonSave();
                         }
+                    });
+                } else if (saveMode == Preferences.SAVE_S2S ||
+                        saveMode == Preferences.SAVE_F2S) {
 
-                        return gestureEvent.onTouch(v, event, Saving.SnapType.SNAP) != GestureEvent.ReturnType.SAVED;
-                    }
-                });
+                    frameLayout.setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            if (gestureEvent == null) {
+                                if (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S)
+                                    gestureEvent = new SweepSaveGesture();
+                                else if (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_F2S)
+                                    gestureEvent = new FlingSaveGesture();
+                                else {
+                                    Logger.log("No gesture method provided");
+                                    return false;
+                                }
+                            }
 
-                frameLayout.addView(saveSnapButton);
-                saveSnapButton.bringToFront();
-
-                saveSnapButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Logger.printTitle("Performing Button Save", LogType.SAVING);
-                        Saving.performButtonSave();
-                    }
-                });
+                            if (gestureEvent.onTouch(v, event, Saving.SnapType.SNAP) == GestureEvent.ReturnType.TAP) {
+                                Logger.log("Performed TAP?", LogType.SAVING);
+                                return false;
+                            } else
+                                return true;
+                        }
+                    });
+                }
             }
         });
     }
