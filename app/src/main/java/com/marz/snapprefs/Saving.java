@@ -344,7 +344,7 @@ public class Saving {
 
                         String key = (String) param.args[0];
                         //Logger.log("aGgkey: " + key);
-                        if (Preferences.getBool(Prefs.TIMER_UNLIMITED) && key.equals("auto_advance_mode"))
+                        if (Preferences.getBool(Prefs.AUTO_ADVANCE) && key.equals("auto_advance_mode"))
                             param.args[1] = enum_NO_AUTO_ADVANCE;
                         else if (Preferences.getInt(Prefs.TIMER_MINIMUM) !=
                                 Preferences.TIMER_MINIMUM_DISABLED && key.equals("total_duration_sec")) {
@@ -379,6 +379,7 @@ public class Saving {
             }
             if (Preferences.getBool(Prefs.HIDE_TIMER_STORY)) {
                 // UPDATED METHOD & CONTENT
+                findAndHookMethod(Obfuscator.save.CLASS_NEW_STORY_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_STORYTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
                 findAndHookMethod(Obfuscator.save.CLASS_STORY_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_STORYTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
             if (Preferences.getBool(Prefs.LOOPING_VIDS)) {

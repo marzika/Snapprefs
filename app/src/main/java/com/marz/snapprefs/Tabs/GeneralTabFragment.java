@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.marz.snapprefs.R;
 import com.marz.snapprefs.Settings.BaseSettings;
 import com.marz.snapprefs.Settings.MiscSettings;
+import com.marz.snapprefs.Settings.StickerSettings;
 
 public class GeneralTabFragment extends Fragment {
 
@@ -68,7 +69,7 @@ public class GeneralTabFragment extends Fragment {
             switch (position){
                 case 0 : return new BaseSettings().setPreferenceId(R.xml.timer_prefs);
                 case 1 : return new BaseSettings().setPreferenceId(R.xml.select_prefs);
-                case 2 : return new BaseSettings().setPreferenceId(R.xml.stickers_prefs);
+                case 2 : return new StickerSettings().setPreferenceId(R.xml.stickers_prefs);
                 case 3 : return new BaseSettings().setPreferenceId(R.xml.filters_prefs);
                 case 4 : return new MiscSettings().setPreferenceId(R.xml.misc_prefs);
             }

@@ -77,6 +77,8 @@
     <string name="pref_sticker_title">Enable Custom Stickers</string>
     <string name="pref_sticker_summary_on">Custom stickers will be loaded</string>
     <string name="pref_sticker_summary_off">Custom stickers will NOT be loaded</string>
+    <string name="pref_sticker_wipe_title">Wipe SVG folder</string>
+    <string name="pref_sticker_wipe_summary">Due to recent changes in Snapchat, unzipped SVGs are stored in /data/data/com.snapchat.android/files/twemoji_2_svg . In order to switch to new stickers, you have to wipe that folder. Click here to wipe that, it requires root access.</string>
     <string name="pref_sticker_readme_title">HOW TO USE</string>
     <string name="pref_sticker_readme_summary">To replace stickers, you have to first get SC\'s Emoji zips (can be found in their apk\'s assets folder), the PNG folder stores the previews of the stickers, the SVG folder contains the actual stickers. Each filename represents the unicode code of the Emoji, which they represent. To change the sticker, you have to replace the desired PNG and SVG in their zip, then place the zips in the /SDCARD/Snapprefs/Stickers/ folder (create them). Click here for a tutorial.</string>
     <string name="pref_sticker_readme_summary2">Example SVGs/PNGs can be found at https://github.com/Ranks/emojione</string>
@@ -403,7 +405,7 @@
     <string name="pref_stealth_saving_button_summary_on">Stealth saving button will be used</string>
     <string name="pref_stealth_saving_button_title">Stealth Saving Button</string>
 
-    <string name="pref_stealth_notification_summary_off">Stealth notifications will NOT bee used</string>
+    <string name="pref_stealth_notification_summary_off">Stealth notifications will NOT be used</string>
     <string name="pref_stealth_notification_summary_on">Stealth notifications will be used</string>
     <string name="pref_stealth_notification_title">Stealth Notifications</string>
 
