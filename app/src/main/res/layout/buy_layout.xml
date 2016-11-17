@@ -66,7 +66,7 @@
                 android:layout_marginLeft="@dimen/default_gap_4x"
                 android:layout_marginRight="@dimen/default_gap_4x"
                 android:layout_marginTop="@dimen/default_gap"
-                android:text="Every Premium Feature\nStealth Viewing - Snaps will not appear as seen to the sender\nGod mode - Other Snapprefs users can&apos;t save your snaps"
+                android:text="Every Premium Feature\nStealth Viewing - Snaps will not appear as seen to the sender\nStealth Chat Saving - The sender won't know you saved the message\nStealth Notifications - Discrete saving notifications\nStealth Saving Button - Invisible save button\nGod mode - Other Snapprefs users can&apos;t save your snaps"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <ImageButton
