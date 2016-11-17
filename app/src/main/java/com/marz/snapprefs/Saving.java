@@ -379,6 +379,7 @@ public class Saving {
             }
             if (Preferences.getBool(Prefs.HIDE_TIMER_STORY)) {
                 // UPDATED METHOD & CONTENT
+                findAndHookMethod(Obfuscator.save.CLASS_NEW_STORY_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_STORYTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
                 findAndHookMethod(Obfuscator.save.CLASS_STORY_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_STORYTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
             }
             if (Preferences.getBool(Prefs.LOOPING_VIDS)) {
