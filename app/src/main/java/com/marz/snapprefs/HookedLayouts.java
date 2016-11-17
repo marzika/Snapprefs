@@ -206,8 +206,9 @@ public class HookedLayouts {
                             int w = resized.getWidth();
                             int h = resized.getHeight();
 
+                            int strokeWidth = px(8);
                             int radius = Math.min(h / 2, w / 2);
-                            Bitmap output = Bitmap.createBitmap(w + 8, h + 8, Bitmap.Config.ARGB_8888);
+                            Bitmap output = Bitmap.createBitmap(w + strokeWidth, h + strokeWidth, Bitmap.Config.ARGB_8888);
 
                             Paint p = new Paint();
                             p.setAntiAlias(true);
@@ -216,16 +217,16 @@ public class HookedLayouts {
                             c.drawARGB(0, 0, 0, 0);
                             p.setStyle(Paint.Style.FILL);
 
-                            c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
+                            c.drawCircle((w / 2) + (strokeWidth / 2), (h / 2) + (strokeWidth / 2), radius, p);
 
                             p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
 
-                            c.drawBitmap(resized, 4, 4, p);
+                            c.drawBitmap(resized, (strokeWidth / 2), (strokeWidth / 2), p);
                             p.setXfermode(null);
                             p.setStyle(Paint.Style.STROKE);
                             p.setColor(Color.WHITE);
-                            p.setStrokeWidth(px(8));
-                            c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
+                            p.setStrokeWidth(strokeWidth);
+                            c.drawCircle((w / 2) + (strokeWidth / 2), (h / 2) + (strokeWidth / 2), radius, p);
                             upload.setImageDrawable(new BitmapDrawable(output));
                         }
 
