@@ -7,6 +7,10 @@
         android:summaryOn="@string/pref_sticker_summary_on"
         android:title="@string/pref_sticker_title" />
     <Preference
+        android:key="pref_sticker_wipe"
+        android:summary="@string/pref_sticker_wipe_summary"
+        android:title="@string/pref_sticker_wipe_title">
+    </Preference>    <Preference
         android:key="pref_sticker_readme"
         android:summary="@string/pref_sticker_readme_summary"
         android:title="@string/pref_sticker_readme_title">
