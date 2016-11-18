@@ -1,6 +1,38 @@
 Changelog
 #################
 
+*Changelog for 2.1.0:*
+
+
+| - Updated for 9.39.5.0
+|
+| - Added Lense Collector and Selector
+|
+| - Added Chat Logs in Snapprefs
+|
+| - Added Disable Auto-Advance
+|
+| - Added Debug Options
+|
+| - Readded Autosave for Snaps and Stories
+|
+| - Added Fling to Save
+|
+| - Added Crop Menu for Image Sharing
+|
+| - Stealth Notification for Deluxe Users
+|
+| - Added Reset Button for Spoofing
+|
+| - Added Saving of Profile Pictures
+|
+| - Added Documentation
+|
+| - Changed Loading of Filters
+|
+| - Fixed A lot of Bugs
+
+
 *Changelog for 2.0.0 beta:*
 
 
