@@ -1,6 +1,6 @@
 Snapprefs
 =========
-[![Build Status](http://138.68.21.49:8080/job/SNAPPREFS%20-%20Official%20-%20stable/badge/icon)](http://138.68.21.49:8080/job/SNAPPREFS%20-%20Official%20-%20stable/) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
+[![Build Status](http://snapprefs-builds.com:8080/job/SNAPPREFS%20-%20Official%20-%20stable/badge/icon)](http://138.68.21.49:8080/job/SNAPPREFS%20-%20Official%20-%20stable/) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
 
 Overview
 -------
@@ -73,7 +73,9 @@ Credits
 
 andrerm124 for working countless hours on the project
 
-m1kep for providing the build server and additional features
+m1kep for managing the bulid server and additional features
+
+electronicwizard for providing the server for jenkins
 
 manvir for his inspirational [SnapColors app](http://repo.xposed.info/module/com.manvir.snapcolors)
 
@@ -116,9 +118,9 @@ Latest automatic builds (provided by m1kep):
 -------
 Available as Jenkins artifacts:
 
-[Official Stable Branch](https://bit.ly/Official-Stable)
+[Official Stable Branch](http://bit.ly/SPOfficialStable)
 
-[Official Development Branch](https://bit.ly/Official-Development)
+[Official Development Branch](http://bit.ly/SPOfficialDevelopment)
 
 License
 -------
