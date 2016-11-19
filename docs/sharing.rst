@@ -59,3 +59,6 @@ Again, you have two ways to share a video :
 	
 	You will need to dismiss the sharing screen (by pressing the X on the upper right of the screen) to go back to the Snapchat camera view.
 	Once in the camera view, you must hold the round button to record a video. Instead of displaying the current camera's video, the video you chose to share will be shown as if you just recorded it.
+
+	
+After sharing any type of media, you must completely kill (force close) the snapchat app to be able to use it correctly again.
