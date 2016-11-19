@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.os.AsyncTaskCompat;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -709,9 +710,12 @@ public class Saving {
             try {
                 if (snapData.hasFlag(FlagState.COMPLETED) &&
                         !snapData.hasFlag(FlagState.SAVED)) {
-                    snapData.addFlag(FlagState.PROCESSING);
+
+                    if (!snapData.hasFlag(FlagState.PROCESSING))
+                        snapData.addFlag(FlagState.PROCESSING);
+
                     if (asyncSaveMode) {
-                        new AsyncSaveSnapData().execute(context, snapData);
+                        AsyncTaskCompat.executeParallel(new AsyncSaveSnapData(), context, snapData);
                     } else
                         handleSave(context, snapData);
                 } else {
@@ -798,7 +802,7 @@ public class Saving {
         if (shouldAutoSave(snapData)) {
             snapData.addFlag(FlagState.PROCESSING);
             if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED))
-                new AsyncSaveSnapData().execute(context, snapData);
+                AsyncTaskCompat.executeParallel(new AsyncSaveSnapData(), context, snapData);
             else
                 handleSave(context, snapData);
         } else {
@@ -915,7 +919,7 @@ public class Saving {
         if (shouldAutoSave(snapData)) {
             snapData.addFlag(FlagState.PROCESSING);
             if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED))
-                new AsyncSaveSnapData().execute(context, snapData);
+                AsyncTaskCompat.executeParallel(new AsyncSaveSnapData(), context, snapData);
             else
                 handleSave(context, snapData);
         } else
@@ -972,7 +976,7 @@ public class Saving {
             Logger.printMessage("Hash Size: " + hashSnapData.size(), LogType.SAVING);
         }
 
-        if(!snapData.hasFlag(FlagState.COMPLETED)) {
+        if (!snapData.hasFlag(FlagState.COMPLETED)) {
             if (originalBmp.isRecycled()) {
                 Logger.printFinalMessage("Bitmap is already recycled", LogType.SAVING);
                 snapData.addFlag(FlagState.FAILED);
@@ -993,7 +997,7 @@ public class Saving {
         if (shouldAutoSave(snapData)) {
             snapData.addFlag(FlagState.PROCESSING);
             if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED))
-                new AsyncSaveSnapData().execute(context, snapData);
+                AsyncTaskCompat.executeParallel(new AsyncSaveSnapData(), context, snapData);
             else
                 handleSave(context, snapData);
         } else
