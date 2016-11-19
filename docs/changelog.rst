@@ -1,6 +1,54 @@
 Changelog
 #################
 
+*Changelog for 2.1.0:*
+
+
+| - Updated for SC 9.39.5.0
+|
+| - Added Lense Collector and Selector
+|
+| - Added Saved Chat Logs in Snapprefs
+|
+| - Significant Performance Improvements
+|
+| - Added Disable Auto-Advance
+|
+| - Added Debug Options and reworked Debug logging
+|
+| - Readded Autosave for Snaps and Stories
+|
+| - Added Fling to Save
+|
+| - Added Crop Menu for Image Sharing
+|
+| - Stealth Notification for Deluxe Users
+|
+| - Stealth Save Button for Deluxe Users
+|
+| - Added Reset Button for Spoofing
+|
+| - Added Saving of Profile Pictures
+|
+| - Added Documentation
+|
+| - Changed Loading of Filters
+|
+| - Readded Rainbox Text
+|
+| - Added more Support Options
+|
+| - Added Front Flash Function (volume up)
+|
+| - Fixed ToU Dialog
+|
+| - Added Customizable Recording Time
+|
+| - Added Option to move Savebutton from the right to the left
+|
+| - Added Now Playing Filter
+
+
 *Changelog for 2.0.0 beta:*
 
 
