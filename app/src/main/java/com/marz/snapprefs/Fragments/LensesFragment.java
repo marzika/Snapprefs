@@ -4,9 +4,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.os.AsyncTaskCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -224,7 +224,7 @@ public class LensesFragment extends Fragment {
                     //TODO Implement try/catch
 
                     try {
-                        new LensIconLoader.AsyncLensIconDownloader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, containerData, context);
+                        AsyncTaskCompat.executeParallel(new LensIconLoader.AsyncLensIconDownloader(), containerData, context);
                     } catch (Throwable e) {
                         Logger.log("Error loading lens", e);
                     }
