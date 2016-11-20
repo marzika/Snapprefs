@@ -1381,7 +1381,7 @@ public class Saving {
             } catch (Exception e) {
                 Logger.log("Exception performing Threaded Save ", e, LogType.SAVING);
             }
-            
+
             Logger.log("Thread " + android.os.Process.myTid() + " finished and destroyed");
         }
     }
