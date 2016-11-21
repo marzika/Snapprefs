@@ -1,6 +1,6 @@
 Snapprefs
 =========
-[![Build Status](http://snapprefsjenkins.hopto.org:8080/job/SNAPPREFS%20-%20stable/badge/icon)](http://jenkins.snapprefs.com) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
+[![Build Status](http://138.68.21.49:8080/job/SNAPPREFS%20-%20Official%20-%20stable/badge/icon)](http://138.68.21.49:8080/job/SNAPPREFS%20-%20Official%20-%20stable/) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
 
 Overview
 -------
@@ -71,6 +71,10 @@ Credits
 
 [Snapshare for their amazing work](https://github.com/P1nGu1n/Snapshare)
 
+andrerm124 for working countless hours on the project
+
+m1kep for providing the build server and additional features
+
 manvir for his inspirational [SnapColors app](http://repo.xposed.info/module/com.manvir.snapcolors)
 
 elesbb for his inspirational [SnapChat Full Caption app](http://repo.xposed.info/module/com.elesbb.snapchatfullcaption)
@@ -112,9 +116,9 @@ Latest automatic builds (provided by m1kep):
 -------
 Available as Jenkins artifacts:
 
-[Official Branches](http://jenkins.snapprefs.com)
+[Official Stable Branch](https://bit.ly/Official-Stable)
 
-[UN-Official Branches](http://138.68.21.49:8080/job/SNAPPREFS/lastSuccessfulBuild/artifact/app/build/outputs/apk/)
+[Official Development Branch](https://bit.ly/Official-Development)
 
 License
 -------

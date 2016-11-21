@@ -8,7 +8,9 @@
         android:id="@+id/scrollView3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerHorizontal="true">
+        android:layout_centerHorizontal="true"
+        android:fadeScrollbars="false"
+        android:scrollbarFadeDuration="0">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,62 +26,189 @@
                 android:text="Support"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
-            <TextView
-                android:id="@+id/xda_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/default_gap_2x"
-                android:text="Tap to visit the official XDA thread"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:stretchColumns="*">
 
-            <ImageButton
-                android:id="@+id/xda"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/default_gap_2x"
-                android:background="@drawable/aa_blank"
-                android:scaleType="centerCrop"
-                android:src="@drawable/xda" />
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/gplu_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/default_gap_2x"
-                android:text="Tap to visit the official G+ page"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
 
-            <ImageButton
-                android:id="@+id/gplus"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/default_gap"
-                android:background="@drawable/aa_blank"
-                android:scaleType="fitXY"
-                android:src="@drawable/googleplus" />
+                        <TextView
+                            android:id="@+id/facebook_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/default_gap_2x"
+                            android:gravity="center"
+                            android:text="Facebook Page"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-            <TextView
-                android:id="@+id/reddit_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/default_gap_2x"
-                android:text="Tap to visit the official Reddit subreddit"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                        <ImageButton
+                            android:id="@+id/facebook"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/default_gap"
+                            android:background="@drawable/aa_blank"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/facebook" />
+                    </LinearLayout>
 
-            <ImageButton
-                android:id="@+id/reddit"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="@dimen/default_gap"
-                android:background="@drawable/aa_blank"
-                android:scaleType="fitXY"
-                android:src="@drawable/reddit" />
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/website_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/default_gap_2x"
+                            android:gravity="center"
+                            android:text="Website"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <ImageButton
+                            android:id="@+id/website"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/default_gap"
+                            android:background="@drawable/aa_blank"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/web"
+                            android:adjustViewBounds="true" />
+                    </LinearLayout>
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/xda_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/default_gap_2x"
+                            android:gravity="center"
+                            android:text="XDA Thread"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <ImageButton
+                            android:id="@+id/xda"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/default_gap_2x"
+                            android:adjustViewBounds="true"
+                            android:background="@drawable/aa_blank"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/xda" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/ig_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/default_gap_2x"
+                            android:gravity="center"
+                            android:text="Documentation"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <ImageButton
+                            android:id="@+id/docs"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/default_gap"
+                            android:adjustViewBounds="true"
+                            android:background="@drawable/aa_blank"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/docs" />
+                    </LinearLayout>
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/reddit_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="@dimen/default_gap_2x"
+                            android:gravity="center"
+                            android:text="Subreddit"
+                            android:textAlignment="center"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <ImageButton
+                            android:id="@+id/reddit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/default_gap"
+                            android:adjustViewBounds="true"
+                            android:background="@drawable/aa_blank"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/reddit" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/gplu_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/default_gap_2x"
+                            android:gravity="center"
+                            android:text="Google+ Page"
+                            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                        <ImageButton
+                            android:id="@+id/gplus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="@dimen/default_gap"
+                            android:background="@drawable/aa_blank"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/googleplus" />
+                    </LinearLayout>
+
+                </TableRow>
+            </TableLayout>
 
         </LinearLayout>
     </ScrollView>

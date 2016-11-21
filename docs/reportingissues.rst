@@ -14,7 +14,7 @@ Report an Issue
 	* Snapprefs and Snapchat Version
 	* Android Version
 	* How is the issue reproduceable
-	* Descripe the steps you are taking
+	* Describe the steps you are taking
 	
 4. *Provide Logs!* This means:
 	* Use Android Studio or a Logcat App like Logcat Extreme to log only Snapchat/Snapprefs

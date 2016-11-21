@@ -29,6 +29,6 @@ Weather
 
 *Weather Spoofing*
 
-	| >Weather will be spoofed if enabled
+	| Weather will be spoofed if enabled
 	| HOW TO USE
 	| After typing in your desired value, you have to kill Snapchat, then restart to apply it.

@@ -50,12 +50,10 @@ Stickers
 *Enable Custom Stickers*
 
 	| Enables the Custom Stickers
-	| HOW TO USE
+	| HOW TO USE :
 	| To replace stickers, you have to first get SC\'s Emoji zips (can be found in their apk\'s assets
 	| folder), the PNG folder stores the previews of the stickers, the SVG folder contains the actual 
-	| stickers. Each filename represents the unicode code of the Emoji, which they represent. To change 
-	| the sticker, you have to replace the desired PNG and SVG in their zip, then place the zips in the 
-	| /SDCARD/Snapprefs/Stickers/ folder (create them). Click here for a tutorial.
+	| stickers. Each filename represents the unicode code of the Emoji, which they represent. To change the sticker, you have to replace the desired PNG and SVG in their zip, then place the zips in the /SDCARD/Snapprefs/Stickers/ folder (create them). Click here for a tutorial.
 	| Example SVGs/PNGs can be found at https://github.com/Ranks/emojione
 
 	
@@ -69,7 +67,7 @@ Filters
 
 *Enable Multi-Filters*
 
-	| Remark: Marz, i think this is obsolete in the app, no?
+	| Enable it for the Now playing filter
 
 	
 

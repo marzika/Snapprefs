@@ -177,6 +177,7 @@ public class Obfuscator implements Serializable {
         public final static String METHOD_SNAPTIMERVIEW_ONDRAW = "onDraw";
 
         // StoryTimerView class
+        public final static String CLASS_NEW_STORY_TIMER_VIEW = "com.snapchat.android.framework.ui.views.NewConcentricTimerView";
         public final static String CLASS_STORY_TIMER_VIEW = "com.snapchat.android.framework.ui.views.ConcentricTimerView"; //Prev com.snapchat.android.ui.StoryTimerView
         public final static String METHOD_STORYTIMERVIEW_ONDRAW = "onDraw";
 
@@ -224,6 +225,7 @@ public class Obfuscator implements Serializable {
         public final static int OPERA_PAGE_VIEW_ID = +2131689491;
 
         public final static String DIRECTIONAL_LAYOUT_CLASS = "com.snapchat.opera.ui.DirectionalLayout";
+        public final static String MCANONICALDISPLAYNAME = "mCanonicalDisplayTime";
     }
     public static class datasaving {
         public final static String DSNAPDOWNLOADER_CLASS = "Df$a";//Prev. KL
