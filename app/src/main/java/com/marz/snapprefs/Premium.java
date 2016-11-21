@@ -30,7 +30,7 @@ public class Premium {
                         protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                             super.beforeHookedMethod(param);
                             Object packet = param.args[1];
-                            Logger.log("GNPacket: " + packet.toString(), LogType.PREMIUM);
+                            //Logger.log("GNPacket: " + packet.toString(), LogType.PREMIUM);
                             performPacketBlocking(lpparam, param, packet, blockPresence, stealthViewing, stealthSaving);
                         }
                     });
@@ -40,7 +40,7 @@ public class Premium {
                 protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                     super.beforeHookedMethod(param);
                     Object packet = param.args[0];
-                    Logger.log("aMjPacket: " + packet.toString(), LogType.PREMIUM);
+                    //Logger.log("aMjPacket: " + packet.toString(), LogType.PREMIUM);
                     performPacketBlocking(lpparam, param, packet, blockPresence, stealthViewing, stealthSaving);
                 }
             });

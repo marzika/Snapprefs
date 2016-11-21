@@ -672,6 +672,13 @@ public class StringUtils {
 
             if( split.length > 0 )
                 finalOutput = split[split.length - 1];
+        } else if( finalOutput.contains("https://app.snapchat.com/bq/story_blob") ) {
+            String[] split = finalOutput.split("&mt=");
+
+            if( split.length > 0 ) {
+                finalOutput = split[split.length - 1];
+                finalOutput = finalOutput.substring(1);
+            }
         }
 
         if( finalOutput.contains("#") )
