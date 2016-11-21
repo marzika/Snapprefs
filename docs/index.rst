@@ -28,22 +28,11 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-General
---------
-	
 	welcome
 	compatibility
 	changelog
 	installation
-
-Features
---------
-
 	features
-	
-Information
------------
-
 	faq
 	reportingissues
 
