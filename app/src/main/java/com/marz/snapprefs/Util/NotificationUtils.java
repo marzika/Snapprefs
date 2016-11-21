@@ -104,13 +104,14 @@ public class NotificationUtils {
         final ImageView view = new ImageView(HookMethods.SnapContext);
         view.setImageDrawable(statusDrawable);
         view.bringToFront();
+        final int horizontalPosition = Preferences.getBool(Prefs.BUTTON_POSITION) ? Gravity.END : Gravity.START;
 
         HookMethods.SnapContext.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 Toast statusToast = new Toast(HookMethods.SnapContext);
                 statusToast.setView(view);
-                statusToast.setGravity(Gravity.BOTTOM | Gravity.START, offset, offset);
+                statusToast.setGravity(Gravity.BOTTOM | horizontalPosition, offset, offset);
                 statusToast.setDuration(longLength ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT);
                 statusToast.show();
             }

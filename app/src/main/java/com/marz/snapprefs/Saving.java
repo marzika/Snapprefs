@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.os.AsyncTaskCompat;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -43,6 +44,8 @@ import java.util.regex.Pattern;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
+import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static com.marz.snapprefs.Util.StringUtils.obfus;
@@ -54,6 +57,7 @@ import static de.robv.android.xposed.XposedHelpers.getAdditionalInstanceField;
 import static de.robv.android.xposed.XposedHelpers.getObjectField;
 import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
 import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
+import static de.robv.android.xposed.XposedHelpers.setDoubleField;
 
 public class Saving {
     //public static final String SNAPCHAT_PACKAGE_NAME = "com.snapchat.android";
@@ -353,24 +357,41 @@ public class Saving {
                     }
                 });
 
-                findAndHookMethod(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader, Obfuscator.save.RECEIVEDSNAP_DISPLAYTIME, new XC_MethodHook() {
-                    @Override
-                    protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                        //Logger.afterHook("RECEIVEDSNAP - DisplayTime");
-                        Double currentResult = (Double) param.getResult();
-
-                        if (Preferences.getBool(Prefs.TIMER_UNLIMITED)) {
-                            findAndHookMethod(Obfuscator.save.CLASS_SNAP_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_SNAPTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
-                            param.setResult((double) 9999.9F);
-                        } else {
-                            if (Preferences.getInt(Prefs.TIMER_MINIMUM) !=
-                                    Preferences.TIMER_MINIMUM_DISABLED &&
-                                    currentResult < (double) Preferences.getInt(Prefs.TIMER_MINIMUM)) {
-                                param.setResult((double) Preferences.getInt(Prefs.TIMER_MINIMUM));
+                if (Preferences.getBool(Prefs.TIMER_UNLIMITED) || Preferences.getInt(Prefs.TIMER_MINIMUM) !=
+                        Preferences.TIMER_MINIMUM_DISABLED) {
+                    XposedBridge.hookAllConstructors(findClass(Obfuscator.save.RECEIVEDSNAP_CLASS, lpparam.classLoader), new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            Double currentResult = XposedHelpers.getDoubleField(param.thisObject, Obfuscator.save.MCANONICALDISPLAYNAME);
+                            if (Preferences.getBool(Prefs.TIMER_UNLIMITED)) {
+                                findAndHookMethod(Obfuscator.save.CLASS_SNAP_TIMER_VIEW, lpparam.classLoader, Obfuscator.save.METHOD_SNAPTIMERVIEW_ONDRAW, Canvas.class, XC_MethodReplacement.DO_NOTHING);
+                                setDoubleField(param.thisObject, Obfuscator.save.MCANONICALDISPLAYNAME, (double) 9999.9F);
+                            } else {
+                                if (Preferences.getInt(Prefs.TIMER_MINIMUM) !=
+                                        Preferences.TIMER_MINIMUM_DISABLED &&
+                                        currentResult < (double) Preferences.getInt(Prefs.TIMER_MINIMUM)) {
+                                    setDoubleField(param.thisObject, Obfuscator.save.MCANONICALDISPLAYNAME, (double) Preferences.getInt(Prefs.TIMER_MINIMUM));
+                                }
                             }
                         }
-                    }
-                });
+                    });
+
+                    XposedBridge.hookAllConstructors(findClass(Obfuscator.save.STORYSNAP_CLASS, lpparam.classLoader), new XC_MethodHook() {
+                        @Override
+                        protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                            Double currentResult = XposedHelpers.getDoubleField(param.thisObject, Obfuscator.save.MCANONICALDISPLAYNAME);
+                            if (Preferences.getBool(Prefs.TIMER_UNLIMITED)) {
+                                setDoubleField(param.thisObject, Obfuscator.save.MCANONICALDISPLAYNAME, (double) 9999.9F);
+                            } else {
+                                if (Preferences.getInt(Prefs.TIMER_MINIMUM) !=
+                                        Preferences.TIMER_MINIMUM_DISABLED &&
+                                        currentResult < (double) Preferences.getInt(Prefs.TIMER_MINIMUM)) {
+                                    setDoubleField(param.thisObject, Obfuscator.save.MCANONICALDISPLAYNAME, (double) Preferences.getInt(Prefs.TIMER_MINIMUM));
+                                }
+                            }
+                        }
+                    });
+                }
             }
 
             if (Preferences.getBool(Prefs.HIDE_TIMER_SNAP)) {
@@ -525,7 +546,7 @@ public class Saving {
             Activity activity = (Activity) callMethod(snapPreviewFragment, "getActivity");
             Object snapEditorView = getObjectField(snapPreviewFragment, Obfuscator.save.OBJECT_SNAP_EDITOR_VIEW);
 
-            if( snapEditorView == null ) {
+            if (snapEditorView == null) {
                 Logger.printFinalMessage("SnapEditorView not assigned - Halting process", LogType.SAVING);
                 return;
             }
@@ -689,9 +710,12 @@ public class Saving {
             try {
                 if (snapData.hasFlag(FlagState.COMPLETED) &&
                         !snapData.hasFlag(FlagState.SAVED)) {
-                    snapData.addFlag(FlagState.PROCESSING);
+
+                    if (!snapData.hasFlag(FlagState.PROCESSING))
+                        snapData.addFlag(FlagState.PROCESSING);
+
                     if (asyncSaveMode) {
-                        new AsyncSaveSnapData().execute(context, snapData);
+                        AsyncTaskCompat.executeParallel(new AsyncSaveSnapData(), context, snapData);
                     } else
                         handleSave(context, snapData);
                 } else {
@@ -763,19 +787,22 @@ public class Saving {
             Logger.printMessage("Hash Size: " + hashSnapData.size(), LogType.SAVING);
         }
 
-        long lngTimestamp = (Long) callMethod(receivedSnap, Obfuscator.save.SNAP_GETTIMESTAMP);
-        Date timestamp = new Date(lngTimestamp);
-        String strTimestamp = dateFormat.format(timestamp);
+        if (!snapData.hasFlag(FlagState.COMPLETED)) {
+            long lngTimestamp = (Long) callMethod(receivedSnap, Obfuscator.save.SNAP_GETTIMESTAMP);
+            Date timestamp = new Date(lngTimestamp);
+            String strTimestamp = dateFormat.format(timestamp);
 
-        Logger.printMessage("Timestamp: " + strTimestamp, LogType.SAVING);
+            Logger.printMessage("Timestamp: " + strTimestamp, LogType.SAVING);
 
-        snapData.setHeader(mId, mKey, strSender, strTimestamp, snapType);
-        Logger.printMessage("Header attached", LogType.SAVING);
+            snapData.setHeader(mId, mKey, strSender, strTimestamp, snapType);
+            Logger.printMessage("Header attached", LogType.SAVING);
+        } else
+            Logger.printMessage("Snap already completed", LogType.SAVING);
 
         if (shouldAutoSave(snapData)) {
             snapData.addFlag(FlagState.PROCESSING);
             if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED))
-                new AsyncSaveSnapData().execute(context, snapData);
+                AsyncTaskCompat.executeParallel(new AsyncSaveSnapData(), context, snapData);
             else
                 handleSave(context, snapData);
         } else {
@@ -877,18 +904,22 @@ public class Saving {
             Logger.printMessage("Hash Size: " + hashSnapData.size(), LogType.SAVING);
         }
 
-        // Get the stream using the filepath provided
-        FileInputStream video = new FileInputStream(mAbsoluteFilePath);
+        if (!snapData.hasFlag(FlagState.COMPLETED)) {
 
-        // Assign the payload to the snapdata
-        snapData.setPayload(video);
-        Logger.printMessage("Successfully attached payload", LogType.SAVING);
+            // Get the stream using the filepath provided
+            FileInputStream video = new FileInputStream(mAbsoluteFilePath);
+
+            // Assign the payload to the snapdata
+            snapData.setPayload(video);
+            Logger.printMessage("Successfully attached payload", LogType.SAVING);
+        } else
+            Logger.printMessage("Snap already completed", LogType.SAVING);
 
         // If set to button saving, do not save
         if (shouldAutoSave(snapData)) {
             snapData.addFlag(FlagState.PROCESSING);
             if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED))
-                new AsyncSaveSnapData().execute(context, snapData);
+                AsyncTaskCompat.executeParallel(new AsyncSaveSnapData(), context, snapData);
             else
                 handleSave(context, snapData);
         } else
@@ -945,25 +976,28 @@ public class Saving {
             Logger.printMessage("Hash Size: " + hashSnapData.size(), LogType.SAVING);
         }
 
-        if (originalBmp.isRecycled()) {
-            Logger.printFinalMessage("Bitmap is already recycled", LogType.SAVING);
-            snapData.addFlag(FlagState.FAILED);
-            createStatefulToast("Error saving image", ToastType.BAD);
-            return;
-        }
+        if (!snapData.hasFlag(FlagState.COMPLETED)) {
+            if (originalBmp.isRecycled()) {
+                Logger.printFinalMessage("Bitmap is already recycled", LogType.SAVING);
+                snapData.addFlag(FlagState.FAILED);
+                createStatefulToast("Error saving image", ToastType.BAD);
+                return;
+            }
 
-        Bitmap bmp = originalBmp.copy(Bitmap.Config.ARGB_8888, false);
+            Bitmap bmp = originalBmp.copy(Bitmap.Config.ARGB_8888, false);
 
-        Logger.printMessage("Pulled Bitmap", LogType.SAVING);
+            Logger.printMessage("Pulled Bitmap", LogType.SAVING);
 
-        // Assign the payload to the snapData
-        snapData.setPayload(bmp);
-        Logger.printMessage("Successfully attached payload", LogType.SAVING);
+            // Assign the payload to the snapData
+            snapData.setPayload(bmp);
+            Logger.printMessage("Successfully attached payload", LogType.SAVING);
+        } else
+            Logger.printMessage("Snap already completed", LogType.SAVING);
 
         if (shouldAutoSave(snapData)) {
             snapData.addFlag(FlagState.PROCESSING);
             if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED))
-                new AsyncSaveSnapData().execute(context, snapData);
+                AsyncTaskCompat.executeParallel(new AsyncSaveSnapData(), context, snapData);
             else
                 handleSave(context, snapData);
         } else

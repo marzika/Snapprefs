@@ -206,8 +206,9 @@ public class HookedLayouts {
                             int w = resized.getWidth();
                             int h = resized.getHeight();
 
+                            int strokeWidth = px(8);
                             int radius = Math.min(h / 2, w / 2);
-                            Bitmap output = Bitmap.createBitmap(w + 8, h + 8, Bitmap.Config.ARGB_8888);
+                            Bitmap output = Bitmap.createBitmap(w + strokeWidth, h + strokeWidth, Bitmap.Config.ARGB_8888);
 
                             Paint p = new Paint();
                             p.setAntiAlias(true);
@@ -216,16 +217,16 @@ public class HookedLayouts {
                             c.drawARGB(0, 0, 0, 0);
                             p.setStyle(Paint.Style.FILL);
 
-                            c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
+                            c.drawCircle((w / 2) + (strokeWidth / 2), (h / 2) + (strokeWidth / 2), radius, p);
 
                             p.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
 
-                            c.drawBitmap(resized, 4, 4, p);
+                            c.drawBitmap(resized, (strokeWidth / 2), (strokeWidth / 2), p);
                             p.setXfermode(null);
                             p.setStyle(Paint.Style.STROKE);
                             p.setColor(Color.WHITE);
-                            p.setStrokeWidth(px(8));
-                            c.drawCircle((w / 2) + 4, (h / 2) + 4, radius, p);
+                            p.setStrokeWidth(strokeWidth);
+                            c.drawCircle((w / 2) + (strokeWidth / 2), (h / 2) + (strokeWidth / 2), radius, p);
                             upload.setImageDrawable(new BitmapDrawable(output));
                         }
 
@@ -297,42 +298,51 @@ public class HookedLayouts {
                         liparam.res.getIdentifier("snap_container", "id", Common.PACKAGE_SNAP)
                 ).getParent();
 
-                saveSnapButton = new ImageButton(localContext);
-                saveSnapButton.setLayoutParams(layoutParams);
-                saveSnapButton.setBackgroundColor(0);
-                saveSnapButton.setAlpha(Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? 0f : 1f);
-                saveSnapButton.setImageBitmap(HookMethods.saveImg);
-                saveSnapButton.setVisibility(Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_BUTTON
-                        ? View.VISIBLE : View.INVISIBLE);
+                int saveMode = Preferences.getInt(Prefs.SAVEMODE_SNAP);
 
-                frameLayout.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        if (gestureEvent == null) {
-                            if (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S)
-                                gestureEvent = new SweepSaveGesture();
-                            else if (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_F2S)
-                                gestureEvent = new FlingSaveGesture();
-                            else {
-                                Logger.log("No gesture method provided");
-                                return false;
-                            }
+                if(saveMode == Preferences.SAVE_BUTTON) {
+                    saveSnapButton = new ImageButton(localContext);
+                    saveSnapButton.setLayoutParams(layoutParams);
+                    saveSnapButton.setBackgroundColor(0);
+                    saveSnapButton.setAlpha(Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? 0f : 1f);
+                    saveSnapButton.setImageBitmap(HookMethods.saveImg);
+                    saveSnapButton.setVisibility(View.VISIBLE);
+
+                    frameLayout.addView(saveSnapButton);
+                    saveSnapButton.bringToFront();
+
+                    saveSnapButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Logger.printTitle("Performing Button Save", LogType.SAVING);
+                            Saving.performButtonSave();
                         }
+                    });
+                } else if (saveMode == Preferences.SAVE_S2S ||
+                        saveMode == Preferences.SAVE_F2S) {
 
-                        return gestureEvent.onTouch(v, event, Saving.SnapType.SNAP) != GestureEvent.ReturnType.SAVED;
-                    }
-                });
+                    frameLayout.setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            if (gestureEvent == null) {
+                                if (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_S2S)
+                                    gestureEvent = new SweepSaveGesture();
+                                else if (Preferences.getInt(Prefs.SAVEMODE_SNAP) == Preferences.SAVE_F2S)
+                                    gestureEvent = new FlingSaveGesture();
+                                else {
+                                    Logger.log("No gesture method provided");
+                                    return false;
+                                }
+                            }
 
-                frameLayout.addView(saveSnapButton);
-                saveSnapButton.bringToFront();
-
-                saveSnapButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Logger.printTitle("Performing Button Save", LogType.SAVING);
-                        Saving.performButtonSave();
-                    }
-                });
+                            if (gestureEvent.onTouch(v, event, Saving.SnapType.SNAP) == GestureEvent.ReturnType.TAP) {
+                                Logger.log("Performed TAP?", LogType.SAVING);
+                                return false;
+                            } else
+                                return true;
+                        }
+                    });
+                }
             }
         });
     }
@@ -438,8 +448,8 @@ public class HookedLayouts {
                 final ImageButton textButton = new ImageButton(HookMethods.SnapContext);
                 textButton.setBackgroundColor(0);
                 textButton.setImageDrawable(mResources.getDrawable(R.drawable.triangle));
-                textButton.setScaleX((float) 0.75);
-                textButton.setScaleY((float) 0.75);
+                textButton.setScaleX((float) 0.4);
+                textButton.setScaleY((float) 0.4);
                 textButton.setOnClickListener(new View.OnClickListener() {
                     boolean shouldHideOptions = true;
 
