@@ -96,7 +96,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/default_gap"
         android:gravity="center_vertical|center_horizontal"
-        android:hint="Type here your username"
+        android:hint="Type your username here"
         android:inputType="textNoSuggestions|textVisiblePassword"
         android:maxLength="20"
         android:textColor="@color/black"
