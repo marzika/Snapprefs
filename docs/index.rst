@@ -28,22 +28,25 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   welcome
-   compatibility
-   changelog
-   installation
-   general
-   deluxe
-   saving
-   textcustomization
-   spoofing
-   sharing
-   datasaving
-   visualfilters
-   lenses
-   faq
-   reportingissues
-   
+General
+--------
+	
+welcome
+compatibility
+changelog
+installation
+
+Features
+--------
+
+features
+	
+Information
+-----------
+
+faq
+reportingissues
+
 
 Indices and tables
 ==================
