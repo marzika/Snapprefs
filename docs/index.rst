@@ -28,18 +28,19 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-     welcome
-     compatibility
-     changelog
-     installation
-     features
-     faq
-     reportingissues
+   welcome
+   compatibility
+   changelog
+   installation
+   features
+   faq
+   reportingissues
+   
 
-	 
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
