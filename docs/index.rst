@@ -31,21 +31,21 @@ Contents:
 General
 --------
 	
-welcome
-compatibility
-changelog
-installation
+	welcome
+	compatibility
+	changelog
+	installation
 
 Features
 --------
 
-features
+	features
 	
 Information
 -----------
 
-faq
-reportingissues
+	faq
+	reportingissues
 
 
 Indices and tables
