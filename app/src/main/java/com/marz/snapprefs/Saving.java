@@ -61,6 +61,10 @@ import static de.robv.android.xposed.XposedHelpers.setDoubleField;
 
 public class Saving {
     //public static final String SNAPCHAT_PACKAGE_NAME = "com.snapchat.android";
+    //TODO implement user selected save mode
+    private static final boolean threadedSaveMode = true;
+    private static final boolean asyncSaveMode = false;
+    private static final boolean printFlags = true;
     private static Resources mSCResources;
     private static XC_LoadPackage.LoadPackageParam lpparam2;
     private static SimpleDateFormat dateFormat =
@@ -68,11 +72,8 @@ public class Saving {
     private static SimpleDateFormat dateFormatSent =
             new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
     private static ConcurrentHashMap<String, SnapData> hashSnapData = new ConcurrentHashMap<>();
-    private static boolean printFlags = true;
     private static String currentSnapKey;
     private static Context relativeContext;
-    //TODO implement user selected save mode
-    private static boolean asyncSaveMode = true;
     private static Object enum_NO_AUTO_ADVANCE;
     private static GestureEvent gestureEvent;
     private static boolean gestureCalledInternally = false;
@@ -710,14 +711,7 @@ public class Saving {
             try {
                 if (snapData.hasFlag(FlagState.COMPLETED) &&
                         !snapData.hasFlag(FlagState.SAVED)) {
-
-                    if (!snapData.hasFlag(FlagState.PROCESSING))
-                        snapData.addFlag(FlagState.PROCESSING);
-
-                    if (asyncSaveMode) {
-                        AsyncTaskCompat.executeParallel(new AsyncSaveSnapData(), context, snapData);
-                    } else
-                        handleSave(context, snapData);
+                    selectSaveType(snapData, context);
                 } else {
                     if (snapData.hasFlag(FlagState.SAVED)) {
                         createStatefulToast("Snap recently saved", ToastType.WARNING);
@@ -800,14 +794,10 @@ public class Saving {
             Logger.printMessage("Snap already completed", LogType.SAVING);
 
         if (shouldAutoSave(snapData)) {
-            snapData.addFlag(FlagState.PROCESSING);
-            if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED))
-                AsyncTaskCompat.executeParallel(new AsyncSaveSnapData(), context, snapData);
-            else
-                handleSave(context, snapData);
+            selectSaveType(snapData, context);
         } else {
-            Logger.printFinalMessage("Not saving this round", LogType.SAVING);
             printFlags(snapData);
+            Logger.printFinalMessage("Not saving this round", LogType.SAVING);
             currentSnapKey = snapData.getmKey();
             relativeContext = context;
         }
@@ -917,11 +907,7 @@ public class Saving {
 
         // If set to button saving, do not save
         if (shouldAutoSave(snapData)) {
-            snapData.addFlag(FlagState.PROCESSING);
-            if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED))
-                AsyncTaskCompat.executeParallel(new AsyncSaveSnapData(), context, snapData);
-            else
-                handleSave(context, snapData);
+            selectSaveType(snapData, context);
         } else
             Logger.printFinalMessage("Not saving this round", LogType.SAVING);
     }
@@ -995,11 +981,7 @@ public class Saving {
             Logger.printMessage("Snap already completed", LogType.SAVING);
 
         if (shouldAutoSave(snapData)) {
-            snapData.addFlag(FlagState.PROCESSING);
-            if (asyncSaveMode && snapData.hasFlag(FlagState.COMPLETED))
-                AsyncTaskCompat.executeParallel(new AsyncSaveSnapData(), context, snapData);
-            else
-                handleSave(context, snapData);
+            selectSaveType(snapData, context);
         } else
             Logger.printFinalMessage("Not saving this round", LogType.SAVING);
     }
@@ -1056,6 +1038,18 @@ public class Saving {
         return snapData.hasFlag(FlagState.SAVED) ||
                 snapData.hasFlag(flagState) ||
                 snapData.hasFlag(FlagState.PROCESSING);
+    }
+
+    private static void selectSaveType(SnapData snapData, Context context) throws Exception {
+        if (!snapData.hasFlag(FlagState.PROCESSING))
+            snapData.addFlag(FlagState.PROCESSING);
+
+        if (threadedSaveMode)
+            new SaveThread(snapData, context).start();
+        else if (asyncSaveMode)
+            AsyncTaskCompat.executeParallel(new AsyncSaveSnapData(), context, snapData);
+        else
+            handleSave(context, snapData);
     }
 
     /**
@@ -1367,6 +1361,28 @@ public class Saving {
                 Logger.log("Exception performing AsyncSave ", e, LogType.SAVING);
             }
             return false;
+        }
+    }
+
+    private static class SaveThread extends Thread {
+        private SnapData snapData;
+        private Context context;
+
+        SaveThread(SnapData snapData, Context context) {
+            this.snapData = snapData;
+            this.context = context;
+        }
+
+        public void run() {
+            Logger.printMessage("(" + android.os.Process.myTid() + ")" + " Performing THREADED save", LogType.SAVING);
+
+            try {
+                Saving.handleSave(context, snapData);
+            } catch (Exception e) {
+                Logger.log("Exception performing Threaded Save ", e, LogType.SAVING);
+            }
+
+            Logger.log("Thread " + android.os.Process.myTid() + " finished and destroyed");
         }
     }
 }
