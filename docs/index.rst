@@ -32,15 +32,7 @@ Contents:
    compatibility
    changelog
    installation
-   general
-   deluxe
-   saving
-   textcustomization
-   spoofing
-   sharing
-   datasaving
-   visualfilters
-   lenses
+   features
    faq
    reportingissues
    
@@ -51,3 +43,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
