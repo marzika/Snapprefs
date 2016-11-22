@@ -44,7 +44,7 @@ public class MainFragment extends Fragment {
         build.setText(build.getText() + " " + BuildConfig.VERSION_NAME);
 
         String currentBranchStr = BuildConfig.JENKINS_BRANCH;
-        if(currentBranchStr == "") {
+        if(currentBranchStr == "N/A") {
             currentBranch.setVisibility(View.GONE);
         } else {
             currentBranch.setText(currentBranch.getText() + " " + currentBranchStr);
