@@ -42,6 +42,7 @@ public class MainFragment extends Fragment {
         });
         build.setText(build.getText() + " " + BuildConfig.VERSION_NAME);
         build.setVisibility(View.GONE);
+
         
         sc_version.setText(sc_version.getText() + " " + Obfuscator.SUPPORTED_VERSION_CODENAME);
 
