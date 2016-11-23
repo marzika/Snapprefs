@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Util.FileUtils;
+import com.marz.snapprefs.Util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -172,7 +173,7 @@ public class Stories {
                     String friendUsername = (String) callMethod(obj, Obfuscator.stories.RECENTSTORY_GETUSERNAME);
 
                     if (friendUsername != null && peopleToHide.contains(friendUsername)) {
-                        Logger.log("Contains blocked friend.... Removing " + friendUsername);
+                        Logger.log("Contains blocked friend.... Removing " + StringUtils.obfus(friendUsername));
                         objectList.remove(obj);
                     }
                 }
@@ -185,7 +186,7 @@ public class Stories {
                     String friendUsername = (String) callMethod(obj, Obfuscator.stories.RECENTSTORY_GETUSERNAME);
 
                     if (friendUsername != null && peopleToHide.contains(friendUsername)) {
-                        Logger.log("Contains blocked friend.... Removing " + friendUsername);
+                        Logger.log("Contains blocked friend.... Removing " + StringUtils.obfus(friendUsername));
                         objectList.remove(obj);
                     }
                 }
