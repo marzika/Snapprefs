@@ -75,15 +75,23 @@ public class ReceiveMediaActivity extends Activity implements DialogInterface.On
                     if (CommonUtils.getModuleStatus() == Common.MODULE_STATUS_ACTIVATED) {
                         if (type.startsWith("image/")) {
                             finish = false;
-                            UCrop.Options options = new UCrop.Options();
-                            options.setAllowedGestures(UCropActivity.ALL, UCropActivity.ALL, UCropActivity.ALL);
-                            options.setCompressionFormat(Bitmap.CompressFormat.PNG);
-                            options.setCompressionQuality(100);
-                            UCrop.of(mediaUri, Uri.fromFile(out))
-                                    .withAspectRatio(9, 16)
-                                    .withMaxResultSize(1080, 1920)
-                                    .withOptions(options)
-                                    .start(this);
+                            if(Preferences.getInt(Preferences.Prefs.ADJUST_METHOD) == Common.ADJUST_SCALE){
+                                FileUtils.saveStream(getContentResolver().openInputStream(mediaUri), out);
+                                intent.setComponent(ComponentName.unflattenFromString("com.snapchat.android/.LandingPageActivity"));
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(out));
+                                startActivity(intent);
+                            } else {
+                                UCrop.Options options = new UCrop.Options();
+                                options.setAllowedGestures(UCropActivity.ALL, UCropActivity.ALL, UCropActivity.ALL);
+                                options.setCompressionFormat(Bitmap.CompressFormat.PNG);
+                                options.setCompressionQuality(100);
+                                UCrop.of(mediaUri, Uri.fromFile(out))
+                                        .withAspectRatio(9, 16)
+                                        .withMaxResultSize(1080, 1920)
+                                        .withOptions(options)
+                                        .start(this);
+                            }
                         } else {
                             FileUtils.saveStream(getContentResolver().openInputStream(mediaUri), out);
                             intent.setComponent(ComponentName.unflattenFromString("com.snapchat.android/.LandingPageActivity"));
