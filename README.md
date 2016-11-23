@@ -1,6 +1,6 @@
 Snapprefs
 =========
-[![Build Status](http://snapprefs-builds.com:8080/job/SNAPPREFS%20-%20Official%20-%20stable/badge/icon)](http://138.68.21.49:8080/job/SNAPPREFS%20-%20Official%20-%20stable/) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
+[![Build Status](http://snapprefs-builds.com/job/SNAPPREFS%20-%20Official%20-%20stable/badge/icon)](http://snapprefs-builds.com/job/SNAPPREFS%20-%20Official%20-%20stable/) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
 
 Overview
 -------
