@@ -438,4 +438,15 @@
     <string name="lense_master_switch_loading_system_txt">Lens Loading System</string>
     <string name="lense_master_switch_lense_system_txt">Lens Collection System</string>
     <string name="lense_master_switches_heading_txt">Master Switches</string>
+    <string name="activate_layout_license_code_txt" translatable="false">License Code:</string>
+    <string name="activate_layout_checklayout_license_code_blank_txt" translatable="false">Type/Paste your License Code here</string>
+    <string name="activate_layout_device_id_txt_label" translatable="false">Device ID:</string>
+    <string name="activate_layout_activate_licenses_button_txt" translatable="false">Activate license</string>
+    <string name="activate_layout_checklayout_license_status_label_txt" translatable="false">Your license status is:</string>
+    <string name="activate_layout_checklayout_purchase_license_btn_txt" translatable="false">Click here to buy a license</string>
+    <string name="activate_layout_checklayout_username_label_txt" translatable="false">Type your username here</string>
+    <string name="activate_layout_checklayout_god_privacy_statement_txt" translatable="false">Your privacy is key to us, that\'s why only your username\'s SHA256 hash is sent to the server.</string>
+    <string name="activate_layout_checklayout_god_apply_btn_txt" translatable="false">Click here to apply for GOD mode</string>
+    <string name="checklayout_redeem_id_label" translatable="false">Redeem ID:</string>
+    <string name="checklayout_redeem_license_btn_txt" translatable="false">Redeem license</string>
 </resources>
