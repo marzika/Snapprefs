@@ -19,7 +19,7 @@
                 android:id="@+id/textView3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="License Code:"
+                android:text="@string/activate_layout_license_code_txt"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/black" />
 
@@ -30,7 +30,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/default_gap"
                 android:gravity="center_vertical|center_horizontal"
-                android:hint="Type/Paste your License Code here"
+                android:hint="@string/activate_layout_checklayout_license_code_blank_txt"
                 android:inputType="textNoSuggestions|textVisiblePassword"
                 android:maxLength="20"
                 android:textColor="@color/black" />
@@ -40,7 +40,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/default_gap"
-                android:text="Device ID:"
+                android:text="@string/activate_layout_device_id_txt_label"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/black" />
 
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/default_gap_2x"
-                android:text="Activate license" />
+                android:text="@string/activate_layout_activate_licenses_button_txt" />
 
             <TextView
                 android:id="@+id/textView"
@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/default_gap_2x"
-                android:text="Your license status is:"
+                android:text="@string/activate_layout_checklayout_license_status_label_txt"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <TextView
@@ -91,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center_vertical|center_horizontal"
-                android:text="Click here to buy a license"
+                android:text="@string/activate_layout_checklayout_purchase_license_btn_txt"
                 android:visibility="gone" />
 
             <EditText
@@ -101,7 +101,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/default_gap"
                 android:gravity="center_vertical|center_horizontal"
-                android:hint="Type here your username"
+                android:hint="@string/activate_layout_checklayout_username_label_txt"
                 android:inputType="textNoSuggestions|textVisiblePassword"
                 android:maxLength="20"
                 android:textColor="@color/black" />
@@ -111,7 +111,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/default_gap"
-                android:text="Your privacy is key to us, that's why only your username's SHA256 hash is sent to the server."
+                android:text="@string/activate_layout_checklayout_god_privacy_statement_txt"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/black" />
 
@@ -121,7 +121,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center_vertical|center_horizontal"
-                android:text="Click here to apply for GOD mode"
+                android:text="@string/activate_layout_checklayout_god_apply_btn_txt"
                 android:visibility="gone" />
         </LinearLayout>
     </ScrollView>

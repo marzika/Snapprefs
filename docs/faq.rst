@@ -6,6 +6,11 @@ Q: How can i use the Front Flash function?
 | A: While using the Front Camera you can press "Volume up" on your phone to enable the Front Flash function.
 
 
+Q: How can i use the Now playing filter?
+
+| A: Listen to music with spotify while taking a snap, apply the filter like any other
+
+
 Q: The Snapchat app force closes, what should I do?
 
 | A: First of all, check if you are using a compatible combination of Snapchat and Snapprefs. (See the compatible chart)
@@ -18,7 +23,7 @@ Q: I am using a compatible combination, but it still crashes, what now?
 
 Q: I have accidentally updated the Snapchat app, how can I roll back to the previous version?
 
-| A: Download the needed Snapchat version from `APKMANIA <http://www.apkmirror.com/apk/snapchat-inc/>`_
+| A: Download the needed Snapchat version from `APK Mirror <http://www.apkmirror.com/apk/snapchat-inc/>`_
 
 
 Q: I'm unable to log in to Snapchat, what should I do?
