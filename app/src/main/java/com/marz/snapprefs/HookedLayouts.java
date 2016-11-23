@@ -257,7 +257,6 @@ public class HookedLayouts {
             XC_InitPackageResources.InitPackageResourcesParam resparam,
             XModuleResources mResources, final Context localContext
     ) {
-        Logger.log("Adding Save Buttons");
 /*
         int intIconID = resparam.res.getIdentifier("aa_snap_preview_save", "drawable", Common
                 .PACKAGE_SNAP);
@@ -271,6 +270,7 @@ public class HookedLayouts {
         FrameLayout.LayoutParams scaledLayoutParams = null;
 
         if (Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON)) {
+            Logger.log("Adding Save Buttons");
             DisplayMetrics metrics = localContext.getResources().getDisplayMetrics();
 
             int unscaledSize = Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? stealthButtonSize : 65;
