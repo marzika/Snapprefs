@@ -297,24 +297,6 @@ public class HookMethods
 
                     Logger.log("Application hook: " + param.thisObject.getClass().getCanonicalName());
 
-                    Class TAKE_PHOTO_METHOD = findClass("com.snapchat.android.camera.TakePhotoCallback.TAKE_PHOTO_METHOD", lpparam.classLoader);
-                    findAndHookMethod("com.snapchat.android.fragments.addfriends.ProfileFragment$d", lpparam.classLoader, "a",
-                            Bitmap.class, TAKE_PHOTO_METHOD, new XC_MethodHook() {
-                                @Override
-                                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                                    super.beforeHookedMethod(param);
-                                    Bitmap image = (Bitmap) param.args[0];
-
-                                    if(image == null) {
-                                        Logger.log("Null Profile Image");
-                                        return;
-                                    }
-
-                                    Logger.log(String.format("Found image [w:%s][h:%s]", image.getWidth(), image.getHeight()));
-                                    //Logger.logStackTrace();
-                                }
-                            });
-
                     findAndHookMethod("com.snapchat.android.ui.ProfilePictureView", lpparam.classLoader, "onClick",
                             View.class, new XC_MethodHook() {
                                 @Override
