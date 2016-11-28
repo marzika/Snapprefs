@@ -18,6 +18,7 @@ import android.os.Message;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -275,10 +276,6 @@ public class HookMethods
                 return;
             }
 
-
-            Logger.loadSelectedLogTypes();
-            Logger.log("Loading map from xposed");
-            Preferences.loadMapFromXposed();
             findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) {
@@ -293,8 +290,48 @@ public class HookMethods
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Friendmojis.init(lpparam);
                     DebugHelper.init(lpparam);
+
+                    Logger.loadSelectedLogTypes();
+                    Logger.log("Loading map from xposed");
+                    Preferences.loadMapFromXposed();
+
                     Logger.log("Application hook: " + param.thisObject.getClass().getCanonicalName());
 
+                    Class TAKE_PHOTO_METHOD = findClass("com.snapchat.android.camera.TakePhotoCallback.TAKE_PHOTO_METHOD", lpparam.classLoader);
+                    findAndHookMethod("com.snapchat.android.fragments.addfriends.ProfileFragment$d", lpparam.classLoader, "a",
+                            Bitmap.class, TAKE_PHOTO_METHOD, new XC_MethodHook() {
+                                @Override
+                                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                                    super.beforeHookedMethod(param);
+                                    Bitmap image = (Bitmap) param.args[0];
+
+                                    if(image == null) {
+                                        Logger.log("Null Profile Image");
+                                        return;
+                                    }
+
+                                    Logger.log(String.format("Found image [w:%s][h:%s]", image.getWidth(), image.getHeight()));
+                                    //Logger.logStackTrace();
+                                }
+                            });
+
+                    findAndHookMethod("com.snapchat.android.ui.ProfilePictureView", lpparam.classLoader, "onClick",
+                            View.class, new XC_MethodHook() {
+                                @Override
+                                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                                    super.beforeHookedMethod(param);
+                                    Object iObject = getObjectField(param.thisObject, "s");
+
+                                    if(iObject == null) {
+                                        Logger.log("Null iObject");
+                                        return;
+                                    }
+
+                                    Logger.log("Interface: " + iObject);
+                                    Logger.log("IType: " + iObject.getClass().getCanonicalName());
+                                    //Logger.logStackTrace();
+                                }
+                            });
                     findAndHookMethod(Obfuscator.timer.RECORDING_MESSAGE_HOOK_CLASS, lpparam.classLoader, Obfuscator.timer.RECORDING_MESSAGE_HOOK_METHOD, Message.class, new XC_MethodHook() {
                         boolean internallyCalled = false;
                         int maxRecordTime = Integer.parseInt(Preferences.getString(Prefs.MAX_RECORDING_TIME).trim()) * 1000;
@@ -329,6 +366,8 @@ public class HookMethods
                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                             //Preferences.loadMapFromXposed();
                             SnapContext = (Activity) param.thisObject;
+                            Logger.log("Loading map from xposed");
+                            Preferences.loadMapFromXposed();
                             if (!Preferences.getBool(Prefs.ACCEPTED_TOU)) {//new ContextThemeWrapper(context.createPackageContext("com.marz.snapprefs", Context.CONTEXT_IGNORE_SECURITY), R.style.AppCompatDialog)
                                 AlertDialog.Builder builder = new AlertDialog.Builder(SnapContext)
                                         .setTitle("ToU and Privacy Policy")

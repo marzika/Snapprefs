@@ -425,6 +425,7 @@
     <string name="pref_save_integration_summary">When enabled you can launch Snapprefs\'s settings by pulling down Snapchat\'s settings bar and clicking on Snapprefs</string>
     <string name="licenses">Snapprefs is licensed under GNU GPLv3. \n\nUsed libraries - License:\nInstagram Filters for Android - Apache License 2.0\nckChangeLog - Apache License 2.0\nColorPicker for Android - Apache License 2.0\nNoNonsense-FilePicker - MPL 2.0\nmp4parser - Free License\n\nModule was originally based on:\nKeepchat - GNU GPLv3\nSnapshare - GNU GPLv3\n\nSnapchat™ is the property of Snapchat Inc.\nSnapprefs is in no way affiliated with, authorized, maintained, sponsored or endorsed by the Snapchat Inc. or any of its affiliates or subsidiaries. This is an independent application.</string>
     <string name="hide_text">Show Icon In Launcher</string>
+    <string name="kill_sc">Kill Snapchat On Preference Change</string>
     <string name="pref_groups_title">Enable Custom Groups</string>
     <string name="hide_current_sc_lenses_switch_txt">Hide Lenses Currently Provided By SnapChat</string>
     <string name="enable_sort_by_sel_time_switch_txt">Enable Sorting Lenses By Selection Time</string>
