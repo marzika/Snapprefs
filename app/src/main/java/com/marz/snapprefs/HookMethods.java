@@ -18,7 +18,6 @@ import android.os.Message;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -297,23 +296,6 @@ public class HookMethods
 
                     Logger.log("Application hook: " + param.thisObject.getClass().getCanonicalName());
 
-                    findAndHookMethod("com.snapchat.android.ui.ProfilePictureView", lpparam.classLoader, "onClick",
-                            View.class, new XC_MethodHook() {
-                                @Override
-                                protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                                    super.beforeHookedMethod(param);
-                                    Object iObject = getObjectField(param.thisObject, "s");
-
-                                    if(iObject == null) {
-                                        Logger.log("Null iObject");
-                                        return;
-                                    }
-
-                                    Logger.log("Interface: " + iObject);
-                                    Logger.log("IType: " + iObject.getClass().getCanonicalName());
-                                    //Logger.logStackTrace();
-                                }
-                            });
                     findAndHookMethod(Obfuscator.timer.RECORDING_MESSAGE_HOOK_CLASS, lpparam.classLoader, Obfuscator.timer.RECORDING_MESSAGE_HOOK_METHOD, Message.class, new XC_MethodHook() {
                         boolean internallyCalled = false;
                         int maxRecordTime = Integer.parseInt(Preferences.getString(Prefs.MAX_RECORDING_TIME).trim()) * 1000;
