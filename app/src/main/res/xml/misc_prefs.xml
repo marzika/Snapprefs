@@ -56,6 +56,10 @@
         android:defaultValue="false"
         android:key="pref_key_launcher"
         android:title="@string/hide_text" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_key_kill_sc"
+        android:title="@string/kill_sc" />
     <Preference
         android:title="Debug Options"
         android:key="pref_key_debug_options"/>
