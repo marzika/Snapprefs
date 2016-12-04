@@ -24,7 +24,8 @@ import static com.marz.snapprefs.Databases.CoreDatabaseHandler.CallbackHandler.g
 
 public class LensDatabaseHelper extends CachedDatabaseHandler {
     private static final int DATABASE_VERSION = 5;
-    private static final String DATABASE_NAME = Preferences.getContentPath() + "/Lenses.db";
+    private static String DEFAULT_DB_NAME = Preferences.getContentPath() + "/Lenses.db";
+    private final String DATABASE_NAME;
     private static final String[] fullProjection = {
             LensEntry.COLUMN_NAME_MCODE,
             LensEntry.COLUMN_NAME_GPLAYID,
@@ -57,7 +58,13 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
                     LensEntry.COLUMN_NAME_SEL_TIME + INT_TYPE + " DEFAULT " + DEF_SEL_TIME_VAL + " )" };
 
     public LensDatabaseHelper(Context context) {
+        super(context, DEFAULT_DB_NAME, SQL_CREATE_ENTRIES, DATABASE_VERSION);
+        this.DATABASE_NAME = DEFAULT_DB_NAME;
+    }
+
+    public LensDatabaseHelper(Context context, String DATABASE_NAME) {
         super(context, DATABASE_NAME, SQL_CREATE_ENTRIES, DATABASE_VERSION);
+        this.DATABASE_NAME = DATABASE_NAME;
     }
 
     @Override
@@ -112,6 +119,28 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    public static int mergeLensDatabases(LensDatabaseHelper masterDB, LensDatabaseHelper slaveDB) {
+        LinkedHashMap<String, Object> slaveMap = (LinkedHashMap<String, Object>) slaveDB.getAllLenses();
+
+        int mergedLenses = 0;
+        for (Object lens : slaveMap.values()) {
+            try {
+                LensData lensData = (LensData) lens;
+
+                if (!masterDB.containsLens(lensData.mCode)) {
+                    masterDB.insertLens(lensData);
+                    mergedLenses++;
+                }
+            } catch( Exception e ) {
+                Logger.log("Error merging databases", e, LogType.DATABASE);
+            }
+        }
+
+        slaveDB.close();
+
+        return mergedLenses;
     }
 
     public long getRowCount() {
@@ -223,6 +252,20 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
     }
 
     @SuppressWarnings("unchecked")
+    public Map<String, Object> getAllWithPartial(String partialCode) {
+        CallbackHandler callback = getCallback(this, "getAllLensesFromCursor", Cursor.class);
+
+        String orderBy = Preferences.getBool(Preferences.Prefs.LENSES_SORT_BY_SEL) ?
+                LensEntry.COLUMN_NAME_SEL_TIME + " ASC" : null;
+
+        return (Map<String, Object>) super.getAllBuiltObjects(
+                LensEntry.TABLE_NAME,
+                LensEntry.COLUMN_NAME_MCODE + " LIKE '%" + partialCode + "%'",
+                orderBy,
+                callback);
+    }
+
+    @SuppressWarnings("unchecked")
     public Map<String, Object> getAllActive() {
         CallbackHandler callback = getCallback(this, "getAllLensesFromCursor", Cursor.class);
 
@@ -251,6 +294,10 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
 // Which row to update, based on the title
         String[] selectionArgs = {mCode};
 
+        super.updateObject(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE, selectionArgs, values);
+    }
+
+    public void updateLenses(String[] selectionArgs, ContentValues values) {
         super.updateObject(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE, selectionArgs, values);
     }
 

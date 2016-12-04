@@ -1,37 +1,45 @@
 package com.marz.snapprefs.Fragments;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.os.AsyncTaskCompat;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.GridLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.marz.snapprefs.Adapters.LensListAdapter;
 import com.marz.snapprefs.Common;
+import com.marz.snapprefs.Databases.LensDatabaseHelper;
+import com.marz.snapprefs.Databases.LensDatabaseHelper.LensEntry;
 import com.marz.snapprefs.Lens;
 import com.marz.snapprefs.Logger;
+import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.R;
 import com.marz.snapprefs.Util.LensData;
-import com.marz.snapprefs.Util.LensIconLoader;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by Andre on 16/09/2016.
@@ -42,28 +50,83 @@ public class LensesFragment extends Fragment {
             "len_",
             "code_special_lens_-_"
     );
-    private static HashMap<String, LensContainerData> iconMap = new HashMap<>();
-    private static final DialogInterface.OnClickListener onSelectAllClick = new DialogInterface.OnClickListener() {
+    public LensListAdapter lensListAdapter;
+    private final DialogInterface.OnClickListener onSelectAllClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
-            Lens.getLensDatabase().setActiveStateOfAllLenses(true);
-            for (LensContainerData containerData : iconMap.values()) {
-                containerData.inflatedLayout.setBackgroundResource(R.drawable.lens_bg_selected);
-                containerData.inflatedLayout.invalidate();
-            }
-        }
-    };
-    private static final DialogInterface.OnClickListener onDeslectAllClick = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            Lens.getLensDatabase().setActiveStateOfAllLenses(false);
+            if (lensListAdapter == null)
+                return;
 
-            for (LensContainerData containerData : iconMap.values()) {
-                containerData.inflatedLayout.setBackgroundResource(R.drawable.lens_bg_unselected);
-                containerData.inflatedLayout.invalidate();
+            LensDatabaseHelper dbHelper = Lens.getLensDatabase(getContext());
+            ContentValues values = new ContentValues();
+            values.put(LensEntry.COLUMN_NAME_ACTIVE, 1);
+
+            //Disable logging for batch updates - Performance improvement for large updates
+            Logger.disableLogging();
+            for (LensItemData itemData : lensListAdapter.lensDataList) {
+                if (itemData.isActive)
+                    continue;
+
+                dbHelper.updateLens(itemData.lensCode, values);
+                itemData.isActive = true;
             }
+            Logger.enableLogging();
+
+            lensListAdapter.notifyDataSetChanged();
+
         }
     };
+    private final DialogInterface.OnClickListener onDeslectAllClick = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (lensListAdapter == null)
+                return;
+
+            LensDatabaseHelper dbHelper = Lens.getLensDatabase(getContext());
+            ContentValues values = new ContentValues();
+            values.put(LensEntry.COLUMN_NAME_ACTIVE, 0);
+
+            //Disable logging for batch updates - Performance improvement for large updates
+            Logger.disableLogging();
+            for (LensItemData itemData : lensListAdapter.lensDataList) {
+                if (!itemData.isActive)
+                    continue;
+
+                dbHelper.updateLens(itemData.lensCode, values);
+                itemData.isActive = false;
+            }
+            Logger.enableLogging();
+
+            lensListAdapter.notifyDataSetChanged();
+        }
+    };
+
+    private static ArrayList<LensItemData> BuildLensItemData(LinkedHashMap<String, Object> lensMap, String partialName) {
+        ArrayList<LensItemData> lensList = new ArrayList<>();
+
+        for (Object obj : lensMap.values()) {
+            LensData lensData = (LensData) obj;
+
+            LensItemData itemData = new LensItemData();
+
+            String nameBuilder = lensData.mCode;
+            for (String filter : stringFilter)
+                nameBuilder = nameBuilder.replace(filter, "");
+
+            nameBuilder = nameBuilder.replaceAll("_", " ");
+
+            if (partialName != null && !nameBuilder.toLowerCase().contains(partialName.toLowerCase()))
+                continue;
+
+            itemData.lensName = nameBuilder;
+            itemData.lensCode = lensData.mCode;
+            itemData.url = lensData.mIconLink;
+            itemData.isActive = lensData.mActive;
+            lensList.add(itemData);
+        }
+
+        return lensList;
+    }
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         final int lensListSize = (int) Lens.getLensDatabase(container.getContext()).getRowCount();
@@ -80,6 +143,7 @@ public class LensesFragment extends Fragment {
         Switch autoEnableSwitch = (Switch) view.findViewById(R.id.autoenable_switch);
         Switch sortBySelDate = (Switch) view.findViewById(R.id.sort_lens_by_sel_date);
         Switch hideCurrProvidedSCLenses = (Switch) view.findViewById(R.id.hide_current_snapchat_lenses);
+        Button btnMerger = (Button) view.findViewById(R.id.btn_db_merger);
 
         loadLensSwitch.setChecked(Preferences.getBool(Prefs.LENSES_LOAD));
         collectLensSwitch.setChecked(Preferences.getBool(Prefs.LENSES_COLLECT));
@@ -129,151 +193,168 @@ public class LensesFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (lensListSize > 0)
-                    DialogHelper.lensDialog(getContext(), loadedLensesTextView, inflater, container);
+                    lensDialog(getContext(), loadedLensesTextView, inflater, container);
                 else
                     Toast.makeText(v.getContext(), "You've not collected any lenses!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btnMerger.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setType("file/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Choose Slave DB to merge"), 1);
             }
         });
         return view;
     }
 
-    public static class DialogHelper {
-        static void lensDialog(final Context context, final TextView loadedLensesTextView, LayoutInflater inflater,
-                               ViewGroup container) {
-            LinkedHashMap<String, Object> lensList = (LinkedHashMap<String, Object>) Lens.getLensDatabase(context).getAllLenses();
+    private void lensDialog(final Context context, final TextView loadedLensesTextView, LayoutInflater inflater,
+                            ViewGroup container) {
+        LinkedHashMap<String, Object> lensMap = (LinkedHashMap<String, Object>) Lens.getLensDatabase(context).getAllLenses();
 
-            if (lensList == null) {
-                Logger.log("Tried to create dialog with no lenses");
+        if (lensMap == null) {
+            Logger.log("Tried to create dialog with no lenses");
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Select Lenses");
+        View view = inflater.inflate(R.layout.lenslist_layout, container, false);
+
+        SetupRecyclerView(lensMap, view);
+        SetupFilterSelector(view);
+        SetupSelectionButtons(context, view);
+
+        builder.setView(view);
+        builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int selectedLensSize = Lens.getLensDatabase(context).getActiveLensCount();
+                loadedLensesTextView.setText(String.format("%s", selectedLensSize));
+            }
+        });
+        builder.setNegativeButton(Common.dialog_cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int selectedLensSize = Lens.getLensDatabase(context).getActiveLensCount();
+                loadedLensesTextView.setText(String.format("%s", selectedLensSize));
+            }
+        });
+
+        builder.show();
+    }
+
+    private void SetupRecyclerView(LinkedHashMap<String, Object> lensMap, View view) {
+        ArrayList<LensItemData> itemDataList = BuildLensItemData(lensMap, null);
+        lensListAdapter = new LensListAdapter(view.getContext(), itemDataList);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.lens_recyclerview);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(view.getContext(), 4);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(lensListAdapter);
+    }
+
+    private void SetupSelectionButtons(Context context, View view) {
+        Button btnSelectAll = (Button) view.findViewById(R.id.btn_select_all_lenses);
+        Button btnDeselectAll = (Button) view.findViewById(R.id.btn_deselect_all_lenses);
+
+        final AlertDialog.Builder selectBuilder = new AlertDialog.Builder(context);
+        selectBuilder.setNegativeButton("Cancel", null);
+
+        btnSelectAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectBuilder.setTitle("Confirm Select All");
+                selectBuilder.setMessage("Are you sure you want to enable all lenses?");
+                selectBuilder.setPositiveButton("Select All", onSelectAllClick);
+                selectBuilder.show();
+            }
+        });
+
+        btnDeselectAll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selectBuilder.setTitle("Confirm Deselect All");
+                selectBuilder.setMessage("Are you sure you want to disable all lenses?");
+                selectBuilder.setPositiveButton("Deselect All", onDeslectAllClick);
+                selectBuilder.show();
+            }
+        });
+    }
+
+    private void SetupFilterSelector(final View view) {
+        final TextView txt_filter = (TextView) view.findViewById(R.id.lens_filter);
+
+        txt_filter.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                LensDatabaseHelper dbHelper = Lens.getLensDatabase(view.getContext());
+                LinkedHashMap<String, Object> lensMap = (LinkedHashMap<String, Object>) dbHelper.getAllWithPartial(editable.toString());
+
+                Logger.log("Checking for partial: " + editable.toString());
+                if (lensMap == null)
+                    lensListAdapter.lensDataList.clear();
+                else
+                    lensListAdapter.lensDataList = BuildLensItemData(lensMap, editable.toString());
+
+                lensListAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int reqCode, int resCode, Intent data) {
+        super.onActivityResult(reqCode, resCode, data);
+
+        if (reqCode == 1 && resCode == RESULT_OK && data != null) {
+            String filePath = data.getData().getPath();
+            Logger.log("File path: " + filePath);
+            String filenameArray[] = filePath.split("\\.");
+
+            if (filenameArray.length <= 0) {
+                Logger.log("Couldn't find file extension: " + filePath, LogType.LENS);
+                Toast.makeText(getContext(), "Couldn't find file extension", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Select Lenses");
+            String extension = filenameArray[filenameArray.length - 1];
+            Logger.log("Extension: " + extension);
 
-            View view = inflater.inflate(R.layout.lenslist_layout, container, false);
-
-            GridLayout gridLayout = (GridLayout) view.findViewById(R.id.lensloader_gridholder);
-            Button btnSelectAll = (Button) view.findViewById(R.id.btn_select_all_lenses);
-            Button btnDeselectAll = (Button) view.findViewById(R.id.btn_deselect_all_lenses);
-
-            final AlertDialog.Builder selectBuilder = new AlertDialog.Builder(context);
-            selectBuilder.setNegativeButton("Cancel", null);
-
-            btnSelectAll.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    selectBuilder.setTitle("Confirm Select All");
-                    selectBuilder.setMessage("Are you sure you want to enable all lenses?");
-                    selectBuilder.setPositiveButton("Select All", onSelectAllClick);
-                    selectBuilder.show();
-                }
-            });
-
-            btnDeselectAll.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    selectBuilder.setTitle("Confirm Deselect All");
-                    selectBuilder.setMessage("Are you sure you want to disable all lenses?");
-                    selectBuilder.setPositiveButton("Deselect All", onDeslectAllClick);
-                    selectBuilder.show();
-                }
-            });
-
-            for (Object lensObj : lensList.values()) {
-                final LensData lensData = (LensData) lensObj;
-
-                // Set up Lens Container \\
-                final LinearLayout inflatedLayout = (LinearLayout) inflater.inflate(R.layout.lensholder_layout, gridLayout, false);
-                inflatedLayout.setBackgroundResource(lensData.mActive ? R.drawable.lens_bg_selected :
-                        R.drawable.lens_bg_unselected);
-
-                inflatedLayout.setTag(lensData.mCode);
-                inflatedLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        LinearLayout btn = (LinearLayout) v;
-                        String mCode = (String) btn.getTag();
-                        Logger.log("Clicked lens item: " + mCode);
-                        try {
-                            boolean activeState = Lens.getLensDatabase(context).toggleLensActiveState(mCode);
-                            inflatedLayout.setBackgroundResource(activeState ? R.drawable.lens_bg_selected :
-                                    R.drawable.lens_bg_unselected);
-                            inflatedLayout.invalidate();
-                        } catch (Exception e) {
-                            Logger.log("No lens found with code: " + mCode + "\n" + e.getMessage());
-                        }
-                    }
-                });
-                ImageView iconImageView = (ImageView) inflatedLayout.findViewById(R.id.lensIconView);
-
-                TextView iconName = (TextView) inflatedLayout.findViewById(R.id.lensTextView);
-                String nameBuilder = lensData.mCode;
-
-                for (String filter : stringFilter)
-                    nameBuilder = nameBuilder.replace(filter, "");
-
-                nameBuilder = nameBuilder.replaceAll("_", " ");
-
-                iconName.setText(nameBuilder.trim());
-                iconName.setMaxWidth(5);
-
-                LensContainerData containerData = iconMap.get(lensData.mCode);
-                if (containerData == null || containerData.bmp == null) {
-                    containerData = new LensContainerData(inflatedLayout, iconImageView, iconName, lensData.mIconLink, null);
-                    iconMap.put(lensData.mCode, containerData);
-                    //TODO Implement try/catch
-
-                    try {
-                        AsyncTaskCompat.executeParallel(new LensIconLoader.AsyncLensIconDownloader(), containerData, context);
-                    } catch (Throwable e) {
-                        Logger.log("Error loading lens", e);
-                    }
-                } else {
-                    iconImageView.setImageBitmap(containerData.bmp);
-                    iconImageView.invalidate();
-
-                    iconName.setMaxWidth(containerData.bmp.getWidth());
-                    iconName.invalidate();
-                    inflatedLayout.invalidate();
-                }
-
-                gridLayout.addView(inflatedLayout);
+            if (!extension.equals("db")) {
+                Logger.log("Incorrect filetype: " + extension, LogType.LENS);
+                Toast.makeText(getContext(), "Incorrect filetype supplied: " + extension, Toast.LENGTH_SHORT).show();
+                return;
             }
 
-            builder.setView(view);
-            builder.setPositiveButton(Common.dialog_done, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    int selectedLensSize = Lens.getLensDatabase(context).getActiveLensCount();
-                    loadedLensesTextView.setText(String.format("%s", selectedLensSize));
-                }
-            });
-            builder.setNegativeButton(Common.dialog_cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    int selectedLensSize = Lens.getLensDatabase(context).getActiveLensCount();
-                    loadedLensesTextView.setText(String.format("%s", selectedLensSize));
-                }
-            });
+            LensDatabaseHelper masterDB = Lens.getLensDatabase(getContext());
+            LensDatabaseHelper slaveDB = new LensDatabaseHelper(getContext(), filePath);
 
+            int mergedLenses = LensDatabaseHelper.mergeLensDatabases(masterDB, slaveDB);
 
-            builder.show();
+            if( mergedLenses > 0 )
+                Toast.makeText(getContext(), "Successfully merged " + mergedLenses + " lenses!", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(getContext(), "Found no lenses to merge!", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public static class LensContainerData {
-        public LinearLayout inflatedLayout;
-        public ImageView iconImageView;
-        public TextView textView;
+    public static class LensItemData {
+        public Bitmap lensIcon;
+        public String lensCode;
+        public String lensName;
         public String url;
-        public Bitmap bmp;
-
-        LensContainerData(LinearLayout inflatedLayout, ImageView iconImageView, TextView textView, String url, Bitmap bmp) {
-            this.inflatedLayout = inflatedLayout;
-            this.iconImageView = iconImageView;
-            this.textView = textView;
-            this.url = url;
-            this.bmp = bmp;
-        }
+        public boolean isActive;
     }
 }

@@ -1,4 +1,4 @@
-package com.marz.snapprefs.Util;
+package com.marz.snapprefs.Adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.marz.snapprefs.R;
+import com.marz.snapprefs.Util.ConversationItem;
 
 import java.util.List;
 
@@ -17,8 +18,9 @@ import java.util.List;
  * Created by Andre on 26/10/2016.
  */
 
-public class ChatLogAdapter extends ArrayAdapter<Object> {
-    public ChatLogAdapter(Context context, int resource, List<Object> objects) {
+public class FriendListAdapter extends ArrayAdapter<Object> {
+
+    public FriendListAdapter(Context context, int resource, List<Object> objects) {
         super(context, resource, objects);
     }
 
@@ -31,19 +33,17 @@ public class ChatLogAdapter extends ArrayAdapter<Object> {
         if (v == null) {
             LayoutInflater vi;
             vi = LayoutInflater.from(getContext());
-            v = vi.inflate(R.layout.chatmessage_item, null);
+            v = vi.inflate(R.layout.chatfriend_item, null);
         }
 
-        ChatData item = (ChatData) getItem(position);
+        ConversationItem item = (ConversationItem) getItem(position);
 
         if( item != null ) {
-            TextView txt_friend_view = (TextView) v.findViewById(R.id.text_list_log_friend);
-            TextView txt_message_count = (TextView) v.findViewById(R.id.text_list_message);
-            TextView txt_date = (TextView) v.findViewById(R.id.text_log_date);
+            TextView txt_friend_view = (TextView) v.findViewById(R.id.text_list_friend);
+            TextView txt_message_count = (TextView) v.findViewById(R.id.txt_message_count);
 
-            txt_friend_view.setText(item.getSender());
-            txt_message_count.setText(item.getText());
-            txt_date.setText(item.getFormattedDate());
+            txt_friend_view.setText(item.friendName);
+            txt_message_count.setText("" + item.messageList.size());
         }
 
         return v;
