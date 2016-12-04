@@ -12,6 +12,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -50,6 +51,7 @@ public class LensesFragment extends Fragment {
             "len_",
             "code_special_lens_-_"
     );
+    private SparseArray<View> viewCache = new SparseArray<>();
     public LensListAdapter lensListAdapter;
     private final DialogInterface.OnClickListener onSelectAllClick = new DialogInterface.OnClickListener() {
         @Override
@@ -129,8 +131,8 @@ public class LensesFragment extends Fragment {
     }
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        final int lensListSize = (int) Lens.getLensDatabase(container.getContext()).getRowCount();
-        int selectedLensSize = Lens.getLensDatabase(container.getContext()).getActiveLensCount();
+        final int lensListSize = (int) Lens.getLensDatabase(getContext()).getRowCount();
+        int selectedLensSize = Lens.getLensDatabase(getContext()).getActiveLensCount();
 
         View view = inflater.inflate(R.layout.lensloader_layout,
                 container, false);
@@ -208,7 +210,18 @@ public class LensesFragment extends Fragment {
                 startActivityForResult(Intent.createChooser(intent, "Choose Slave DB to merge"), 1);
             }
         });
+
+        viewCache.put(R.id.textview_total_lens_count, totalLensesTextView);
+        viewCache.put(R.id.textview_loaded_lens_count, loadedLensesTextView);
         return view;
+    }
+
+    private void refreshLensCount() {
+        final int lensListSize = (int) Lens.getLensDatabase(getContext()).getRowCount();
+        int selectedLensSize = Lens.getLensDatabase(getContext()).getActiveLensCount();
+
+        ((TextView) viewCache.get(R.id.textview_total_lens_count)).setText(String.format("%s", lensListSize));
+        ((TextView) viewCache.get(R.id.textview_loaded_lens_count)).setText(String.format("%s", selectedLensSize));
     }
 
     private void lensDialog(final Context context, final TextView loadedLensesTextView, LayoutInflater inflater,
@@ -343,8 +356,10 @@ public class LensesFragment extends Fragment {
 
             int mergedLenses = LensDatabaseHelper.mergeLensDatabases(masterDB, slaveDB);
 
-            if( mergedLenses > 0 )
+            if (mergedLenses > 0) {
+                refreshLensCount();
                 Toast.makeText(getContext(), "Successfully merged " + mergedLenses + " lenses!", Toast.LENGTH_SHORT).show();
+            }
             else
                 Toast.makeText(getContext(), "Found no lenses to merge!", Toast.LENGTH_SHORT).show();
         }
