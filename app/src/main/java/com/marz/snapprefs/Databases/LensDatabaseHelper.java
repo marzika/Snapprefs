@@ -284,10 +284,12 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
         return (Map<String, Object>) super.getAllBuiltObjects(LensEntry.TABLE_NAME, callback);
     }
 
-    public void deleteLens(String mCode) {
+    public boolean deleteLens(String mCode) {
         String[] selectionArgs = {mCode};
 
-        super.deleteObject(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE, selectionArgs);
+        int rowsAffected = super.deleteObject(LensEntry.TABLE_NAME, LensEntry.COLUMN_NAME_MCODE, selectionArgs);
+        Logger.log("Removed " + rowsAffected + " lenses", LogType.DATABASE);
+        return rowsAffected > 0;
     }
 
     public void updateLens(String mCode, ContentValues values) {

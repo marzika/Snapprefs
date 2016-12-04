@@ -216,7 +216,7 @@ public class LensesFragment extends Fragment {
         return view;
     }
 
-    private void refreshLensCount() {
+    public void refreshLensCount() {
         final int lensListSize = (int) Lens.getLensDatabase(getContext()).getRowCount();
         int selectedLensSize = Lens.getLensDatabase(getContext()).getActiveLensCount();
 
@@ -262,7 +262,7 @@ public class LensesFragment extends Fragment {
 
     private void SetupRecyclerView(LinkedHashMap<String, Object> lensMap, View view) {
         ArrayList<LensItemData> itemDataList = BuildLensItemData(lensMap, null);
-        lensListAdapter = new LensListAdapter(view.getContext(), itemDataList);
+        lensListAdapter = new LensListAdapter(view.getContext(), itemDataList, this);
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.lens_recyclerview);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(view.getContext(), 4);
         recyclerView.setLayoutManager(layoutManager);
