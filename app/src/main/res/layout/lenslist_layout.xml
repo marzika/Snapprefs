@@ -8,19 +8,19 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_above="@+id/lens_filter_bg">
+        android:layout_above="@+id/lens_span_count">
 
 
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/lens_recyclerview"
-            android:layout_alignParentBottom="true"
             android:scrollbars="vertical"
-            />
+            android:layout_alignParentTop="true"/>
+
     </RelativeLayout>
 
     <LinearLayout
@@ -65,8 +65,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/linear"
-        android:layout_alignParentBottom="true"
-        android:layout_height="40dp">
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true">
 
         <Button
             android:text="Select All"
@@ -82,5 +82,24 @@
             android:layout_weight="1"
             android:id="@+id/btn_deselect_all_lenses" />
     </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/lens_filter_bg"
+        android:layout_alignRight="@+id/lens_filter_bg"
+        android:layout_alignEnd="@+id/lens_filter_bg"
+        android:layout_alignLeft="@+id/lens_filter_bg"
+        android:layout_alignStart="@+id/lens_filter_bg"
+        android:id="@+id/lens_span_count">
+
+        <SeekBar
+            style="@style/Widget.AppCompat.SeekBar.Discrete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="10"
+            android:progress="1"
+            android:id="@+id/lens_seek_span"/>
+    </FrameLayout>
 
 </RelativeLayout>

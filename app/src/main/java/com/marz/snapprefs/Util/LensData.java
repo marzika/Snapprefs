@@ -24,6 +24,7 @@ public class LensData {
     public String mSignature;
     public boolean mActive;
     public long selTime;
+    public String name;
 
     //public Object mType;
     //public Bitmap mLensIcon;
@@ -41,6 +42,7 @@ public class LensData {
         contentValues.put(LensEntry.COLUMN_NAME_MSIGNATURE, mSignature);
         contentValues.put(LensEntry.COLUMN_NAME_ACTIVE, mActive);
         contentValues.put(LensEntry.COLUMN_NAME_SEL_TIME, selTime);
+        contentValues.put(LensEntry.COLUMN_NAME_LENS_NAME, name);
         return contentValues;
     }
 

@@ -19,6 +19,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,9 +38,7 @@ import com.marz.snapprefs.R;
 import com.marz.snapprefs.Util.LensData;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -46,11 +46,6 @@ import static android.app.Activity.RESULT_OK;
  * Created by Andre on 16/09/2016.
  */
 public class LensesFragment extends Fragment {
-    private static final List<String> stringFilter = Arrays.asList(
-            "code_scheduled_lens_-_",
-            "len_",
-            "code_special_lens_-_"
-    );
     private SparseArray<View> viewCache = new SparseArray<>();
     public LensListAdapter lensListAdapter;
     private final DialogInterface.OnClickListener onSelectAllClick = new DialogInterface.OnClickListener() {
@@ -111,16 +106,16 @@ public class LensesFragment extends Fragment {
 
             LensItemData itemData = new LensItemData();
 
-            String nameBuilder = lensData.mCode;
-            for (String filter : stringFilter)
-                nameBuilder = nameBuilder.replace(filter, "");
+            if(lensData.name == null) {
+                String strippedName = Lens.stripLensName(lensData.mCode);
 
-            nameBuilder = nameBuilder.replaceAll("_", " ");
+                if (partialName != null && !strippedName.toLowerCase().contains(partialName.toLowerCase()))
+                    continue;
 
-            if (partialName != null && !nameBuilder.toLowerCase().contains(partialName.toLowerCase()))
-                continue;
+                itemData.lensName = strippedName;
+            } else
+                itemData.lensName = lensData.name;
 
-            itemData.lensName = nameBuilder;
             itemData.lensCode = lensData.mCode;
             itemData.url = lensData.mIconLink;
             itemData.isActive = lensData.mActive;
@@ -260,13 +255,35 @@ public class LensesFragment extends Fragment {
         builder.show();
     }
 
-    private void SetupRecyclerView(LinkedHashMap<String, Object> lensMap, View view) {
+    private void SetupRecyclerView(LinkedHashMap<String, Object> lensMap, final View view) {
         ArrayList<LensItemData> itemDataList = BuildLensItemData(lensMap, null);
         lensListAdapter = new LensListAdapter(view.getContext(), itemDataList, this);
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.lens_recyclerview);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(view.getContext(), 4);
+        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.lens_recyclerview);
+        SeekBar spanCount = (SeekBar) view.findViewById(R.id.lens_seek_span);
+        int defaultSpan = Preferences.getInt(Prefs.LENS_SELECTOR_SPAN);
+        spanCount.setProgress(defaultSpan - 1);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(view.getContext(), defaultSpan);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(lensListAdapter);
+
+        spanCount.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                RecyclerView.LayoutManager layoutManager = new GridLayoutManager(view.getContext(), i + 1);
+                recyclerView.setLayoutManager(layoutManager);
+                Preferences.setPref(Prefs.LENS_SELECTOR_SPAN, i + 1);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
     private void SetupSelectionButtons(Context context, View view) {

@@ -482,7 +482,8 @@ public class Preferences {
         CUSTOM_FILTER_TYPE("pref_key_filter_type", 0),
         LICENCE(DEVICE_ID.key, 0),
         ROTATION_MODE("pref_rotation", Common.ROTATION_CW),
-        ADJUST_METHOD("pref_adjustment", Common.ADJUST_CROP);
+        ADJUST_METHOD("pref_adjustment", Common.ADJUST_CROP),
+        LENS_SELECTOR_SPAN("pref_lens_span", 4);
 
         public String key;
         public Object defaultVal;
