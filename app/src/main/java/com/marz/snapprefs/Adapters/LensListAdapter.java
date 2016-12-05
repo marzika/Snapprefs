@@ -91,7 +91,6 @@ public class LensListAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         AsyncTaskCompat.executeParallel(new LensIconLoader.AsyncLensIconDownloader(),
                 lensData, context, holder.lensIcon);
-
     }
 
     @Override
@@ -127,7 +126,7 @@ public class LensListAdapter extends RecyclerView.Adapter<ViewHolder> {
                     Toast.makeText(context, "Reset lens name back to: " + lensItemData.lensName, Toast.LENGTH_SHORT).show();
                     int position = lensDataList.indexOf(lensItemData);
 
-                    if( position != -1 )
+                    if (position != -1)
                         notifyItemChanged(position);
                     else
                         notifyDataSetChanged();
@@ -182,7 +181,7 @@ public class LensListAdapter extends RecyclerView.Adapter<ViewHolder> {
                         lensItemData.lensName = newName;
                         int position = lensDataList.indexOf(lensItemData);
 
-                        if( position != -1 )
+                        if (position != -1)
                             notifyItemChanged(position);
                         else
                             notifyDataSetChanged();
