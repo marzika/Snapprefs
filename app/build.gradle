@@ -42,5 +42,4 @@ dependencies {
     compile 'com.nononsenseapps:filepicker:2.5.1'
     compile 'com.yalantis:ucrop:2.2.0-native'
     compile 'com.google.code.gson:gson:2.7'
-    compile 'com.android.support:recyclerview-v7:24.2.1'
 }
