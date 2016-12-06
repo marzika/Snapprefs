@@ -5,6 +5,7 @@ import android.app.AlertDialog.Builder;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ import com.marz.snapprefs.Lens;
 import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.R;
+import com.marz.snapprefs.Util.BitmapCache;
 import com.marz.snapprefs.Util.LensIconLoader;
 
 import java.util.ArrayList;
@@ -38,12 +40,15 @@ import java.util.ArrayList;
 public class LensListAdapter extends RecyclerView.Adapter<ViewHolder> {
     public ArrayList<LensItemData> lensDataList;
     private Context context;
+    private BitmapCache bitmapCache;
     private LensesFragment lensesFragment;
 
-    public LensListAdapter(Context context, ArrayList<LensItemData> lensDataList, LensesFragment lensesFragment) {
+    public LensListAdapter(Context context, ArrayList<LensItemData> lensDataList, LensesFragment lensesFragment,
+                           BitmapCache bitmapCache) {
         this.context = context;
         this.lensDataList = lensDataList;
         this.lensesFragment = lensesFragment;
+        this.bitmapCache = bitmapCache;
     }
 
     @Override
@@ -89,8 +94,13 @@ public class LensListAdapter extends RecyclerView.Adapter<ViewHolder> {
         holder.lensText.setText(lensData.lensName);
         holder.backgroundLayout.setBackgroundResource(lensData.isActive ? R.drawable.lens_bg_selected : R.drawable.lens_bg_unselected);
 
-        AsyncTaskCompat.executeParallel(new LensIconLoader.AsyncLensIconDownloader(),
-                lensData, context, holder.lensIcon);
+        Bitmap cachedBitmap = bitmapCache.getBitmapFromMemCache(lensData.lensCode);
+        if(cachedBitmap != null)
+            holder.lensIcon.setImageBitmap(cachedBitmap);
+        else {
+            AsyncTaskCompat.executeParallel(new LensIconLoader.AsyncLensIconDownloader(),
+                    lensData, context, holder.lensIcon, bitmapCache);
+        }
     }
 
     @Override
@@ -225,8 +235,8 @@ public class LensListAdapter extends RecyclerView.Adapter<ViewHolder> {
         alertBuilder.create().show();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView lensIcon;
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public ImageView lensIcon;
         TextView lensText;
         View backgroundLayout;
 

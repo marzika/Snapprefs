@@ -41,6 +41,7 @@ import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.R;
+import com.marz.snapprefs.Util.BitmapCache;
 import com.marz.snapprefs.Util.LensData;
 
 import java.util.ArrayList;
@@ -49,10 +50,13 @@ import java.util.LinkedHashMap;
 import static android.app.Activity.RESULT_OK;
 
 /**
- * Created by Andre on 16/09/2016.
+ * This class was created by Andre R M (SID: 701439)
+ * It and its contents are free to use by all
  */
 public class LensesFragment extends Fragment {
     public LensListAdapter lensListAdapter;
+    public static BitmapCache bitmapCache = new BitmapCache();
+
     private final DialogInterface.OnClickListener onSelectAllClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
@@ -258,7 +262,7 @@ public class LensesFragment extends Fragment {
     private RecyclerView setupRecyclerView(LinkedHashMap<String, Object> lensMap, final View view) {
         RelativeLayout recyclerContainer = (RelativeLayout) view.findViewById(R.id.lens_list_holder);
         ArrayList<LensItemData> itemDataList = buildLensItemData(lensMap, null);
-        lensListAdapter = new LensListAdapter(view.getContext(), itemDataList, this);
+        lensListAdapter = new LensListAdapter(view.getContext(), itemDataList, this, bitmapCache);
 
         RecyclerView recyclerView = new RecyclerView(getContext()) {
             @Override
@@ -268,6 +272,8 @@ public class LensesFragment extends Fragment {
                 int selectedLensSize = Lens.getLensDatabase(getContext()).getActiveLensCount();
                 TextView loadedLenses = (TextView) viewCache.get(R.id.textview_loaded_lens_count);
                 loadedLenses.setText(String.format("%s", selectedLensSize));
+
+                Logger.log("Endpoint");
             }
         };
 

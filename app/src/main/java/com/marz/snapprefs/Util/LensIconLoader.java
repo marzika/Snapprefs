@@ -98,6 +98,7 @@ public class LensIconLoader {
                 LensesFragment.LensItemData itemData = (LensesFragment.LensItemData) params[0];
                 Activity context = (Activity) params[1];
                 final ImageView iconView = (ImageView) params[2];
+                BitmapCache bitmapCache = (BitmapCache) params[3];
 
                 final String url = itemData.url;
                 final Bitmap bmp = retrieveAppropriateBitmap(url, context);
@@ -106,6 +107,8 @@ public class LensIconLoader {
                     Logger.log("Could not retrieve Lens Icon", LogType.LENS);
                     return null;
                 }
+
+                bitmapCache.addBitmapToMemoryCache(itemData.lensCode, bmp);
 
                 context.runOnUiThread(new Runnable() {
                     @Override
