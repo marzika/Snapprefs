@@ -5,7 +5,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
@@ -13,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,6 +41,7 @@ import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.R;
 import com.marz.snapprefs.Util.BitmapCache;
 import com.marz.snapprefs.Util.LensData;
+import com.marz.snapprefs.Util.ViewCache;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -54,9 +53,8 @@ import static android.app.Activity.RESULT_OK;
  * It and its contents are free to use by all
  */
 public class LensesFragment extends Fragment {
-    public LensListAdapter lensListAdapter;
     public static BitmapCache bitmapCache = new BitmapCache();
-
+    public LensListAdapter lensListAdapter;
     private final DialogInterface.OnClickListener onSelectAllClick = new DialogInterface.OnClickListener() {
         @Override
         public void onClick(DialogInterface dialog, int which) {
@@ -105,7 +103,7 @@ public class LensesFragment extends Fragment {
             lensListAdapter.notifyDataSetChanged();
         }
     };
-    private SparseArray<View> viewCache = new SparseArray<>();
+    private ViewCache viewCache = new ViewCache();
 
     private static ArrayList<LensItemData> buildLensItemData(LinkedHashMap<String, Object> lensMap, String partialName) {
         ArrayList<LensItemData> lensList = new ArrayList<>();
@@ -143,7 +141,7 @@ public class LensesFragment extends Fragment {
 
         Button lensLoaderButton = (Button) view.findViewById(R.id.btnLensSelector);
         TextView totalLensesTextView = (TextView) view.findViewById(R.id.textview_total_lens_count);
-        final TextView loadedLensesTextView = (TextView) view.findViewById(R.id.textview_loaded_lens_count);
+        TextView loadedLensesTextView = (TextView) view.findViewById(R.id.textview_loaded_lens_count);
         Switch loadLensSwitch = (Switch) view.findViewById(R.id.lensloader_toggle);
         Switch collectLensSwitch = (Switch) view.findViewById(R.id.lenscollector_toggle);
         Switch autoEnableSwitch = (Switch) view.findViewById(R.id.autoenable_switch);
@@ -199,7 +197,7 @@ public class LensesFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (lensListSize > 0)
-                    lensDialog(getContext(), loadedLensesTextView, inflater, container);
+                    lensDialog(getContext(), inflater, container);
                 else
                     Toast.makeText(v.getContext(), "You've not collected any lenses!", Toast.LENGTH_SHORT).show();
             }
@@ -224,11 +222,11 @@ public class LensesFragment extends Fragment {
         final int lensListSize = (int) Lens.getLensDatabase(getContext()).getRowCount();
         int selectedLensSize = Lens.getLensDatabase(getContext()).getActiveLensCount();
 
-        ((TextView) viewCache.get(R.id.textview_total_lens_count)).setText(String.format("%s", lensListSize));
-        ((TextView) viewCache.get(R.id.textview_loaded_lens_count)).setText(String.format("%s", selectedLensSize));
+        viewCache.getTV(R.id.textview_total_lens_count).setText(String.format("%s", lensListSize));
+        viewCache.getTV(R.id.textview_loaded_lens_count).setText(String.format("%s", selectedLensSize));
     }
 
-    private void lensDialog(final Context context, final TextView loadedLensesTextView, LayoutInflater inflater,
+    private void lensDialog(final Context context, LayoutInflater inflater,
                             ViewGroup container) {
         LinkedHashMap<String, Object> lensMap = (LinkedHashMap<String, Object>) Lens.getLensDatabase(context).getAllLenses();
 
@@ -291,7 +289,6 @@ public class LensesFragment extends Fragment {
 
     private void setupLensSpanSeekbar(final View view, final RecyclerView recyclerView) {
         SeekBar spanCount = (SeekBar) view.findViewById(R.id.lens_seek_span);
-        int defaultSpan = Preferences.getInt(Prefs.LENS_SELECTOR_SPAN);
         spanCount.setProgress(Preferences.getInt(Prefs.LENS_SELECTOR_SPAN) - 1);
 
         spanCount.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
@@ -303,14 +300,10 @@ public class LensesFragment extends Fragment {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) {}
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
     }
 
@@ -410,7 +403,6 @@ public class LensesFragment extends Fragment {
     }
 
     public static class LensItemData {
-        public Bitmap lensIcon;
         public String lensCode;
         public String lensName;
         public String url;
