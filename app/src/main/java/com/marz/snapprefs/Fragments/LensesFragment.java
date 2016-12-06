@@ -249,12 +249,13 @@ public class LensesFragment extends Fragment {
 
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         Window window = builder.show().getWindow();
-        assert window != null;
-        lp.copyFrom(window.getAttributes());
+        if( window != null ) {
+            lp.copyFrom(window.getAttributes());
 //This makes the dialog take up the full width
-        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-        window.setAttributes(lp);
+            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            window.setAttributes(lp);
+        }
     }
 
     private RecyclerView setupRecyclerView(LinkedHashMap<String, Object> lensMap, final View view) {
