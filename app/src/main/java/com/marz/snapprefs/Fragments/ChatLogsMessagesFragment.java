@@ -23,7 +23,7 @@ import com.marz.snapprefs.Logger;
 import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.R;
 import com.marz.snapprefs.Util.ChatData;
-import com.marz.snapprefs.Util.ChatLogAdapter;
+import com.marz.snapprefs.Adapters.ChatLogAdapter;
 import com.marz.snapprefs.Util.ConversationItem;
 
 /**

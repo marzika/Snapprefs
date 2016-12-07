@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.marz.snapprefs.Util.FileUtils;
-import com.marz.snapprefs.Util.ViewDataAdapter;
+import com.marz.snapprefs.Adapters.ViewDataAdapter;
 
 import java.util.List;
 

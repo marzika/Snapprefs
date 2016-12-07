@@ -8,8 +8,6 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.marz.snapprefs.Fragments.LensesFragment;
 import com.marz.snapprefs.Logger;
@@ -68,7 +66,6 @@ public class LensIconLoader {
         if (!MainActivity.isNetworkAvailable(context))
             return null;
 
-        Bitmap bmImg;
         URL myFileUrl;
 
         try {
@@ -98,13 +95,12 @@ public class LensIconLoader {
         @Override
         protected Boolean doInBackground(Object... params) {
             try {
-                LensesFragment.LensContainerData pair = (LensesFragment.LensContainerData) params[0];
+                LensesFragment.LensItemData itemData = (LensesFragment.LensItemData) params[0];
                 Activity context = (Activity) params[1];
+                final ImageView iconView = (ImageView) params[2];
+                BitmapCache bitmapCache = (BitmapCache) params[3];
 
-                final String url = pair.url;
-                final LinearLayout inflatedLayout = pair.inflatedLayout;
-                final ImageView button = pair.iconImageView;
-                final TextView textView = pair.textView;
+                final String url = itemData.url;
                 final Bitmap bmp = retrieveAppropriateBitmap(url, context);
 
                 if (bmp == null) {
@@ -112,14 +108,12 @@ public class LensIconLoader {
                     return null;
                 }
 
-                float density = context.getResources().getDisplayMetrics().density;
-                final int imgSize = (int) (65f * density);
-                pair.bmp = Bitmap.createScaledBitmap(bmp, imgSize, imgSize, false);
+                bitmapCache.addBitmapToMemoryCache(itemData.lensCode, bmp);
 
                 context.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        button.setImageBitmap(bmp);
+                        iconView.setImageBitmap(bmp);
                     }
                 });
             } catch (Throwable e) {

@@ -43,6 +43,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.marz.snapprefs.Fragments.LensesFragment;
 import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Tabs.BuyTabFragment;
 import com.marz.snapprefs.Tabs.ChatLogsTabFragment;
@@ -145,6 +146,8 @@ public class MainActivity extends AppCompatActivity {
 
         if( prefsFile.exists())
             prefsFile.setReadable(true, false);
+
+        LensesFragment.bitmapCache.clearCache();
     }
 
     @Override
@@ -544,7 +547,7 @@ public class MainActivity extends AppCompatActivity {
 
                 os.flush();
 
-                Toast.makeText(activity, "Kill snapchat in the background", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "Killed snapchat in the background", Toast.LENGTH_SHORT).show();
                 break;
             }
         }

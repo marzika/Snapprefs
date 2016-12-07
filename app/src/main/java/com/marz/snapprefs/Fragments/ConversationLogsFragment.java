@@ -23,7 +23,7 @@ import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.MainActivity;
 import com.marz.snapprefs.R;
 import com.marz.snapprefs.Util.ConversationItem;
-import com.marz.snapprefs.Util.FriendListAdapter;
+import com.marz.snapprefs.Adapters.FriendListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -8,28 +9,48 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/linear">
-
-        <ScrollView
-            android:id="@+id/scrollView7"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center"
-            android:layoutMode="clipBounds">
-
-            <GridLayout
-                android:id="@+id/lensloader_gridholder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:alignmentMode="alignBounds"
-                android:columnCount="4"
-                android:layoutMode="clipBounds"
-                android:orientation="horizontal"
-                android:useDefaultMargins="false"></GridLayout>
-        </ScrollView>
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/lens_span_count"
+        android:id="@+id/lens_list_holder"
+        android:layout_alignParentTop="true">
     </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/lens_filter_bg"
+        android:layout_above="@+id/linear"
+        android:weightSum="3"
+        android:layout_margin="5dp">
+
+        <TextView
+            android:text="Name Filter"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/textView14"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:background="@drawable/rounded_left_black_border"
+            android:textColor="@color/black"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:layout_weight="1"
+            android:id="@+id/lens_filter"
+            android:hint="Lens Name"
+            android:maxLines="1"
+            android:background="@drawable/rounded_right_black_border"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"/>
+    </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -37,8 +58,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:id="@+id/linear"
-        android:layout_alignParentBottom="true"
-        android:layout_height="40dp">
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true">
 
         <Button
             android:text="Select All"
@@ -54,5 +75,24 @@
             android:layout_weight="1"
             android:id="@+id/btn_deselect_all_lenses" />
     </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/lens_filter_bg"
+        android:layout_alignRight="@+id/lens_filter_bg"
+        android:layout_alignEnd="@+id/lens_filter_bg"
+        android:layout_alignLeft="@+id/lens_filter_bg"
+        android:layout_alignStart="@+id/lens_filter_bg"
+        android:id="@+id/lens_span_count">
+
+        <SeekBar
+            style="@style/Widget.AppCompat.SeekBar.Discrete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="10"
+            android:progress="1"
+            android:id="@+id/lens_seek_span"/>
+    </FrameLayout>
 
 </RelativeLayout>
