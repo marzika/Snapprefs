@@ -34,7 +34,8 @@ public class LensDatabaseHelper extends CachedDatabaseHandler {
             LensEntry.COLUMN_NAME_MLENSLINK,
             LensEntry.COLUMN_NAME_MSIGNATURE,
             LensEntry.COLUMN_NAME_ACTIVE,
-            LensEntry.COLUMN_NAME_SEL_TIME
+            LensEntry.COLUMN_NAME_SEL_TIME,
+            LensEntry.COLUMN_NAME_LENS_NAME
     };
     private static final String TEXT_TYPE = " TEXT";
     private static final String INT_TYPE = " INTEGER";
