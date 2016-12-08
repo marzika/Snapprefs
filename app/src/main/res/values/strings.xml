@@ -376,7 +376,7 @@
     <string name="title_activity_redeem">Redeem</string>
     <string name="title_activity_visual">Visual Filters</string>
     <string name="title_activity_visual_preview">Visual Filters Preview</string>
-    <string name="buy_text"><![CDATA[<b>Premium:</b><br><small>AdFree, Typing alert bypass, Chat presence bypass</small><br><br><b>Deluxe:</b><br><small>Every Premium feature, Stealth viewing (stories and snaps), GodMode (noone can save your Snaps -- not added yet)</small><br><br><b>NOTE:<br><small>You will receive an email with your Redeem ID from support@snapprefs.com (Check your Spam/Junk folder).<br>Your transaction ID is NOT your Redeem ID.<br><br>Payments can take up to 24 hours to activate. With payment issues send me an email to the above mentioned address.</small>]]></string>
+    <string name="buy_text"><![CDATA[<b>Premium:</b><br><small>AdFree, Typing alert bypass, Chat presence bypass</small><br><br><b>Deluxe:</b><br><small>Every Premium feature, Stealth viewing (snaps), GodMode (noone can save your Snaps -- not added yet)</small><br><br><b>NOTE:<br><small>You will receive an email with your Redeem ID from support@snapprefs.com (Check your Spam/Junk folder).<br>Your transaction ID is NOT your Redeem ID.<br><br>Payments can take up to 24 hours to activate. With payment issues send me an email to the above mentioned address.</small>]]></string>
     <string name="buy_deluxe">Deluxe (9.99$)</string>
     <string name="buy_premium">Premium (2.99$)</string>
     <string name="hello_world">Hello world!</string>
