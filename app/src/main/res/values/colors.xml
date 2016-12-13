@@ -19,4 +19,9 @@
     <color name="secondary_text">#727272</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#B6B6B6</color>
+
+    <item name="color_bottom_line_enabled" type="color">#BDBDBD</item>
+    <item name="color_bottom_line_disabled" type="color">#EEEEEE</item>
+
+    <item name="color_dialog" type="color">#607D8B</item>
 </resources>
