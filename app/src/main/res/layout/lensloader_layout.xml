@@ -186,6 +186,27 @@
                 android:checked="false"
                 android:padding="10dp"
                 android:text="@string/hide_current_sc_lenses_switch_txt" />
+
+            <TextView
+                android:text="Merge Lens Databases"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView11"
+                android:layout_centerHorizontal="true"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_below="@+id/hide_current_snapchat_lenses"/>
+
+            <Button
+                android:text="Select Database"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_db_merger"
+                android:layout_below="@+id/textView11"
+                android:layout_alignRight="@+id/textView11"
+                android:layout_alignEnd="@+id/textView11"
+                android:layout_alignLeft="@+id/textView11"
+                android:layout_alignStart="@+id/textView11"/>
+
         </RelativeLayout>
     </ScrollView>
 

@@ -376,7 +376,7 @@
     <string name="title_activity_redeem">Redeem</string>
     <string name="title_activity_visual">Visual Filters</string>
     <string name="title_activity_visual_preview">Visual Filters Preview</string>
-    <string name="buy_text"><![CDATA[<b>Premium:</b><br><small>AdFree, Typing alert bypass, Chat presence bypass</small><br><br><b>Deluxe:</b><br><small>Every Premium feature, Stealth viewing (stories and snaps), GodMode (noone can save your Snaps -- not added yet)</small><br><br><b>NOTE:<br><small>You will receive an email with your Redeem ID from support@snapprefs.com (Check your Spam/Junk folder).<br>Your transaction ID is NOT your Redeem ID.<br><br>Payments can take up to 24 hours to activate. With payment issues send me an email to the above mentioned address.</small>]]></string>
+    <string name="buy_text"><![CDATA[<b>Premium:</b><br><small>AdFree, Typing alert bypass, Chat presence bypass</small><br><br><b>Deluxe:</b><br><small>Every Premium feature, Stealth viewing (snaps), GodMode (noone can save your Snaps -- not added yet)</small><br><br><b>NOTE:<br><small>You will receive an email with your Redeem ID from support@snapprefs.com (Check your Spam/Junk folder).<br>Your transaction ID is NOT your Redeem ID.<br><br>Payments can take up to 24 hours to activate. With payment issues send me an email to the above mentioned address.</small>]]></string>
     <string name="buy_deluxe">Deluxe (9.99$)</string>
     <string name="buy_premium">Premium (2.99$)</string>
     <string name="hello_world">Hello world!</string>
@@ -425,6 +425,7 @@
     <string name="pref_save_integration_summary">When enabled you can launch Snapprefs\'s settings by pulling down Snapchat\'s settings bar and clicking on Snapprefs</string>
     <string name="licenses">Snapprefs is licensed under GNU GPLv3. \n\nUsed libraries - License:\nInstagram Filters for Android - Apache License 2.0\nckChangeLog - Apache License 2.0\nColorPicker for Android - Apache License 2.0\nNoNonsense-FilePicker - MPL 2.0\nmp4parser - Free License\n\nModule was originally based on:\nKeepchat - GNU GPLv3\nSnapshare - GNU GPLv3\n\nSnapchat™ is the property of Snapchat Inc.\nSnapprefs is in no way affiliated with, authorized, maintained, sponsored or endorsed by the Snapchat Inc. or any of its affiliates or subsidiaries. This is an independent application.</string>
     <string name="hide_text">Show Icon In Launcher</string>
+    <string name="kill_sc">Kill Snapchat On Preference Change</string>
     <string name="pref_groups_title">Enable Custom Groups</string>
     <string name="hide_current_sc_lenses_switch_txt">Hide Lenses Currently Provided By SnapChat</string>
     <string name="enable_sort_by_sel_time_switch_txt">Enable Sorting Lenses By Selection Time</string>
@@ -438,4 +439,15 @@
     <string name="lense_master_switch_loading_system_txt">Lens Loading System</string>
     <string name="lense_master_switch_lense_system_txt">Lens Collection System</string>
     <string name="lense_master_switches_heading_txt">Master Switches</string>
+    <string name="activate_layout_license_code_txt" translatable="false">License Code:</string>
+    <string name="activate_layout_checklayout_license_code_blank_txt" translatable="false">Type/Paste your License Code here</string>
+    <string name="activate_layout_device_id_txt_label" translatable="false">Device ID:</string>
+    <string name="activate_layout_activate_licenses_button_txt" translatable="false">Activate license</string>
+    <string name="activate_layout_checklayout_license_status_label_txt" translatable="false">Your license status is:</string>
+    <string name="activate_layout_checklayout_purchase_license_btn_txt" translatable="false">Click here to buy a license</string>
+    <string name="activate_layout_checklayout_username_label_txt" translatable="false">Type your username here</string>
+    <string name="activate_layout_checklayout_god_privacy_statement_txt" translatable="false">Your privacy is key to us, that\'s why only your username\'s SHA256 hash is sent to the server.</string>
+    <string name="activate_layout_checklayout_god_apply_btn_txt" translatable="false">Click here to apply for GOD mode</string>
+    <string name="checklayout_redeem_id_label" translatable="false">Redeem ID:</string>
+    <string name="checklayout_redeem_license_btn_txt" translatable="false">Redeem license</string>
 </resources>

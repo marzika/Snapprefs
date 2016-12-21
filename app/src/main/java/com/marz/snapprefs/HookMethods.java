@@ -275,10 +275,6 @@ public class HookMethods
                 return;
             }
 
-
-            Logger.loadSelectedLogTypes();
-            Logger.log("Loading map from xposed");
-            Preferences.loadMapFromXposed();
             findAndHookMethod("android.media.MediaRecorder", lpparam.classLoader, "setMaxDuration", int.class, new XC_MethodHook() {
                 @Override
                 protected void beforeHookedMethod(MethodHookParam param) {
@@ -293,6 +289,11 @@ public class HookMethods
                 protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                     Friendmojis.init(lpparam);
                     DebugHelper.init(lpparam);
+
+                    Logger.loadSelectedLogTypes();
+                    Logger.log("Loading map from xposed");
+                    Preferences.loadMapFromXposed();
+
                     Logger.log("Application hook: " + param.thisObject.getClass().getCanonicalName());
 
                     findAndHookMethod(Obfuscator.timer.RECORDING_MESSAGE_HOOK_CLASS, lpparam.classLoader, Obfuscator.timer.RECORDING_MESSAGE_HOOK_METHOD, Message.class, new XC_MethodHook() {
@@ -329,6 +330,8 @@ public class HookMethods
                         protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                             //Preferences.loadMapFromXposed();
                             SnapContext = (Activity) param.thisObject;
+                            Logger.log("Loading map from xposed");
+                            Preferences.loadMapFromXposed();
                             if (!Preferences.getBool(Prefs.ACCEPTED_TOU)) {//new ContextThemeWrapper(context.createPackageContext("com.marz.snapprefs", Context.CONTEXT_IGNORE_SECURITY), R.style.AppCompatDialog)
                                 AlertDialog.Builder builder = new AlertDialog.Builder(SnapContext)
                                         .setTitle("ToU and Privacy Policy")

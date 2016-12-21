@@ -10,6 +10,7 @@ import com.marz.snapprefs.Util.LensData;
 import com.marz.snapprefs.Util.LensData.LensType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,6 +29,11 @@ import static de.robv.android.xposed.XposedHelpers.newInstance;
 import static de.robv.android.xposed.XposedHelpers.setObjectField;
 
 public class Lens {
+    private static final List<String> stringFilter = Arrays.asList(
+            "code_scheduled_lens_-_",
+            "len_",
+            "code_special_lens_-_"
+    );
     private static Class lensPrepareState;
     private static Class PrepareStatus;
     private static Class LensClass;
@@ -47,6 +53,16 @@ public class Lens {
 
     public static LensDatabaseHelper getLensDatabase() {
         return lensDatabaseHelper;
+    }
+
+    public static String stripLensName(String mCode) {
+        String nameBuilder = mCode;
+        for (String filter : stringFilter)
+            nameBuilder = nameBuilder.replace(filter, "");
+
+        nameBuilder = nameBuilder.replaceAll("_", " ");
+
+        return nameBuilder;
     }
 
     static void initLens(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {

@@ -56,6 +56,7 @@ public class FlingSaveGesture implements GestureEvent {
                 hasAssignedStart = true;
                 return TAP;
             case MotionEvent.ACTION_MOVE:
+                v.getParent().requestDisallowInterceptTouchEvent(true);
                 velocityTracker.addMovement(event);
 
                 velocityTracker.computeCurrentVelocity(1000, minVelocityThreshhold);

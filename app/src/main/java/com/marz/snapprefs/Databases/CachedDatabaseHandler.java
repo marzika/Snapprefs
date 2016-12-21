@@ -168,9 +168,7 @@ class CachedDatabaseHandler extends CoreDatabaseHandler {
     }
 
     public int deleteObject(String tableName, String columnName, String[] selectionArgs) {
-        String selection = columnName + " = ?";
-
-        return (int) shouldInvalidateCache(super.deleteObject(tableName, selection, selectionArgs));
+        return (int) shouldInvalidateCache(super.deleteObject(tableName, columnName, selectionArgs));
     }
 
     public int updateObject(String tableName, String columnName, String[] selectionArgs,
