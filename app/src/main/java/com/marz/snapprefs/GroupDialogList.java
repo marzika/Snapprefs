@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.marz.snapprefs.Groups.Group;
 import com.marz.snapprefs.Util.FileUtils;
-import com.marz.snapprefs.Util.GroupDataAdapter;
+import com.marz.snapprefs.Adapters.GroupDataAdapter;
 
 import java.io.File;
 import java.util.List;

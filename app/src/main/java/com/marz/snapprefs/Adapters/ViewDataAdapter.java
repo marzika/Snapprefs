@@ -1,4 +1,4 @@
-package com.marz.snapprefs.Util;
+package com.marz.snapprefs.Adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -10,8 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.marz.snapprefs.Friend;
-import com.marz.snapprefs.GroupDialog;
-import com.marz.snapprefs.Logger;
+import com.marz.snapprefs.FriendListDialog;
 import com.marz.snapprefs.R;
 
 import java.util.List;
@@ -19,13 +18,14 @@ import java.util.List;
 /**
  * Created by MARZ on 2016. 04. 14..
  */
-public class GroupDataAdapter extends RecyclerView.Adapter<GroupDataAdapter.ViewHolder> {
+public class ViewDataAdapter extends RecyclerView.Adapter<ViewDataAdapter.ViewHolder> {
 
     private static List<Friend> friendList;
     public Context context;
     public LayoutInflater inflater = null;
 
-    public GroupDataAdapter(Context snapContext) {
+    public ViewDataAdapter(List<Friend> friends, Context snapContext) {
+        friendList = friends;
         this.context = snapContext;
         inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -35,17 +35,13 @@ public class GroupDataAdapter extends RecyclerView.Adapter<GroupDataAdapter.View
         return friendList;
     }
 
-    public static void setFriendList(List<Friend> friends) {
-        friendList = friends;
-    }
-
     // Create new views
     @Override
-    public GroupDataAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                          int viewType) {
+    public ViewDataAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                         int viewType) {
         // create a new view
-        int group_item = (int) GroupDialog.group_item;
-        View itemLayoutView = inflater.inflate(group_item, null);
+
+        View itemLayoutView = inflater.inflate(FriendListDialog.friend_item, null);
 
         // create ViewHolder
 
@@ -61,8 +57,7 @@ public class GroupDataAdapter extends RecyclerView.Adapter<GroupDataAdapter.View
         viewHolder.tvName = (TextView) viewHolder.itemView.getChildAt(0);
         viewHolder.chkSelected = (CheckBox) viewHolder.itemView.getChildAt(1);
 
-        viewHolder.tvName.setText(friendList.get(position).getDisplayName());
-        viewHolder.tvName.setHint(friendList.get(position).getName());
+        viewHolder.tvName.setText(friendList.get(position).getName());
 
         viewHolder.chkSelected.setChecked(friendList.get(position).isSelected());
 
