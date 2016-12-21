@@ -11,7 +11,7 @@ android {
         targetSdkVersion 21
         versionCode 25
         versionName "2.0.0 beta"
-
+        buildConfigField "String", "JENKINS_BRANCH", "\"N/A\""
     }
     lintOptions{
         checkReleaseBuilds false

@@ -29,6 +29,7 @@ public class MainFragment extends Fragment {
         ImageButton donate = (ImageButton) view.findViewById(R.id.paypal);
         TextView build = (TextView) view.findViewById(R.id.build_version);
         TextView sc_version = (TextView) view.findViewById(R.id.sc_version);
+        TextView currentBranch = (TextView) view.findViewById(R.id.branch_name);
         donate.setOnClickListener(new Button.OnClickListener() {
             public void onClick(View v) {
                 try {
@@ -41,6 +42,13 @@ public class MainFragment extends Fragment {
             }
         });
         build.setText(build.getText() + " " + BuildConfig.VERSION_NAME);
+
+        String currentBranchStr = BuildConfig.JENKINS_BRANCH;
+        if(currentBranchStr == "N/A") {
+            currentBranch.setVisibility(View.GONE);
+        } else {
+            currentBranch.setText(currentBranch.getText() + " " + currentBranchStr);
+        }
         sc_version.setText(sc_version.getText() + " " + Obfuscator.SUPPORTED_VERSION_CODENAME);
 
         return view;

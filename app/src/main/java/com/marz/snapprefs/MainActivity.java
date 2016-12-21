@@ -1,6 +1,8 @@
 package com.marz.snapprefs;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -23,6 +25,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -55,6 +58,7 @@ import com.marz.snapprefs.Tabs.SpoofingTabFragment;
 import com.marz.snapprefs.Tabs.TextTabFragment;
 import com.marz.snapprefs.Util.CommonUtils;
 
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -130,9 +134,6 @@ public class MainActivity extends AppCompatActivity {
         return prefs;
     }
 
-    private static void createIfNotExisting() {
-    }
-
     @Override
     protected void onPause(){
         super.onPause();
@@ -191,11 +192,7 @@ public class MainActivity extends AppCompatActivity {
             Preferences.loadMap(prefs);
         }
 
-        Logger.log("MainActivity: initialiseListener");
-        Preferences.initialiseListener(prefs);
-
         Logger.log("Load lenses: " + prefs.contains("pref_key_load_lenses"));
-
 
         Logger.log("SAVE LOCATION: " + Preferences.getSavePath());
         if (!Preferences.getBool(Preferences.Prefs.ACCEPTED_TOU)) {
@@ -477,12 +474,11 @@ public class MainActivity extends AppCompatActivity {
         deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
     }
 
-    public String readStringPreference(String key) {
-        SharedPreferences prefs = getPreferences();
-        return prefs.getString(key, null);
-    }
-
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private SharedPreferences createPrefsIfNotExisting() {
+        if(prefs != null)
+            return prefs;
+
         File prefsFile = new File(
                 Environment.getDataDirectory(), "data/"
                 + getPackageName() + "/shared_prefs/" + getPackageName()
@@ -490,13 +486,19 @@ public class MainActivity extends AppCompatActivity {
         prefsFile.setReadable(true, false);
         Logger.log("Creating preference object : " + this.getPackageName());
 
-        prefs = this.getSharedPreferences(this.getPackageName() + "_preferences", Activity.MODE_WORLD_READABLE);
+        prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
         return prefs;
     }
 
     public static boolean isNetworkAvailable(final Context context) {
         return ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo() != null;
+    }
+
+    public void onResume() {
+        super.onResume();
+
+        Preferences.initialiseListener(createPrefsIfNotExisting(), this);
     }
 
     public void saveInSharedPref(String result) {
@@ -519,7 +521,33 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
         return true;
+    }
 
+    public static void killSCService(Activity activity) throws IOException {
+        ActivityManager activityManager = (ActivityManager) activity.getSystemService(Context.ACTIVITY_SERVICE);
+        for(RunningServiceInfo serviceInfo : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+            String packageName = serviceInfo.service.getPackageName();
+
+            if(packageName.equals("com.snapchat.android")) {
+                Logger.log("PackageName: " + packageName);
+                Logger.log("Process: " + serviceInfo.process);
+                Logger.log("Started: " + serviceInfo.started);
+
+                Process suProcess = Runtime.getRuntime().exec("su");
+                DataOutputStream os = new DataOutputStream(suProcess.getOutputStream());
+
+                os.writeBytes("adb shell" + "\n");
+
+                os.flush();
+
+                os.writeBytes("am force-stop com.snapchat.android" + "\n");
+
+                os.flush();
+
+                Toast.makeText(activity, "Kill snapchat in the background", Toast.LENGTH_SHORT).show();
+                break;
+            }
+        }
     }
 
     private class GCMRegistrationTask extends AsyncTask<Void, Void, String> {

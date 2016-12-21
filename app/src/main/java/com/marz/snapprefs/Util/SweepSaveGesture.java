@@ -52,6 +52,7 @@ public class SweepSaveGesture implements GestureEvent {
                 v.getParent().requestDisallowInterceptTouchEvent(true);
                 return TAP;
             case MotionEvent.ACTION_MOVE:
+                v.getParent().requestDisallowInterceptTouchEvent(true);
                 xEnd = Math.abs(event.getRawX());
                 yEnd = Math.abs(event.getRawY());
                 distance = Math.hypot(xStart - xEnd,

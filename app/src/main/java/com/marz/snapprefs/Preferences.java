@@ -1,5 +1,6 @@
 package com.marz.snapprefs;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Environment;
 
@@ -7,6 +8,7 @@ import com.marz.snapprefs.Logger.LogType;
 import com.marz.snapprefs.Settings.MiscSettings;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -103,11 +105,13 @@ public class Preferences {
         loadMap(xSPrefs);
     }
 
-    public static void initialiseListener(SharedPreferences sharedPreferences) {
+    public static void initialiseListener(SharedPreferences sharedPreferences, final Activity activity) {
+        Logger.log("Initialising Preference Listener", LogType.PREFS);
+
         sharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
             @Override
             public void onSharedPreferenceChanged(SharedPreferences sPrefs, String key) {
-                Logger.log("SharedPreference changed: " + key, LogType.PREFS);
+                Logger.log("SharedPreference changed: " + key, LogType.PREFS.setForced());
                 Prefs preference = Prefs.getPrefFromKey(key);
 
                 if (preference == null) {
@@ -126,6 +130,17 @@ public class Preferences {
                     setPref(preference, sPrefs.getString(key, (String) preference.defaultVal));
                 else if (preference.defaultVal instanceof Integer)
                     setPref(preference, sPrefs.getInt(key, (int) preference.defaultVal));
+                else {
+                    Logger.log("Unknown preference type! " + preference.defaultVal, LogType.PREFS.setForced());
+                    return;
+                }
+
+                try {
+                    if(getBool(Prefs.KILL_SC_ON_PREF_CHANGE))
+                        MainActivity.killSCService(activity);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -201,12 +216,9 @@ public class Preferences {
         return (int) preferenceVal;
     }
 
-    public static void setPref(String key, Object value) throws NullPointerException {
-        preferenceMap.put(key, value);
-    }
-
     public static void setPref(Prefs preference, Object value) {
         preferenceMap.put(preference.key, value != null ? value : preference.defaultVal);
+        Logger.log(String.format("Setting preference [Pref:%s] to [Value:%s]", preference, value));
     }
 
     public static void putContent(Map<String, Object> values) {
@@ -432,6 +444,7 @@ public class Preferences {
         AUTO_ADVANCE("pref_key_auto_advance", false),
         CHAT_LOGGING("pref_key_chat_logging", true),
         GROUPS("pref_key_groups", true),
+        KILL_SC_ON_PREF_CHANGE("pref_key_kill_sc", true),
 
         VFILTER_AMARO("AMARO", false),
         VFILTER_F1997("F1997", false),

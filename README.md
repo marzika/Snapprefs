@@ -1,6 +1,6 @@
 Snapprefs
 =========
-[![Build Status](http://138.68.21.49:8080/job/SNAPPREFS%20-%20Official%20-%20stable/badge/icon)](http://138.68.21.49:8080/job/SNAPPREFS%20-%20Official%20-%20stable/) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
+[![Build Status](http://snapprefs-builds.com/job/SNAPPREFS%20-%20Official%20-%20stable/badge/icon)](http://snapprefs-builds.com/job/SNAPPREFS%20-%20Official%20-%20stable/) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
 
 Overview
 -------
@@ -116,9 +116,9 @@ Latest automatic builds (provided by m1kep):
 -------
 Available as Jenkins artifacts:
 
-[Official Stable Branch](https://bit.ly/Official-Stable)
+[Official Stable Branch](http://bit.ly/SPOfficialStable)
 
-[Official Development Branch](https://bit.ly/Official-Development)
+[Official Development Branch](http://bit.ly/SPOfficialDevelopment)
 
 License
 -------

@@ -96,12 +96,20 @@
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <TextView
+                    android:id="@+id/branch_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8.0dip"
+                    android:text="Current Branch:"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <TextView
                     android:id="@+id/sc_version"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="@dimen/default_gap"
-                    android:phoneNumber="false"
                     android:text="For Snapchat™ version:"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
