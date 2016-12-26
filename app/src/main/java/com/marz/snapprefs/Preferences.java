@@ -421,6 +421,7 @@ public class Preferences {
         SELECT_ALL("pref_key_selectall", false),
         HIDE_BF("pref_key_hidebf", false),
         TIMER_COUNTER("pref_key_timercounter", false),
+        FLASH_KEY("pref_key_flashkey", true),
         CHAT_AUTO_SAVE("pref_key_save_chat_text", false),
         CHAT_MEDIA_SAVE("pref_key_save_chat_image", false),
         INTEGRATION("pref_key_integration", true),

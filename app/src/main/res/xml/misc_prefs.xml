@@ -49,6 +49,12 @@
         android:title="@string/pref_timercounter_cb_title" />
     <CheckBoxPreference
         android:defaultValue="true"
+        android:key="pref_key_flashkey"
+        android:summaryOn="@string/pref_flashkey_volume_up"
+        android:summaryOff="@string/pref_flashkey_volume_down"
+        android:title="@string/pref_flashkey_cb_title" />
+    <CheckBoxPreference
+        android:defaultValue="true"
         android:key="pref_key_integration"
         android:summary="@string/pref_save_integration_summary"
         android:title="@string/pref_save_integration_title" />
