@@ -547,7 +547,7 @@ public class MainActivity extends AppCompatActivity {
 
                 os.flush();
 
-                Toast.makeText(activity, "Kill snapchat in the background", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "Killed snapchat in the background", Toast.LENGTH_SHORT).show();
                 break;
             }
         }
