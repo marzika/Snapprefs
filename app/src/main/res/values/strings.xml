@@ -150,14 +150,6 @@
     <string name="pref_save_button_position_title">Button Position</string>
     <string name="pref_save_button_position_summary_on">Save button position: LEFT</string>
     <string name="pref_save_button_position_summary_off">Save button position: RIGHT</string>
-    <string name="pref_save_button_opacity_title">Save button opacity:</string>
-    <string name="pref_key_save_button_opacity_resize_title">Resize button when opacity decreases</string>
-    <string name="pref_key_save_button_opacity_resize_summary_on">Save button will get bigger as opacity decreases</string>
-    <string name="pref_key_save_button_opacity_resize_summary_off">Save button will keep the same size</string>
-    <string name="errors.must_be_between">Must be between</string>
-    <string name="errors.and">And</string>
-    <string name="enter_custom_value">Enter custom value</string>
-    <string name="apply">apply</string>
     <string name="pref_save_snapchats_default" translatable="false">0</string>
     <string name="pref_save_snaps_images">Image snaps</string>
     <string name="pref_save_snaps_videos">Video snaps</string>
