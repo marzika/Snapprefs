@@ -150,6 +150,10 @@
     <string name="pref_save_button_position_title">Button Position</string>
     <string name="pref_save_button_position_summary_on">Save button position: LEFT</string>
     <string name="pref_save_button_position_summary_off">Save button position: RIGHT</string>
+    <string name="pref_save_button_opacity_title">Save button opacity:</string>
+    <string name="pref_key_save_button_opacity_resize_title">Resize button when opacity decreases</string>
+    <string name="pref_key_save_button_opacity_resize_summary_on">Save button will get bigger as opacity decreases</string>
+    <string name="pref_key_save_button_opacity_resize_summary_off">Save button will keep the same size</string>
     <string name="pref_save_snapchats_default" translatable="false">0</string>
     <string name="pref_save_snaps_images">Image snaps</string>
     <string name="pref_save_snaps_videos">Video snaps</string>
@@ -422,8 +426,11 @@
     <string name="pref_save_chat_logging_title">Enable Chat Logging into Database</string>
     <string name="pref_save_chat_logging_summary">When enabled chat messages are logged to a database and are viewable in Snapprefs</string>
     <string name="pref_save_integration_title">Enable Snapchat integration</string>
+    <string name="pref_flashkey_cb_title">Front Flash key:</string>
+    <string name="pref_flashkey_volume_up">Volume UP</string>
+    <string name="pref_flashkey_volume_down">Volume DOWN</string>
     <string name="pref_save_integration_summary">When enabled you can launch Snapprefs\'s settings by pulling down Snapchat\'s settings bar and clicking on Snapprefs</string>
-    <string name="licenses">Snapprefs is licensed under GNU GPLv3. \n\nUsed libraries - License:\nInstagram Filters for Android - Apache License 2.0\nckChangeLog - Apache License 2.0\nColorPicker for Android - Apache License 2.0\nNoNonsense-FilePicker - MPL 2.0\nmp4parser - Free License\n\nModule was originally based on:\nKeepchat - GNU GPLv3\nSnapshare - GNU GPLv3\n\nSnapchat™ is the property of Snapchat Inc.\nSnapprefs is in no way affiliated with, authorized, maintained, sponsored or endorsed by the Snapchat Inc. or any of its affiliates or subsidiaries. This is an independent application.</string>
+    <string name="licenses">Snapprefs is licensed under GNU GPLv3. \n\nUsed libraries - License:\nInstagram Filters for Android - Apache License 2.0\nckChangeLog - Apache License 2.0\nColorPicker for Android - Apache License 2.0\nMaterialSeekBarPreference - Apache License 2.0\nNoNonsense-FilePicker - MPL 2.0\nmp4parser - Free License\n\nModule was originally based on:\nKeepchat - GNU GPLv3\nSnapshare - GNU GPLv3\n\nSnapchat™ is the property of Snapchat Inc.\nSnapprefs is in no way affiliated with, authorized, maintained, sponsored or endorsed by the Snapchat Inc. or any of its affiliates or subsidiaries. This is an independent application.</string>
     <string name="hide_text">Show Icon In Launcher</string>
     <string name="kill_sc">Kill Snapchat On Preference Change</string>
     <string name="pref_groups_title">Enable Custom Groups</string>

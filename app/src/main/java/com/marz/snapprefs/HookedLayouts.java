@@ -74,6 +74,8 @@ import de.robv.android.xposed.callbacks.XC_LayoutInflated;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import static com.marz.snapprefs.Dialogs.rColor;
+import static de.robv.android.xposed.XposedHelpers.callMethod;
+import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
 import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
 
@@ -81,7 +83,8 @@ import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
  * Created by MARZ on 2016. 04. 08..
  */
 public class HookedLayouts {
-    public static final int stealthButtonSize = 130;
+    public static final int regularButtonSize = 50;
+    public static final int marginValue = 10;
     public static ImageButton upload = null;
     public static RelativeLayout outerOptionsLayout = null;
     public static ImageButton saveSnapButton;
@@ -269,21 +272,24 @@ public class HookedLayouts {
 
         FrameLayout.LayoutParams scaledLayoutParams = null;
 
-        if (Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON)) {
-            Logger.log("Adding Save Buttons");
-            DisplayMetrics metrics = localContext.getResources().getDisplayMetrics();
 
-            int unscaledSize = Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? stealthButtonSize : 65;
-            int scaledSize = px(unscaledSize, metrics.density);
-            scaledLayoutParams =
-                    new FrameLayout.LayoutParams(scaledSize, scaledSize,
-                            Gravity.BOTTOM | horizontalPosition);
-        } else {
-            scaledLayoutParams =
-                    new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
-                            FrameLayout.LayoutParams.WRAP_CONTENT,
-                            Gravity.BOTTOM | horizontalPosition);
-        }
+        // We get the opacity level and then we calculate the scale accordingly
+        int saveButtonOpacity = Preferences.getInt(Prefs.BUTTON_OPACITY);
+
+        DisplayMetrics metrics = localContext.getResources().getDisplayMetrics();
+
+        // We define the scale of our button so that it will be scaled as opacity decrease
+        // 100% opacity --> regular size
+        // 0% opacity --> 2x regular size
+        float unscaledSize = Preferences.getBool(Prefs.BUTTON_RESIZE) ?
+                ((float )(100 - saveButtonOpacity)/100) * regularButtonSize + regularButtonSize
+                : regularButtonSize;
+        int scaledSize =   px(unscaledSize, metrics.density);
+        int margins = px(marginValue,metrics.density);
+        scaledLayoutParams =  new FrameLayout.LayoutParams(scaledSize, scaledSize,
+                Gravity.BOTTOM | horizontalPosition);
+
+        scaledLayoutParams.setMargins(margins,margins,margins,margins);
 
         final FrameLayout.LayoutParams layoutParams = scaledLayoutParams;
 
@@ -303,8 +309,11 @@ public class HookedLayouts {
                 if(saveMode == Preferences.SAVE_BUTTON) {
                     saveSnapButton = new ImageButton(localContext);
                     saveSnapButton.setLayoutParams(layoutParams);
+                    saveSnapButton.setScaleType(ImageView.ScaleType.FIT_XY);
+                    saveSnapButton.setPadding(0,0,0,0);
+                    saveSnapButton.setAdjustViewBounds(true);
                     saveSnapButton.setBackgroundColor(0);
-                    saveSnapButton.setAlpha(Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? 0f : 1f);
+                    saveSnapButton.setAlpha((float) Preferences.getInt(Prefs.BUTTON_OPACITY) / 100);
                     saveSnapButton.setImageBitmap(HookMethods.saveImg);
                     saveSnapButton.setVisibility(View.VISIBLE);
 
@@ -347,10 +356,11 @@ public class HookedLayouts {
         });
     }
 
-    static void assignStoryButton(FrameLayout frameLayout, Context context, String mKey) {
+    // HookedLayouts.assignStoryButton(snapContainer, snapContext, mKey);
+    static void assignStoryButton(FrameLayout frameLayout, Context context, final String mKey) {
 
         AssignedStoryButton storyButton = new AssignedStoryButton(context);
-            storyButton.buildParams(frameLayout, context);
+        storyButton.buildParams(frameLayout, context);
 
         Logger.log("Parent: " + storyButton.getParent());
 
@@ -362,6 +372,7 @@ public class HookedLayouts {
 
         storyButton.setVisibility(Preferences.getInt(Preferences.Prefs.SAVEMODE_STORY) == Preferences.SAVE_BUTTON
                 ? View.VISIBLE : View.INVISIBLE);
+        storyButton.setAlpha((float) Preferences.getInt(Prefs.BUTTON_OPACITY) / 100);
         storyButton.bringToFront();
         storyButton.invalidate();
         frameLayout.invalidate();
@@ -573,10 +584,10 @@ public class HookedLayouts {
     private static class OptionsAdapter extends BaseAdapter {
         private static LayoutInflater inflater = null;
         String[] options =
-                        {"Text Color", "Text Gradient", "Text Transparency",
-                         "Background Color", "Background Gradient", "Background Transparency",
-                         "Text Size", "Text Font", "Text Style",
-                         "Text Alignment", "Rainbow Text", "Reset"};
+                {"Text Color", "Text Gradient", "Text Transparency",
+                        "Background Color", "Background Gradient", "Background Transparency",
+                        "Text Size", "Text Font", "Text Style",
+                        "Text Alignment", "Rainbow Text", "Reset"};
         Context context;
         XModuleResources mRes;
         int[] optionImageId =
