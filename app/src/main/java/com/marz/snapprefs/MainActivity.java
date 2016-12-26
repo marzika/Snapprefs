@@ -169,11 +169,11 @@ public class MainActivity extends AppCompatActivity {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Obfuscator.readJsonFile();
+        Obfuscator.readJsonFile();*/
 
         if (cl.isFirstRun()) {
             cl.getLogDialog().show();
-        }*/
+        }
         Logger.log("MainActivity: Checking if module is enabled.");
         int moduleStatus = CommonUtils.getModuleStatus();
         if(moduleStatus != Common.MODULE_STATUS_ACTIVATED) {
