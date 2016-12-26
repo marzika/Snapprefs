@@ -1,7 +1,9 @@
 package com.marz.snapprefs.Util;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -15,7 +17,10 @@ import com.marz.snapprefs.Preferences;
 import com.marz.snapprefs.Preferences.Prefs;
 import com.marz.snapprefs.Saving;
 
+import static com.marz.snapprefs.HookedLayouts.marginValue;
 import static com.marz.snapprefs.HookedLayouts.px;
+
+import static com.marz.snapprefs.HookedLayouts.regularButtonSize;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 
 /**
@@ -26,11 +31,18 @@ public class AssignedStoryButton extends ImageButton {
     private boolean areParamsSet = false;
     private String assignedmKey;
 
+    /**
+     * Weird offset value needed to ensure the button stays in place
+     *
+     * Why 26 ? Best working value i found...
+     */
+    private final float buttonOffset = 26f;
+
+
     public AssignedStoryButton(Context context) {
         super(context);
 
         this.setBackgroundColor(0);
-        this.setAlpha(Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? 0f : 0.8f);
         this.setImageBitmap(HookMethods.saveImg);
 
         this.setOnClickListener(new View.OnClickListener() {
@@ -59,29 +71,41 @@ public class AssignedStoryButton extends ImageButton {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
 
         boolean horizontalPosition = Preferences.getBool(Preferences.Prefs.BUTTON_POSITION);
-        int unscaledSize = Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON) ? HookedLayouts.stealthButtonSize : 65;
+
+        int saveButtonOpacity = Preferences.getInt(Prefs.BUTTON_OPACITY);
+
+        // We determine our scale according the the value
+        float unscaledSize = ((float )(100 - saveButtonOpacity)/100) * regularButtonSize + regularButtonSize;
+        float scalingFactor = (float) (100 - saveButtonOpacity)/100 + 1 ;
+
         int scaledSize = px(unscaledSize, metrics.density);
-        int newX = horizontalPosition ? 0 : metrics.widthPixels - scaledSize;
-        int newY = metrics.heightPixels - scaledSize;
 
-        FrameLayout.LayoutParams layoutParams;
+        int newX;
+        int newY;
 
-        if (Preferences.getBool(Prefs.STEALTH_SAVING_BUTTON)) {
-            layoutParams =
-                    new FrameLayout.LayoutParams(scaledSize, scaledSize);
+        // Resize and change margins the button only if needed
+        if (Preferences.getBool(Prefs.BUTTON_RESIZE)) {
+            this.setScaleX(scalingFactor);
+            this.setScaleY(scalingFactor);
+
+            // Black magic margins calculation
+            newX = horizontalPosition ? Math.round(px(buttonOffset,metrics.density) * (scalingFactor - 1) ) + px(marginValue,metrics.density)
+                    : metrics.widthPixels - scaledSize + Math.round(px(buttonOffset,metrics.density) * (scalingFactor - 1)) - px(marginValue,metrics.density);;
+            newY = metrics.heightPixels - scaledSize + Math.round(px(buttonOffset,metrics.density) * (scalingFactor - 1) - px(marginValue,metrics.density));
         } else {
-            layoutParams =
-                    new FrameLayout.LayoutParams(
-                            FrameLayout.LayoutParams.WRAP_CONTENT,
-                            FrameLayout.LayoutParams.WRAP_CONTENT);
+            newX = horizontalPosition ? px(marginValue,metrics.density) : metrics.widthPixels - px(regularButtonSize,metrics.density) - px(marginValue,metrics.density);;
+            newY = metrics.heightPixels - px(regularButtonSize,metrics.density) - px(marginValue,metrics.density);;
         }
+
+        FrameLayout.LayoutParams layoutParams =
+                new FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.WRAP_CONTENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT);
 
         FrameLayout.LayoutParams newParams = (FrameLayout.LayoutParams) callMethod(frameLayout, "generateLayoutParams", layoutParams);
 
-
         //noinspection ResourceType
-        newParams.setMargins(newX, newY, newX, newY);
-
+        newParams.setMargins(newX, newY, 0,0);
         super.setLayoutParams(newParams);
         this.setAdjustViewBounds(true);
         super.setPadding(0, 0, 0, 0);
