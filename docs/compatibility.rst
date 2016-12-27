@@ -3,6 +3,8 @@ Compatiblity Chart
 
 .. DANGER::
    Snapprefs will not work if you don't use the version according to the Snapchat version!
+   
+`Snapprefs 2.1.0 <http://dl-xda.xposed.info/modules/com.marz.snapprefs_v26_dfed20.apk>`_ ->				SC 9.39.5.0 
 
 `Snapprefs 2.0.0 <http://dl-xda.xposed.info/modules/com.marz.snapprefs_v25_a955ea.apk>`_ ->				SC 9.31.1.0 
 

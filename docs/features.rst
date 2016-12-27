@@ -225,7 +225,9 @@ Deluxe
 
 The Premium Version is 2.99$
 The Deluxe Version is 9.99$
-**Todo: Add Paypal links**
+
+The Premium/Deluxe Options can be bought directly in the app via Paypal.
+
 
 
 
@@ -250,12 +252,38 @@ Options
 Premium
 -------
 
+*Chat alert*
+
+	| Block the typing and presence alert in chat
+
+*Unlimited Groups*
+
+	| Enable Option to create more than 3 Snapchat Groups
+
+	
+	
 Deluxe
 ------
 
-TODO
+*Stealth Viewing*
 
+	|  Viewing of a Snap will not trigger the viewed state
+	
+*Stealth Chat*
 
+	|  Viewing of a Chat will not trigger the viewed state
+	
+*Stealth Notifications*
+
+	|  Changes the toast notifiction to a little dot in the corner of the screen
+
+*Save button opacity*
+
+	|  Sets the opacity level of the save button
+	
+*Resize save button*
+
+	|  Enable option to increase the size of the save button, if opacity decreases
 
 Saving
 =================
@@ -496,21 +524,57 @@ Visual Filters / Filters
 Visual
 ------
 
+Click on a visual filer and tick to enable.
+
 My Filters
 ----------
+
+	| An overview of your own Filters. When you click a Filter you will be able to delete it.
+
+	.. hint:: Snapchat uses a lot of Memory, too many Filters causes it too lag, best practice is to keep the number low.
 
 Reddit Filters
 --------------
 
+	| List of the Filters on Reddit. Click on it do download the Filter.
+
 G+ Filters
 ----------
 
+	| Tab for the Filters in the Google Plus Community.
 
-
+	
+	
 Lenses
 ======
 
 Lenses
 ------
 
-.. image:: /images/lenses.png
+*Lens Collection System*
+
+	| Enable to collect the Lenses.
+
+*Lens Loading System*
+
+	| Enable to have the collected Lenses loaded.
+
+*Select Lenses*
+
+	| Brings up the menu to enable or disable your collected lenses.
+
+*Enable Lenses when collected*
+
+	| Autoenables the collected lenses
+
+*Sorting Lenses by selection time*
+
+	| Sorts the Lenses by selection time
+
+*Hide current SC Lenses*
+
+	| Hides the Lenses currently provided by Snapchat and only shows your enabled Lenses
+
+*Merge Lens Databases*
+
+	| As there are many GEO Lenses, only active in a certain location around the world, it is very possible that someone else has collected different Lenses. Use this function to merge a downloaded Lenses.db with your own.
