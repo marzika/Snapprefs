@@ -667,7 +667,13 @@ public class HookMethods
                             boolean c = (boolean) XposedHelpers.callMethod(swipeLayout, Obfuscator.flash.ISSCROLLED_METHOD);
                             if (isVisible && resId != 0 && resId != 2 && !c) {
                                 int keycode = XposedHelpers.getIntField(param.args[0], Obfuscator.flash.KEYCODE_FIELD);
-                                if (keycode == KeyEvent.KEYCODE_VOLUME_UP) {
+                                int flashkey;
+                                if(Preferences.getBool(Prefs.FLASH_KEY) == true){
+                                    flashkey = KeyEvent.KEYCODE_VOLUME_UP;
+                                } else {
+                                    flashkey = KeyEvent.KEYCODE_VOLUME_DOWN;
+                                }
+                                if (keycode == flashkey) {
                                     if (System.currentTimeMillis() - lastChange > 500) {
                                         lastChange = System.currentTimeMillis();
                                         frontFlash = !frontFlash;

@@ -1,6 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
     <release
+        version="2.1.0"
+        versioncode="26">
+        <change>Updated for SC 9.39.5.0</change>
+        <change>Readded Autosave for Snaps and Stories</change>
+        <change>Added Now Playing Filter</change>
+        <change>Added Customizable Recording Time</change>
+        <change>Added Advanced Crop Menu for Image Sharing</change>
+        <change>Added Fling to Save</change>
+        <change>Added Disable Auto-Advance</change>
+        <change>Stealth Save Button for Deluxe Users (size and opacity)</change>
+        <change>Added Saving of Profile Pictures</change>
+        <change>Added Front Flash Function (volume up or down)</change>
+        <change>Stealth Notification for Deluxe Users</change>
+        <change>Significant Performance Improvements</change>
+        <change>Added Option to move the Save button from the right to the left</change>
+        <change>Added Saved Chat Logs in Snapprefs</change>
+        <change>Added Reset Button for Spoofing</change>
+        <change>Readded Rainbox Text</change>
+        <change>Added Auto killing of Snapchat on preference change</change>
+        <change>Added Lense Collector and Selector</change>
+        <change>Added Debug Options and reworked Debug logging</change>
+        <change>Changed Loading of Filters</change>
+        <change>Added more Support Options</change>
+        <change>Added Documentation</change>
+        <change>Fixed ToU Dialog</change>
+        <change>Bugfixes</change>
+    </release>
+    <release
         version="2.0.0 beta"
         versioncode="25">
         <change>Updated for 9.31.1.0</change>
