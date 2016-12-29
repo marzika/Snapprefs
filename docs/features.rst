@@ -174,13 +174,15 @@ Misc
 
 	| Some phones overlay the Snapchat buttons with the navigation buttons. With this option you can force the Navbar padding.
 .. image:: /images/navbarpadding.png
-   :scale: 25 %
+	:scale: 25 %
 	
 *Enable Timer Counter*
 
 	| Enables the Timer Counter
 
 *Enable Snapchat Integration*
+
+	.. _`Snapchat Integration`: 
 
 	| When enabled you can launch Snapprefs's settings by pulling down Snapchat's settings bar and clicking on Snapprefs
 
@@ -223,7 +225,9 @@ Deluxe
 
 The Premium Version is 2.99$
 The Deluxe Version is 9.99$
-**Todo: Add Paypal links**
+
+The Premium/Deluxe Options can be bought directly in the app via Paypal.
+
 
 
 
@@ -248,12 +252,38 @@ Options
 Premium
 -------
 
+*Chat alert*
+
+	| Block the typing and presence alert in chat
+
+*Unlimited Groups*
+
+	| Enable Option to create more than 3 Snapchat Groups
+
+	
+	
 Deluxe
 ------
 
-TODO
+*Stealth Viewing*
 
+	|  Viewing of a Snap will not trigger the viewed state
+	
+*Stealth Chat*
 
+	|  Viewing of a Chat will not trigger the viewed state
+	
+*Stealth Notifications*
+
+	|  Changes the toast notifiction to a little dot in the corner of the screen
+
+*Save button opacity*
+
+	|  Sets the opacity level of the save button
+	
+*Resize save button*
+
+	|  Enable option to increase the size of the save button, if opacity decreases
 
 Saving
 =================
@@ -396,33 +426,72 @@ Weather
 	| After typing in your desired value, you have to kill Snapchat, then restart to apply it.
 	
 	
-	
 Sharing
-=================
-
-Sharing
--------
+=======
 
 *Rotation Mode*
 
-	| Choose between Don't rotate, Clockwise (90°) or Counterclockwise (-90°) for 
-	| the shared images.
+	| Choose between Don't rotate, Clockwise (90°) or Counterclockwise (-90°) for the shared images.
 
 	
-	
+
 How-to
 ------
 
-Images
-------
+	.. warning:: When you're done sharing any type of media, you must completely KILL (force close) Snapchat to be able to use it correctly.
 
-TODO
+**Images**
 
-Videos
-------
 
-TODO
+There are two ways to share a picture,   :
 
+	* From the gallery, by opening the share menu to share it to Snapprefs (NOT Snapchat). You will be presented with a tool that will allow you to crop or rotate your picture to fit your needs.
+	
+		.. image:: /images/SharingUI.png
+			:scale: 50 %
+	
+	* From the Snapchat app, by pressing the share button next to the camera swap button.
+		
+		.. image:: /images/SCShareButton.png
+			:scale: 50 %
+			
+		.. hint:: If you don't see it, enable `Snapchat Integration`_.
+
+		A gallery selector where you'll be able to choose the picture you want to share will appear.
+
+		.. note:: Selecting the picture with this method won't let you crop or rotate your picture).
+ 
+	Afterwards, you will be redirected to Snapchat's sharing screen
+	
+	.. warning:: You MUST NOT edit or send your picture at this point !! 
+	
+	You will need to dismiss the sharing screen (by pressing the X on the upper right of the screen) to go back to the Snapchat camera view.
+	Once in the camera view, you must press the round button to take a picture. Instead of displaying the current camera's photo, the picture you chose to share will be shown as if you just took it.
+
+	You may then proceed to add captions, paint or stickers, and customize the viewing time, before adding the snap to your story or sending it to someone.
+	
+	.. tip:: Sharing through Snapprefs won't add any overlay to your picture, contrarily to sharing a gallery picture directly through Snapchat
+
+
+**Videos**
+
+Again, you have two ways to share a video :	
+
+	* From the gallery, by opening the share menu to share it to Snapprefs (NOT Snapchat)
+	
+	* From the Snapchat app, by pressing the share button next to the camera swap button, as if you were sharing a picture
+
+			.. hint:: If you don't see it, enable `Snapchat Integration`_.
+
+			A gallery selector where you'll be able to choose the video you want to share will appear.
+
+ 
+	Afterwards, you will be redirected to Snapchat's sharing screen
+	
+	.. warning:: You MUST NOT edit or send your video at this point !! 
+	
+	You will need to dismiss the sharing screen (by pressing the X on the upper right of the screen) to go back to the Snapchat camera view.
+	Once in the camera view, you must hold the round button to record a video. Instead of displaying the current camera's video, the video you chose to share will be shown as if you just recorded it.
 
 
 Data saving
@@ -455,21 +524,57 @@ Visual Filters / Filters
 Visual
 ------
 
+Click on a visual filer and tick to enable.
+
 My Filters
 ----------
+
+	| An overview of your own Filters. When you click a Filter you will be able to delete it.
+
+	.. hint:: Snapchat uses a lot of Memory, too many Filters causes it too lag, best practice is to keep the number low.
 
 Reddit Filters
 --------------
 
+	| List of the Filters on Reddit. Click on it do download the Filter.
+
 G+ Filters
 ----------
 
+	| Tab for the Filters in the Google Plus Community.
 
-
+	
+	
 Lenses
 ======
 
 Lenses
 ------
 
-.. image:: /images/lenses.png
+*Lens Collection System*
+
+	| Enable to collect the Lenses.
+
+*Lens Loading System*
+
+	| Enable to have the collected Lenses loaded.
+
+*Select Lenses*
+
+	| Brings up the menu to enable or disable your collected lenses.
+
+*Enable Lenses when collected*
+
+	| Autoenables the collected lenses
+
+*Sorting Lenses by selection time*
+
+	| Sorts the Lenses by selection time
+
+*Hide current SC Lenses*
+
+	| Hides the Lenses currently provided by Snapchat and only shows your enabled Lenses
+
+*Merge Lens Databases*
+
+	| As there are many GEO Lenses, only active in a certain location around the world, it is very possible that someone else has collected different Lenses. Use this function to merge a downloaded Lenses.db with your own.
