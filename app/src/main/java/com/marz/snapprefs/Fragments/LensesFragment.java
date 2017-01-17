@@ -53,7 +53,7 @@ import static android.app.Activity.RESULT_OK;
  * It and its contents are free to use by all
  */
 public class LensesFragment extends Fragment {
-    public static BitmapCache bitmapCache = new BitmapCache();
+    public static BitmapCache bitmapCache = new BitmapCache(8);
     public LensListAdapter lensListAdapter;
     private final DialogInterface.OnClickListener onSelectAllClick = new DialogInterface.OnClickListener() {
         @Override

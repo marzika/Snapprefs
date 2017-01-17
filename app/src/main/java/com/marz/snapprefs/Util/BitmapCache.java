@@ -13,10 +13,12 @@ import com.marz.snapprefs.Logger.LogType;
 
 public class BitmapCache extends LruCache<String, Bitmap> {
     private static final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-    private static final int cacheSize = maxMemory / 8;
+    private static int cacheSize;
+    private int currentMemUsage = 0;
 
-    public BitmapCache() {
-        super(cacheSize);
+    public BitmapCache(int memoryModifier) {
+        super(maxMemory / memoryModifier);
+        cacheSize = maxMemory / memoryModifier;
     }
 
     @Override
@@ -30,11 +32,24 @@ public class BitmapCache extends LruCache<String, Bitmap> {
     protected void entryRemoved(boolean evicted, String key,
                                 Bitmap oldValue, Bitmap newValue) {
         super.entryRemoved(evicted,key, oldValue, newValue);
+
+        if( oldValue != null ) {
+            currentMemUsage -= sizeOf(null, oldValue);
+
+            Logger.log("Bitmap removed from cache [MemUsage:" + currentMemUsage + "/" + cacheSize + "]");
+
+            if (!oldValue.isRecycled()) {
+                oldValue.recycle();
+                Logger.log("Recycled removed bitmap");
+            }
+        }
     }
 
     public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
         if (getBitmapFromMemCache(key) == null) {
             this.put(key, bitmap);
+            currentMemUsage+= sizeOf(null, bitmap);
+            Logger.log("Added image to memory cache [MemUsage:" + currentMemUsage + "/" + cacheSize + "]");
         }
     }
 
@@ -45,10 +60,6 @@ public class BitmapCache extends LruCache<String, Bitmap> {
     public void clearCache() {
         this.evictAll();
         Logger.log("Evicted " + this.evictionCount() + " bitmaps from cache", LogType.DEBUG);
-    }
-
-    public void recycleAll() {
-        for( Bitmap obj : this.snapshot().values())
-            obj.recycle();
+        currentMemUsage = 0;
     }
 }

@@ -35,10 +35,10 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -71,7 +71,11 @@ public class Saving {
             new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss-SSS", Locale.getDefault());
     private static SimpleDateFormat dateFormatSent =
             new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
-    private static ConcurrentHashMap<String, SnapData> hashSnapData = new ConcurrentHashMap<>();
+    private static LinkedHashMap<String, SnapData> hashSnapData = new LinkedHashMap<String, SnapData>() {
+        @Override protected boolean removeEldestEntry(Entry eldest) {
+            return size() > 40;
+        }
+    };
     private static String currentSnapKey;
     private static Context relativeContext;
     private static Object enum_NO_AUTO_ADVANCE;
@@ -976,6 +980,7 @@ public class Saving {
 
             // Assign the payload to the snapData
             snapData.setPayload(bmp);
+
             Logger.printMessage("Successfully attached payload", LogType.SAVING);
         } else
             Logger.printMessage("Snap already completed", LogType.SAVING);

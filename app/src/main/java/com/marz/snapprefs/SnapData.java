@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 
 import com.marz.snapprefs.Saving.MediaType;
 import com.marz.snapprefs.Saving.SnapType;
+import com.marz.snapprefs.Util.BitmapCache;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -14,14 +15,11 @@ public class SnapData {
     private String strSender;
     private String strTimestamp;
     private FileInputStream inputStream;
-    private Bitmap bmpImage;
     private MediaType mediaType;
     private SnapType snapType;
     private ArrayList<FlagState> flags = new ArrayList<>();
 
-    public SnapData() {
-
-    }
+    private static final BitmapCache imageCache = new BitmapCache(6);
 
     public SnapData(String mKey) {
         this.mKey = mKey;
@@ -40,7 +38,7 @@ public class SnapData {
 
     public boolean setPayload(Object payload) {
         if (payload instanceof Bitmap) {
-            bmpImage = (Bitmap) payload;
+            imageCache.addBitmapToMemoryCache(mKey, (Bitmap) payload);
             mediaType = MediaType.IMAGE;
         } else if (payload instanceof FileInputStream) {
             inputStream = (FileInputStream) payload;
@@ -54,8 +52,10 @@ public class SnapData {
     }
 
     public Object getPayload() {
-        if (mediaType == MediaType.IMAGE)
-            return bmpImage;
+        if (mediaType == MediaType.IMAGE) {
+            Bitmap bmpImage = imageCache.get(mKey);
+            return bmpImage == null || bmpImage.isRecycled() ? null : bmpImage;
+        }
         else if (mediaType == MediaType.VIDEO)
             return inputStream;
 
@@ -67,8 +67,13 @@ public class SnapData {
      * Should save memory in the long run
      */
     public void wipePayload() {
-        this.bmpImage = null;
-        this.inputStream = null;
+        if(mediaType == null)
+            return;
+
+        if(mediaType == MediaType.IMAGE)
+            imageCache.remove(mKey);
+        else
+            this.inputStream = null;
     }
 
     public void setSaved()
@@ -92,14 +97,13 @@ public class SnapData {
 
     public String toString()
     {
-        String toString = "mID: " + getmId() +
+        return "mID: " + getmId() +
                 "\nmKey: " + getmKey() +
                 "\nSnapType: " + getSnapType() +
                 "\nMediaType: " + getMediaType() +
                 "\nSender: " + getStrSender() +
                 "\nPayload: " + (getPayload() != null ) +
                 "\nFlagCount: " + getFlags().size();
-        return toString;
     }
 
     // ### GETTERS & SETTERS ### \\
@@ -145,11 +149,11 @@ public class SnapData {
     }
 
     public Bitmap getBmpImage() {
-        return bmpImage;
+        return imageCache.get(mKey);
     }
 
     public void setBmpImage(Bitmap bmpImage) {
-        this.bmpImage = bmpImage;
+        imageCache.put(mKey, bmpImage);
     }
 
     public MediaType getMediaType() {

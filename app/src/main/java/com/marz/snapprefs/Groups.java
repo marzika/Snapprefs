@@ -31,7 +31,7 @@ import static de.robv.android.xposed.XposedHelpers.newInstance;
 
 public class Groups {
 
-    public static ArrayList<Group> groups = new ArrayList<>();
+    public static final ArrayList<Group> groups = new ArrayList<>();
     public static List<Friend> friendList = new ArrayList<>();
     static boolean doneOnce = false;
     static File groupsDir = new File(Environment.getExternalStorageDirectory() + "/Snapprefs/Groups");
@@ -52,11 +52,13 @@ public class Groups {
                 if (!result.contains(edit))
                     newResult.add(edit);
 
-                for (Group g : groups) {
-                    Object group = XposedHelpers.newInstance(Ly, "group_" + g.name, g.name);
-                    XposedHelpers.setAdditionalInstanceField(group, "group", g);
-                    if (!result.contains(group))
-                        newResult.add(group);
+                synchronized (groups) {
+                    for (Group g : groups) {
+                        Object group = XposedHelpers.newInstance(Ly, "group_" + g.name, g.name);
+                        XposedHelpers.setAdditionalInstanceField(group, "group", g);
+                        if (!result.contains(group))
+                            newResult.add(group);
+                    }
                 }
                 newResult.addAll(result);
                 param.setResult(newResult);
