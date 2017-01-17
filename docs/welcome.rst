@@ -104,3 +104,35 @@ Documentation is available at `http://snapprefs.readthedocs.io <http://snapprefs
 ********
 License
 ********
+
+It is licensed on the GPL V3 which you have already received a million times.
+
+*******
+Credits
+*******
+
+andrerm124 for ton of his work on Snapprefs, like saving, Lenses and more
+
+P1nGu1n for his awesome work on Keepchat and Snapshare
+
+manvir for his inspirating SnapColors app
+
+elesbb for his inspirating SnapChat Full Caption app
+
+chiralcode for his ColorPicker
+
+Yoganandh for his color collection
+
+cketti for his ckChangelog library
+
+Toni78r for the logo
+
+ddmanfire for implementing array saving
+
+m1kep for profile picture saving
+
+azsde for opacity function for save button
+
+quorn23 for maintaining the doc
+
+The crowd on Slack for testing, providing input and more

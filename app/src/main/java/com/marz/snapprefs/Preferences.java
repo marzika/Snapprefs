@@ -400,7 +400,7 @@ public class Preferences {
         SAVE_SENT_SNAPS("pref_key_save_sent_snaps", true),
         SORT_BY_CATEGORY("pref_key_sort_files_mode", false),
         SORT_BY_USERNAME("pref_key_sort_files_username", true),
-        DEBUGGING("pref_key_debug", true),
+        DEBUGGING("pref_key_debug", BuildConfig.BUILD_TYPE.toLowerCase() == "debug"),
         OVERLAYS("pref_key_overlay", false),
         SPEED("pref_key_speed", false),
         WEATHER("pref_key_weather", false),
