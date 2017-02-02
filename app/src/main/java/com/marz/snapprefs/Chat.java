@@ -65,40 +65,71 @@ public class Chat {
 
         findAndHookMethod(Obfuscator.chat.MESSAGEVIEWHOLDER_CLASS, lpparam.classLoader, "r", new XC_MethodHook() {
             @Override
-            protected void beforeHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
-                super.beforeHookedMethod(param);
+            protected void afterHookedMethod(final XC_MethodHook.MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
 
                 try {
-                    Object chatLinker = getObjectField(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_VAR1);
-
-                    if (chatLinker == null)
-                        return;
-
-                    Object chat = getObjectField(chatLinker, Obfuscator.chat.MESSAGEVIEWHOLDER_VAR2);
-
-                    if (chat == null)
-                        return;
-
-
-                    if (chatClass.isInstance(chat)) {
-                        Boolean isSaved = (Boolean) callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISSAVED);
-                        Boolean isFailed = (Boolean) callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISFAILED);
-
-                        if (isSaved == null || isFailed == null) {
-                            Logger.log("Null Chat Data [isSaved:%s] [isFailed:%s]", LogType.CHAT);
-                            return;
-                        }
-
-                        if (!isSaved && !isFailed) {
-                            Logger.log("Performed chat save", LogType.CHAT);
-                            callMethod(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_SAVE);
-                        }
-                    }
+                    performMessageSave(param, chatClass);
                 } catch (Throwable t) {
-                    Logger.log("Error saving chat message", t, LogType.CHAT);
+                    Logger.log("Error saving chat message [attempt:1]", LogType.CHAT);
+
+                    new Thread(new Runnable() {
+                        @Override public void run() {
+                            Logger.log("Started new save thread");
+
+                            int attempts = 1;
+
+                            while (attempts <= 5) {
+                                try {
+                                    Thread.sleep(500L);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+                                try {
+                                    performMessageSave(param, chatClass);
+                                    break;
+                                } catch (Throwable t) {
+                                    attempts++;
+
+                                    if (attempts >= 5)
+                                        Logger.log("Error saving chat message [attempt:]" + attempts, t, LogType.CHAT);
+                                    else
+                                        Logger.log("Error saving chat message [attempt:]" + attempts, LogType.CHAT);
+                                }
+                            }
+                        }
+                    }).start();
                 }
             }
         });
+    }
+
+    private static void performMessageSave(final XC_MethodHook.MethodHookParam param, Class chatClass) {
+        Object chatLinker = getObjectField(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_VAR1);
+
+        if (chatLinker == null)
+            return;
+
+        Object chat = getObjectField(chatLinker, Obfuscator.chat.MESSAGEVIEWHOLDER_VAR2);
+
+        if (chat == null)
+            return;
+
+        if (chatClass.isInstance(chat)) {
+            Boolean isSaved = (Boolean) callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISSAVED);
+            Boolean isFailed = (Boolean) callMethod(chat, Obfuscator.chat.MESSAGEVIEWHOLDER_ISFAILED);
+
+            if (isSaved == null || isFailed == null) {
+                Logger.log("Null Chat Data [isSaved:%s] [isFailed:%s]", LogType.CHAT);
+                return;
+            }
+
+            if (!isSaved && !isFailed) {
+                callMethod(param.thisObject, Obfuscator.chat.MESSAGEVIEWHOLDER_SAVE);
+                Logger.log("Performed chat save", LogType.CHAT);
+            }
+        }
     }
 
     static void initChatLogging(final XC_LoadPackage.LoadPackageParam lpparam, final Context snapContext) {
@@ -212,8 +243,7 @@ public class Chat {
                         if (!chatMediaMap.containsKey(mKey)) {
                             chatMediaMap.put(mKey, chatMedia);
                             Logger.printFinalMessage("Stored key for conversion", LogType.CHAT);
-                        }
-                        else
+                        } else
                             Logger.printFinalMessage("Map already contains key", LogType.CHAT);
                     }
                 });
@@ -302,7 +332,7 @@ public class Chat {
                                                     Logger.printMessage("Null Video URI - Stage 1", LogType.CHAT);
                                                     key = (String) getAdditionalInstanceField(view, "MediaKey");
 
-                                                    if( key == null ) {
+                                                    if (key == null) {
                                                         Logger.printFinalMessage("Null Video URI - Stage 2... Aborting", LogType.CHAT);
                                                         return;
                                                     }
@@ -326,11 +356,11 @@ public class Chat {
                                                 if (chatMedia == null) {
                                                     Logger.printFinalMessage("No ChatMedia found for key: " + key, LogType.CHAT);
                                                     return;
-                                                } else if( fullUri == null ) {
+                                                } else if (fullUri == null) {
                                                     fullUri = (String) getAdditionalInstanceField(chatMedia, "FullUrl");
                                                     Logger.log("FullUri: " + fullUri);
 
-                                                    if( fullUri == null ) {
+                                                    if (fullUri == null) {
                                                         Logger.printFinalMessage("Null Video URI - Stage 3... Aborting", LogType.CHAT);
                                                         return;
                                                     } else {
@@ -391,14 +421,14 @@ public class Chat {
                         Logger.log("Clearing Video URI", LogType.CHAT);
                         Uri videoUri;
 
-                        try{
-                             videoUri = (Uri) getObjectField(param.thisObject, "b");
-                        }catch (ClassCastException e){
+                        try {
+                            videoUri = (Uri) getObjectField(param.thisObject, "b");
+                        } catch (ClassCastException e) {
                             Logger.log("ClassCastException ignored: null to Uri", LogType.CHAT);
                             return;
                         }
 
-                        if( videoUri == null ) {
+                        if (videoUri == null) {
                             Logger.log("TextureVideoView tried to clear null Uri", LogType.CHAT);
                             return;
                         }
