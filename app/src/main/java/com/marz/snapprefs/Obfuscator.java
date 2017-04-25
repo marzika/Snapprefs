@@ -41,9 +41,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 public class Obfuscator implements Serializable {
-    public static int SUPPORTED_VERSION_CODE = 847;
-    public final static String SUPPORTED_VERSION_CODENAME = "9.39.5.0";
-    public final static String ROOTDETECTOR_CLASS = "aAY";//prev. ali
+    public static int SUPPORTED_VERSION_CODE = 1092;
+    public final static String SUPPORTED_VERSION_CODENAME = "10.6.6.0";
+    public final static String ROOTDETECTOR_CLASS = "jsh";//prev. aAY
     public final static String[] ROOTDETECTOR_METHODS= {"b", "c", "d", "e"};
     public final static String FRIENDS_BF= "l";//prev. j
 
@@ -60,9 +60,9 @@ public class Obfuscator implements Serializable {
     public static class save {
 
         //User class
-        public final static String USER_CLASS = "DP"; //prev. VU
+        public final static String USER_CLASS = ""; //prev. DP
         //ReceivedSnap class
-        public final static String RECEIVEDSNAP_CLASS = "Sc"; //+ prev Vt
+        public final static String RECEIVEDSNAP_CLASS = ""; //+ prev Sc
         public final static String OBJECT_MID = "mId";
         public final static String OBJECT_CACHEKEYSUFFIX = "mCacheKeyInstanceSuffix";
         public final static String RECEIVEDSNAP_BEING_SEEN = "c"; // prev. d
@@ -242,18 +242,18 @@ public class Obfuscator implements Serializable {
         public final static String STORYPRELOAD_CLASS = "aaF";
         public final static String STORYPRELOAD_METHOD = "H_";
     }
-    public static class spoofing {
+    public static class spoofing { //DONE
         //SpeedometerView class
-        public final static String SPEEDOMETERVIEW_CLASS = "awa";
+        public final static String SPEEDOMETERVIEW_CLASS = "cwn";
         //SpeedometerView.setSpeed(Float)
         public final static String SPEEDOMETERVIEW_SETSPEED = "a";
-        public final static String LOCATION_CLASS = "Rm";
+        public final static String LOCATION_CLASS = "com.snapchat.android.app.shared.location.CurrentLocationProvider";
         public final static String LOCATION_GETLOCATION = "a";
-        public final static String LOCATION_GETLOCATION_PARAM = "Rl";
-        public final static String WEATHER_CLASS = "apy";
-        public final static String WEATHER_FIRST = "aPd";
-        public final static String BATTERY_FILTER = "Pc";
-        public final static String BATTERY_FULL_ENUM = "FULL";
+        public final static String LOCATION_GETLOCATION_PARAM = "hcj";
+        public final static String WEATHER_CLASS = "ivc";
+        public final static String WEATHER_FIRST = "nwl"; //mTempF = b mTempC = a
+        public final static String BATTERY_FILTER = "gro";
+        public final static String BATTERY_FULL_ENUM = "FULL"; //BatteryLevel = gpz
     }
     public static class select {
         //SendToFragment class
@@ -277,18 +277,18 @@ public class Obfuscator implements Serializable {
         //PostToVenue class
         public final static String POSTTOVENUE_CLASS = "apb";//prev. Vp
     }
-    public static class sharing {
+    public static class sharing { //DONE
         //cameraStateEvent class
-        public final static String CAMERASTATEEVENT_CLASS = "azr";
+        public final static String CAMERASTATEEVENT_CLASS = "gia";
         //snapCapturedEvent class
-        public final static String SNAPCAPTUREDEVENT_CLASS = "bhv"; //prev. bhv, bfy ->from LandingPageActivity$8
+        public final static String SNAPCAPTUREDEVENT_CLASS = "bhv"; // ??? bhv, bfy ->from LandingPageActivity$8
         //snapCaptureContext class
-        public final static String SNAPCAPTURECONTEXT_CLASS = "com.snapchat.android.util.eventbus.SnapCaptureContext";
+        public final static String SNAPCAPTURECONTEXT_CLASS = "com.snapchat.android.busevents.SnapCaptureContext";
         //aa_chat_camera_upload
         public final static String UPLOAD_ICON = "0x7f02001a";
 
         //API, SCREENSHOT # TAKE_PHOTO_METHOD
-        public static final String TAKE_PHOTO_METHOD = "com.snapchat.android.camera.TakePhotoCallback.TAKE_PHOTO_METHOD";
+        public static final String TAKE_PHOTO_METHOD = "ghw$a";
     }
     public static class lens {
         public final static String LENSCLASS = "com.snapchat.android.model.lenses.Lens";
@@ -354,15 +354,15 @@ public class Obfuscator implements Serializable {
         public static final String VISUAL_FILTER_TYPE_CHECK_METHOD = "c";
         public static final String VISUAL_FILTER_TYPE_CHECK_METHOD_PARAMETER_CLASS = "Oi";
     }
-    public static class timer {
+    public static class timer { //DONE
         public final static String TAKESNAPBUTTON_CLASS = "com.snapchat.android.ui.camera.TakeSnapButton";
         public final static String TAKESNAPBUTTON_ONDRAW = "onDraw";
         public final static String TAKESNAPBUTTON_BLEAN1 = "c";
         public final static String TAKESNAPBUTTON_BLEAN2 = "e";
         public final static String TAKESNAPBUTTON_TIME = "b";
-        public final static String TAKESNAPBUTTON_X = "o";//prev. n
-        public final static String TAKESNAPBUTTON_Y = "p";//prev. o
-        public final static String RECORDING_MESSAGE_HOOK_CLASS = "abc";
+        public final static String TAKESNAPBUTTON_X = "p";//prev. o
+        public final static String TAKESNAPBUTTON_Y = "q";//prev. p
+        public final static String RECORDING_MESSAGE_HOOK_CLASS = "crr";
         public final static String RECORDING_MESSAGE_HOOK_METHOD = "handleMessage";
     }
     public static class chat {
@@ -395,13 +395,13 @@ public class Obfuscator implements Serializable {
         public final static String CHAT_MESSAGE_BASE_CLASS = "aMj";
         public final static String CHAT_MESSAGE_DETAILS_CLASS = "aJE";
     }
-    public static class notification {
-        public final static String NOTIFICATION_CLASS_1 = "xH";//prev. vz
-        public final static String NOTIFICATION_CLASS_2 = "azz";//prev. ajh
+    public static class notification {//NEEDS REWORK
+        public final static String NOTIFICATION_CLASS_1 = "hgt$b.a.a";//prev. xH
+        public final static String NOTIFICATION_CLASS_2 = "iwf";//prev. azz
     }
-    public static class icons {
-        public final static String CAPTIONOPENED_CLASS = "TX";
-        public final static String CAPTIONOPENED_METHOD = "c";
+    public static class icons { //DONE
+        public final static String CAPTIONOPENED_CLASS = "cug";
+        public final static String CAPTIONOPENED_METHOD = "e";
     }
     public static class stories {
         public final static String RECENTSTORY_CLASS = "ahd";
@@ -446,12 +446,12 @@ public class Obfuscator implements Serializable {
         public final static String GETBUS_METHOD = "a";
         public final static String BUS_POST = "a";
     }
-    public static class navbar {
-        public final static String FORCENAVBAR_CLASS = "amv"; // prev. SM
-        public final static String FORCENAVBAR_METHOD = "a";
+    public static class navbar { //DONE
+        public final static String FORCENAVBAR_CLASS = "ioe"; // prev. amv
+        public final static String FORCENAVBAR_METHOD = "b";
     }
-    public static class paint{
-        public final static String LEGACYCANVASVIEW_A = "OF";
+    public static class paint{ //DONE
+        public final static String LEGACYCANVASVIEW_A = "gpl"; //NEW CONSTRUCTOR
     }
     public static class flash {
         public final static String ISVISIBLE_FIELD = "mIsVisible";
@@ -471,14 +471,14 @@ public class Obfuscator implements Serializable {
         public final static String IS_IT_ME_METHOD = "n";//prev. k
         public final static String GET_FRIENDMOJI_STRING_METHOD = "q";//Prev. o
     }
-    public static class misc {
-        public final static String CAPTIONVIEW = "UA";
-        public final static String CAPTIONVIEW_TEXT_LIMITER = "d";
-        public final static String PREFERENCES_CLASS = "SU";
-        public final static String GETUSERNAME_METHOD = "C";
+    public static class misc { //DONE
+        public final static String CAPTIONVIEW = "hmv";
+        public final static String CAPTIONVIEW_TEXT_LIMITER = "c";
+        public final static String PREFERENCES_CLASS = "com.snapchat.android.app.shared.persistence.UserPrefs";
+        public final static String GETUSERNAME_METHOD = "M";
 
-        public final static String ADVANCE_TYPE_CLASS = "aFl";
-        public final static String NO_AUTO_ADVANCE_OBJECT = "a";
+        public final static String ADVANCE_TYPE_CLASS = "klj";
+        public final static String NO_AUTO_ADVANCE_OBJECT = "a"; //???
     }
     public static class premium{
         public final static String SNAP_UPDATE_CLASS = "zT";
