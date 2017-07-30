@@ -739,7 +739,7 @@ public class HookMethods
         });
         //Used to emulate the battery status as being FULL -> above 90%
         final Class<?> batteryInfoProviderEnum =
-                findClass("com.snapchat.android.app.shared.feature.preview.model.filter.BatteryLevel", lpparam.classLoader); //prev. com.snapchat.android.app.shared.model.filter.BatteryLevel
+                findClass("iif", lpparam.classLoader); //prev. com.snapchat.android.app.shared.model.filter.BatteryLevel
 
         findAndHookMethod(Obfuscator.spoofing.BATTERY_FILTER, lpparam.classLoader, "a", new XC_MethodHook() {
             @Override

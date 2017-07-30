@@ -78,7 +78,6 @@ public class Saving {
     };
     private static String currentSnapKey;
     private static Context relativeContext;
-    private static Object enum_NO_AUTO_ADVANCE;
     private static GestureEvent gestureEvent;
     private static boolean gestureCalledInternally = false;
 
@@ -92,9 +91,6 @@ public class Saving {
             final ClassLoader cl = lpparam.classLoader;
 
             final Class storyClass = findClass(Obfuscator.save.STORYSNAP_CLASS, cl);
-            Class AdvanceType = findClass(Obfuscator.misc.ADVANCE_TYPE_CLASS, cl);
-            enum_NO_AUTO_ADVANCE = getStaticObjectField(AdvanceType, Obfuscator.misc.NO_AUTO_ADVANCE_OBJECT);
-
             /**
              * Called whenever a video is decrypted by snapchat
              * Will pre-load the next snap in the list
@@ -353,9 +349,7 @@ public class Saving {
 
                         String key = (String) param.args[0];
                         //Logger.log("aGgkey: " + key);
-                        if (Preferences.getBool(Prefs.AUTO_ADVANCE) && key.equals("auto_advance_mode"))
-                            param.args[1] = enum_NO_AUTO_ADVANCE;
-                        else if (Preferences.getInt(Prefs.TIMER_MINIMUM) !=
+                        if (Preferences.getInt(Prefs.TIMER_MINIMUM) !=
                                 Preferences.TIMER_MINIMUM_DISABLED && key.equals("total_duration_sec")) {
                             param.args[1] = 9999;
                         }

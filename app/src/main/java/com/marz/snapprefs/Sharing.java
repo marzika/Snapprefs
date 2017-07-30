@@ -213,8 +213,8 @@ public class Sharing {
                     }
                 });*/
 
-                Class<?> TAKE_PHOTO_METHOD = findClass(Obfuscator.sharing.TAKE_PHOTO_METHOD, lpparam.classLoader);
-                findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Bitmap.class, TAKE_PHOTO_METHOD, new XC_MethodHook() {
+                Class<?> bhu_a = findClass("bhu.a", lpparam.classLoader);
+                findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Bitmap.class, long.class, boolean.class, int.class, bhu_a, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         param.args[0] = mediaImg.getContent();
@@ -231,7 +231,8 @@ public class Sharing {
                         setObjectField(getObjectField(Ue, "mMediabryo"), "mSnapType", snapType);
                     }
                 });*/
-                findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Uri.class, int.class, boolean.class, new XC_MethodHook() {
+                Class<?> kss = findClass("kss", lpparam.classLoader);
+                findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "a", Uri.class, int.class, boolean.class, kss, long.class, new XC_MethodHook() {
                     @Override
                     protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                         param.args[0] = mediaVid.getContent();

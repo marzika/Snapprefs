@@ -41,8 +41,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 
 public class Obfuscator implements Serializable {
-    public static int SUPPORTED_VERSION_CODE = 847;
-    public final static String SUPPORTED_VERSION_CODENAME = "9.39.5.0";
+    public static int SUPPORTED_VERSION_CODE = 1161;
+    public final static String SUPPORTED_VERSION_CODENAME = "10.13.5.0";
     public final static String ROOTDETECTOR_CLASS = "aAY";//prev. ali
     public final static String[] ROOTDETECTOR_METHODS= {"b", "c", "d", "e"};
     public final static String FRIENDS_BF= "l";//prev. j
@@ -242,17 +242,15 @@ public class Obfuscator implements Serializable {
         public final static String STORYPRELOAD_CLASS = "aaF";
         public final static String STORYPRELOAD_METHOD = "H_";
     }
-    public static class spoofing {
-        //SpeedometerView class
-        public final static String SPEEDOMETERVIEW_CLASS = "awa";
-        //SpeedometerView.setSpeed(Float)
+    public static class spoofing { //done exccept weather
+        public final static String SPEEDOMETERVIEW_CLASS = "cjo";
         public final static String SPEEDOMETERVIEW_SETSPEED = "a";
-        public final static String LOCATION_CLASS = "Rm";
-        public final static String LOCATION_GETLOCATION = "a";
-        public final static String LOCATION_GETLOCATION_PARAM = "Rl";
-        public final static String WEATHER_CLASS = "apy";
+        public final static String LOCATION_CLASS = "com.snapchat.android.app.shared.location.CurrentLocationProvider";
+        public final static String LOCATION_GETLOCATION = "b";
+        public final static String LOCATION_GETLOCATION_PARAM = "ivw";
+        public final static String WEATHER_CLASS = "apy"; //rxz must be rewritten
         public final static String WEATHER_FIRST = "aPd";
-        public final static String BATTERY_FILTER = "Pc";
+        public final static String BATTERY_FILTER = "ijl";
         public final static String BATTERY_FULL_ENUM = "FULL";
     }
     public static class select {
@@ -277,9 +275,9 @@ public class Obfuscator implements Serializable {
         //PostToVenue class
         public final static String POSTTOVENUE_CLASS = "apb";//prev. Vp
     }
-    public static class sharing {
+    public static class sharing { //done
         //cameraStateEvent class
-        public final static String CAMERASTATEEVENT_CLASS = "azr";
+        public final static String CAMERASTATEEVENT_CLASS = "bhh";
         //snapCapturedEvent class
         public final static String SNAPCAPTUREDEVENT_CLASS = "bhv"; //prev. bhv, bfy ->from LandingPageActivity$8
         //snapCaptureContext class
@@ -354,16 +352,16 @@ public class Obfuscator implements Serializable {
         public static final String VISUAL_FILTER_TYPE_CHECK_METHOD = "c";
         public static final String VISUAL_FILTER_TYPE_CHECK_METHOD_PARAMETER_CLASS = "Oi";
     }
-    public static class timer {
+    public static class timer { //done except longer recording
         public final static String TAKESNAPBUTTON_CLASS = "com.snapchat.android.ui.camera.TakeSnapButton";
         public final static String TAKESNAPBUTTON_ONDRAW = "onDraw";
         public final static String TAKESNAPBUTTON_BLEAN1 = "c";
         public final static String TAKESNAPBUTTON_BLEAN2 = "e";
         public final static String TAKESNAPBUTTON_TIME = "b";
-        public final static String TAKESNAPBUTTON_X = "o";//prev. n
-        public final static String TAKESNAPBUTTON_Y = "p";//prev. o
-        public final static String RECORDING_MESSAGE_HOOK_CLASS = "abc";
-        public final static String RECORDING_MESSAGE_HOOK_METHOD = "handleMessage";
+        public final static String TAKESNAPBUTTON_X = "p";//prev. o
+        public final static String TAKESNAPBUTTON_Y = "q";//prev. p
+        public final static String RECORDING_MESSAGE_HOOK_CLASS = "cdy";//abc
+        public final static String RECORDING_MESSAGE_HOOK_METHOD = "b";//handleMessage(Message)
     }
     public static class chat {
         public final static String CHAT_CLASS = "Ie";
@@ -446,9 +444,9 @@ public class Obfuscator implements Serializable {
         public final static String GETBUS_METHOD = "a";
         public final static String BUS_POST = "a";
     }
-    public static class navbar {
-        public final static String FORCENAVBAR_CLASS = "amv"; // prev. SM
-        public final static String FORCENAVBAR_METHOD = "a";
+    public static class navbar { //done
+        public final static String FORCENAVBAR_CLASS = "krk"; // prev. amv
+        public final static String FORCENAVBAR_METHOD = "b";
     }
     public static class paint{
         public final static String LEGACYCANVASVIEW_A = "OF";
@@ -471,14 +469,11 @@ public class Obfuscator implements Serializable {
         public final static String IS_IT_ME_METHOD = "n";//prev. k
         public final static String GET_FRIENDMOJI_STRING_METHOD = "q";//Prev. o
     }
-    public static class misc {
-        public final static String CAPTIONVIEW = "UA";
-        public final static String CAPTIONVIEW_TEXT_LIMITER = "d";
-        public final static String PREFERENCES_CLASS = "SU";
-        public final static String GETUSERNAME_METHOD = "C";
-
-        public final static String ADVANCE_TYPE_CLASS = "aFl";
-        public final static String NO_AUTO_ADVANCE_OBJECT = "a";
+    public static class misc { //DONE
+        public final static String CAPTIONVIEW = "jmj";
+        public final static String CAPTIONVIEW_TEXT_LIMITER = "c";
+        public final static String PREFERENCES_CLASS = "com.snapchat.android.app.shared.persistence.UserPrefs";
+        public final static String GETUSERNAME_METHOD = "U";
     }
     public static class premium{
         public final static String SNAP_UPDATE_CLASS = "zT";
