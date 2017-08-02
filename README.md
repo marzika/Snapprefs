@@ -1,6 +1,6 @@
 Snapprefs - (Current Supported Version: 10.13.5.0)
 =========
-[![Build Status](http://www.snapprefs-builds.com/job/SNAPPREFS%20-%20Official%20-%20stable/badge/icon)](http://www.snapprefs-builds.com/job/SNAPPREFS%20-%20Official%20-%20stable/) [![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
+[![Join the chat on Slack](https://snapprefs-dev2.herokuapp.com/badge.svg)](https://snapprefs-dev.herokuapp.com)
 
 Overview
 -------
