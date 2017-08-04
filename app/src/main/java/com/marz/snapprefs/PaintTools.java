@@ -88,18 +88,18 @@ public class PaintTools {
 
     public static void initPaint(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources mResources) {
         final Bitmap[] background = new Bitmap[1];
-        findAndHookConstructor("com.snapchat.android.model.Mediabryo", lpparam.classLoader, findClass("com.snapchat.android.model.Mediabryo$a", lpparam.classLoader), new XC_MethodHook() {
+        findAndHookConstructor("iyd", lpparam.classLoader, findClass("iyd$a", lpparam.classLoader), new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                background[0] = (Bitmap) getObjectField(param.thisObject, "mRawImageBitmap");
+                background[0] = (Bitmap) getObjectField(param.thisObject, "aM"); //Mediabryo.mRawImageBitmap
             }
         });
         colorList.add(Color.RED);
         //Use method for setting last point
-        XposedHelpers.findAndHookMethod("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, "a", float.class, float.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.snapchat.android.app.feature.creativetools.drawing.SnapCanvasView", lpparam.classLoader, "a", float.class, float.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Object i = XposedHelpers.getObjectField(param.thisObject, "j");
+                Object i = XposedHelpers.getObjectField(XposedHelpers.getObjectField(param.thisObject, "a"), "m");
                 if (i != null && type != null && type != DrawingType.DEFAULT) {//only if there is object being drawn
                     XposedHelpers.callMethod(i, "b", param.args[0], param.args[1]);//was a
                 }
@@ -166,7 +166,7 @@ public class PaintTools {
             }
         });
 
-        XposedHelpers.findAndHookConstructor("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, Context.class, boolean.class,new XC_MethodHook() {
+        XposedHelpers.findAndHookConstructor("com.snapchat.android.app.feature.creativetools.drawing.SnapCanvasView", lpparam.classLoader, Context.class, boolean.class,new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (param.args[0] != null) {
@@ -176,8 +176,7 @@ public class PaintTools {
                 }
             }
         });
-        Class<?> legacyCanvasView = findClass("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader);
-        XposedHelpers.findAndHookConstructor(Obfuscator.paint.LEGACYCANVASVIEW_A, lpparam.classLoader, int.class, float.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookConstructor(Obfuscator.paint.LEGACYCANVASVIEW_A, lpparam.classLoader, int.class, float.class, float.class, float.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 Logger.log("CanvasView - ORIGINAL, setColor: " + param.args[0] + " setStrokeWidth: " + param.args[1], true);
@@ -222,11 +221,13 @@ public class PaintTools {
             }
         });
 
-        findAndHookMethod("com.snapchat.android.analytics.AnalyticsEvents", lpparam.classLoader, "h", new XC_MethodHook() {
+        findAndHookMethod("com.snapchat.android.app.main.preview.SnapPreviewFragment", lpparam.classLoader, "h", boolean.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                boolean blean = (boolean) param.args[0];
                 try{
-                    outerOptionsLayout.setVisibility(View.VISIBLE);
+                    if(blean)
+                        outerOptionsLayout.setVisibility(View.VISIBLE);
                 }catch (NullPointerException ignore){
                     //This method is being called on every button press, before the ColorPickerView constructor is called for the first time
                     //Therefore the first press after the capture will throw a NPE
@@ -234,7 +235,7 @@ public class PaintTools {
             }
         });
         once = false;
-        XposedHelpers.findAndHookConstructor("com.snapchat.android.app.shared.feature.preview.ui.view.ColorPickerView", lpparam.classLoader, Context.class, AttributeSet.class, new XC_MethodHook() {
+        XposedHelpers.findAndHookConstructor("com.snapchat.android.app.shared.ui.view.ColorPickerView", lpparam.classLoader, Context.class, AttributeSet.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(final MethodHookParam param) throws Throwable {
                 if (!once){
@@ -258,7 +259,7 @@ public class PaintTools {
                 }
             }
         });
-        findAndHookMethod("com.snapchat.android.ui.LegacyCanvasView", lpparam.classLoader, "setColor", int.class, new XC_MethodHook() {
+        findAndHookMethod("cie", lpparam.classLoader, "a", int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 Logger.log("Called setColor: " + param.args[0], true);

@@ -228,21 +228,13 @@ public class Obfuscator implements Serializable {
         public final static String MCANONICALDISPLAYNAME = "mCanonicalDisplayTime";
     }
     public static class datasaving {
-        public final static String DSNAPDOWNLOADER_CLASS = "Df$a";//Prev. KL
+        public final static String DSNAPDOWNLOADER_CLASS = "cwk$b";
         public final static String DSNAPDOWNLOADER_DOWNLOADSNAP = "a";
-        public final static String DOWNLOADREQUEST_CLASS = "com.snapchat.android.app.shared.framework.network.manager";//prev. com.snapchat.android.networkmanager.DownloadRequest
-        public final static String DYNAMICBYTEBUFFER_CLASS = "aku";
-        public final static String DOWNLOADREQUEST_HOLDER_CLASS = "Qq";
-        public final static String NETWORKRESULT_CLASS = "Ae";
-        public final static String DSNAPDOWNLOAD_CLASS = "Df$a";//prev. KP$a
-        public final static String DSNAPDOWNLOAD_PARAM = "mz";//prev. mp
-        public final static String DSNAPINTRODOWNLOAD_CLASS = "Df$a";
-        public final static String LIVESTORYPRELOAD_CLASS = "asx";
-        public final static String LIVESTORYPRELOAD_METHOD = "d";
-        public final static String STORYPRELOAD_CLASS = "aaF";
-        public final static String STORYPRELOAD_METHOD = "H_";
+        public final static String DOWNLOADREQUEST_HOLDER_CLASS = "kod";
+        public final static String LIVESTORYPRELOAD_CLASS = "bod";
+        public final static String LIVESTORYPRELOAD_METHOD = "f";
     }
-    public static class spoofing { //done exccept weather
+    public static class spoofing { //done except weather
         public final static String SPEEDOMETERVIEW_CLASS = "cjo";
         public final static String SPEEDOMETERVIEW_SETSPEED = "a";
         public final static String LOCATION_CLASS = "com.snapchat.android.app.shared.location.CurrentLocationProvider";
@@ -331,7 +323,7 @@ public class Obfuscator implements Serializable {
         public static int BATTERY_ICON = 2131689687;
         public final static String SNAPCHAPTUREDEVENT_CLASS = "";
     }
-    public class visualfilters {
+    public static class visualfilters {
         public static final String FILTERS_CLASS = "On";//prev. afg
         public static final String FILTERSLOADER_CLASS = "awB";//prev. afh
         public static final String FILTERSLOADER_2_CLASS = "awH";//prev. afn
@@ -448,20 +440,20 @@ public class Obfuscator implements Serializable {
         public final static String FORCENAVBAR_CLASS = "krk"; // prev. amv
         public final static String FORCENAVBAR_METHOD = "b";
     }
-    public static class paint{
-        public final static String LEGACYCANVASVIEW_A = "OF";
+    public static class paint{ //done
+        public final static String LEGACYCANVASVIEW_A = "ihj";
     }
     public static class flash {
-        public final static String ISVISIBLE_FIELD = "mIsVisible";
-        public final static String SWIPELAYOUT_FIELD = "p";//prev. n
-        public final static String GETRESID_OBJECT = "g";//prev. e
-        public final static String ISSCROLLED_METHOD = "c";
-        public final static String KEYEVENT_CLASS = "Xk";//prev. CX
+        public final static String ISVISIBLE_FIELD = "V"; //mIsVisible
+        public final static String SWIPELAYOUT_FIELD = "q";//prev. p
+        public final static String GETRESID_OBJECT = "i";//prev. g
+        public final static String ISSCROLLED_METHOD = "d"; //prev. c
+        public final static String KEYEVENT_CLASS = "jtf";
         public final static String KEYCODE_FIELD = "a";
-        public final static String FLASH_METHOD = "a";//prev. b
-        public final static String OVERLAY_FIELD = "z";//prev. y
+        public final static String FLASH_METHOD = "a";
+        public final static String OVERLAY_FIELD = "R";//prev. y
     }
-    public static class friendmojis {
+    public static class friendmojis { //unneeded?
         public final static String ON_FRIENDS_UPDATE_METHOD = "u";//prev. w
         public final static String FRIEND_MANAGER_CLASS = "com.snapchat.android.model.FriendManager";
         public final static String FRIENDS_MAP_FIELD = "mOutgoingFriendsListMap";

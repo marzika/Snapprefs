@@ -653,7 +653,6 @@ public class HookMethods
                     if (Preferences.getBool(Prefs.SELECT_ALL)) {
                         HookSendList.initSelectAll(lpparam);
                     }
-                    //Completed 9.39.5
                     findAndHookMethod("com.snapchat.android.camera.CameraFragment", lpparam.classLoader, "onKeyDownEvent", XposedHelpers.findClass(Obfuscator.flash.KEYEVENT_CLASS, lpparam.classLoader), new XC_MethodHook() {
                         public boolean frontFlash = false;
                         public long lastChange = System.currentTimeMillis();
