@@ -61,88 +61,16 @@ public class Stickers {
     static void initStickers(final XC_LoadPackage.LoadPackageParam lpparam, final XModuleResources modRes, final Context snapContext) {
 
         initEmojiNames();//init unicode-cool name map
-        //List single emojis
-        /*File myFile = new File(Environment.getExternalStorageDirectory() + "/Snapprefs/Stickers/");
-        File[] files = myFile.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String filename) {
-                return filename.endsWith(".svg") && new File(dir, filename.substring(0, filename.lastIndexOf(".")) + ".png").exists();
-            }
-        });
-
-        if( files == null )
-
-        for (File f : files) {
-            String s = f.getName().substring(0, f.getName().lastIndexOf("."));
-            existing.add(s);
-        }
-        //This method loads contents of a zip
-        XposedHelpers.findAndHookMethod(Obfuscator.stickers.ASSETREADER_CLASS, lpparam.classLoader, Obfuscator.stickers.ASSETREADER_READ, new XC_MethodReplacement() {
-            @Override
-            protected Object replaceHookedMethod(MethodHookParam methodHookParam) throws Throwable {
-                if (XposedHelpers.getBooleanField(methodHookParam.thisObject, "mIsUnzipped"))
-                    return null;
-                Context mContext = (Context) XposedHelpers.getObjectField(methodHookParam.thisObject, "mContext");
-                InputStream is = null;
-                try {
-                    XposedHelpers.callMethod(methodHookParam.thisObject, "b");
-                    is = mContext.getAssets().open((String) XposedHelpers.getObjectField(methodHookParam.thisObject, "mPath"));
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                }
-                ZipInputStream zis = new ZipInputStream(is);
-                ZipEntry entry;
-                ByteArrayOutputStream output = new ByteArrayOutputStream();
-                HashMap mAssets = (HashMap) XposedHelpers.getObjectField(methodHookParam.thisObject, "mAssets");
-                while ((entry = zis.getNextEntry()) != null) {
-                    String coolName = entry.getName().substring(0, entry.getName().lastIndexOf("."));
-                    String type = entry.getName().substring(entry.getName().lastIndexOf("."));
-                    String unicodeName = coolName;
-                    int length = 0;
-                    if (emojiNames.containsKey(coolName)) {
-                        unicodeName = emojiNames.get(coolName);
-                    } else {
-                        coolName = emojiNames.getByValue(unicodeName);
-                    }
-                    if (existing.contains(unicodeName)) {
-                        byte[] bytes = readFile(unicodeName + type);
-                        output.write(bytes, 0, bytes.length);
-                    } else if (existing.contains(coolName)) {
-                        byte[] bytes = readFile(coolName + type);
-                        output.write(bytes, 0, bytes.length);
-                    } else {
-                        int i;
-                        byte[] buffer = new byte[100000];
-                        while ((i = zis.read(buffer)) > 0) {
-                            length += i;
-                            output.write(buffer, 0, i);
-                        }
-                    }
-                    mAssets.put(unicodeName + type, output.toByteArray());
-                }
-                output.close();
-                zis.close();
-                is.close();
-                XposedHelpers.setBooleanField(methodHookParam.thisObject, "mIsUnzipped", true);
-                AtomicBoolean mIsUnzipping = (AtomicBoolean) XposedHelpers.getObjectField(methodHookParam.thisObject, "mIsUnzipping");
-                mIsUnzipping.set(false);
-                synchronized (mIsUnzipping) {
-                    XposedHelpers.callMethod(mIsUnzipping, "notifyAll");
-                }
-
-                return null;
-            }
-        });*/
 
         //TODO: Vj = regular emoji sticker
         //TODO: Vj.k -> akQ = aet
         //TODO: akQ.f -> akV = agm aka FastZippedAssetReader -- MINOR REFACTOR HERE
-        XposedHelpers.findAndHookMethod("Vu", lpparam.classLoader, "a", MotionEvent.class, new XC_MethodHook() {
+        /*XposedHelpers.findAndHookMethod("cri", lpparam.classLoader, "a", MotionEvent.class, new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable { //Vu.a
                 if (XposedHelpers.getAdditionalInstanceField(param.thisObject, "scale") == null)
                     XposedHelpers.setAdditionalInstanceField(param.thisObject, "scale", 1.0F);
-                ImageView previevStickerView = (ImageView) XposedHelpers.getObjectField(param.thisObject, "f");
+                ImageView previevStickerView = (ImageView) XposedHelpers.getObjectField(param.thisObject, "g");
                 float diff = previevStickerView.getScaleY() - (float) XposedHelpers.getAdditionalInstanceField(param.thisObject, "scale");
                 if (diff > .5F && !isResizing) {
                     XposedHelpers.setAdditionalInstanceField(param.thisObject, "scale", previevStickerView.getScaleY());
@@ -163,7 +91,7 @@ public class Stickers {
                     new ResizeTask(previevStickerView, svg, emoji).execute();
                 }
             }
-        });
+        });*/
 
         findAndHookMethod("android.content.res.AssetManager", lpparam.classLoader, "open", String.class, new XC_MethodHook() {
             @Override

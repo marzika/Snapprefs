@@ -77,6 +77,9 @@ import static com.marz.snapprefs.Dialogs.rColor;
 import static de.robv.android.xposed.XposedHelpers.callMethod;
 import static de.robv.android.xposed.XposedHelpers.findAndHookConstructor;
 import static de.robv.android.xposed.XposedHelpers.findAndHookMethod;
+import static de.robv.android.xposed.XposedHelpers.findClass;
+import static de.robv.android.xposed.XposedHelpers.getObjectField;
+import static de.robv.android.xposed.XposedHelpers.getStaticObjectField;
 import static de.robv.android.xposed.XposedHelpers.setAdditionalInstanceField;
 
 /**
@@ -96,7 +99,7 @@ public class HookedLayouts {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 TableLayout navigation =
-                        (TableLayout) ((LinearLayout) XposedHelpers.getObjectField(param.thisObject, "z")).getChildAt(0);//prev. C
+                        (TableLayout) ((LinearLayout) getObjectField(param.thisObject, "z")).getChildAt(0);//prev. C
                 ImageView orig =
                         (ImageView) ((TableRow) navigation.getChildAt(0)).getChildAt(0);
                 TextView orig1 =
@@ -569,16 +572,19 @@ public class HookedLayouts {
     }
 
     public static void initVisiblity(XC_LoadPackage.LoadPackageParam lpparam) {
-        XC_MethodHook hideLayout = new XC_MethodHook() {
+        //a(cto cto, boolean z, boolean z2, boolean z3)
+        //cto = enum of current event
+        final Class<?> cto = findClass("cto", lpparam.classLoader);
+        findAndHookMethod("csx", lpparam.classLoader, "a", cto, boolean.class, boolean.class, boolean.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                if (outerOptionsLayout != null)
-                    outerOptionsLayout.setVisibility(View.GONE);
+                Object sticker_picker = getStaticObjectField(cto, "STICKER_PICKER");
+                Object caption = getStaticObjectField(cto, "CAPTION");
+                if(param.args[0] == sticker_picker || param.args[0] == caption)
+                    if (outerOptionsLayout != null)
+                        outerOptionsLayout.setVisibility(View.GONE);
             }
-        };
-        findAndHookMethod("com.snapchat.android.app.shared.analytics.ui.StickerPickerAnalytics", lpparam.classLoader, "b", hideLayout);//prev. a
-        //TODO Find the new representation of this method - DONE?
-        findAndHookMethod(Obfuscator.icons.CAPTIONOPENED_CLASS, lpparam.classLoader, Obfuscator.icons.CAPTIONOPENED_METHOD, hideLayout);
+        });
     }
 
     private static class OptionsAdapter extends BaseAdapter {

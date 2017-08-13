@@ -296,7 +296,7 @@ public class Obfuscator implements Serializable {
         public final static String AUTHENTICATION_CLASS = "arS";//prev. Zq
         public final static String SIGNITURE_CHECK_METHOD = "a";
     }
-    public static class stickers {
+    /*public static class stickers { //Stickers are already hq
         //FastZippedAssetReader class
         public final static String ASSETREADER_CLASS = "agm";
         //FastZippedAssetReader.a
@@ -305,44 +305,41 @@ public class Obfuscator implements Serializable {
         public final static String ASSETREADER_READ = "a";
         //SVG class
         public final static String SVG_CLASS = "hc";//prev gZ
-    }
-    public static class filters {
+    }*/
+    public static class filters { //done
         //FilterLoader class
-        public final static String LOADER_CLASS = "axf";//prev. afM
+        public final static String LOADER_CLASS = "cis";//prev. axf
         //FilterLoader First Param
-        public final static String LOADER_FIRST = "amH";//prev. SP
+        public final static String LOADER_FIRST = "kuj";//prev. amH
         //added instance
-        public final static String FILTER_CLASS = "avV";//prev. adG
+        public final static String FILTER_CLASS = "cji";//prev. avV
         //called Object
-        public final static String OBJECT_CLASS = "awU";//prev. afy
-        //onSnapCapturedEvent first param
-        public final static String CAPTURED_FIRST = "azW";//prev. ajD
+        public final static String OBJECT_CLASS = "ckx";//prev. awU
         //public.xml - battery_view
-        public static int BATTERY_VIEW = 2130968600;
+        public static int BATTERY_VIEW = 2130968636;
         //public.xml - battery_icon
-        public static int BATTERY_ICON = 2131689687;
-        public final static String SNAPCHAPTUREDEVENT_CLASS = "";
+        public static int BATTERY_ICON = 2131888151;
     }
     public static class visualfilters {
-        public static final String FILTERS_CLASS = "On";//prev. afg
-        public static final String FILTERSLOADER_CLASS = "awB";//prev. afh
-        public static final String FILTERSLOADER_2_CLASS = "awH";//prev. afn
-        public static final String SETFILTER_B_CLASS = "sK";//prev. rA
-        public static final String GREYSCALE_CLASS = "axc";//prev. afJ
-        public static final String ADDFILTER_CLASS = "axd";//prev. afK
-        public static final String ADDFILTER_PARAM = "axa";//prev. afH
-        public static final String ADDER_3_PARAM = "awH";
-        public static final String ADDER_CLASS = "awC"; //prev. afi
-        public static final String ADDER_PARAM = "awL"; //prev afr
-        public static final String SNAPCHAPTUREDEVENT_CLASS = "azW";//prev. ajD
-        public static final String FILTERMETRICSPROVIDER_CLASS = "yo";
-        public static final String ANNOTATEDMEDIABRYO = "com.snapchat.android.model.AnnotatedMediabryo";
-        public static final String VISUALFILTERBASE = "awI";
-        public static final String FILTER_GETVIEW = "c";
-        public static final String BRYO_SNAPTYPE = "com.snapchat.android.app.feature.messaging.chat.type.SnapType";
-        public static final String VISUALFILTER_TYPE = "com.snapchat.android.app.shared.feature.preview.model.filter.VisualFilterType";
-        public static final String VISUAL_FILTER_TYPE_CHECK_METHOD = "c";
-        public static final String VISUAL_FILTER_TYPE_CHECK_METHOD_PARAMETER_CLASS = "Oi";
+        public static final String FILTERS_CLASS = "iig";//prev. On
+        public static final String FILTERSLOADER_CLASS = "awB";//prev. awB
+        public static final String FILTERSLOADER_2_CLASS = "ckl";//prev. awH
+        public static final String SETFILTER_B_CLASS = "ala";//prev. sK
+        public static final String GREYSCALE_CLASS = "clk";//prev. axc
+        public static final String ADDFILTER_CLASS = "cll";//prev. axd
+        public static final String ADDFILTER_PARAM = "clh";//prev. axa
+        public static final String ADDER_3_PARAM = "ckl"; //prev. awH
+        public static final String ADDER_CLASS = "ckf"; //prev. awC
+        public static final String ADDER_PARAM = "cko"; //prev awL
+        public static final String SNAPCHAPTUREDEVENT_CLASS = "azW";//prev. azW
+        public static final String FILTERMETRICSPROVIDER_CLASS = "igt"; //prev. yo
+        public static final String VISUALFILTERBASE = "awI"; //prev. awI
+        public static final String FILTER_GETVIEW = "c"; //prev. c
+        public static final String BRYO_SNAPTYPE = "gjx"; //SnapType
+        public static final String VISUALFILTER_TYPE = "com.snapchat.android.app.shared.feature.preview.model.filter.VisualFilterType"; //VisualFilterType
+        public static final String VISUAL_FILTER_TYPE_CHECK_METHOD = "d"; //prev. c
+        public static final String VISUAL_FILTER_TYPE_CHECK_METHOD_PARAMETER_CLASS = "igs";//prev. Oi
+        public static final String last_param = "iyd";
     }
     public static class timer { //done except longer recording
         public final static String TAKESNAPBUTTON_CLASS = "com.snapchat.android.ui.camera.TakeSnapButton";
@@ -389,10 +386,10 @@ public class Obfuscator implements Serializable {
         public final static String NOTIFICATION_CLASS_1 = "xH";//prev. vz
         public final static String NOTIFICATION_CLASS_2 = "azz";//prev. ajh
     }
-    public static class icons {
+    /*public static class icons {
         public final static String CAPTIONOPENED_CLASS = "TX";
         public final static String CAPTIONOPENED_METHOD = "c";
-    }
+    }*/
     public static class stories {
         public final static String RECENTSTORY_CLASS = "ahd";
         public final static String RECENTSTORY_GETUSERNAME = "d";
@@ -405,22 +402,12 @@ public class Obfuscator implements Serializable {
         public final static String STORIES_FRAGMENT_POPULATEARRAY = "c";
         public final static String FRIENDMANAGER_CLASS = "com.snapchat.android.model.FriendManager";
         public final static String FRIENDMANAGER_RETURNINSTANCE = "h";
-        //public final static String DISCOVERSTORY_CLASS = "aay"; new story type "featured?" TODO: look into it
-        //search for "AUTO_ADVANCE_RECENT_UPDATES"
-        public final static String AUTOADVANCE_CLASS2 = "atJ";
-        public final static String AUTOADVANCE_METHOD2 = "a";
-        public final static String AUTOADVANCE_CLASS = "aty";
-        public final static String AUTOADVANCE_METHOD = "a";
-
-        public final static String TILE_HANDLER_CLASS = "atk";
-        public final static String GET_TILES_METHOD = "c";
 
         public final static String STORY_LOADER_CLASS = "ahm";
         public final static String SL_LOAD_METHOD = "a";
-        public final static String VIEWED_STORY_CLASS = "agD";
-        public final static String VS_FRIEND_OBJECT = "b";
     }
-    public static class groups {
+    //Already implemented in Snapchat
+    /*public static class groups {
         public final static String STORY_CLASS = "apb";//prev. Vp
         public final static String STORYARRAY_CLASS = "ase";//prev. Zx
         public final static String STORYARRAY_METHOD = "a";
@@ -435,7 +422,7 @@ public class Obfuscator implements Serializable {
         public final static String GETBUS_CLASS = "aju";//prev. RX
         public final static String GETBUS_METHOD = "a";
         public final static String BUS_POST = "a";
-    }
+    }*/
     public static class navbar { //done
         public final static String FORCENAVBAR_CLASS = "krk"; // prev. amv
         public final static String FORCENAVBAR_METHOD = "b";

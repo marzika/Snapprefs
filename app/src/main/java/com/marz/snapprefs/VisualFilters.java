@@ -141,6 +141,7 @@ public class VisualFilters {
             }
         });
         //change getName method of filters
+        //TODO: Find this
         findAndHookMethod(Obfuscator.visualfilters.VISUALFILTERBASE, lpparam.classLoader, "a", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -174,16 +175,24 @@ public class VisualFilters {
                     if (XposedHelpers.getAdditionalInstanceField(afh, FILTER_TYPE) != null) return;
                     Class<?> afn = lpparam.classLoader.loadClass(Obfuscator.visualfilters.FILTERSLOADER_2_CLASS);
                     Class<?> afi = lpparam.classLoader.loadClass(Obfuscator.visualfilters.ADDER_CLASS);
-                    Object grey = XposedHelpers.callStaticMethod(lpparam.classLoader.loadClass("com.snapchat.android.app.shared.feature.preview.model.filter.VisualFilterType"), "valueOf", "GREYSCALE");
+                    // ^^
+//                    iit[] iitArr = new iit[]{iit.SMOOTHING, iit.INSTASNAP, iit.MISS_ETIKATE, iit.GREYSCALE};
+//                    for (int i2 = 0; i2 < 4; i2++) {
+//                        iig a = this.q.a(this.i, iitArr[i2]);
+//                        if (a != null) {
+//                            this.d.a(new clh(a));
+//                        }
+//                    }
+                    Object grey = XposedHelpers.callStaticMethod(lpparam.classLoader.loadClass("iit"), "valueOf", "GREYSCALE"); //prev. com.snapchat.android.app.shared.feature.preview.model.filter.VisualFilterType
                     if (afn.isInstance(afh)) {
-                        Object visualFilterType = XposedHelpers.getObjectField(afh, "b");
+                        Object visualFilterType = XposedHelpers.getObjectField(afh, "a"); //prev. b
                         if (visualFilterType == grey) {
                             for (FilterType fType : FilterType.values()) {
                                 if (!fType.isEnabled()) continue;
                                 if(added.contains(fType.toString())){
                                     continue;
                                 }
-                                Object filter = XposedHelpers.newInstance(lpparam.classLoader.loadClass(Obfuscator.visualfilters.ADDER_3_PARAM), new Class[]{lpparam.classLoader.loadClass("com.snapchat.android.app.shared.feature.preview.model.filter.VisualFilterType")}, grey);
+                                Object filter = XposedHelpers.newInstance(lpparam.classLoader.loadClass(Obfuscator.visualfilters.ADDER_3_PARAM), new Class[]{lpparam.classLoader.loadClass("iit")}, grey); //prev. com.snapchat.android.app.shared.feature.preview.model.filter.VisualFilterType
                                 XposedHelpers.setAdditionalInstanceField(filter, FILTER_TYPE, fType);
                                 Object wrapper = XposedHelpers.newInstance(fk, new Class[]{lpparam.classLoader.loadClass(Obfuscator.visualfilters.FILTERS_CLASS)}, filter);
                                 XposedHelpers.callMethod(param.thisObject, "a", wrapper);
@@ -191,6 +200,8 @@ public class VisualFilters {
                             }
                         }
                     }
+
+                    //TODO: ˇˇmust be figured out
                     if (afi.isInstance(afh)) {
                         Object visualFilterType = XposedHelpers.getObjectField(afh, "b");
                         if (visualFilterType == grey) {
@@ -211,8 +222,10 @@ public class VisualFilters {
             }
         });
         //just picking context
-        Class <?> mediabryoSnapType = findClass(Obfuscator.visualfilters.BRYO_SNAPTYPE, lpparam.classLoader);
-        findAndHookMethod(Obfuscator.visualfilters.ADDER_PARAM, lpparam.classLoader, "a", boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, mediabryoSnapType, new XC_MethodHook() {
+        Class <?> snaptype = findClass(Obfuscator.visualfilters.BRYO_SNAPTYPE, lpparam.classLoader);
+        Class <?> last_param= findClass(Obfuscator.visualfilters.last_param, lpparam.classLoader);
+
+        findAndHookMethod(Obfuscator.visualfilters.ADDER_PARAM, lpparam.classLoader, "a", boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, boolean.class, snaptype, int.class, last_param, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 if (context == null) {
@@ -272,6 +285,7 @@ public class VisualFilters {
             }
         });
         //title nullifier
+        //TODO: Find this
         findAndHookMethod(Obfuscator.visualfilters.FILTERSLOADER_CLASS, lpparam.classLoader, "d", new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
